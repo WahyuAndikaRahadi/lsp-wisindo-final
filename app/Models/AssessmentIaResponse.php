@@ -19,7 +19,9 @@ class AssessmentIaResponse extends Model
         'score',
         'assessor_notes',
         'asesi_feedback',
+        'assessor_signature',
         'assessor_signed_at',
+        'asesi_signature',
         'asesi_signed_at',
     ];
 

@@ -441,4 +441,87 @@ class LspWorkflowIntegrationTest extends TestCase
         $this->assertEquals('Kompeten sesuai bukti lembar kertas.', $response->assessor_notes);
         $this->assertNotEmpty($response->data_json['evidence_image_path']);
     }
+
+    public function test_ia01b_productive_view_and_signature_saving(): void
+    {
+        $asesorUser = User::where('role', 'ASESOR')->first();
+        $asesiUser = User::where('role', 'ASESI')->first();
+        $admin = User::where('role', 'ADMIN_LSP')->first();
+        $scheme = Scheme::first();
+
+        $schedule = Schedule::create([
+            'scheme_id' => $scheme->id,
+            'name' => 'Jadwal IA01B Test',
+            'code' => 'SCH-IA01B-TEST-'.uniqid(),
+            'tuk_name' => 'TUK Otomotif Mandiri',
+            'date' => now()->toDateString(),
+            'start_time' => '08:00:00',
+            'end_time' => '16:00:00',
+            'selected_instruments' => ['IA01B'],
+            'status' => 'ACTIVE',
+            'created_by' => $admin->id,
+        ]);
+        $schedule->assessors()->syncWithoutDetaching([$asesorUser->id]);
+
+        $assessment = Assessment::create([
+            'asesi_id' => $asesiUser->id,
+            'schedule_id' => $schedule->id,
+            'scheme_id' => $scheme->id,
+            'apl_status' => 'APPROVED',
+        ]);
+
+        $sampleItems = [
+            ['measured' => '12.6 Volt', 'result' => 'SESUAI'],
+            ['measured' => '0.45 mm', 'result' => 'SESUAI'],
+            ['measured' => '1.80 mm', 'result' => 'TIDAK'],
+        ];
+
+        $iaResponse = AssessmentIaResponse::create([
+            'assessment_id' => $assessment->id,
+            'instrument_code' => 'IA01B',
+            'data_json' => ['items' => $sampleItems],
+            'assessor_notes' => 'Pemeriksaan dimensi celah katup melebihi limit spesifikasi.',
+            'assessor_signed_at' => now(),
+        ]);
+
+        // 1. Asesi views IA01B - must be productive table, NOT raw JSON
+        $viewRes = $this->actingAs($asesiUser)->get(
+            route('asesi.assessment.instrument.view', [$assessment, 'IA01B'])
+        );
+        $viewRes->assertOk();
+        $viewRes->assertSee('FR.IA.01B REPORT SHEET');
+        $viewRes->assertSee('Lembar Pemeriksaan');
+        $viewRes->assertSee('Total Item Ukur');
+        $viewRes->assertSee('12.6 Volt');
+        $viewRes->assertSee('SESUAI');
+        $viewRes->assertSee('TIDAK');
+        $viewRes->assertDontSee('items: [{"measured":');
+
+        // 2. Asesi signs and submits feedback (verifies no SQL column error)
+        $sigData = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+        $postRes = $this->actingAs($asesiUser)->post(
+            route('asesi.assessment.instrument.feedback', [$assessment, 'IA01B']),
+            [
+                'asesi_feedback' => 'Proses verifikasi pengukuran objektif dan jelas.',
+                'signature_data' => $sigData,
+            ]
+        );
+        $postRes->assertSessionHasNoErrors();
+        $postRes->assertRedirect();
+
+        // 3. Verify in database
+        $iaResponse->refresh();
+        $this->assertEquals('Proses verifikasi pengukuran objektif dan jelas.', $iaResponse->asesi_feedback);
+        $this->assertEquals($sigData, $iaResponse->asesi_signature);
+        $this->assertNotNull($iaResponse->asesi_signed_at);
+
+        // 4. Verify asesi viewing after signed displays signature and badge
+        $signedViewRes = $this->actingAs($asesiUser)->get(
+            route('asesi.assessment.instrument.view', [$assessment, 'IA01B'])
+        );
+        $signedViewRes->assertOk();
+        $signedViewRes->assertSee('✓ Sudah Ditandatangani');
+        $signedViewRes->assertSee('Proses verifikasi pengukuran objektif dan jelas.');
+        $signedViewRes->assertSee($sigData);
+    }
 }

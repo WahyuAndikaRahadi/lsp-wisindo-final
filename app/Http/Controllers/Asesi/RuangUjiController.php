@@ -70,14 +70,16 @@ class RuangUjiController extends Controller
     {
         abort_if($assessment->asesi_id !== auth()->id(), 403);
 
-        $assessment->load('schedule.scheme', 'iaResponses');
-        $response = $assessment->iaResponses->firstWhere('instrument_code', strtoupper($code));
+        $assessment->load('schedule.scheme.competencyUnits.elements.kuks', 'iaResponses', 'assessor');
+        $codeUpper = strtoupper($code);
+        $response = $assessment->iaResponses->firstWhere('instrument_code', $codeUpper);
         $scheme = $assessment->schedule->scheme;
         $reportSheetItems = $instrumentService->getReportSheetItems($scheme);
         $tpdData = $instrumentService->getTpdData($scheme);
         $pmoQuestions = $instrumentService->getPmoQuestions($scheme);
+        $units = $scheme->competencyUnits;
 
-        return view('asesi.ruang-uji.ia-view', compact('assessment', 'code', 'response', 'reportSheetItems', 'tpdData', 'pmoQuestions'));
+        return view('asesi.ruang-uji.ia-view', compact('assessment', 'code', 'codeUpper', 'response', 'scheme', 'reportSheetItems', 'tpdData', 'pmoQuestions', 'units'));
     }
 
     public function submitFeedback(Assessment $assessment, $code, Request $request): RedirectResponse
@@ -114,6 +116,12 @@ class RuangUjiController extends Controller
         if ($signature) {
             $response->asesi_signature = $signature;
             $response->asesi_signed_at = now();
+            if (empty($assessment->asesi_signature)) {
+                $assessment->update([
+                    'asesi_signature' => $signature,
+                    'asesi_signed_at' => now(),
+                ]);
+            }
         }
 
         $response->save();

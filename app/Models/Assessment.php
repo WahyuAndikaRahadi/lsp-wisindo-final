@@ -17,6 +17,10 @@ class Assessment extends Model
         'schedule_id',
         'asesi_id',
         'assessor_id',
+        'assessor_signature',
+        'assessor_signed_at',
+        'asesi_signature',
+        'asesi_signed_at',
         'apl_status',
         'apl_revision_notes',
         'last_active_step',
@@ -32,6 +36,8 @@ class Assessment extends Model
             'registered_at' => 'datetime',
             'approved_at' => 'datetime',
             'completed_at' => 'datetime',
+            'assessor_signed_at' => 'datetime',
+            'asesi_signed_at' => 'datetime',
         ];
     }
 
