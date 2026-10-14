@@ -79,7 +79,7 @@
                     </div>
 
                     <div class="mt-5 pt-4 border-t border-slate-100">
-                        <a href="{{ route('asesor.jadwal.asesi', $jadwal->id) }}" class="w-full inline-flex items-center justify-center px-4 py-2.5 text-xs font-black uppercase tracking-wider bg-brand-600 hover:bg-brand-700 text-white rounded-lg border-2 border-black shadow-[2px_2px_0_0_rgba(0,0,0,0.9)] transition">
+                        <a href="{{ route('asesor.jadwal.asesi', $jadwal->id) }}" class="w-full inline-flex items-center justify-center px-4 py-2.5 text-xs font-bold uppercase tracking-wider bg-brand-600 hover:bg-brand-700 text-white rounded-lg shadow-sm transition">
                             Masuk Asesmen &rarr;
                         </a>
                     </div>

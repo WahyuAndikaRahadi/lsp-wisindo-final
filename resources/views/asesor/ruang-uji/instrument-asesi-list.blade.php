@@ -20,7 +20,7 @@
         </div>
 
         <div class="flex items-center space-x-2">
-            <a href="{{ route('asesor.schedule.ruang-uji', $schedule->id) }}" class="px-4 py-2 text-xs font-bold bg-white text-slate-800 border-2 border-black rounded-lg shadow-[2px_2px_0_0_rgba(0,0,0,0.9)] hover:bg-slate-50 transition">
+            <a href="{{ route('asesor.schedule.ruang-uji', $schedule->id) }}" class="px-4 py-2 text-xs font-semibold bg-white text-slate-800 border border-slate-300 rounded-lg shadow-sm hover:bg-slate-50 transition">
                 Ganti Instrumen
             </a>
         </div>
@@ -28,23 +28,23 @@
 
     {{-- Meta Stats Bar --}}
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div class="bg-white rounded-xl border-2 border-black p-4 shadow-[2px_2px_0_0_rgba(0,0,0,0.9)]">
+        <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
             <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Peserta Asesi</span>
             <div class="text-2xl font-black text-slate-900 mt-0.5">{{ $asesiList->count() }} Orang</div>
         </div>
-        <div class="bg-white rounded-xl border-2 border-black p-4 shadow-[2px_2px_0_0_rgba(0,0,0,0.9)]">
+        <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
             <span class="text-xs font-bold text-emerald-600 uppercase tracking-wider">Sudah Dinilai / Selesai</span>
             <div class="text-2xl font-black text-emerald-600 mt-0.5">{{ $asesiList->where('is_completed', true)->count() }} Asesi</div>
         </div>
-        <div class="bg-white rounded-xl border-2 border-black p-4 shadow-[2px_2px_0_0_rgba(0,0,0,0.9)]">
+        <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
             <span class="text-xs font-bold text-amber-600 uppercase tracking-wider">Belum Dinilai</span>
             <div class="text-2xl font-black text-amber-600 mt-0.5">{{ $asesiList->where('is_completed', false)->count() }} Asesi</div>
         </div>
     </div>
 
     {{-- Asesi List Table --}}
-    <div class="bg-white rounded-xl border-2 border-black shadow-[2px_2px_0_0_rgba(0,0,0,0.9)] overflow-hidden">
-        <div class="px-6 py-4 border-b-2 border-black bg-slate-50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-200 bg-slate-50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
             <div>
                 <h2 class="text-base font-black text-slate-900">Daftar Asesi untuk {{ $meta['code'] }}</h2>
                 <p class="text-xs text-slate-500">Pilih asesi untuk memeriksa lembar hasil kerja dan memberikan penilaian</p>
@@ -122,7 +122,7 @@
                                 </td>
                                 <td class="px-6 py-4 text-right">
                                     <a href="{{ $item->inspect_url }}"
-                                       class="inline-flex items-center space-x-1.5 px-4 py-2 text-xs font-black {{ $item->is_completed ? 'bg-slate-900 hover:bg-slate-800 text-white' : 'bg-brand-600 hover:bg-brand-700 text-white' }} rounded-lg border-2 border-black shadow-[2px_2px_0_0_rgba(0,0,0,0.9)] transition">
+                                       class="inline-flex items-center space-x-1.5 px-4 py-2 text-xs font-bold {{ $item->is_completed ? 'bg-slate-900 hover:bg-slate-800 text-white' : 'bg-brand-600 hover:bg-brand-700 text-white' }} rounded-lg shadow-sm transition">
                                         <span>{{ $item->is_completed ? 'Tinjau / Ubah Penilaian' : 'Periksa Hasil Asesi' }}</span>
                                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>

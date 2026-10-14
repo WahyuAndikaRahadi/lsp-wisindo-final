@@ -38,6 +38,19 @@ class Schedule extends Model
         ];
     }
 
+    /**
+     * Get effective list of instruments, defaulting to full standard suite when empty.
+     */
+    public function getEffectiveInstruments(): array
+    {
+        $instruments = $this->selected_instruments;
+        if (! empty($instruments) && is_array($instruments)) {
+            return $instruments;
+        }
+
+        return ['AK01', 'IA01', 'IA01B', 'IA02', 'IA03', 'IA05'];
+    }
+
     public function scheme(): BelongsTo
     {
         return $this->belongsTo(Scheme::class);

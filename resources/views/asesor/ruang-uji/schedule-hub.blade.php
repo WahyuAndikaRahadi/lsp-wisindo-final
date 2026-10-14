@@ -16,18 +16,18 @@
             <p class="text-sm text-slate-500">Pilih instrumen asesmen untuk memeriksa dan menilai seluruh peserta uji</p>
         </div>
         <div class="flex items-center space-x-2">
-            <a href="{{ route('asesor.ak07.create', $schedule->id) }}" class="px-4 py-2 text-xs font-bold bg-white text-slate-800 border-2 border-slate-900 rounded-lg shadow-[2px_2px_0_0_rgba(0,0,0,0.9)] hover:bg-slate-50 transition">
+            <a href="{{ route('asesor.ak07.create', $schedule->id) }}" class="px-4 py-2 text-xs font-semibold bg-white text-slate-800 border border-slate-300 rounded-lg shadow-sm hover:bg-slate-50 transition">
                 FR.AK07 Penyesuaian
             </a>
-            <a href="{{ route('asesor.jadwal.asesi', $schedule->id) }}" class="px-4 py-2 text-xs font-bold bg-slate-900 text-white rounded-lg shadow-[2px_2px_0_0_rgba(0,0,0,0.9)] hover:bg-slate-800 transition">
+            <a href="{{ route('asesor.jadwal.asesi', $schedule->id) }}" class="px-4 py-2 text-xs font-semibold bg-slate-900 text-white rounded-lg shadow-sm hover:bg-slate-800 transition">
                 Daftar Asesi ({{ $totalAsesi }})
             </a>
         </div>
     </div>
 
     {{-- Schedule Details Card --}}
-    <div class="bg-white rounded-xl border-2 border-black p-6 shadow-[2px_2px_0_0_rgba(0,0,0,0.9)]">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+    <div class="bg-white rounded-xl border border-slate-200 p-5 sm:p-6 shadow-sm">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
             <div>
                 <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Skema Sertifikasi</span>
                 <p class="text-slate-900 font-bold mt-1 text-sm">{{ $schedule->scheme->name }}</p>
@@ -64,19 +64,19 @@
     {{-- Grid of Selected Instruments --}}
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         @forelse($instruments as $inst)
-            <div class="bg-white rounded-xl border-2 border-black p-5 shadow-[2px_2px_0_0_rgba(0,0,0,0.9)] flex flex-col justify-between hover:translate-x-0.5 hover:translate-y-0.5 transition">
+            <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm flex flex-col justify-between hover:shadow-md transition">
                 <div class="space-y-3">
                     <div class="flex items-center justify-between">
-                        <span class="font-mono text-xs font-black px-2.5 py-1 rounded border-2 border-black {{ $inst['badge_color'] }}">
+                        <span class="font-mono text-xs font-bold px-2.5 py-1 rounded border {{ $inst['badge_color'] }}">
                             {{ $inst['code'] }}
                         </span>
-                        <span class="text-xs font-bold text-slate-600 bg-slate-100 px-2 py-0.5 rounded border border-slate-300">
+                        <span class="text-xs font-semibold text-slate-600 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
                             {{ $inst['badge'] }}
                         </span>
                     </div>
 
                     <div>
-                        <h3 class="text-base font-black text-slate-900 leading-snug">{{ $inst['title'] }}</h3>
+                        <h3 class="text-base font-bold text-slate-900 leading-snug">{{ $inst['title'] }}</h3>
                         <p class="text-xs text-slate-600 mt-1.5 leading-relaxed">{{ $inst['desc'] }}</p>
                     </div>
 
@@ -86,15 +86,15 @@
                             <span class="text-slate-600">Progres Penilaian</span>
                             <span class="text-slate-900 font-bold">{{ $inst['completed_count'] }} / {{ $inst['total_asesi'] }} Asesi</span>
                         </div>
-                        <div class="w-full bg-slate-100 rounded-full h-2 border border-slate-300 overflow-hidden">
+                        <div class="w-full bg-slate-100 rounded-full h-2 border border-slate-200 overflow-hidden">
                             <div class="bg-brand-600 h-2 rounded-full transition-all" style="width: {{ $inst['percentage'] }}%"></div>
                         </div>
                     </div>
                 </div>
 
-                <div class="pt-5 mt-4 border-t border-slate-200">
+                <div class="pt-5 mt-4 border-t border-slate-100">
                     <a href="{{ route('asesor.schedule.instrument', ['schedule' => $schedule->id, 'code' => $inst['route_code']]) }}"
-                       class="w-full flex items-center justify-center space-x-2 px-4 py-2.5 text-xs font-black bg-brand-600 hover:bg-brand-700 text-white rounded-lg border-2 border-black shadow-[2px_2px_0_0_rgba(0,0,0,0.9)] transition">
+                       class="w-full flex items-center justify-center space-x-2 px-4 py-2.5 text-xs font-bold bg-brand-600 hover:bg-brand-700 text-white rounded-lg shadow-sm transition">
                         <span>Buka Penilaian Instrumen</span>
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
@@ -103,14 +103,14 @@
                 </div>
             </div>
         @empty
-            <div class="col-span-full bg-white rounded-xl border-2 border-black p-8 text-center shadow-[2px_2px_0_0_rgba(0,0,0,0.9)]">
+            <div class="col-span-full bg-white rounded-xl border border-slate-200 p-8 text-center shadow-sm">
                 <p class="text-sm text-slate-500">Tidak ada instrumen yang terdaftar untuk jadwal ini.</p>
             </div>
         @endforelse
     </div>
 
     {{-- Finalize Schedule Banner --}}
-    <div class="bg-slate-900 text-white rounded-xl border-2 border-black p-6 shadow-[2px_2px_0_0_rgba(0,0,0,0.9)] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div class="bg-slate-900 text-white rounded-xl border border-slate-800 p-5 sm:p-6 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
             <h3 class="text-base font-bold text-white">Selesai Menilai Seluruh Instrumen?</h3>
             <p class="text-xs text-slate-300 mt-0.5">Setelah semua asesi dinilai pada instrumen terkait, Anda dapat menyelesaikan jadwal uji dan menerbitkan berita acara.</p>
@@ -118,7 +118,7 @@
         <div>
             <form action="{{ route('asesor.schedule.finalize', $schedule->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menyelesaikan seluruh rangkaian asesmen untuk jadwal ini?')">
                 @csrf
-                <button type="submit" class="px-5 py-2.5 text-xs font-black bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg border-2 border-white shadow-[2px_2px_0_0_rgba(0,0,0,0.9)] transition">
+                <button type="submit" class="w-full sm:w-auto px-5 py-2.5 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg shadow-sm transition">
                     Selesaikan & Finalisasi Asesmen
                 </button>
             </form>

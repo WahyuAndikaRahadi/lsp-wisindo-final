@@ -3,26 +3,26 @@
 @section('content')
 <div class="space-y-6">
     {{-- Header Banner --}}
-    <div class="bg-gradient-to-r from-lsp-navy to-lsp-navy-dark rounded-xl p-6 md:p-8 text-white shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 border-t-4 border-lsp-red">
+    <div class="bg-gradient-to-r from-lsp-navy to-lsp-navy-dark rounded-xl p-5 sm:p-6 md:p-8 text-white shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 border-t-4 border-lsp-red">
         <div>
             <span class="inline-block px-2.5 py-0.5 rounded-full bg-white/10 text-lsp-red border border-lsp-red/30 text-[10px] font-extrabold tracking-wider uppercase mb-2">
                 Peserta Asesmen Kompetensi
             </span>
-            <h1 class="font-serif text-2xl md:text-3xl font-bold tracking-tight">
+            <h1 class="font-sans text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight">
                 Selamat Datang, {{ auth()->user()->full_name }}!
             </h1>
             <p class="text-blue-100/80 text-xs mt-1 max-w-xl">
                 LSP PrO Indo mendigitalisasi proses sertifikasi kompetensi profesi teknisi otomotif Indonesia berstandar BNSP.
             </p>
         </div>
-        <div class="flex items-center space-x-3">
-            <a href="{{ route('asesi.jadwal.index') }}" class="px-4 py-2.5 bg-lsp-red hover:bg-lsp-red-dark text-white rounded text-xs font-bold shadow-sm transition flex items-center space-x-2">
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:space-x-3 shrink-0">
+            <a href="{{ route('asesi.jadwal.index') }}" class="px-4 py-2.5 bg-lsp-red hover:bg-lsp-red-dark text-white rounded-lg text-xs font-bold shadow-sm transition flex items-center justify-center space-x-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                 </svg>
                 <span>Gabung Jadwal Baru</span>
             </a>
-            <a href="{{ route('asesi.profile.edit') }}" class="px-4 py-2.5 bg-white/10 hover:bg-white/20 border border-white/20 text-white rounded text-xs font-semibold transition">
+            <a href="{{ route('asesi.profile.edit') }}" class="px-4 py-2.5 bg-white/10 hover:bg-white/20 border border-white/20 text-white rounded-lg text-xs font-semibold transition text-center justify-center">
                 Profil Saya
             </a>
         </div>
@@ -152,8 +152,8 @@
                             };
                         }
                     @endphp
-                    <div class="p-6 hover:bg-slate-50/60 transition flex flex-col md:flex-row md:items-center justify-between gap-4">
-                        <div class="space-y-1.5 flex-1">
+                    <div class="p-4 sm:p-6 hover:bg-slate-50/60 transition flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div class="space-y-1.5 flex-1 min-w-0">
                             <div class="flex items-center space-x-2.5 flex-wrap gap-y-1">
                                 <span class="font-mono text-xs font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-700">
                                     {{ $sch->code }}
@@ -168,7 +168,7 @@
                                 @endif
                             </div>
 
-                            <h3 class="text-base font-bold text-slate-900">
+                            <h3 class="text-base font-bold text-slate-900 leading-snug">
                                 {{ $sch->name ?? $sch->scheme->name }}
                             </h3>
 
@@ -188,17 +188,17 @@
                             </div>
                         </div>
 
-                        <div class="flex items-center space-x-3 shrink-0">
+                        <div class="flex items-center space-x-3 shrink-0 w-full sm:w-auto">
                             @if($item->apl_status === 'REVISION_REQUESTED')
-                                <a href="{{ route('asesi.assessment.apl', $item->id) }}" class="px-4 py-2 text-xs font-bold bg-amber-500 hover:bg-amber-600 text-white rounded-lg shadow-sm transition">
+                                <a href="{{ route('asesi.assessment.apl', $item->id) }}" class="w-full sm:w-auto text-center justify-center px-4 py-2 text-xs font-bold bg-amber-500 hover:bg-amber-600 text-white rounded-lg shadow-sm transition">
                                     Perbaiki APL &rarr;
                                 </a>
                             @elseif($item->apl_status === 'APPROVED')
-                                <a href="{{ $targetUrl }}" class="px-4 py-2 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg shadow-sm transition">
+                                <a href="{{ $targetUrl }}" class="w-full sm:w-auto text-center justify-center px-4 py-2 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg shadow-sm transition">
                                     Lanjutkan Asesmen &rarr;
                                 </a>
                             @else
-                                <a href="{{ route('asesi.assessment.apl', $item->id) }}" class="px-4 py-2 text-xs font-bold bg-brand-600 hover:bg-brand-700 text-white rounded-lg shadow-sm transition">
+                                <a href="{{ route('asesi.assessment.apl', $item->id) }}" class="w-full sm:w-auto text-center justify-center px-4 py-2 text-xs font-bold bg-brand-600 hover:bg-brand-700 text-white rounded-lg shadow-sm transition">
                                     Masuk Jadwal Uji &rarr;
                                 </a>
                             @endif

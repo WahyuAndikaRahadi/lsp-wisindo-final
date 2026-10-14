@@ -6,10 +6,10 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $title ?? 'LSP PrO Indo' }} - Sistem Sertifikasi BNSP</title>
 
-    <!-- Google Fonts: Inter & Playfair Display -->
+    <!-- Google Fonts: Plus Jakarta Sans & Inter (Modern Sans-Serif) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600;1,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -24,9 +24,9 @@
                             'navy-light': '#2A3B94',
                             red: '#CE181E',
                             'red-dark': '#B01419',
-                            canvas: '#F4F6FA',
-                            'input-bg': '#EEF3FC',
-                            title: '#1A2356',
+                            canvas: '#F8FAFC',
+                            'input-bg': '#F8FAFC',
+                            title: '#0F172A',
                             muted: '#64748B',
                         },
                         brand: {
@@ -41,8 +41,9 @@
                         }
                     },
                     fontFamily: {
-                        serif: ['"Playfair Display"', 'Georgia', 'serif'],
-                        sans: ['"Inter"', 'system-ui', '-apple-system', 'sans-serif'],
+                        sans: ['"Plus Jakarta Sans"', '"Inter"', 'system-ui', '-apple-system', 'sans-serif'],
+                        serif: ['"Plus Jakarta Sans"', '"Inter"', 'system-ui', '-apple-system', 'sans-serif'],
+                        heading: ['"Plus Jakarta Sans"', '"Inter"', 'system-ui', '-apple-system', 'sans-serif'],
                     }
                 }
             }
@@ -54,62 +55,28 @@
 
     <style>
         [x-cloak] { display: none !important; }
-        body { font-family: 'Inter', system-ui, sans-serif; }
 
-        /* ========================================================= */
-        /* HIGH CONTRAST OUTLINE DESIGN SYSTEM (LSP PR O INDO)       */
-        /* ========================================================= */
-        :root {
-            --contrast-black: #000000;
-            --contrast-border: #111827;
-            --contrast-subtle: #374151;
-            --contrast-line: #6B7280;
+        body, button, input, select, textarea {
+            font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        /* 1. Cards, Modals, & Content Panels with Crisp Black Outline */
-        .bg-white.rounded-xl,
-        .bg-white.rounded-2xl,
-        .bg-white.rounded-lg,
-        .bg-white.rounded-md,
-        .bg-white.rounded-sm,
-        .bg-white.rounded,
-        .bg-white.shadow-sm,
-        .bg-white.shadow-md,
-        .bg-white.shadow-lg,
-        .bg-white.shadow-xl,
-        .card-contrast {
-            border: 2px solid var(--contrast-black) !important;
-            box-shadow: 2px 2px 0 0 rgba(0, 0, 0, 0.9) !important;
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
+            letter-spacing: -0.015em;
         }
 
-        /* Inner alert boxes and colored card panels */
-        .bg-slate-50.rounded-xl,
-        .bg-slate-50.rounded-lg,
-        .bg-indigo-50.rounded-xl,
-        .bg-indigo-50.rounded-lg,
-        .bg-amber-50.rounded-xl,
-        .bg-amber-50.rounded-lg,
-        .bg-emerald-50.rounded-xl,
-        .bg-emerald-50.rounded-lg,
-        .bg-rose-50.rounded-xl,
-        .bg-rose-50.rounded-lg {
-            border: 1.5px solid var(--contrast-black) !important;
+        /* Simplified Clean Design System */
+        .card-contrast,
+        [class*="shadow-[2px_2px"],
+        .border-2.border-black,
+        .border-2.border-slate-900 {
+            border-width: 1px !important;
+            border-color: #E2E8F0 !important;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05) !important;
         }
 
-        /* 2. Structural Layout Boundaries */
-        aside {
-            border-right: 2px solid var(--contrast-black) !important;
-            box-shadow: 2px 0 0 0 rgba(0, 0, 0, 0.15) !important;
-        }
-        header {
-            border-bottom: 2px solid var(--contrast-black) !important;
-            box-shadow: 0 2px 0 0 rgba(0, 0, 0, 0.15) !important;
-        }
-        footer {
-            border-top: 2px solid var(--contrast-black) !important;
-        }
-
-        /* 3. Form Inputs & Controls High Contrast Outlines */
+        /* Form Inputs & Controls */
         input[type="text"],
         input[type="email"],
         input[type="password"],
@@ -120,82 +87,71 @@
         input[type="file"],
         select,
         textarea {
-            border: 2px solid var(--contrast-black) !important;
+            border: 1px solid #CBD5E1 !important;
             background-color: #FFFFFF !important;
-            color: #000000 !important;
-            font-weight: 500 !important;
-            transition: all 0.15s ease-in-out !important;
+            color: #0F172A !important;
+            font-size: 0.875rem !important;
+            border-radius: 0.5rem !important;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
         }
+
         input:focus,
         select:focus,
         textarea:focus {
             border-color: #1E2B6E !important;
-            outline: 2px solid #000000 !important;
-            outline-offset: 1px !important;
-            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.15) !important;
+            outline: none !important;
+            box-shadow: 0 0 0 3px rgba(30, 43, 110, 0.12) !important;
         }
 
-        /* 4. Tables with High Contrast Lines & Headers */
+        /* Clean Modern Tables */
         table {
-            border: 2px solid var(--contrast-black) !important;
+            border-collapse: separate !important;
+            border-spacing: 0 !important;
         }
+
         table thead tr {
-            border-bottom: 2px solid var(--contrast-black) !important;
-            background-color: #E2E8F0 !important;
+            background-color: #F8FAFC !important;
+            border-bottom: 1px solid #E2E8F0 !important;
         }
+
         table thead th {
-            color: #000000 !important;
-            font-weight: 800 !important;
-            border-right: 1.5px solid var(--contrast-black) !important;
+            color: #475569 !important;
+            font-weight: 600 !important;
+            font-size: 0.75rem !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.05em !important;
         }
-        table thead th:last-child {
-            border-right: none !important;
-        }
+
         table tbody td {
-            border-bottom: 1px solid #94A3B8 !important;
-            border-right: 1px solid #CBD5E1 !important;
-        }
-        table tbody td:last-child {
-            border-right: none !important;
-        }
-        table tbody tr:last-child td {
-            border-bottom: none !important;
+            border-bottom: 1px solid #F1F5F9 !important;
+            color: #334155 !important;
         }
 
-        /* 5. Buttons & Interactive Controls */
-        button[type="submit"],
-        .btn,
-        a.inline-flex.rounded-lg,
-        a.inline-flex.rounded-xl {
-            border: 1.5px solid var(--contrast-black);
+        /* Smooth Touch Scrolling */
+        .overflow-x-auto {
+            -webkit-overflow-scrolling: touch;
         }
 
-        /* 6. Badges & Status Indicators */
-        .inline-flex.rounded-full,
-        .inline-flex.rounded-lg,
-        .inline-flex.rounded {
-            border: 1px solid rgba(0, 0, 0, 0.4);
-        }
-
-        /* 7. Auth Split-Card Container (Login/Register) */
+        /* Auth Container */
         .max-w-4xl.bg-white {
-            border: 2.5px solid var(--contrast-black) !important;
-            box-shadow: 6px 6px 0 0 var(--contrast-black) !important;
+            border: 1px solid #E2E8F0 !important;
+            border-radius: 1rem !important;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.06), 0 8px 10px -6px rgba(0, 0, 0, 0.04) !important;
         }
     </style>
     @stack('styles')
 </head>
 <body class="h-full font-sans text-slate-800 antialiased bg-lsp-canvas" x-data="{ sidebarOpen: false }">
 
-    <!-- Extreme Left Screen Vertical Dual Bar -->
-    <div class="fixed left-0 top-0 bottom-0 flex w-2 z-50 pointer-events-none">
-        <div class="w-1 bg-lsp-navy h-full"></div>
-        <div class="w-1 bg-lsp-red h-full"></div>
+    <!-- Desktop Left Screen Vertical Dual Bar (Hidden on Mobile) -->
+    <div class="hidden md:flex fixed left-0 top-0 bottom-0 w-1.5 z-50 pointer-events-none">
+        <div class="w-0.75 bg-lsp-navy h-full"></div>
+        <div class="w-0.75 bg-lsp-red h-full"></div>
     </div>
 
     @guest
         <!-- Guest Content (Login, Register) -->
-        <main class="min-h-screen flex flex-col justify-center items-center p-4 pl-6">
+        <main class="min-h-screen flex flex-col justify-center items-center p-3 sm:p-6 md:pl-8">
             @yield('content')
         </main>
     @else
@@ -206,11 +162,11 @@
             <div x-show="sidebarOpen" 
                  x-cloak
                  @click="sidebarOpen = false"
-                 class="fixed inset-0 z-40 bg-slate-900/50 backdrop-blur-sm md:hidden transition-opacity"></div>
+                 class="fixed inset-0 z-40 bg-slate-900/50 backdrop-blur-xs md:hidden transition-opacity"></div>
 
             <!-- Sidebar Navigation -->
             <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
-                   class="fixed inset-y-0 left-2 z-40 w-64 bg-white border-r border-slate-200 shadow-sm flex flex-col justify-between transition-transform duration-200 ease-in-out md:translate-x-0">
+                   class="fixed inset-y-0 left-0 md:left-1.5 z-50 md:z-30 w-72 md:w-64 bg-white border-r border-slate-200 shadow-xl md:shadow-none flex flex-col justify-between transition-transform duration-200 ease-in-out md:translate-x-0">
                 
                 <!-- Sidebar Top Section -->
                 <div>
@@ -220,22 +176,34 @@
                         <div class="w-1/3 bg-lsp-red"></div>
                     </div>
 
-                    <!-- Brand / Logo -->
-                    <div class="p-5 border-b border-slate-100 flex items-center space-x-3">
-                        <img src="{{ asset('images/logo-lsp-wisindo.png') }}" 
-                             alt="Logo LSP" 
-                             class="h-12 w-auto object-contain flex-shrink-0">
-                        <div class="flex flex-col">
-                            <span class="font-serif font-bold text-base leading-tight text-lsp-title tracking-tight">
-                                LSP PrO Indo
-                            </span>
-                            <span class="text-[9px] font-bold text-lsp-red uppercase tracking-wider mt-0.5">
-                                PRAKTISI OTOMOTIF
-                            </span>
-                            <span class="text-[9px] text-slate-400 font-medium">
-                                Lisensi BNSP
-                            </span>
+                    <!-- Brand / Logo with Mobile Close Button -->
+                    <div class="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <img src="{{ asset('images/logo-lsp-wisindo.png') }}" 
+                                 alt="Logo LSP" 
+                                 class="h-10 sm:h-12 w-auto object-contain flex-shrink-0">
+                            <div class="flex flex-col">
+                                <span class="font-sans font-bold text-base leading-tight text-lsp-title tracking-tight">
+                                    LSP PrO Indo
+                                </span>
+                                <span class="text-[9px] font-bold text-lsp-red uppercase tracking-wider mt-0.5">
+                                    PRAKTISI OTOMOTIF
+                                </span>
+                                <span class="text-[9px] text-slate-400 font-medium">
+                                    Lisensi BNSP
+                                </span>
+                            </div>
                         </div>
+
+                        <!-- Mobile Close Button -->
+                        <button @click="sidebarOpen = false" 
+                                type="button" 
+                                aria-label="Tutup Menu"
+                                class="md:hidden p-1.5 -mr-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 focus:outline-none">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
                     </div>
 
                     <!-- Navigation Links Grouped by Role -->
@@ -377,36 +345,37 @@
             </aside>
 
             <!-- Main Content Area (Shifted for sidebar) -->
-            <div class="md:pl-64 flex flex-col flex-1">
+            <div class="md:pl-64 flex flex-col flex-1 min-w-0">
                 
                 <!-- Top Horizontal Header Bar -->
-                <header class="bg-white border-b border-slate-200 sticky top-0 z-30">
+                <header class="bg-white/95 backdrop-blur-sm border-b border-slate-200 sticky top-0 z-30">
                     <!-- Top dual stripe above the header bar -->
                     <div class="w-full flex h-1">
                         <div class="w-2/3 bg-lsp-navy"></div>
                         <div class="w-1/3 bg-lsp-red"></div>
                     </div>
 
-                    <div class="px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between">
+                    <div class="px-3.5 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-3">
                         <!-- Left: Mobile Toggle & Page Title -->
-                        <div class="flex items-center space-x-3">
+                        <div class="flex items-center space-x-2.5 sm:space-x-3 min-w-0">
                             <button @click="sidebarOpen = !sidebarOpen" 
                                     type="button" 
-                                    class="p-1.5 rounded-lg text-slate-600 hover:text-lsp-navy hover:bg-slate-100 md:hidden focus:outline-none">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    aria-label="Buka Menu"
+                                    class="p-2 -ml-1 rounded-lg text-slate-600 hover:text-lsp-navy hover:bg-slate-100 md:hidden focus:outline-none shrink-0">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
                                 </svg>
                             </button>
-                            <h1 class="font-serif font-bold text-lg text-lsp-title tracking-tight">
+                            <h1 class="font-sans font-bold text-base sm:text-lg text-lsp-title tracking-tight truncate">
                                 {{ $title ?? 'Sistem Asesmen Digital' }}
                             </h1>
                         </div>
 
                         <!-- Right: Portal & Impersonation Badge -->
-                        <div class="flex items-center space-x-3">
+                        <div class="flex items-center space-x-2.5 sm:space-x-3 shrink-0">
                             @if(session('admin_impersonator_id'))
-                                <div class="bg-amber-100 border border-amber-300 px-3 py-1 rounded text-xs font-semibold text-amber-900 flex items-center space-x-2 shadow-sm">
-                                    <span>Proxy Mode: <strong>{{ auth()->user()->full_name }}</strong></span>
+                                <div class="bg-amber-100 border border-amber-300 px-2.5 py-1 rounded text-[11px] sm:text-xs font-semibold text-amber-900 flex items-center space-x-2 shadow-xs">
+                                    <span class="truncate max-w-[120px] sm:max-w-none">Proxy: <strong>{{ auth()->user()->full_name }}</strong></span>
                                     <form action="{{ route('proxy.switch-back') }}" method="POST" class="inline">
                                         @csrf
                                         <button type="submit" class="bg-amber-800 hover:bg-slate-900 text-white px-2 py-0.5 rounded text-[10px] font-bold transition">
@@ -427,7 +396,7 @@
                 </header>
 
                 <!-- Page Content Body -->
-                <main class="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
+                <main class="flex-1 p-3.5 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
                     
                     {{-- Flash Messages --}}
                     @if(session('success'))

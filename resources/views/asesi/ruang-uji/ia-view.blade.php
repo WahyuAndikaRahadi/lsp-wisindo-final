@@ -68,9 +68,45 @@
             </div>
 
             <div class="p-6 space-y-4">
+                {{-- Template Download Card --}}
+                <div class="bg-indigo-50 border-2 border-indigo-200 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-[#1E2B6E] text-white flex items-center justify-center font-bold text-lg shrink-0">
+                            📄
+                        </div>
+                        <div>
+                            <div class="text-xs font-bold text-slate-900">Template Lembar Uji Praktik FR.IA.02 (PDF Resmi BNSP)</div>
+                            <p class="text-[11px] text-slate-600">Unduh lembar soal & instruksi demonstrasi resmi untuk dicetak atau dibaca di TUK.</p>
+                        </div>
+                    </div>
+                    <a href="{{ route('asesi.assessment.instrument.download-template', [$assessment, 'IA02']) }}" class="px-4 py-2 bg-[#1E2B6E] hover:bg-[#152055] text-white text-xs font-black rounded-lg border-2 border-black shadow-[2px_2px_0_0_rgba(0,0,0,0.9)] transition shrink-0 inline-flex items-center gap-2">
+                        <span>📥 Unduh Template PDF</span>
+                    </a>
+                </div>
+
                 <div class="bg-amber-50 border border-amber-300 rounded-lg p-3 text-xs text-amber-900 leading-relaxed">
                     <strong>Petunjuk Uji Praktik:</strong> Instrumen Tugas Praktik Demonstrasi (FR.IA.02) dilaksanakan menggunakan <strong>lembar kerja kertas (paper-based)</strong> di TUK. Selesaikan tugas demonstrasi dan catat hasilnya pada kertas fisik. Foto lembar jawaban Anda dengan pencahayaan yang jelas dan tegak lurus, kemudian unggah pada tombol di bawah agar asesor dapat memeriksa pekerjaan Anda.
                 </div>
+
+                {{-- Skenario & Langkah Kerja TPD --}}
+                @if(! empty($tpdData))
+                    <div class="border border-slate-200 rounded-lg p-4 bg-slate-50 space-y-3 text-xs">
+                        <div>
+                            <span class="font-bold text-slate-800 uppercase tracking-wider text-[11px] block">Skenario Uji Demonstrasi:</span>
+                            <p class="text-slate-700 mt-1 leading-relaxed">{{ $tpdData['scenario'] ?? '-' }}</p>
+                        </div>
+                        @if(! empty($tpdData['tasks']))
+                            <div>
+                                <span class="font-bold text-slate-800 uppercase tracking-wider text-[11px] block">Langkah & Instruksi Kerja:</span>
+                                <ol class="list-decimal list-inside space-y-1 mt-1 text-slate-700">
+                                    @foreach($tpdData['tasks'] as $t)
+                                        <li>{{ is_array($t) ? ($t['instruction'] ?? '') : $t }}</li>
+                                    @endforeach
+                                </ol>
+                            </div>
+                        @endif
+                    </div>
+                @endif
 
                 @if($evidencePath)
                     <div class="border-2 border-slate-200 rounded-xl p-4 bg-slate-50 flex flex-col md:flex-row items-center gap-4">
@@ -132,6 +168,22 @@
             $tidakCount = collect($rawItems)->filter(fn($i) => is_array($i) && strtoupper($i['result'] ?? '') === 'TIDAK')->count();
             $percent = $totalCount > 0 ? round(($sesuaiCount / $totalCount) * 100) : 0;
         @endphp
+
+        {{-- Download Template FR.IA.01B --}}
+        <div class="bg-indigo-50 border-2 border-indigo-200 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-[#1E2B6E] text-white flex items-center justify-center font-bold text-lg shrink-0">
+                    📄
+                </div>
+                <div>
+                    <div class="text-xs font-bold text-slate-900">Format Lembar Pemeriksaan FR.IA.01B (PDF Resmi BNSP)</div>
+                    <p class="text-[11px] text-slate-600">Unduh lembar kerja teknis spesifikasi Report Sheet resmi untuk skema ini.</p>
+                </div>
+            </div>
+            <a href="{{ route('asesi.assessment.instrument.download-template', [$assessment, 'IA01B']) }}" class="px-4 py-2 bg-[#1E2B6E] hover:bg-[#152055] text-white text-xs font-black rounded-lg border-2 border-black shadow-[2px_2px_0_0_rgba(0,0,0,0.9)] transition shrink-0 inline-flex items-center gap-2">
+                <span>📥 Unduh Report Sheet PDF</span>
+            </a>
+        </div>
 
         {{-- Ringkasan Statistik IA.01B --}}
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -236,27 +288,50 @@
                 </table>
             </div>
         </div>
-    @elseif(strtoupper($code) === 'IA01' && isset($response?->data_json['kuks']))
+    @elseif(strtoupper($code) === 'IA01')
         @php
-            $kukData = $response->data_json['kuks'];
+            $kukData = $response?->data_json['kuks'] ?? [];
             $kCount = collect($kukData)->filter(fn($v) => (is_array($v) ? ($v['result'] ?? '') : $v) === 'K')->count();
             $bkCount = collect($kukData)->filter(fn($v) => (is_array($v) ? ($v['result'] ?? '') : $v) === 'BK')->count();
             $totalKuk = count($kukData);
         @endphp
-        <div class="grid grid-cols-3 gap-3">
-            <div class="bg-white p-4 rounded-xl border-2 border-black shadow-[2px_2px_0_0_rgba(0,0,0,0.9)]">
-                <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Total Kriteria (KUK)</div>
-                <div class="text-2xl font-black text-slate-900 mt-1 font-mono">{{ $totalKuk }}</div>
+
+        {{-- Download Template FR.IA.01 --}}
+        <div class="bg-indigo-50 border-2 border-indigo-200 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-[#1E2B6E] text-white flex items-center justify-center font-bold text-lg shrink-0">
+                    📄
+                </div>
+                <div>
+                    <div class="text-xs font-bold text-slate-900">Format Ceklis Observasi FR.IA.01 (PDF Resmi BNSP)</div>
+                    <p class="text-[11px] text-slate-600">Unduh lembar ceklis observasi unjuk kerja untuk rujukan standar kompetensi.</p>
+                </div>
             </div>
-            <div class="bg-emerald-50 p-4 rounded-xl border-2 border-black shadow-[2px_2px_0_0_rgba(0,0,0,0.9)]">
-                <div class="text-[11px] font-bold text-emerald-800 uppercase tracking-wider">Kompeten (K)</div>
-                <div class="text-2xl font-black text-emerald-700 mt-1 font-mono">{{ $kCount }}</div>
-            </div>
-            <div class="bg-rose-50 p-4 rounded-xl border-2 border-black shadow-[2px_2px_0_0_rgba(0,0,0,0.9)]">
-                <div class="text-[11px] font-bold text-rose-800 uppercase tracking-wider">Belum Kompeten (BK)</div>
-                <div class="text-2xl font-black text-rose-700 mt-1 font-mono">{{ $bkCount }}</div>
-            </div>
+            <a href="{{ route('asesi.assessment.instrument.download-template', [$assessment, 'IA01']) }}" class="px-4 py-2 bg-[#1E2B6E] hover:bg-[#152055] text-white text-xs font-black rounded-lg border-2 border-black shadow-[2px_2px_0_0_rgba(0,0,0,0.9)] transition shrink-0 inline-flex items-center gap-2">
+                <span>📥 Unduh Lembar PDF</span>
+            </a>
         </div>
+
+        @if(! empty($kukData))
+            <div class="grid grid-cols-3 gap-3">
+                <div class="bg-white p-4 rounded-xl border-2 border-black shadow-[2px_2px_0_0_rgba(0,0,0,0.9)]">
+                    <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Total Kriteria (KUK)</div>
+                    <div class="text-2xl font-black text-slate-900 mt-1 font-mono">{{ $totalKuk }}</div>
+                </div>
+                <div class="bg-emerald-50 p-4 rounded-xl border-2 border-black shadow-[2px_2px_0_0_rgba(0,0,0,0.9)]">
+                    <div class="text-[11px] font-bold text-emerald-800 uppercase tracking-wider">Kompeten (K)</div>
+                    <div class="text-2xl font-black text-emerald-700 mt-1 font-mono">{{ $kCount }}</div>
+                </div>
+                <div class="bg-rose-50 p-4 rounded-xl border-2 border-black shadow-[2px_2px_0_0_rgba(0,0,0,0.9)]">
+                    <div class="text-[11px] font-bold text-rose-800 uppercase tracking-wider">Belum Kompeten (BK)</div>
+                    <div class="text-2xl font-black text-rose-700 mt-1 font-mono">{{ $bkCount }}</div>
+                </div>
+            </div>
+        @else
+            <div class="bg-amber-50 border border-amber-300 rounded-xl p-4 text-xs text-amber-900">
+                <strong>Informasi:</strong> Asesor sedang dalam proses penilaian observasi langsung di TUK. Hasil observasi per elemen dan KUK akan tampil di bawah ini setelah asesor menyelesaikan penilaian.
+            </div>
+        @endif
 
         <div class="bg-white rounded-xl border-2 border-black shadow-[2px_2px_0_0_rgba(0,0,0,0.9)] overflow-hidden">
             <div class="bg-slate-900 text-white px-6 py-3 border-b-2 border-black">
@@ -300,10 +375,33 @@
                 @endforeach
             </div>
         </div>
-    @elseif(strtoupper($code) === 'IA03' && isset($response?->data_json['questions']))
+    @elseif(strtoupper($code) === 'IA03')
         @php
-            $qData = $response->data_json['questions'];
+            $qData = $response?->data_json['questions'] ?? [];
         @endphp
+
+        {{-- Download Template FR.IA.03 --}}
+        <div class="bg-indigo-50 border-2 border-indigo-200 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-[#1E2B6E] text-white flex items-center justify-center font-bold text-lg shrink-0">
+                    📄
+                </div>
+                <div>
+                    <div class="text-xs font-bold text-slate-900">Daftar Pertanyaan Observasi FR.IA.03 (PDF Resmi BNSP)</div>
+                    <p class="text-[11px] text-slate-600">Unduh lembar pertanyaan pendukung observasi resmi untuk skema ini.</p>
+                </div>
+            </div>
+            <a href="{{ route('asesi.assessment.instrument.download-template', [$assessment, 'IA03']) }}" class="px-4 py-2 bg-[#1E2B6E] hover:bg-[#152055] text-white text-xs font-black rounded-lg border-2 border-black shadow-[2px_2px_0_0_rgba(0,0,0,0.9)] transition shrink-0 inline-flex items-center gap-2">
+                <span>📥 Unduh Soal PMO PDF</span>
+            </a>
+        </div>
+
+        @if(empty($qData))
+            <div class="bg-amber-50 border border-amber-300 rounded-xl p-4 text-xs text-amber-900">
+                <strong>Informasi:</strong> Sesi wawancara dan klarifikasi teknis (PMO) dilakukan secara lisan oleh Asesor. Hasil penilaian jawaban Anda akan tampil di bawah ini setelah asesor menyelesaikan input.
+            </div>
+        @endif
+
         <div class="bg-white rounded-xl border-2 border-black shadow-[2px_2px_0_0_rgba(0,0,0,0.9)] overflow-hidden">
             <div class="bg-slate-900 text-white px-6 py-3 border-b-2 border-black">
                 <span class="text-amber-300 font-bold text-xs uppercase tracking-wider font-mono">FR.IA.03 Pertanyaan Mendukung Observasi (PMO)</span>
@@ -327,7 +425,7 @@
                                 @elseif(strtoupper($resStatus) === 'TIDAK MEMUASKAN' || strtoupper($resStatus) === 'TIDAK')
                                     <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-300">✗ Tidak Memuaskan</span>
                                 @else
-                                    <span class="text-slate-400 text-[10px] italic">-</span>
+                                    <span class="text-slate-400 text-[10px] italic">Belum Dinilai</span>
                                 @endif
                             </div>
                         </div>

@@ -113,4 +113,92 @@ class SchemeInstrumentService
             ['item' => '5. Housekeeping dan Pembersihan Area Kerja Uji', 'standard' => '5R / Ringkas Rapi Resik'],
         ];
     }
+
+    /**
+     * Map of Scheme IDs to directory in all-document-lsp-ProIndo.
+     */
+    protected array $schemeDirectoryMap = [
+        1 => 'MUK SKEMA 1 Engine Junior Technician',
+        2 => 'MUK SKEMA 2 Klaster Maintenance Gasoline Engine Injection',
+        3 => 'MUK SKEMA 3 Maintenence Electrical Vehicle.pdf',
+        4 => 'MUK SKEMA 4 Memperbaiki Panel Bodi Kendaraan',
+        5 => 'MUK SKEMA 5 Mekanik Junior pdf',
+        6 => 'MUK SKEMA 6 Servis Sepeda Motor Listrik.pdf',
+        7 => 'MUK SKEMA 7 Klaster Servis Sepeda Motor Injeksi',
+    ];
+
+    /**
+     * Get directory path for official MUK documents of a scheme.
+     */
+    public function getSchemeDirectory(Scheme $scheme): ?string
+    {
+        $dirName = $this->schemeDirectoryMap[$scheme->id] ?? null;
+        if (! $dirName) {
+            foreach ($this->schemeDirectoryMap as $id => $name) {
+                if (str_contains(strtolower($name), strtolower($scheme->name))) {
+                    $dirName = $name;
+                    break;
+                }
+            }
+        }
+
+        if ($dirName) {
+            $fullPath = base_path('all-document-lsp-ProIndo/'.$dirName);
+            if (is_dir($fullPath)) {
+                return $fullPath;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Get official PDF template path for an instrument code (e.g. IA02, IA01B, IA01, IA03).
+     */
+    public function getInstrumentTemplatePath(Scheme $scheme, string $instrumentCode): ?string
+    {
+        $dir = $this->getSchemeDirectory($scheme);
+        if (! $dir || ! is_dir($dir)) {
+            return null;
+        }
+
+        $codeUpper = strtoupper(str_replace(['.', ' ', '_', '-'], '', $instrumentCode));
+        $files = scandir($dir);
+
+        foreach ($files as $file) {
+            if (! str_ends_with(strtolower($file), '.pdf')) {
+                continue;
+            }
+
+            $norm = strtoupper(str_replace(['.', ' ', '_', '-'], '', $file));
+
+            if ($codeUpper === 'IA01B') {
+                if (str_contains($norm, 'IA01B') || str_contains($norm, 'REPORTSHEET')) {
+                    return $dir.DIRECTORY_SEPARATOR.$file;
+                }
+            } elseif ($codeUpper === 'IA01') {
+                if ((str_contains($norm, 'IA01') && ! str_contains($norm, '01B') && ! str_contains($norm, 'REPORTSHEET')) || str_contains($norm, 'IA01CEKLIS')) {
+                    return $dir.DIRECTORY_SEPARATOR.$file;
+                }
+            } elseif ($codeUpper === 'IA02') {
+                if (str_contains($norm, 'IA02')) {
+                    return $dir.DIRECTORY_SEPARATOR.$file;
+                }
+            } elseif ($codeUpper === 'IA03') {
+                if (str_contains($norm, 'IA03')) {
+                    return $dir.DIRECTORY_SEPARATOR.$file;
+                }
+            } elseif ($codeUpper === 'AK01') {
+                if (str_contains($norm, 'AK01')) {
+                    return $dir.DIRECTORY_SEPARATOR.$file;
+                }
+            } else {
+                if (str_contains($norm, $codeUpper)) {
+                    return $dir.DIRECTORY_SEPARATOR.$file;
+                }
+            }
+        }
+
+        return null;
+    }
 }

@@ -57,6 +57,7 @@ Route::middleware(['auth', 'role:ASESI'])->prefix('asesi')->name('asesi.')->grou
         Route::get('/instrument/IA05', [Asesi\RuangUjiController::class, 'ia05'])->name('instrument.ia05');
         Route::post('/instrument/IA05', [Asesi\RuangUjiController::class, 'submitIa05'])->name('instrument.ia05.submit');
 
+        Route::get('/instrument/{code}/download-template', [Asesi\RuangUjiController::class, 'downloadTemplate'])->name('instrument.download-template');
         Route::get('/instrument/{code}', [Asesi\RuangUjiController::class, 'iaView'])->name('instrument.view');
         Route::post('/instrument/{code}/feedback', [Asesi\RuangUjiController::class, 'submitFeedback'])->name('instrument.feedback');
         Route::post('/instrument/{code}/upload-evidence', [Asesi\RuangUjiController::class, 'uploadEvidence'])->name('instrument.upload-evidence');

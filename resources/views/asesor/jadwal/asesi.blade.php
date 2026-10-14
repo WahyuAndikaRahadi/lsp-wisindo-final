@@ -21,11 +21,11 @@
         </div>
         <div class="flex items-center space-x-2">
             @if($allApproved)
-                <a href="{{ route('asesor.ak07.create', $jadwal->id) }}" class="inline-flex items-center px-4 py-2 text-xs font-black uppercase tracking-wider bg-brand-600 hover:bg-brand-700 text-white rounded-lg border-2 border-slate-900 shadow-[2px_2px_0_0_rgba(0,0,0,0.9)] transition">
+                <a href="{{ route('asesor.ak07.create', $jadwal->id) }}" class="inline-flex items-center px-4 py-2 text-xs font-bold uppercase tracking-wider bg-brand-600 hover:bg-brand-700 text-white rounded-lg shadow-sm transition">
                     Lanjut ke FR.AK07 &rarr;
                 </a>
             @else
-                <div class="inline-flex items-center px-3.5 py-2 text-xs font-bold text-amber-800 bg-amber-50 border-2 border-amber-300 rounded-lg shadow-sm">
+                <div class="inline-flex items-center px-3.5 py-2 text-xs font-semibold text-amber-800 bg-amber-50 border border-amber-200 rounded-lg shadow-xs">
                     <span class="mr-2 inline-block w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
                     <span>Verifikasi APL Berjalan ({{ $approvedAsesi }}/{{ $totalAsesi }} Disetujui)</span>
                 </div>

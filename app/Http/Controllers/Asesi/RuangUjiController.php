@@ -39,9 +39,29 @@ class RuangUjiController extends Controller
     {
         abort_if($assessment->asesi_id !== auth()->id(), 403);
 
-        $assessment->load('schedule.scheme', 'iaResponses');
+        $assessment->load('schedule.scheme', 'schedule.assessors', 'iaResponses', 'assessor');
+        $selectedInstruments = $assessment->schedule->getEffectiveInstruments();
+        $responses = $assessment->iaResponses->keyBy('instrument_code');
 
-        return view('asesi.ruang-uji.hub', compact('assessment'));
+        return view('asesi.ruang-uji.hub', compact('assessment', 'selectedInstruments', 'responses'));
+    }
+
+    public function downloadTemplate(Assessment $assessment, string $code, SchemeInstrumentService $instrumentService)
+    {
+        abort_if($assessment->asesi_id !== auth()->id() && auth()->user()->role !== 'ASESOR' && auth()->user()->role !== 'ADMIN_LSP', 403);
+
+        $path = $instrumentService->getInstrumentTemplatePath($assessment->schedule->scheme, $code);
+
+        if (! $path || ! file_exists($path)) {
+            return back()->with('error', 'File template PDF resmi untuk instrumen FR.'.strtoupper($code).' belum tersedia.');
+        }
+
+        $cleanSchemeName = str_replace(['/', '\\'], '-', $assessment->schedule->scheme->name);
+        $filename = 'FR.'.strtoupper($code).' - '.$cleanSchemeName.'.pdf';
+
+        return response()->download($path, $filename, [
+            'Content-Type' => 'application/pdf',
+        ]);
     }
 
     public function ia05(Assessment $assessment): View
