@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full bg-lsp-canvas">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>{{ $title ?? 'LSP PrO Indo' }} - Sistem Sertifikasi BNSP</title>
+
+    <!-- Google Fonts: Inter & Playfair Display -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600;1,700&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        lsp: {
+                            navy: '#1E2B6E',
+                            'navy-dark': '#162052',
+                            'navy-light': '#2A3B94',
+                            red: '#CE181E',
+                            'red-dark': '#B01419',
+                            canvas: '#F4F6FA',
+                            'input-bg': '#EEF3FC',
+                            title: '#1A2356',
+                            muted: '#64748B',
+                        },
+                        brand: {
+                            50: '#EEF3FC',
+                            100: '#D9E4FA',
+                            200: '#B8CFF7',
+                            500: '#2A3B94',
+                            600: '#1E2B6E',
+                            700: '#162052',
+                            800: '#11183E',
+                            900: '#0B1028',
+                        }
+                    },
+                    fontFamily: {
+                        serif: ['"Playfair Display"', 'Georgia', 'serif'],
+                        sans: ['"Inter"', 'system-ui', '-apple-system', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Alpine.js CDN -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <style>
+        [x-cloak] { display: none !important; }
+        body { font-family: 'Inter', system-ui, sans-serif; }
+
+        /* ========================================================= */
+        /* HIGH CONTRAST OUTLINE DESIGN SYSTEM (LSP PR O INDO)       */
+        /* ========================================================= */
+        :root {
+            --contrast-black: #000000;
+            --contrast-border: #111827;
+            --contrast-subtle: #374151;
+            --contrast-line: #6B7280;
+        }
+
+        /* 1. Cards, Modals, & Content Panels with Crisp Black Outline */
+        .bg-white.rounded-xl,
+        .bg-white.rounded-2xl,
+        .bg-white.rounded-lg,
+        .bg-white.rounded-md,
+        .bg-white.rounded-sm,
+        .bg-white.rounded,
+        .bg-white.shadow-sm,
+        .bg-white.shadow-md,
+        .bg-white.shadow-lg,
+        .bg-white.shadow-xl,
+        .card-contrast {
+            border: 2px solid var(--contrast-black) !important;
+            box-shadow: 2px 2px 0 0 rgba(0, 0, 0, 0.9) !important;
+        }
+
+        /* Inner alert boxes and colored card panels */
+        .bg-slate-50.rounded-xl,
+        .bg-slate-50.rounded-lg,
+        .bg-indigo-50.rounded-xl,
+        .bg-indigo-50.rounded-lg,
+        .bg-amber-50.rounded-xl,
+        .bg-amber-50.rounded-lg,
+        .bg-emerald-50.rounded-xl,
+        .bg-emerald-50.rounded-lg,
+        .bg-rose-50.rounded-xl,
+        .bg-rose-50.rounded-lg {
+            border: 1.5px solid var(--contrast-black) !important;
+        }
+
+        /* 2. Structural Layout Boundaries */
+        aside {
+            border-right: 2px solid var(--contrast-black) !important;
+            box-shadow: 2px 0 0 0 rgba(0, 0, 0, 0.15) !important;
+        }
+        header {
+            border-bottom: 2px solid var(--contrast-black) !important;
+            box-shadow: 0 2px 0 0 rgba(0, 0, 0, 0.15) !important;
+        }
+        footer {
+            border-top: 2px solid var(--contrast-black) !important;
+        }
+
+        /* 3. Form Inputs & Controls High Contrast Outlines */
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="number"],
+        input[type="tel"],
+        input[type="date"],
+        input[type="time"],
+        input[type="file"],
+        select,
+        textarea {
+            border: 2px solid var(--contrast-black) !important;
+            background-color: #FFFFFF !important;
+            color: #000000 !important;
+            font-weight: 500 !important;
+            transition: all 0.15s ease-in-out !important;
+        }
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: #1E2B6E !important;
+            outline: 2px solid #000000 !important;
+            outline-offset: 1px !important;
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.15) !important;
+        }
+
+        /* 4. Tables with High Contrast Lines & Headers */
+        table {
+            border: 2px solid var(--contrast-black) !important;
+        }
+        table thead tr {
+            border-bottom: 2px solid var(--contrast-black) !important;
+            background-color: #E2E8F0 !important;
+        }
+        table thead th {
+            color: #000000 !important;
+            font-weight: 800 !important;
+            border-right: 1.5px solid var(--contrast-black) !important;
+        }
+        table thead th:last-child {
+            border-right: none !important;
+        }
+        table tbody td {
+            border-bottom: 1px solid #94A3B8 !important;
+            border-right: 1px solid #CBD5E1 !important;
+        }
+        table tbody td:last-child {
+            border-right: none !important;
+        }
+        table tbody tr:last-child td {
+            border-bottom: none !important;
+        }
+
+        /* 5. Buttons & Interactive Controls */
+        button[type="submit"],
+        .btn,
+        a.inline-flex.rounded-lg,
+        a.inline-flex.rounded-xl {
+            border: 1.5px solid var(--contrast-black);
+        }
+
+        /* 6. Badges & Status Indicators */
+        .inline-flex.rounded-full,
+        .inline-flex.rounded-lg,
+        .inline-flex.rounded {
+            border: 1px solid rgba(0, 0, 0, 0.4);
+        }
+
+        /* 7. Auth Split-Card Container (Login/Register) */
+        .max-w-4xl.bg-white {
+            border: 2.5px solid var(--contrast-black) !important;
+            box-shadow: 6px 6px 0 0 var(--contrast-black) !important;
+        }
+    </style>
+    @stack('styles')
+</head>
+<body class="h-full font-sans text-slate-800 antialiased bg-lsp-canvas" x-data="{ sidebarOpen: false }">
+
+    <!-- Extreme Left Screen Vertical Dual Bar -->
+    <div class="fixed left-0 top-0 bottom-0 flex w-2 z-50 pointer-events-none">
+        <div class="w-1 bg-lsp-navy h-full"></div>
+        <div class="w-1 bg-lsp-red h-full"></div>
+    </div>
+
+    @guest
+        <!-- Guest Content (Login, Register) -->
+        <main class="min-h-screen flex flex-col justify-center items-center p-4 pl-6">
+            @yield('content')
+        </main>
+    @else
+        <!-- Authenticated Layout with Sidebar -->
+        <div class="min-h-screen flex flex-col">
+
+            <!-- Mobile Sidebar Backdrop -->
+            <div x-show="sidebarOpen" 
+                 x-cloak
+                 @click="sidebarOpen = false"
+                 class="fixed inset-0 z-40 bg-slate-900/50 backdrop-blur-sm md:hidden transition-opacity"></div>
+
+            <!-- Sidebar Navigation -->
+            <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
+                   class="fixed inset-y-0 left-2 z-40 w-64 bg-white border-r border-slate-200 shadow-sm flex flex-col justify-between transition-transform duration-200 ease-in-out md:translate-x-0">
+                
+                <!-- Sidebar Top Section -->
+                <div>
+                    <!-- Top Horizontal Dual Stripe -->
+                    <div class="w-full flex h-1">
+                        <div class="w-2/3 bg-lsp-navy"></div>
+                        <div class="w-1/3 bg-lsp-red"></div>
+                    </div>
+
+                    <!-- Brand / Logo -->
+                    <div class="p-5 border-b border-slate-100 flex items-center space-x-3">
+                        <img src="{{ asset('images/logo-lsp-wisindo.png') }}" 
+                             alt="Logo LSP" 
+                             class="h-12 w-auto object-contain flex-shrink-0">
+                        <div class="flex flex-col">
+                            <span class="font-serif font-bold text-base leading-tight text-lsp-title tracking-tight">
+                                LSP PrO Indo
+                            </span>
+                            <span class="text-[9px] font-bold text-lsp-red uppercase tracking-wider mt-0.5">
+                                PRAKTISI OTOMOTIF
+                            </span>
+                            <span class="text-[9px] text-slate-400 font-medium">
+                                Lisensi BNSP
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Navigation Links Grouped by Role -->
+                    <nav class="p-3 space-y-1 text-xs">
+                        
+                        @if(auth()->user()->isRole('ASESI'))
+                            <div class="px-3 pt-3 pb-1 text-[10px] font-extrabold text-lsp-muted uppercase tracking-wider">
+                                Menu Asesi
+                            </div>
+                            <a href="{{ route('asesi.dashboard') }}" 
+                               class="flex items-center space-x-3 px-3 py-2.5 rounded text-xs font-semibold transition {{ request()->routeIs('asesi.dashboard') ? 'bg-lsp-input-bg text-lsp-navy border-l-4 border-lsp-navy font-bold' : 'text-slate-600 hover:text-lsp-navy hover:bg-slate-50' }}">
+                                <svg class="w-4 h-4 text-lsp-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                                </svg>
+                                <span>Dashboard Asesi</span>
+                            </a>
+                            <a href="{{ route('asesi.profile.edit') }}" 
+                               class="flex items-center space-x-3 px-3 py-2.5 rounded text-xs font-semibold transition {{ request()->routeIs('asesi.profile.*') ? 'bg-lsp-input-bg text-lsp-navy border-l-4 border-lsp-navy font-bold' : 'text-slate-600 hover:text-lsp-navy hover:bg-slate-50' }}">
+                                <svg class="w-4 h-4 text-lsp-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7 7z"/>
+                                </svg>
+                                <span>Biodata & TTD Digital</span>
+                            </a>
+                            <a href="{{ route('asesi.jadwal.index') }}" 
+                               class="flex items-center space-x-3 px-3 py-2.5 rounded text-xs font-semibold transition {{ request()->routeIs('asesi.jadwal.*') || request()->routeIs('asesi.assessment.*') ? 'bg-lsp-input-bg text-lsp-navy border-l-4 border-lsp-navy font-bold' : 'text-slate-600 hover:text-lsp-navy hover:bg-slate-50' }}">
+                                <svg class="w-4 h-4 text-lsp-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                                <span>Jadwal Asesmen Uji</span>
+                            </a>
+
+                        @elseif(auth()->user()->isRole('ASESOR'))
+                            <div class="px-3 pt-3 pb-1 text-[10px] font-extrabold text-lsp-muted uppercase tracking-wider">
+                                Menu Asesor
+                            </div>
+                            <a href="{{ route('asesor.jadwal.index') }}" 
+                               class="flex items-center space-x-3 px-3 py-2.5 rounded text-xs font-semibold transition {{ request()->routeIs('asesor.*') ? 'bg-lsp-input-bg text-lsp-navy border-l-4 border-lsp-navy font-bold' : 'text-slate-600 hover:text-lsp-navy hover:bg-slate-50' }}">
+                                <svg class="w-4 h-4 text-lsp-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                                </svg>
+                                <span>Jadwal Penugasan Uji</span>
+                            </a>
+
+                        @elseif(auth()->user()->isAdmin() || in_array(auth()->user()->role, ['KOMITE_TEKNIS', 'TUK_ADMIN']))
+                            <div class="px-3 pt-3 pb-1 text-[10px] font-extrabold text-lsp-muted uppercase tracking-wider">
+                                Manajemen Asesmen
+                            </div>
+                            <a href="{{ route('admin.dashboard') }}" 
+                               class="flex items-center space-x-3 px-3 py-2.5 rounded text-xs font-semibold transition {{ request()->routeIs('admin.dashboard') ? 'bg-lsp-input-bg text-lsp-navy border-l-4 border-lsp-navy font-bold' : 'text-slate-600 hover:text-lsp-navy hover:bg-slate-50' }}">
+                                <svg class="w-4 h-4 text-lsp-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+                                </svg>
+                                <span>Dashboard Admin</span>
+                            </a>
+                            <a href="{{ route('admin.jadwal.index') }}" 
+                               class="flex items-center space-x-3 px-3 py-2.5 rounded text-xs font-semibold transition {{ request()->routeIs('admin.jadwal.*') ? 'bg-lsp-input-bg text-lsp-navy border-l-4 border-lsp-navy font-bold' : 'text-slate-600 hover:text-lsp-navy hover:bg-slate-50' }}">
+                                <svg class="w-4 h-4 text-lsp-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                                <span>Kelola Jadwal Asesmen</span>
+                            </a>
+                            <a href="{{ route('admin.dokumen-muk.index') }}" 
+                               class="flex items-center space-x-3 px-3 py-2.5 rounded text-xs font-semibold transition {{ request()->routeIs('admin.dokumen-muk.*') ? 'bg-lsp-input-bg text-lsp-navy border-l-4 border-lsp-navy font-bold' : 'text-slate-600 hover:text-lsp-navy hover:bg-slate-50' }}">
+                                <svg class="w-4 h-4 text-lsp-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                                <span>Dokumen MUK Ekspor</span>
+                            </a>
+                            <a href="{{ route('admin.proxy.index') }}" 
+                               class="flex items-center space-x-3 px-3 py-2.5 rounded text-xs font-semibold transition {{ request()->routeIs('admin.proxy.*') ? 'bg-lsp-input-bg text-lsp-navy border-l-4 border-lsp-navy font-bold' : 'text-slate-600 hover:text-lsp-navy hover:bg-slate-50' }}">
+                                <svg class="w-4 h-4 text-lsp-red" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+                                </svg>
+                                <span>Switch Role (Proxy)</span>
+                            </a>
+
+                            @if(auth()->user()->isRole('SUPER_ADMIN'))
+                                <div class="px-3 pt-4 pb-1 text-[10px] font-extrabold text-lsp-muted uppercase tracking-wider">
+                                    Super Admin Master
+                                </div>
+                                <a href="{{ route('admin.users.index') }}" 
+                                   class="flex items-center space-x-3 px-3 py-2 rounded text-xs font-medium transition {{ request()->routeIs('admin.users.*') ? 'bg-lsp-input-bg text-lsp-navy font-bold border-l-4 border-lsp-navy' : 'text-slate-600 hover:text-lsp-navy hover:bg-slate-50' }}">
+                                    <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                                    </svg>
+                                    <span>Master Pengguna</span>
+                                </a>
+                                <a href="{{ route('admin.schemes.index') }}" 
+                                   class="flex items-center space-x-3 px-3 py-2 rounded text-xs font-medium transition {{ request()->routeIs('admin.schemes.*') ? 'bg-lsp-input-bg text-lsp-navy font-bold border-l-4 border-lsp-navy' : 'text-slate-600 hover:text-lsp-navy hover:bg-slate-50' }}">
+                                    <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                                    </svg>
+                                    <span>Master Skema Sertifikasi</span>
+                                </a>
+                                <a href="{{ route('admin.question-banks.index') }}" 
+                                   class="flex items-center space-x-3 px-3 py-2 rounded text-xs font-medium transition {{ request()->routeIs('admin.question-banks.*') ? 'bg-lsp-input-bg text-lsp-navy font-bold border-l-4 border-lsp-navy' : 'text-slate-600 hover:text-lsp-navy hover:bg-slate-50' }}">
+                                    <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                    </svg>
+                                    <span>Bank Soal CBT (IA05)</span>
+                                </a>
+                            @endif
+                        @endif
+
+                    </nav>
+                </div>
+
+                <!-- Sidebar Bottom: User Profile & Logout -->
+                <div class="p-3 border-t border-slate-200 bg-slate-50/50">
+                    <div class="flex items-center justify-between p-2">
+                        <div class="flex items-center space-x-2.5 overflow-hidden">
+                            <div class="w-8 h-8 rounded bg-lsp-navy text-white font-bold text-xs flex items-center justify-center flex-shrink-0 shadow-sm">
+                                {{ strtoupper(substr(auth()->user()->full_name, 0, 2)) }}
+                            </div>
+                            <div class="truncate">
+                                <p class="text-xs font-bold text-slate-800 truncate leading-tight">
+                                    {{ auth()->user()->full_name }}
+                                </p>
+                                <span class="inline-block px-1.5 py-0.2 text-[9px] font-bold rounded bg-lsp-navy/10 text-lsp-navy uppercase tracking-wider mt-0.5">
+                                    {{ auth()->user()->role }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Logout Form -->
+                        <form action="{{ route('logout') }}" method="POST">
+                            @csrf
+                            <button type="submit" 
+                                    title="Keluar" 
+                                    class="p-1.5 text-slate-400 hover:text-lsp-red hover:bg-red-50 rounded transition">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                                </svg>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+            </aside>
+
+            <!-- Main Content Area (Shifted for sidebar) -->
+            <div class="md:pl-64 flex flex-col flex-1">
+                
+                <!-- Top Horizontal Header Bar -->
+                <header class="bg-white border-b border-slate-200 sticky top-0 z-30">
+                    <!-- Top dual stripe above the header bar -->
+                    <div class="w-full flex h-1">
+                        <div class="w-2/3 bg-lsp-navy"></div>
+                        <div class="w-1/3 bg-lsp-red"></div>
+                    </div>
+
+                    <div class="px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between">
+                        <!-- Left: Mobile Toggle & Page Title -->
+                        <div class="flex items-center space-x-3">
+                            <button @click="sidebarOpen = !sidebarOpen" 
+                                    type="button" 
+                                    class="p-1.5 rounded-lg text-slate-600 hover:text-lsp-navy hover:bg-slate-100 md:hidden focus:outline-none">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                                </svg>
+                            </button>
+                            <h1 class="font-serif font-bold text-lg text-lsp-title tracking-tight">
+                                {{ $title ?? 'Sistem Asesmen Digital' }}
+                            </h1>
+                        </div>
+
+                        <!-- Right: Portal & Impersonation Badge -->
+                        <div class="flex items-center space-x-3">
+                            @if(session('admin_impersonator_id'))
+                                <div class="bg-amber-100 border border-amber-300 px-3 py-1 rounded text-xs font-semibold text-amber-900 flex items-center space-x-2 shadow-sm">
+                                    <span>Proxy Mode: <strong>{{ auth()->user()->full_name }}</strong></span>
+                                    <form action="{{ route('proxy.switch-back') }}" method="POST" class="inline">
+                                        @csrf
+                                        <button type="submit" class="bg-amber-800 hover:bg-slate-900 text-white px-2 py-0.5 rounded text-[10px] font-bold transition">
+                                            Kembali &rarr;
+                                        </button>
+                                    </form>
+                                </div>
+                            @endif
+
+                            <div class="hidden sm:flex items-center space-x-2 text-xs text-slate-500 font-medium">
+                                <svg class="w-3.5 h-3.5 text-lsp-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                                <span>{{ now()->isoFormat('D MMMM Y') }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </header>
+
+                <!-- Page Content Body -->
+                <main class="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
+                    
+                    {{-- Flash Messages --}}
+                    @if(session('success'))
+                        <div class="mb-6 rounded bg-emerald-50 border-l-4 border-emerald-500 p-4 text-xs text-emerald-800 flex items-start space-x-3 shadow-sm">
+                            <svg class="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <div class="flex-1 font-medium">{{ session('success') }}</div>
+                        </div>
+                    @endif
+
+                    @if(session('error'))
+                        <div class="mb-6 rounded bg-rose-50 border-l-4 border-lsp-red p-4 text-xs text-rose-800 flex items-start space-x-3 shadow-sm">
+                            <svg class="w-4 h-4 text-lsp-red shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <div class="flex-1 font-medium">{{ session('error') }}</div>
+                        </div>
+                    @endif
+
+                    @if($errors->any())
+                        <div class="mb-6 rounded bg-rose-50 border-l-4 border-lsp-red p-4 text-xs text-rose-800 shadow-sm">
+                            <div class="flex items-center space-x-2 font-bold mb-1">
+                                <svg class="w-4 h-4 text-lsp-red shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                <span>Terjadi kesalahan validasi:</span>
+                            </div>
+                            <ul class="list-disc list-inside space-y-0.5 text-rose-700 ml-5 text-xs">
+                                @foreach($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
+                    @yield('content')
+                </main>
+
+                <!-- Footer -->
+                <footer class="bg-white border-t border-slate-200 py-4 mt-auto">
+                    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-[11px] text-slate-500">
+                        <p>&copy; {{ date('Y') }} <strong>LSP PrO Indo</strong> (Lembaga Sertifikasi Profesi Praktisi Otomotif Indonesia). Lisensi Resmi BNSP.</p>
+                    </div>
+                </footer>
+
+            </div>
+        </div>
+    @endguest
+
+    @stack('scripts')
+</body>
+</html>

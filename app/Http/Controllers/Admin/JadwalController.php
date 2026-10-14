@@ -1,0 +1,124 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\Schedule;
+use App\Models\Scheme;
+use App\Models\User;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use Illuminate\View\View;
+
+class JadwalController extends Controller
+{
+    public function index(): View
+    {
+        $schedules = Schedule::with('scheme', 'assessors', 'creator')
+            ->latest('date')
+            ->paginate(15);
+
+        return view('admin.jadwal.index', compact('schedules'));
+    }
+
+    public function create(): View
+    {
+        $schemes = Scheme::active()->get();
+        $assessors = User::where('role', 'ASESOR')->where('status', 'ACTIVE')->get();
+
+        return view('admin.jadwal.create', compact('schemes', 'assessors'));
+    }
+
+    public function store(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'scheme_id' => 'required|exists:m_schemes,id',
+            'tuk_name' => 'nullable|string|max:255',
+            'date' => 'required|date',
+            'start_time' => 'nullable|string',
+            'end_time' => 'nullable|string',
+            'duration_minutes' => 'nullable|integer|min:1',
+            'selected_instruments' => 'nullable|array',
+            'notes' => 'nullable|string',
+            'assessor_ids' => 'nullable|array',
+            'assessors' => 'nullable|array',
+            'code' => 'nullable|string|max:50',
+        ]);
+
+        $code = $request->input('code') ?: strtoupper(Str::random(8));
+
+        $schedule = Schedule::create([
+            'name' => $validated['name'],
+            'scheme_id' => $validated['scheme_id'],
+            'tuk_name' => $validated['tuk_name'] ?? null,
+            'date' => $validated['date'],
+            'start_time' => $validated['start_time'] ?? null,
+            'end_time' => $validated['end_time'] ?? null,
+            'duration_minutes' => $validated['duration_minutes'] ?? null,
+            'selected_instruments' => $validated['selected_instruments'] ?? [],
+            'notes' => $validated['notes'] ?? null,
+            'code' => $code,
+            'status' => 'ACTIVE',
+            'created_by' => auth()->id(),
+        ]);
+
+        $assessorList = $request->input('assessor_ids', $request->input('assessors', []));
+        if (! empty($assessorList)) {
+            $schedule->assessors()->sync($assessorList);
+        }
+
+        return redirect()->route('admin.jadwal.index')
+            ->with('success', 'Jadwal berhasil dibuat.');
+    }
+
+    public function show(Schedule $jadwal): View
+    {
+        $jadwal->load('scheme', 'assessors', 'assessments.asesi.profile');
+
+        return view('admin.jadwal.show', compact('jadwal'));
+    }
+
+    public function edit(Schedule $jadwal): View
+    {
+        $schemes = Scheme::active()->get();
+        $assessors = User::where('role', 'ASESOR')->where('status', 'ACTIVE')->get();
+        $jadwal->load('assessors');
+
+        return view('admin.jadwal.edit', compact('jadwal', 'schemes', 'assessors'));
+    }
+
+    public function update(Request $request, Schedule $jadwal): RedirectResponse
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'scheme_id' => 'required|exists:m_schemes,id',
+            'tuk_name' => 'nullable|string|max:255',
+            'date' => 'required|date',
+            'start_time' => 'nullable|string',
+            'end_time' => 'nullable|string',
+            'duration_minutes' => 'nullable|integer|min:1',
+            'selected_instruments' => 'nullable|array',
+            'notes' => 'nullable|string',
+            'assessor_ids' => 'nullable|array',
+        ]);
+
+        $jadwal->update($validated);
+
+        if ($request->has('assessor_ids')) {
+            $jadwal->assessors()->sync($request->input('assessor_ids'));
+        }
+
+        return redirect()->route('admin.jadwal.index')
+            ->with('success', 'Jadwal berhasil diperbarui.');
+    }
+
+    public function destroy(Schedule $jadwal): RedirectResponse
+    {
+        $jadwal->delete();
+
+        return redirect()->route('admin.jadwal.index')
+            ->with('success', 'Jadwal berhasil dihapus.');
+    }
+}
