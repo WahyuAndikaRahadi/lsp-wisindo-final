@@ -154,6 +154,7 @@ class JadwalController extends Controller
             if ($status === 'APPROVED') {
                 if (! $workflowService->isCandidateDocumentComplete($assessment)) {
                     $skippedCandidates[] = $assessment->asesi->full_name ?? "Asesi #{$assessment->id}";
+
                     continue;
                 }
             }

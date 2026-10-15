@@ -203,7 +203,7 @@ class AkWorkflowService
             $deadline = $this->calculateAppealDeadline($baseDate);
 
             throw ValidationException::withMessages([
-                'appeal_reasons' => "Batas waktu pengajuan banding ({$days} hari kerja) telah berakhir pada " . $deadline->translatedFormat('d F Y') . ". Sesuai ketentuan, pengajuan banding tidak dapat diproses.",
+                'appeal_reasons' => "Batas waktu pengajuan banding ({$days} hari kerja) telah berakhir pada ".$deadline->translatedFormat('d F Y').'. Sesuai ketentuan, pengajuan banding tidak dapat diproses.',
             ]);
         }
 
