@@ -224,7 +224,16 @@
     </div>
 
     <div class="sheet">
+        @if(isset($docCode))
+            <div class="header-kop">
+                <div class="title-lsp">LEMBAGA SERTIFIKASI PROFESI PRAKTISI OTOMOTIF (LSP-PrO INDO)</div>
+                <div style="font-size: 8pt; color: #475569;">Lisensi BNSP: KEP.1444/BNSP/VIII/2021 | Alamat: Ruko Sedayu Square Blok J No. 17 Jakarta Barat</div>
+                <div class="doc-code">{{ $docCode }} - {{ $docTitle ?? '' }}</div>
+            </div>
+            <div style="border-bottom: 2px solid #000; margin-bottom: 12px;"></div>
+        @endif
         @yield('content')
+        @yield('print-content')
     </div>
 
     @stack('scripts')

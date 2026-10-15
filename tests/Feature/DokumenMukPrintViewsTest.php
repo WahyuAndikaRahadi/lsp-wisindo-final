@@ -295,4 +295,85 @@ class DokumenMukPrintViewsTest extends TestCase
         $suratRes->assertSee('3215012345670001');
         $suratRes->assertSee('Mematuhi ketentuan yang relevan dalam skema sertifikasi.');
     }
+
+    public function test_can_render_fr_mapa02_peta_instrumen_asesmen(): void
+    {
+        $response = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.export', [
+            'schedule' => $this->schedule->id,
+            'type' => 'mapa02',
+        ]));
+        $response->assertOk();
+        $response->assertSee('FR.MAPA.02');
+        $response->assertSee('PETA INSTRUMEN ASESMEN');
+        $response->assertSee('Engine Junior Technician');
+    }
+
+    public function test_can_render_fr_ia05_variants_a_b_c(): void
+    {
+        // IA.05.B Answer Key (Schedule level)
+        $resB = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.export', [
+            'schedule' => $this->schedule->id,
+            'type' => 'ia05b',
+        ]));
+        $resB->assertOk();
+        $resB->assertSee('FR.IA.05.B');
+        $resB->assertSee('LEMBAR KUNCI JAWABAN');
+
+        // IA.05.A Question sheet (Asesi level)
+        $resA = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.export-asesi', [
+            'assessment' => $this->assessment->id,
+            'type' => 'ia05a',
+        ]));
+        $resA->assertOk();
+        $resA->assertSee('FR.IA.05.A');
+        $resA->assertSee('PERTANYAAN TERTULIS PILIHAN GANDA');
+
+        // IA.05.C Answer sheet (Asesi level)
+        $resC = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.export-asesi', [
+            'assessment' => $this->assessment->id,
+            'type' => 'ia05c',
+        ]));
+        $resC->assertOk();
+        $resC->assertSee('FR.IA.05.C');
+        $resC->assertSee('LEMBAR JAWABAN PILIHAN GANDA');
+    }
+
+    public function test_can_render_fr_ia01_ia01b_ia02_ia03(): void
+    {
+        // IA.01 Observation Checklist
+        $res01 = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.export-asesi', [
+            'assessment' => $this->assessment->id,
+            'type' => 'ia01',
+        ]));
+        $res01->assertOk();
+        $res01->assertSee('FR.IA.01');
+        $res01->assertSee('CEKLIS OBSERVASI AKTIVITAS');
+
+        // IA.01B Report Sheet
+        $res01b = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.export-asesi', [
+            'assessment' => $this->assessment->id,
+            'type' => 'ia01b',
+        ]));
+        $res01b->assertOk();
+        $res01b->assertSee('FR.IA.01B');
+        $res01b->assertSee('REPORT SHEET');
+
+        // IA.02 Practical Demonstration
+        $res02 = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.export-asesi', [
+            'assessment' => $this->assessment->id,
+            'type' => 'ia02',
+        ]));
+        $res02->assertOk();
+        $res02->assertSee('FR.IA.02');
+        $res02->assertSee('TUGAS PRAKTIK DEMONSTRASI');
+
+        // IA.03 Oral Questions
+        $res03 = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.export-asesi', [
+            'assessment' => $this->assessment->id,
+            'type' => 'ia03',
+        ]));
+        $res03->assertOk();
+        $res03->assertSee('FR.IA.03');
+        $res03->assertSee('PERTANYAAN MENDUKUNG OBSERVASI');
+    }
 }

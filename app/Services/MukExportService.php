@@ -16,6 +16,7 @@ class MukExportService
     {
         $schedule->load([
             'scheme.competencyUnits.elements.kuks',
+            'scheme.questionBanks',
             'assessors.profile',
             'assessments.asesi.profile',
             'assessments.ak02Items.competencyUnit',
@@ -43,6 +44,7 @@ class MukExportService
             'total_kompeten_terbilang' => self::terbilang($totalKompeten),
             'total_belum_kompeten' => $totalBelumKompeten,
             'total_belum_kompeten_terbilang' => self::terbilang($totalBelumKompeten),
+            'questionBanks' => $schedule->scheme?->questionBanks ?? collect(),
         ];
     }
 
@@ -55,6 +57,7 @@ class MukExportService
     {
         $assessment->load([
             'schedule.scheme.competencyUnits.elements.kuks',
+            'schedule.scheme.questionBanks',
             'schedule.assessors.profile',
             'asesi.profile',
             'assessor.profile',
@@ -77,6 +80,8 @@ class MukExportService
             'ak02Items' => $assessment->ak02Items,
             'ak03Items' => $assessment->ak03Items,
             'appeals' => $assessment->appeals,
+            'iaResponses' => $assessment->iaResponses,
+            'questionBanks' => $assessment->schedule?->scheme?->questionBanks ?? collect(),
         ];
     }
 
