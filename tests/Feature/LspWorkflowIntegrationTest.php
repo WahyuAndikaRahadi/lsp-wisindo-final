@@ -583,4 +583,65 @@ class LspWorkflowIntegrationTest extends TestCase
         $signedViewRes->assertSee('Proses verifikasi pengukuran objektif dan jelas.');
         $signedViewRes->assertSee($sigData);
     }
+
+    public function test_admin_can_batch_approve_candidate_registrations(): void
+    {
+        $admin = User::where('role', 'ADMIN_LSP')->first();
+        $scheme = Scheme::where('code', 'SKM-01-2026')->first();
+        $asesor = User::where('email', 'asesor.randi@gmail.com')->first();
+        $asesi1 = User::where('email', 'asesi1@gmail.com')->first();
+
+        $schedule = Schedule::create([
+            'code' => 'LSP-BATCH-TEST',
+            'name' => 'Batch Test Admin Approval',
+            'scheme_id' => $scheme->id,
+            'tuk_name' => 'TUK Otomotif Cikarang',
+            'date' => '2026-11-25',
+            'start_time' => '08:00:00',
+            'end_time' => '16:00:00',
+            'selected_instruments' => ['AK01', 'AK07', 'IA01', 'IA02', 'IA03', 'IA05'],
+            'status' => 'ACTIVE',
+            'created_by' => $admin->id,
+        ]);
+        $schedule->assessors()->attach($asesor->id);
+
+        $asesi2 = User::create([
+            'full_name' => 'Asesi Batch Test 2',
+            'email' => 'asesibatch2@test.local',
+            'password' => bcrypt('secret123'),
+            'role' => 'ASESI',
+            'status' => 'ACTIVE',
+        ]);
+
+        Assessment::create([
+            'schedule_id' => $schedule->id,
+            'asesi_id' => $asesi1->id,
+            'scheme_id' => $schedule->scheme_id,
+            'status' => 'REGISTERED',
+            'admin_status' => 'PENDING',
+            'apl_status' => 'SUBMITTED',
+        ]);
+
+        Assessment::create([
+            'schedule_id' => $schedule->id,
+            'asesi_id' => $asesi2->id,
+            'scheme_id' => $schedule->scheme_id,
+            'status' => 'REGISTERED',
+            'admin_status' => 'PENDING',
+            'apl_status' => 'SUBMITTED',
+        ]);
+
+        $res = $this->actingAs($admin)->post(
+            route('admin.jadwal.batch-review-registration', $schedule),
+            ['admin_status' => 'APPROVED']
+        );
+
+        $res->assertRedirect();
+        $res->assertSessionHas('success');
+
+        $pendingCount = Assessment::where('schedule_id', $schedule->id)->where('admin_status', 'PENDING')->count();
+        $this->assertEquals(0, $pendingCount);
+        $approvedCount = Assessment::where('schedule_id', $schedule->id)->where('admin_status', 'APPROVED')->count();
+        $this->assertEquals(2, $approvedCount);
+    }
 }

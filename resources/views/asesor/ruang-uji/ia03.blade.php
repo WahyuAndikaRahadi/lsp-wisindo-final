@@ -12,10 +12,30 @@
         @csrf
 
         {{-- Oral Questions Table --}}
-        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-            <div class="px-6 py-4 border-b border-slate-200">
-                <h2 class="text-base font-bold text-slate-900">Daftar Pertanyaan Lisan</h2>
-                <p class="text-xs text-slate-500">Nilai tanggapan lisan asesi terhadap pertanyaan terkait unjuk kerja</p>
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden" x-data="{
+            setAllQuestions(val) {
+                const target = val.toLowerCase();
+                document.querySelectorAll(`.q-radio-${target}`).forEach(el => {
+                    el.checked = true;
+                    el.dispatchEvent(new Event('change', { bubbles: true }));
+                });
+            }
+        }">
+            <div class="px-6 py-4 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50">
+                <div>
+                    <h2 class="text-base font-bold text-slate-900">Daftar Pertanyaan Lisan</h2>
+                    <p class="text-xs text-slate-500">Nilai tanggapan lisan asesi terhadap pertanyaan terkait unjuk kerja</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button type="button" @click="setAllQuestions('M')" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white rounded-lg text-xs font-bold shadow-xs transition flex items-center gap-1.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                        Semua M (Memuaskan)
+                    </button>
+                    <button type="button" @click="setAllQuestions('TM')" class="px-3.5 py-1.5 bg-rose-600 hover:bg-rose-700 active:bg-rose-800 text-white rounded-lg text-xs font-bold shadow-xs transition flex items-center gap-1.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        Semua TM
+                    </button>
+                </div>
             </div>
 
             <div class="overflow-x-auto">
@@ -24,7 +44,7 @@
                         <tr>
                             <th class="px-6 py-3 w-16">No</th>
                             <th class="px-6 py-3">Daftar Pertanyaan & Kunci Jawaban</th>
-                            <th class="px-6 py-3 text-center w-36">Hasil (Memuaskan / Tidak)</th>
+                            <th class="px-6 py-3 text-center w-40">Hasil (Memuaskan / Tidak)</th>
                             <th class="px-6 py-3 w-48">Tanggapan / Catatan Asesi</th>
                         </tr>
                     </thead>
@@ -46,16 +66,16 @@
                                 </td>
                                 <td class="px-6 py-3 text-center">
                                     <div class="flex items-center justify-center space-x-3">
-                                        <label class="inline-flex items-center cursor-pointer">
-                                            <input type="radio" name="questions[{{ $q->id }}][result]" value="M" required class="text-emerald-600 focus:ring-emerald-500 w-4 h-4" {{ $val === 'M' ? 'checked' : '' }}>
-                                            <span class="ml-1 text-xs font-semibold text-emerald-700">M</span>
+                                        <label class="p-2 inline-flex items-center cursor-pointer">
+                                            <input type="radio" name="questions[{{ $q->id }}][result]" value="M" required class="q-radio q-radio-m text-emerald-600 focus:ring-emerald-500 w-5 h-5 cursor-pointer" {{ $val === 'M' ? 'checked' : '' }}>
+                                            <span class="ml-1.5 text-xs font-bold text-emerald-700">M</span>
                                         </label>
-                                        <label class="inline-flex items-center cursor-pointer">
-                                            <input type="radio" name="questions[{{ $q->id }}][result]" value="TM" required class="text-rose-600 focus:ring-rose-500 w-4 h-4" {{ $val === 'TM' ? 'checked' : '' }}>
-                                            <span class="ml-1 text-xs font-semibold text-rose-700">TM</span>
+                                        <label class="p-2 inline-flex items-center cursor-pointer">
+                                            <input type="radio" name="questions[{{ $q->id }}][result]" value="TM" required class="q-radio q-radio-tm text-rose-600 focus:ring-rose-500 w-5 h-5 cursor-pointer" {{ $val === 'TM' ? 'checked' : '' }}>
+                                            <span class="ml-1.5 text-xs font-bold text-rose-700">TM</span>
                                         </label>
                                     </div>
-                                    <div class="text-[10px] text-slate-400 mt-1">M: Memuaskan | TM: Tidak</div>
+                                    <div class="text-[10px] text-slate-400 mt-0.5">M: Memuaskan | TM: Tidak</div>
                                 </td>
                                 <td class="px-6 py-3">
                                     <textarea name="questions[{{ $q->id }}][response]" rows="2" placeholder="Catatan tanggapan asesi..." class="w-full px-2.5 py-1 text-xs rounded border border-slate-300 focus:ring-1 focus:ring-brand-500 focus:outline-none">{{ $response }}</textarea>

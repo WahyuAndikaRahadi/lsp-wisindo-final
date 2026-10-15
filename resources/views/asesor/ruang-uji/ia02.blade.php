@@ -134,10 +134,30 @@
         </div>
 
         {{-- Demonstration Tasks --}}
-        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-            <div class="px-6 py-4 border-b border-slate-200">
-                <h2 class="text-base font-bold text-slate-900">Lembar Penilaian Praktik Demonstrasi</h2>
-                <p class="text-xs text-slate-500">Beri penilaian pencapaian untuk setiap instruksi tugas/demonstrasi</p>
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden" x-data="{
+            setAllTasks(val) {
+                const target = val.toLowerCase();
+                document.querySelectorAll(`.task-radio-${target}`).forEach(el => {
+                    el.checked = true;
+                    el.dispatchEvent(new Event('change', { bubbles: true }));
+                });
+            }
+        }">
+            <div class="px-6 py-4 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50">
+                <div>
+                    <h2 class="text-base font-bold text-slate-900">Lembar Penilaian Praktik Demonstrasi</h2>
+                    <p class="text-xs text-slate-500">Beri penilaian pencapaian untuk setiap instruksi tugas/demonstrasi</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button type="button" @click="setAllTasks('YA')" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white rounded-lg text-xs font-bold shadow-xs transition flex items-center gap-1.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                        Semua Ya
+                    </button>
+                    <button type="button" @click="setAllTasks('TIDAK')" class="px-3.5 py-1.5 bg-rose-600 hover:bg-rose-700 active:bg-rose-800 text-white rounded-lg text-xs font-bold shadow-xs transition flex items-center gap-1.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        Semua Tidak
+                    </button>
+                </div>
             </div>
 
             <div class="overflow-x-auto">
@@ -146,7 +166,7 @@
                         <tr>
                             <th class="px-6 py-3 w-16">No</th>
                             <th class="px-6 py-3">Instruksi Kerja / Tugas Praktik</th>
-                            <th class="px-6 py-3 text-center w-36">Pencapaian (Ya / Tidak)</th>
+                            <th class="px-6 py-3 text-center w-40">Pencapaian (Ya / Tidak)</th>
                             <th class="px-6 py-3 w-48">Catatan Pengamatan</th>
                         </tr>
                     </thead>
@@ -166,18 +186,18 @@
                                 </td>
                                 <td class="px-6 py-3 text-center">
                                     <div class="flex items-center justify-center space-x-4">
-                                        <label class="inline-flex items-center cursor-pointer">
-                                            <input type="radio" name="tasks[{{ $task->id }}][result]" value="YA" required class="text-emerald-600 focus:ring-emerald-500 w-4 h-4" {{ $val === 'YA' ? 'checked' : '' }}>
-                                            <span class="ml-1 text-xs font-semibold text-emerald-700">Ya</span>
+                                        <label class="p-2 inline-flex items-center cursor-pointer">
+                                            <input type="radio" name="tasks[{{ $task->id }}][result]" value="YA" required class="task-radio task-radio-ya text-emerald-600 focus:ring-emerald-500 w-5 h-5 cursor-pointer" {{ $val === 'YA' ? 'checked' : '' }}>
+                                            <span class="ml-1.5 text-xs font-bold text-emerald-700">Ya</span>
                                         </label>
-                                        <label class="inline-flex items-center cursor-pointer">
-                                            <input type="radio" name="tasks[{{ $task->id }}][result]" value="TIDAK" required class="text-rose-600 focus:ring-rose-500 w-4 h-4" {{ $val === 'TIDAK' ? 'checked' : '' }}>
-                                            <span class="ml-1 text-xs font-semibold text-rose-700">Tidak</span>
+                                        <label class="p-2 inline-flex items-center cursor-pointer">
+                                            <input type="radio" name="tasks[{{ $task->id }}][result]" value="TIDAK" required class="task-radio task-radio-tidak text-rose-600 focus:ring-rose-500 w-5 h-5 cursor-pointer" {{ $val === 'TIDAK' ? 'checked' : '' }}>
+                                            <span class="ml-1.5 text-xs font-bold text-rose-700">Tidak</span>
                                         </label>
                                     </div>
                                 </td>
                                 <td class="px-6 py-3">
-                                    <input type="text" name="tasks[{{ $task->id }}][note]" value="{{ $note }}" placeholder="Catatan..." class="w-full px-2.5 py-1 text-xs rounded border border-slate-300 focus:ring-1 focus:ring-brand-500 focus:outline-none">
+                                    <input type="text" name="tasks[{{ $task->id }}][note]" value="{{ $note }}" placeholder="Catatan..." class="w-full px-2.5 py-1.5 text-xs rounded border border-slate-300 focus:ring-1 focus:ring-brand-500 focus:outline-none">
                                 </td>
                             </tr>
                         @empty

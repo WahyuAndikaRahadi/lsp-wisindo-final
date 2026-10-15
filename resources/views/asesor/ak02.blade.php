@@ -42,11 +42,43 @@
         @csrf
 
         {{-- Units Table with Methods Checkboxes --}}
-        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-            <div class="px-6 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden" x-data="{
+            setAllUnits(val) {
+                document.querySelectorAll('.unit-result-select').forEach(el => el.value = val);
+                const finalSel = document.getElementById('finalResultSelect');
+                if (finalSel) {
+                    finalSel.value = (val == 1) ? 'KOMPETEN' : 'BELUM_KOMPETEN';
+                }
+            },
+            toggleMethod(name) {
+                const boxes = document.querySelectorAll(`input[name*='[${name}]']`);
+                const allChecked = Array.from(boxes).every(b => b.checked);
+                boxes.forEach(b => b.checked = !allChecked);
+            }
+        }">
+            <div class="px-6 py-4 bg-slate-50 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
                     <h2 class="text-sm font-bold text-slate-900">Unit Kompetensi & Metode Asesmen yang Digunakan</h2>
                     <p class="text-xs text-slate-500">Beri tanda centang pada metode pengumpulan bukti yang diperoleh untuk menentukan kompetensi asesi</p>
+                </div>
+                <div class="flex items-center gap-2 flex-wrap">
+                    <button type="button" @click="setAllUnits(1)" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white rounded text-xs font-bold shadow-xs transition flex items-center gap-1">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                        Semua K
+                    </button>
+                    <button type="button" @click="setAllUnits(0)" class="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 active:bg-rose-800 text-white rounded text-xs font-bold shadow-xs transition flex items-center gap-1">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        Semua BK
+                    </button>
+                    <button type="button" @click="toggleMethod('observasi_demonstrasi')" class="px-2.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded text-xs font-medium transition">
+                        + Observasi
+                    </button>
+                    <button type="button" @click="toggleMethod('tulis')" class="px-2.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded text-xs font-medium transition">
+                        + Tulis (CBT)
+                    </button>
+                    <button type="button" @click="toggleMethod('lisan')" class="px-2.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded text-xs font-medium transition">
+                        + Lisan (PMO)
+                    </button>
                 </div>
             </div>
 
@@ -61,7 +93,7 @@
                             <th class="px-2 py-3 text-center">Lisan (PMO)</th>
                             <th class="px-2 py-3 text-center">Tulis (CBT)</th>
                             <th class="px-2 py-3 text-center">Pihak Ketiga</th>
-                            <th class="px-3 py-3 text-center w-28">Hasil Unit</th>
+                            <th class="px-3 py-3 text-center w-32">Hasil Unit</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100">
@@ -78,22 +110,32 @@
                                     <span class="text-slate-700">{{ $unit->title }}</span>
                                 </td>
                                 <td class="px-2 py-3 text-center">
-                                    <input type="checkbox" name="units[{{ $unit->id }}][observasi_demonstrasi]" value="1" {{ !empty($methods['observasi_demonstrasi']) ? 'checked' : '' }} class="rounded border-slate-300 text-brand-600 focus:ring-brand-500">
+                                    <label class="p-2 inline-flex items-center justify-center cursor-pointer">
+                                        <input type="checkbox" name="units[{{ $unit->id }}][observasi_demonstrasi]" value="1" {{ !empty($methods['observasi_demonstrasi']) ? 'checked' : '' }} class="w-5 h-5 rounded border-slate-300 text-brand-600 focus:ring-brand-500 cursor-pointer">
+                                    </label>
                                 </td>
                                 <td class="px-2 py-3 text-center">
-                                    <input type="checkbox" name="units[{{ $unit->id }}][portofolio]" value="1" {{ !empty($methods['portofolio']) ? 'checked' : '' }} class="rounded border-slate-300 text-brand-600 focus:ring-brand-500">
+                                    <label class="p-2 inline-flex items-center justify-center cursor-pointer">
+                                        <input type="checkbox" name="units[{{ $unit->id }}][portofolio]" value="1" {{ !empty($methods['portofolio']) ? 'checked' : '' }} class="w-5 h-5 rounded border-slate-300 text-brand-600 focus:ring-brand-500 cursor-pointer">
+                                    </label>
                                 </td>
                                 <td class="px-2 py-3 text-center">
-                                    <input type="checkbox" name="units[{{ $unit->id }}][lisan]" value="1" {{ !empty($methods['lisan']) ? 'checked' : '' }} class="rounded border-slate-300 text-brand-600 focus:ring-brand-500">
+                                    <label class="p-2 inline-flex items-center justify-center cursor-pointer">
+                                        <input type="checkbox" name="units[{{ $unit->id }}][lisan]" value="1" {{ !empty($methods['lisan']) ? 'checked' : '' }} class="w-5 h-5 rounded border-slate-300 text-brand-600 focus:ring-brand-500 cursor-pointer">
+                                    </label>
                                 </td>
                                 <td class="px-2 py-3 text-center">
-                                    <input type="checkbox" name="units[{{ $unit->id }}][tulis]" value="1" {{ !empty($methods['tulis']) ? 'checked' : '' }} class="rounded border-slate-300 text-brand-600 focus:ring-brand-500">
+                                    <label class="p-2 inline-flex items-center justify-center cursor-pointer">
+                                        <input type="checkbox" name="units[{{ $unit->id }}][tulis]" value="1" {{ !empty($methods['tulis']) ? 'checked' : '' }} class="w-5 h-5 rounded border-slate-300 text-brand-600 focus:ring-brand-500 cursor-pointer">
+                                    </label>
                                 </td>
                                 <td class="px-2 py-3 text-center">
-                                    <input type="checkbox" name="units[{{ $unit->id }}][pihak_ketiga]" value="1" {{ !empty($methods['pihak_ketiga']) ? 'checked' : '' }} class="rounded border-slate-300 text-brand-600 focus:ring-brand-500">
+                                    <label class="p-2 inline-flex items-center justify-center cursor-pointer">
+                                        <input type="checkbox" name="units[{{ $unit->id }}][pihak_ketiga]" value="1" {{ !empty($methods['pihak_ketiga']) ? 'checked' : '' }} class="w-5 h-5 rounded border-slate-300 text-brand-600 focus:ring-brand-500 cursor-pointer">
+                                    </label>
                                 </td>
                                 <td class="px-3 py-3 text-center">
-                                    <select name="units[{{ $unit->id }}][is_competent]" class="text-xs font-bold rounded border-slate-300 focus:ring-brand-500 {{ $isCompetent ? 'text-emerald-700' : 'text-rose-700' }}">
+                                    <select name="units[{{ $unit->id }}][is_competent]" class="unit-result-select text-xs font-bold rounded border-slate-300 focus:ring-brand-500 py-1.5 px-2 w-full {{ $isCompetent ? 'text-emerald-700' : 'text-rose-700' }}">
                                         <option value="1" {{ $isCompetent ? 'selected' : '' }}>Kompeten (K)</option>
                                         <option value="0" {{ !$isCompetent ? 'selected' : '' }}>Belum Kompeten (BK)</option>
                                     </select>
@@ -112,7 +154,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label class="block font-bold text-slate-700 mb-1">Rekomendasi Hasil Asesmen (*):</label>
-                    <select name="final_result" class="w-full text-xs font-bold rounded-lg border-slate-300 focus:ring-brand-500">
+                    <select name="final_result" id="finalResultSelect" class="w-full text-xs font-bold rounded-lg border-slate-300 focus:ring-brand-500">
                         <option value="KOMPETEN" {{ ($assessment->final_result ?? 'KOMPETEN') === 'KOMPETEN' ? 'selected' : '' }}>KOMPETEN (K)</option>
                         <option value="BELUM_KOMPETEN" {{ ($assessment->final_result ?? '') === 'BELUM_KOMPETEN' ? 'selected' : '' }}>BELUM KOMPETEN (BK)</option>
                     </select>

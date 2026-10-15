@@ -138,4 +138,26 @@ class JadwalController extends Controller
 
         return back()->with('success', "Status pendaftaran asesi {$assessment->asesi->full_name} berhasil diperbarui menjadi {$status}.");
     }
+
+    public function batchReviewRegistration(Schedule $jadwal, Request $request): RedirectResponse
+    {
+        $status = strtoupper((string) ($request->input('admin_status') ?? 'APPROVED'));
+        $notes = $request->input('admin_notes', 'Persetujuan batch admin');
+        $workflowService = app(AkWorkflowService::class);
+        $count = 0;
+
+        foreach ($jadwal->assessments as $assessment) {
+            if (($assessment->admin_status ?? 'PENDING') !== $status) {
+                $workflowService->approveCandidateRegistration(
+                    $assessment,
+                    $status,
+                    $notes,
+                    auth()->id()
+                );
+                $count++;
+            }
+        }
+
+        return back()->with('success', "Berhasil memperbarui status {$count} pendaftar menjadi {$status}.");
+    }
 }

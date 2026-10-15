@@ -22,11 +22,21 @@
 
     {{-- Review Asesi Table (4 Status Components) --}}
     <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-        <div class="px-6 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+        <div class="px-6 py-4 bg-slate-50 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
                 <h2 class="text-sm font-bold text-slate-900">Tabel Status & Review Peserta Uji ({{ $jadwal->assessments->count() }})</h2>
                 <p class="text-xs text-slate-500">Pantau 4 komponen status: Approval Admin, Approval Asesor, Hasil Asesmen, dan Status Banding</p>
             </div>
+            @if($jadwal->assessments->where('admin_status', '!=', 'APPROVED')->count() > 0)
+                <form action="{{ route('admin.jadwal.batch-review-registration', $jadwal->id) }}" method="POST" onsubmit="return confirm('Setujui semua pendaftar pada jadwal ini?')">
+                    @csrf
+                    <input type="hidden" name="admin_status" value="APPROVED">
+                    <button type="submit" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold shadow-xs transition flex items-center gap-1.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                        Setujui Semua Pendaftar (Batch)
+                    </button>
+                </form>
+            @endif
         </div>
 
         <div class="overflow-x-auto">

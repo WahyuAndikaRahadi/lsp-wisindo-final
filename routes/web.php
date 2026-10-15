@@ -138,6 +138,7 @@ Route::middleware(['auth', 'role:SUPER_ADMIN,ADMIN_LSP,KOMITE_TEKNIS,TUK_ADMIN']
 
     // Candidate Registration Review
     Route::post('/assessment/{assessment}/review-registration', [Admin\JadwalController::class, 'reviewRegistration'])->name('assessment.review-registration');
+    Route::post('/jadwal/{jadwal}/batch-review-registration', [Admin\JadwalController::class, 'batchReviewRegistration'])->name('jadwal.batch-review-registration');
 
     // Appeals (FR.AK.04)
     Route::get('/appeals', [Admin\AppealController::class, 'index'])->name('appeals.index');
