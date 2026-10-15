@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Asesor;
 
+use App\Http\Controllers\Concerns\AuthorizesAssessor;
 use App\Http\Controllers\Controller;
 use App\Models\Assessment;
 use Illuminate\Http\RedirectResponse;
@@ -11,8 +12,12 @@ use Illuminate\View\View;
 
 class AplReviewController extends Controller
 {
+    use AuthorizesAssessor;
+
     public function show(Assessment $assessment): View
     {
+        $this->authorizeAssessorAssessment($assessment);
+
         $assessment->load([
             'asesi.profile',
             'schedule.scheme.competencyUnits.elements.kuks',
@@ -36,6 +41,8 @@ class AplReviewController extends Controller
 
     public function decide(Assessment $assessment, Request $request): RedirectResponse
     {
+        $this->authorizeAssessorAssessment($assessment);
+
         $status = strtoupper((string) ($request->input('apl_status') ?? $request->input('decision') ?? $request->input('action') ?? ''));
         if ($status === 'APPROVE') {
             $status = 'APPROVED';

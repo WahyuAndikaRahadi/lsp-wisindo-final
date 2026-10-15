@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Asesor;
 
+use App\Http\Controllers\Concerns\AuthorizesAssessor;
 use App\Http\Controllers\Controller;
 use App\Models\Assessment;
 use App\Models\AssessmentAk02Item;
@@ -15,6 +16,8 @@ use Illuminate\View\View;
 
 class FinalizationController extends Controller
 {
+    use AuthorizesAssessor;
+
     public function __construct(
         protected AkWorkflowService $workflowService
     ) {}
@@ -24,6 +27,8 @@ class FinalizationController extends Controller
      */
     public function completeAssessment(Assessment $assessment): RedirectResponse
     {
+        $this->authorizeAssessorAssessment($assessment);
+
         if ($assessment->schedule && $assessment->schedule->is_closed) {
             return back()->with('error', 'Jadwal asesmen sudah resmi ditutup.');
         }
@@ -51,6 +56,8 @@ class FinalizationController extends Controller
      */
     public function showAk02(Assessment $assessment): View
     {
+        $this->authorizeAssessorAssessment($assessment);
+
         $assessment->load([
             'schedule.scheme.competencyUnits',
             'asesi.profile',
@@ -75,6 +82,8 @@ class FinalizationController extends Controller
      */
     public function updateAk02(Assessment $assessment, Request $request): RedirectResponse
     {
+        $this->authorizeAssessorAssessment($assessment);
+
         if ($assessment->schedule && $assessment->schedule->is_closed) {
             return back()->with('error', 'Jadwal asesmen sudah ditutup dan dikunci.');
         }
@@ -144,6 +153,8 @@ class FinalizationController extends Controller
      */
     public function showReports(Schedule $schedule): View
     {
+        $this->authorizeAssessorSchedule($schedule);
+
         $schedule->load('scheme', 'assessors', 'assessments.asesi');
 
         return view('asesor.reports-ak05-ak06', compact('schedule'));
@@ -154,6 +165,8 @@ class FinalizationController extends Controller
      */
     public function submitReports(Schedule $schedule, Request $request): RedirectResponse
     {
+        $this->authorizeAssessorSchedule($schedule);
+
         $validated = $request->validate([
             'ak05_aspek_positif' => 'required|string|min:10',
             'ak05_aspek_negatif' => 'required|string|min:10',
@@ -212,6 +225,8 @@ class FinalizationController extends Controller
      */
     public function finalize(Schedule $schedule): RedirectResponse
     {
+        $this->authorizeAssessorSchedule($schedule);
+
         if ($schedule->is_closed) {
             return redirect()->route('asesor.jadwal.index')
                 ->with('info', 'Jadwal asesmen ini sudah resmi ditutup sebelumnya.');

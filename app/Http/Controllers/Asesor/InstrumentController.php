@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers\Asesor;
 
+use App\Http\Controllers\Concerns\AuthorizesAssessor;
 use App\Http\Controllers\Controller;
 use App\Models\Assessment;
 use App\Models\AssessmentIaResponse;
 use App\Models\Schedule;
+use App\Rules\ValidSignature;
 use App\Services\SchemeInstrumentService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -15,6 +17,8 @@ use Illuminate\View\View;
 
 class InstrumentController extends Controller
 {
+    use AuthorizesAssessor;
+
     /**
      * Metadata definitions for standard BNSP instruments.
      */
@@ -74,6 +78,8 @@ class InstrumentController extends Controller
      */
     public function scheduleRuangUji(Schedule $schedule): View|RedirectResponse
     {
+        $this->authorizeAssessorSchedule($schedule);
+
         $unapprovedCount = $schedule->assessments()->where('apl_status', '!=', 'APPROVED')->count();
         if ($unapprovedCount > 0) {
             return redirect()->route('asesor.jadwal.asesi', $schedule->id)
@@ -136,6 +142,8 @@ class InstrumentController extends Controller
      */
     public function scheduleInstrument(Schedule $schedule, string $code, SchemeInstrumentService $instrumentService): View
     {
+        $this->authorizeAssessorSchedule($schedule);
+
         $codeUpper = strtoupper($code);
         $codeLower = strtolower($code);
 
@@ -208,9 +216,12 @@ class InstrumentController extends Controller
 
     public function ak01Schedule(Schedule $schedule, Request $request)
     {
+        $this->authorizeAssessorSchedule($schedule);
+
         $assessmentId = $request->query('assessment');
         if ($assessmentId) {
             $assessment = Assessment::with('schedule.scheme', 'asesi.profile', 'assessor')->findOrFail($assessmentId);
+            $this->authorizeAssessorAssessment($assessment);
 
             return view('asesor.ak01', compact('schedule', 'assessment'));
         }
@@ -220,6 +231,13 @@ class InstrumentController extends Controller
 
     public function ak01Sign(Assessment $assessment, Request $request): RedirectResponse
     {
+        $this->authorizeAssessorAssessment($assessment);
+
+        $request->validate([
+            'assessor_signature' => ['nullable', 'string', new ValidSignature],
+            'signature_data' => ['nullable', 'string', new ValidSignature],
+        ]);
+
         $signature = $request->input('assessor_signature') ?? $request->input('signature_data');
         $assessment->update([
             'assessor_signature' => $signature,
@@ -235,6 +253,8 @@ class InstrumentController extends Controller
 
     public function hub(Assessment $assessment): View
     {
+        $this->authorizeAssessorAssessment($assessment);
+
         $assessment->load('schedule.scheme', 'asesi.profile', 'iaResponses');
 
         return view('asesor.ruang-uji.hub', compact('assessment'));
@@ -242,6 +262,8 @@ class InstrumentController extends Controller
 
     public function instrumentShow(Assessment $assessment, $code, SchemeInstrumentService $instrumentService): View
     {
+        $this->authorizeAssessorAssessment($assessment);
+
         $code = strtolower($code);
 
         if ($code === 'ak01') {
@@ -306,6 +328,8 @@ class InstrumentController extends Controller
 
     public function instrumentStore(Assessment $assessment, $code, Request $request): RedirectResponse
     {
+        $this->authorizeAssessorAssessment($assessment);
+
         $code = strtoupper($code);
 
         if ($assessment->schedule && $assessment->schedule->is_closed) {
@@ -315,6 +339,11 @@ class InstrumentController extends Controller
         if ($assessment->apl_status !== 'APPROVED') {
             return back()->with('error', 'Penilaian instrumen hanya dapat direkam untuk asesi yang permohonan APL-nya telah disetujui.');
         }
+
+        $request->validate([
+            'signature_data' => ['nullable', 'string', new ValidSignature],
+            'assessor_signature' => ['nullable', 'string', new ValidSignature],
+        ]);
 
         $data = $request->input('data') ?? [
             'kuks' => $request->input('kuks'),

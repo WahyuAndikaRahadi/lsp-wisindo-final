@@ -7,6 +7,7 @@ use App\Models\Assessment;
 use App\Models\AssessmentAppeal;
 use App\Models\AssessmentIaResponse;
 use App\Models\QuestionBank;
+use App\Rules\ValidSignature;
 use App\Services\AkWorkflowService;
 use App\Services\AutoGradeService;
 use App\Services\SchemeInstrumentService;
@@ -37,6 +38,11 @@ class RuangUjiController extends Controller
         if ($assessment->apl_status !== 'APPROVED') {
             return back()->with('error', 'FR.AK.01 hanya dapat disetujui setelah permohonan APL Anda disetujui asesor.');
         }
+
+        $request->validate([
+            'signature_data' => ['nullable', 'string', new ValidSignature],
+            'asesi_signature' => ['nullable', 'string', new ValidSignature],
+        ]);
 
         $now = now();
         $signature = $request->input('signature_data') ?? $request->input('asesi_signature') ?? $assessment->asesi_signature;
@@ -172,6 +178,11 @@ class RuangUjiController extends Controller
         if ($request->filled('asesi_feedback')) {
             $response->asesi_feedback = $request->input('asesi_feedback');
         }
+
+        $request->validate([
+            'signature_data' => ['nullable', 'string', new ValidSignature],
+            'asesi_signature' => ['nullable', 'string', new ValidSignature],
+        ]);
 
         $signature = $request->input('signature_data') ?? $request->input('asesi_signature');
         if ($signature) {

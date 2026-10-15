@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Asesor;
 
+use App\Http\Controllers\Concerns\AuthorizesAssessor;
 use App\Http\Controllers\Controller;
 use App\Models\AssessmentAk07Item;
 use App\Models\Schedule;
@@ -12,8 +13,12 @@ use Illuminate\View\View;
 
 class Ak07Controller extends Controller
 {
+    use AuthorizesAssessor;
+
     public function index(Schedule $schedule, Request $request): View|RedirectResponse
     {
+        $this->authorizeAssessorSchedule($schedule);
+
         $schedule->load('scheme', 'assessments.asesi', 'assessments.ak07Items');
 
         $unapprovedCount = $schedule->assessments()->where('apl_status', '!=', 'APPROVED')->count();
@@ -31,6 +36,8 @@ class Ak07Controller extends Controller
 
     public function store(Schedule $schedule, Request $request): RedirectResponse
     {
+        $this->authorizeAssessorSchedule($schedule);
+
         if ($schedule->is_closed) {
             return back()->with('error', 'Jadwal asesmen sudah resmi ditutup.');
         }

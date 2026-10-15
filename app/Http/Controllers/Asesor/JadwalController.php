@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Asesor;
 
+use App\Http\Controllers\Concerns\AuthorizesAssessor;
 use App\Http\Controllers\Controller;
 use App\Models\Assessment;
 use App\Models\Schedule;
@@ -9,6 +10,8 @@ use Illuminate\View\View;
 
 class JadwalController extends Controller
 {
+    use AuthorizesAssessor;
+
     public function index(): View
     {
         $user = auth()->user();
@@ -48,6 +51,8 @@ class JadwalController extends Controller
 
     public function asesiList(Schedule $schedule): View
     {
+        $this->authorizeAssessorSchedule($schedule);
+
         $schedule->load('scheme');
         $jadwal = $schedule;
         $assessments = $schedule->assessments()

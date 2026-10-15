@@ -22,6 +22,21 @@ class ProxyController extends Controller
 
     public function impersonate(User $user): RedirectResponse
     {
+        // Prevent privilege escalation to SUPER_ADMIN
+        if ($user->role === 'SUPER_ADMIN') {
+            abort(403, 'Tidak diizinkan melakukan impersonasi ke akun Super Admin.');
+        }
+
+        // Prevent self-impersonation
+        if ($user->id === auth()->id()) {
+            return back()->with('warning', 'Tidak dapat melakukan impersonasi ke akun sendiri.');
+        }
+
+        // Prevent nested/chained impersonation
+        if (session()->has('admin_impersonator_id')) {
+            return back()->with('error', 'Selesaikan sesi impersonasi aktif terlebih dahulu.');
+        }
+
         session(['admin_impersonator_id' => auth()->id()]);
 
         Auth::login($user);

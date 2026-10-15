@@ -82,10 +82,11 @@ class AuthController extends Controller
     public function proxySwitchBack(Request $request)
     {
         if ($originalAdminId = session('admin_impersonator_id')) {
+            session()->forget('admin_impersonator_id');
             $admin = User::find($originalAdminId);
-            if ($admin) {
+            if ($admin && in_array($admin->role, ['SUPER_ADMIN', 'ADMIN_LSP'], true)) {
+                $request->session()->regenerate();
                 Auth::login($admin);
-                session()->forget('admin_impersonator_id');
 
                 return redirect()->route('admin.proxy.index')->with('success', 'Kembali ke sesi Admin.');
             }

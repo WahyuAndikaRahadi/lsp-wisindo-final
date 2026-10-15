@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Asesi;
 
 use App\Http\Controllers\Controller;
 use App\Models\UserProfile;
+use App\Rules\ValidSignature;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -33,7 +34,7 @@ class ProfileController extends Controller
             'nama_institusi_perusahaan' => 'nullable|string|max:255',
             'jabatan' => 'nullable|string|max:100',
             'alamat_kantor' => 'nullable|string',
-            'signature_data' => 'nullable|string',
+            'signature_data' => ['nullable', 'string', new ValidSignature],
         ]);
 
         UserProfile::updateOrCreate(

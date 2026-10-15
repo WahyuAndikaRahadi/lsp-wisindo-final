@@ -41,6 +41,22 @@ class AplController extends Controller
                 ->with('info', 'Permohonan APL Anda sudah disetujui oleh Asesor.');
         }
 
+        $request->validate([
+            'proofs' => 'nullable|array',
+            'proofs.*' => 'nullable|file|mimes:pdf,jpg,jpeg,png,webp|max:5120',
+            'ktp' => 'nullable|file|mimes:pdf,jpg,jpeg,png,webp|max:5120',
+            'pas_foto' => 'nullable|file|mimes:jpeg,jpg,png,webp|max:3072',
+            'ijazah_smk' => 'nullable|file|mimes:pdf,jpg,jpeg,png,webp|max:5120',
+            'surat_siswa_aktif' => 'nullable|file|mimes:pdf,jpg,jpeg,png,webp|max:5120',
+            'ijazah_sma_sertifikat' => 'nullable|file|mimes:pdf,jpg,jpeg,png,webp|max:5120',
+            'pengalaman_kerja' => 'nullable|file|mimes:pdf,jpg,jpeg,png,webp|max:5120',
+        ], [
+            'proofs.*.mimes' => 'Format file bukti harus berupa PDF, JPG, PNG, atau WEBP.',
+            'proofs.*.max' => 'Ukuran file bukti maksimal 5 MB.',
+            'ktp.mimes' => 'Format KTP harus berupa PDF, JPG, PNG, atau WEBP.',
+            'pas_foto.mimes' => 'Format Pas Foto harus berupa JPG, PNG, atau WEBP.',
+        ]);
+
         $proofCategories = [
             'IJAZAH_SMK' => 'PERSYARATAN_DASAR',
             'SURAT_SISWA_AKTIF' => 'PERSYARATAN_DASAR',
