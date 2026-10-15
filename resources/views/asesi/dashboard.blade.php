@@ -131,41 +131,47 @@
                 @foreach($assessments as $item)
                     @php
                         $sch = $item->schedule;
-                        $aplStatusBadge = match($item->apl_status) {
-                            'APPROVED' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
-                            'SUBMITTED' => 'bg-blue-50 text-blue-700 border-blue-200',
-                            'REVISION_REQUESTED' => 'bg-amber-50 text-amber-700 border-amber-200',
-                            'REJECTED' => 'bg-rose-50 text-rose-700 border-rose-200',
-                            default => 'bg-slate-50 text-slate-600 border-slate-200',
-                        };
 
-                        // Determine target action url based on progress
-                        $isResume = ($item->apl_status === 'APPROVED');
-                        $targetUrl = route('asesi.assessment.apl', $item->id);
-
-                        if ($item->apl_status === 'APPROVED') {
-                            $targetUrl = match($item->last_active_step) {
-                                'ak01' => route('asesi.assessment.ak01', $item->id),
-                                'ruang-uji' => route('asesi.assessment.ruang-uji', $item->id),
-                                'ia05' => route('asesi.assessment.instrument.ia05', $item->id),
-                                default => route('asesi.assessment.ruang-uji', $item->id),
-                            };
+                        // 5-Stage progress determination
+                        if ($item->status === 'COMPLETED' || $item->final_result) {
+                            $stageNumber = 5;
+                            $stageTitle = 'Tahap 5 dari 5: Hasil Keputusan Asesmen (' . ($item->final_result ?? 'Selesai') . ')';
+                            $stageBadgeColor = ($item->final_result === 'KOMPETEN') ? 'bg-emerald-100 text-emerald-800 border-emerald-300' : 'bg-rose-100 text-rose-800 border-rose-300';
+                            $targetUrl = route('asesi.assessment.ruang-uji', $item->id);
+                        } elseif ($item->apl_status === 'APPROVED' && !empty($item->ak01_agreed_at)) {
+                            $stageNumber = 4;
+                            $stageTitle = 'Tahap 4 dari 5: Pelaksanaan Uji Kompetensi (Ruang Uji & CBT)';
+                            $stageBadgeColor = 'bg-indigo-100 text-indigo-800 border-indigo-200';
+                            $targetUrl = route('asesi.assessment.ruang-uji', $item->id);
+                        } elseif ($item->apl_status === 'APPROVED') {
+                            $stageNumber = 3;
+                            $stageTitle = 'Tahap 3 dari 5: Persetujuan Asesmen & Kerahasiaan (FR.AK.01)';
+                            $stageBadgeColor = 'bg-blue-100 text-blue-800 border-blue-200';
+                            $targetUrl = route('asesi.assessment.ak01', $item->id);
+                        } elseif ($item->admin_status === 'APPROVED' || $item->apl_status === 'SUBMITTED' || $item->apl_status === 'REVISION_REQUESTED') {
+                            $stageNumber = 2;
+                            $stageTitle = ($item->apl_status === 'REVISION_REQUESTED')
+                                ? 'Tahap 2 dari 5: Perbaikan Dokumen / Asesmen Mandiri (APL-02)'
+                                : (($item->apl_status === 'SUBMITTED') ? 'Tahap 2 dari 5: Menunggu Verifikasi APL oleh Asesor' : 'Tahap 2 dari 5: Mengisi Asesmen Mandiri (APL-02)');
+                            $stageBadgeColor = ($item->apl_status === 'REVISION_REQUESTED') ? 'bg-rose-100 text-rose-800 border-rose-300' : 'bg-amber-100 text-amber-800 border-amber-200';
+                            $targetUrl = route('asesi.assessment.apl', $item->id);
+                        } else {
+                            $stageNumber = 1;
+                            $stageTitle = 'Tahap 1 dari 5: Pendaftaran & Verifikasi Berkas (APL-01)';
+                            $stageBadgeColor = 'bg-slate-100 text-slate-800 border-slate-300';
+                            $targetUrl = route('asesi.assessment.apl', $item->id);
                         }
                     @endphp
                     <div class="p-4 sm:p-6 hover:bg-slate-50/60 transition flex flex-col md:flex-row md:items-center justify-between gap-4">
-                        <div class="space-y-1.5 flex-1 min-w-0">
+                        <div class="space-y-2 flex-1 min-w-0">
+                            {{-- Stage & Schedule Code Badges --}}
                             <div class="flex items-center space-x-2.5 flex-wrap gap-y-1">
                                 <span class="font-mono text-xs font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-700">
                                     {{ $sch->code }}
                                 </span>
-                                <span class="px-2 py-0.5 rounded text-xs font-semibold border {{ $aplStatusBadge }}">
-                                    APL: {{ str_replace('_', ' ', $item->apl_status) }}
+                                <span class="px-2.5 py-0.5 rounded text-xs font-bold border {{ $stageBadgeColor }}">
+                                    {{ $stageTitle }}
                                 </span>
-                                @if($item->status === 'COMPLETED')
-                                    <span class="px-2 py-0.5 rounded text-xs font-bold bg-purple-50 text-purple-700 border border-purple-200">
-                                        SELESAI
-                                    </span>
-                                @endif
                             </div>
 
                             <h3 class="text-base font-bold text-slate-900 leading-snug">
@@ -185,21 +191,57 @@
                                     </svg>
                                     {{ \Carbon\Carbon::parse($sch->date)->isoFormat('D MMMM Y') }} ({{ substr($sch->start_time, 0, 5) }} - {{ substr($sch->end_time, 0, 5) }})
                                 </span>
+                                @if($item->assessor)
+                                    <span class="flex items-center">
+                                        <svg class="w-3.5 h-3.5 mr-1 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7 7z"/>
+                                        </svg>
+                                        Asesor: <strong class="ml-1 text-slate-700">{{ $item->assessor->full_name }}</strong>
+                                    </span>
+                                @endif
                             </div>
+
+                            {{-- Revision Callout Box --}}
+                            @if($item->apl_status === 'REVISION_REQUESTED' && ($item->apl_revision_notes || $item->admin_notes))
+                                <div class="p-3 bg-rose-50 border-l-4 border-rose-500 rounded-r-lg text-xs text-rose-900 mt-2">
+                                    <div class="flex items-center space-x-1.5 font-bold mb-0.5">
+                                        <svg class="w-4 h-4 text-rose-600 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+                                        <span>Catatan Revisi Persyaratan:</span>
+                                    </div>
+                                    <p class="pl-5 text-rose-800">{{ $item->apl_revision_notes ?? $item->admin_notes }}</p>
+                                </div>
+                            @endif
                         </div>
 
-                        <div class="flex items-center space-x-3 shrink-0 w-full sm:w-auto">
-                            @if($item->apl_status === 'REVISION_REQUESTED')
-                                <a href="{{ route('asesi.assessment.apl', $item->id) }}" class="w-full sm:w-auto text-center justify-center px-4 py-2 text-xs font-bold bg-amber-500 hover:bg-amber-600 text-white rounded-lg shadow-sm transition">
-                                    Perbaiki APL &rarr;
+                        {{-- Action Buttons --}}
+                        <div class="flex items-center space-x-2 shrink-0 w-full sm:w-auto flex-wrap gap-y-2">
+                            @if($item->status === 'COMPLETED' || $item->final_result)
+                                <a href="{{ route('asesi.assessment.ruang-uji', $item->id) }}" class="px-3 py-2 text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 border border-slate-300 rounded-lg shadow-xs transition">
+                                    Lihat Rekap Hasil
+                                </a>
+                                <a href="{{ route('asesi.assessment.ak03', $item->id) }}" class="px-3 py-2 text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 rounded-lg shadow-xs transition" title="FR.AK.03 Umpan Balik Asesmen">
+                                    Umpan Balik (AK.03)
+                                </a>
+                                @if($item->final_result === 'BELUM_KOMPETEN' || $item->final_result === 'BK')
+                                    <a href="{{ route('asesi.assessment.appeal', $item->id) }}" class="px-3 py-2 text-xs font-bold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-300 rounded-lg shadow-xs transition" title="FR.AK.04 Banding Asesmen">
+                                        Banding (AK.04)
+                                    </a>
+                                @endif
+                            @elseif($item->apl_status === 'REVISION_REQUESTED')
+                                <a href="{{ route('asesi.assessment.apl', $item->id) }}" class="w-full sm:w-auto text-center justify-center px-5 py-2.5 text-xs font-bold bg-amber-500 hover:bg-amber-600 text-white rounded-lg shadow-sm transition">
+                                    Perbaiki Formulir APL &rarr;
+                                </a>
+                            @elseif($item->apl_status === 'APPROVED' && empty($item->ak01_agreed_at))
+                                <a href="{{ route('asesi.assessment.ak01', $item->id) }}" class="w-full sm:w-auto text-center justify-center px-5 py-2.5 text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-sm transition">
+                                    Setujui Persetujuan (AK.01) &rarr;
                                 </a>
                             @elseif($item->apl_status === 'APPROVED')
-                                <a href="{{ $targetUrl }}" class="w-full sm:w-auto text-center justify-center px-4 py-2 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg shadow-sm transition">
-                                    Lanjutkan Asesmen &rarr;
+                                <a href="{{ route('asesi.assessment.ruang-uji', $item->id) }}" class="w-full sm:w-auto text-center justify-center px-5 py-2.5 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg shadow-sm transition">
+                                    Masuk Ruang Uji &rarr;
                                 </a>
                             @else
-                                <a href="{{ route('asesi.assessment.apl', $item->id) }}" class="w-full sm:w-auto text-center justify-center px-4 py-2 text-xs font-bold bg-brand-600 hover:bg-brand-700 text-white rounded-lg shadow-sm transition">
-                                    Masuk Jadwal Uji &rarr;
+                                <a href="{{ route('asesi.assessment.apl', $item->id) }}" class="w-full sm:w-auto text-center justify-center px-5 py-2.5 text-xs font-bold bg-brand-600 hover:bg-brand-700 text-white rounded-lg shadow-sm transition">
+                                    Lengkapi APL (01 & 02) &rarr;
                                 </a>
                             @endif
                         </div>

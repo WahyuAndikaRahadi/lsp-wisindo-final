@@ -178,7 +178,8 @@
             <a href="{{ route('asesor.jadwal.asesi', $schedule->id) }}" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-900">
                 Kembali
             </a>
-            <button type="submit" class="px-6 py-2.5 text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 rounded-lg shadow-sm transition">
+            <button type="submit" class="px-6 py-2.5 text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 rounded-lg shadow-sm transition"
+                    onclick="return confirm('PERINGATAN KONSEKUENSI PENUTUPAN JADWAL:\n\n1. Jadwal asesmen ini akan resmi DITUTUP (status FINISHED).\n2. Seluruh hasil penilaian peserta akan dikunci dan tidak dapat diubah lagi.\n3. Berita Acara dan Dokumen MUK siap diverifikasi untuk audit BNSP.\n\nApakah Anda yakin ingin menyimpan laporan dan MENUTUP jadwal asesmen ini?');">
                 Simpan Laporan & Tutup Jadwal Asesmen (Final)
             </button>
         </div>

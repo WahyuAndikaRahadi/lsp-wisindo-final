@@ -66,7 +66,8 @@
                                         <a href="{{ route('admin.jadwal.edit', $sch->id) }}" class="px-3 py-1 text-xs font-semibold text-brand-600 hover:text-brand-800 bg-brand-50 rounded">
                                             Edit
                                         </a>
-                                        <form action="{{ route('admin.jadwal.destroy', $sch->id) }}" method="POST" class="inline" onsubmit="return confirm('Hapus jadwal ini?')">
+                                        <form action="{{ route('admin.jadwal.destroy', $sch->id) }}" method="POST" class="inline"
+                                              onsubmit="return confirm('PERINGATAN KONSEKUENSI PENGHAPUSAN JADWAL:\n\nJika jadwal memiliki peserta atau riwayat asesmen aktif, status jadwal akan dinonaktifkan (FINISHED) untuk melindungi data audit BNSP. Jika kosong, jadwal akan dihapus.\n\nApakah Anda yakin ingin melanjutkan?');">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="px-3 py-1 text-xs font-semibold text-rose-600 hover:text-rose-800 bg-rose-50 rounded">

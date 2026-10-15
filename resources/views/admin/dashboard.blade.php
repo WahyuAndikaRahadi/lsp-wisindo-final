@@ -79,6 +79,107 @@
         </div>
     </div>
 
+    {{-- Action Required / Yang Perlu Dikerjakan Sekarang --}}
+    @if(($pendingRegistrationsCount ?? 0) > 0 || ($schedulesToCloseCount ?? 0) > 0 || ($pendingAppealsCount ?? 0) > 0)
+        <div class="bg-amber-50/60 border border-amber-200 rounded-xl p-5 shadow-xs space-y-4">
+            <div class="flex items-center justify-between border-b border-amber-200/80 pb-3">
+                <div class="flex items-center space-x-2">
+                    <span class="w-3 h-3 rounded-full bg-amber-500 animate-pulse"></span>
+                    <h2 class="text-sm font-bold uppercase tracking-wider text-amber-950">Perhatian Admin: Tugas Yang Perlu Dikerjakan</h2>
+                </div>
+                <span class="text-xs font-semibold text-amber-800">
+                    {{ ($pendingRegistrationsCount ?? 0) + ($schedulesToCloseCount ?? 0) + ($pendingAppealsCount ?? 0) }} Item Perlu Tindakan
+                </span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {{-- 1. Pendaftar Menunggu Verifikasi Berkas --}}
+                <div class="bg-white rounded-lg border border-amber-200 p-4 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-bold text-slate-800">Verifikasi Berkas Asesi</span>
+                            <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-amber-100 text-amber-800">
+                                {{ $pendingRegistrationsCount ?? 0 }} Pendaftar
+                            </span>
+                        </div>
+                        <p class="text-xs text-slate-600 mb-3">Peserta baru mendaftar jadwal dan menunggu persetujuan berkas admin.</p>
+                        
+                        @if(!empty($pendingRegistrations) && $pendingRegistrations->count() > 0)
+                            <div class="space-y-1.5 border-t border-slate-100 pt-2 mb-3">
+                                @foreach($pendingRegistrations->take(3) as $pendingAsm)
+                                    <div class="text-[11px] text-slate-700 flex items-center justify-between">
+                                        <span class="font-medium truncate max-w-[150px]">{{ $pendingAsm->asesi->full_name }}</span>
+                                        <span class="font-mono text-slate-400">{{ $pendingAsm->schedule->code }}</span>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
+                    </div>
+
+                    <a href="{{ route('admin.jadwal.index') }}" class="w-full text-center py-2 px-3 bg-amber-500 hover:bg-amber-600 text-white rounded text-xs font-bold transition">
+                        Verifikasi Pendaftar &rarr;
+                    </a>
+                </div>
+
+                {{-- 2. Jadwal Perlu Ditutup / Selesai --}}
+                <div class="bg-white rounded-lg border border-slate-200 p-4 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-bold text-slate-800">Jadwal Perlu Ditutup</span>
+                            <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-blue-100 text-blue-800">
+                                {{ $schedulesToCloseCount ?? 0 }} Jadwal
+                            </span>
+                        </div>
+                        <p class="text-xs text-slate-600 mb-3">Asesmen telah dinilai oleh asesor dan siap dikunci serta difinalisasi.</p>
+
+                        @if(!empty($schedulesToClose) && $schedulesToClose->count() > 0)
+                            <div class="space-y-1.5 border-t border-slate-100 pt-2 mb-3">
+                                @foreach($schedulesToClose->take(3) as $schClose)
+                                    <div class="text-[11px] text-slate-700 flex items-center justify-between">
+                                        <span class="font-medium truncate max-w-[150px]">{{ $schClose->code }}</span>
+                                        <span class="text-slate-500">{{ \Carbon\Carbon::parse($schClose->date)->format('d/m/y') }}</span>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
+                    </div>
+
+                    <a href="{{ route('admin.jadwal.index') }}" class="w-full text-center py-2 px-3 bg-brand-600 hover:bg-brand-700 text-white rounded text-xs font-bold transition">
+                        Kelola Jadwal &rarr;
+                    </a>
+                </div>
+
+                {{-- 3. Banding Masuk --}}
+                <div class="bg-white rounded-lg border border-purple-200 p-4 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-bold text-slate-800">Banding Asesmen (AK.04)</span>
+                            <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-purple-100 text-purple-800">
+                                {{ $pendingAppealsCount ?? 0 }} Banding
+                            </span>
+                        </div>
+                        <p class="text-xs text-slate-600 mb-3">Permohonan banding asesmen dari asesi belum diputuskan oleh Komite Banding.</p>
+
+                        @if(!empty($pendingAppeals) && $pendingAppeals->count() > 0)
+                            <div class="space-y-1.5 border-t border-slate-100 pt-2 mb-3">
+                                @foreach($pendingAppeals->take(3) as $appealItem)
+                                    <div class="text-[11px] text-slate-700 flex items-center justify-between">
+                                        <span class="font-medium truncate max-w-[150px]">{{ $appealItem->assessment->asesi->full_name }}</span>
+                                        <span class="font-mono text-purple-700 font-bold">{{ $appealItem->status }}</span>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
+                    </div>
+
+                    <a href="{{ route('admin.appeals.index') }}" class="w-full text-center py-2 px-3 bg-purple-700 hover:bg-purple-800 text-white rounded text-xs font-bold transition">
+                        Review Banding &rarr;
+                    </a>
+                </div>
+            </div>
+        </div>
+    @endif
+
     {{-- Recent Schedules & Quick Actions --}}
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div class="lg:col-span-2 bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">

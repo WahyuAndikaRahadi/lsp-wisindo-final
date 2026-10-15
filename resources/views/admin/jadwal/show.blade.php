@@ -139,12 +139,14 @@
                                         </button>
                                     @endif
                                     @if(($assessment->admin_status ?? 'PENDING') !== 'REVISION')
-                                        <button type="submit" name="admin_status" value="REVISION" class="px-2 py-1 text-[11px] font-bold text-amber-800 bg-amber-100 hover:bg-amber-200 border border-amber-300 rounded shadow-xs" title="Minta perbaikan berkas">
+                                        <button type="submit" name="admin_status" value="REVISION" class="px-2 py-1 text-[11px] font-bold text-amber-800 bg-amber-100 hover:bg-amber-200 border border-amber-300 rounded shadow-xs" title="Minta perbaikan berkas"
+                                                onclick="return confirm('Minta perbaikan berkas asesi {{ addslashes($assessment->asesi->full_name) }}? Status pendaftaran akan diubah menjadi REVISION dan asesi diminta memperbaiki berkas.');">
                                             Revisi
                                         </button>
                                     @endif
                                     @if(($assessment->admin_status ?? 'PENDING') !== 'REJECTED')
-                                        <button type="submit" name="admin_status" value="REJECTED" class="px-2 py-1 text-[11px] font-bold text-rose-800 bg-rose-100 hover:bg-rose-200 border border-rose-300 rounded shadow-xs" title="Tolak pendaftaran">
+                                        <button type="submit" name="admin_status" value="REJECTED" class="px-2 py-1 text-[11px] font-bold text-rose-800 bg-rose-100 hover:bg-rose-200 border border-rose-300 rounded shadow-xs" title="Tolak pendaftaran"
+                                                onclick="return confirm('PERINGATAN KONSEKUENSI PENOLAKAN ASESI:\n\nMenolak berkas asesi akan membatalkan hak asesi untuk mengikuti proses asesmen pada jadwal ini.\n\nApakah Anda yakin ingin MENOLAK asesi {{ addslashes($assessment->asesi->full_name) }}?');">
                                             Tolak
                                         </button>
                                     @endif
