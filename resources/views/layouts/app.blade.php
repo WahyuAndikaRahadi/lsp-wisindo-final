@@ -272,6 +272,13 @@
                                 </svg>
                                 <span>Dokumen MUK Ekspor</span>
                             </a>
+                            <a href="{{ route('admin.appeals.index') }}" 
+                               class="flex items-center space-x-3 px-3 py-2.5 rounded text-xs font-semibold transition {{ request()->routeIs('admin.appeals.*') ? 'bg-lsp-input-bg text-lsp-navy border-l-4 border-lsp-navy font-bold' : 'text-slate-600 hover:text-lsp-navy hover:bg-slate-50' }}">
+                                <svg class="w-4 h-4 text-lsp-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"/>
+                                </svg>
+                                <span>Banding Asesmen (AK.04)</span>
+                            </a>
                             <a href="{{ route('admin.proxy.index') }}" 
                                class="flex items-center space-x-3 px-3 py-2.5 rounded text-xs font-semibold transition {{ request()->routeIs('admin.proxy.*') ? 'bg-lsp-input-bg text-lsp-navy border-l-4 border-lsp-navy font-bold' : 'text-slate-600 hover:text-lsp-navy hover:bg-slate-50' }}">
                                 <svg class="w-4 h-4 text-lsp-red" fill="none" stroke="currentColor" viewBox="0 0 24 24">

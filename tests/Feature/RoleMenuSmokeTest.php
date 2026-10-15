@@ -146,13 +146,10 @@ class RoleMenuSmokeTest extends TestCase
         $this->assertEquals(200, $workingRoutes['jadwal.index']);
         $this->assertEquals(200, $workingRoutes['jadwal.create']);
         $this->assertEquals(200, $workingRoutes['jadwal.show']);
+        $this->assertEquals(200, $workingRoutes['jadwal.edit']);
         $this->assertEquals(200, $workingRoutes['dokumen-muk.index']);
         $this->assertEquals(200, $workingRoutes['appeals.index']);
         $this->assertEquals(200, $workingRoutes['proxy.index']);
-
-        // In Fase 1 audit: record if jadwal.edit is broken
-        // (will be asserted == 200 in Fase 2)
-        $this->assertArrayHasKey('jadwal.edit', array_merge($workingRoutes, $brokenRoutes));
     }
 
     public function test_superadmin_master_routes_smoke(): void
@@ -189,19 +186,49 @@ class RoleMenuSmokeTest extends TestCase
             'question-banks.edit' => route('admin.question-banks.edit', $qb),
         ];
 
-        $results = [];
         foreach ($routes as $name => $url) {
             $res = $this->actingAs($user)->get($url);
-            $results[$name] = $res->status();
+            $this->assertEquals(200, $res->status(), "Route $name ($url) returned status {$res->status()}");
         }
+    }
 
-        // Auditing all master routes
-        $this->assertEquals(200, $results['schemes.index']);
-        $this->assertEquals(200, $results['users.index']);
-        $this->assertEquals(200, $results['question-banks.index']);
+    public function test_entities_with_active_relations_are_safely_deactivated_instead_of_hard_deleted(): void
+    {
+        $f = $this->getFixture();
+        $admin = $f['admin'];
+        $superAdmin = $f['superAdmin'];
+        $sch = $f['schedule'];
+        $scheme = $f['scheme'];
+        $asesi = $f['asesi'];
 
-        // In Fase 1 audit: create, show, and edit are identified as missing views (500)
-        // In Fase 2 they will all be resolved to 200.
-        $this->assertCount(12, $results);
+        // 1. Schedule with candidates -> soft deactivated, not deleted
+        $resSch = $this->actingAs($admin)->delete(route('admin.jadwal.destroy', $sch));
+        $resSch->assertRedirect(route('admin.jadwal.index'));
+        $resSch->assertSessionHas('warning');
+        $sch->refresh();
+        $this->assertEquals('FINISHED', $sch->status);
+        $this->assertDatabaseHas('t_schedules', ['id' => $sch->id]);
+
+        // 2. Scheme used in schedules -> is_active = false, not deleted
+        $resScm = $this->actingAs($superAdmin)->delete(route('admin.schemes.destroy', $scheme));
+        $resScm->assertRedirect(route('admin.schemes.index'));
+        $resScm->assertSessionHas('warning');
+        $scheme->refresh();
+        $this->assertFalse((bool) $scheme->is_active);
+        $this->assertDatabaseHas('m_schemes', ['id' => $scheme->id]);
+
+        // 3. User deleting self -> blocked with error
+        $resSelf = $this->actingAs($superAdmin)->delete(route('admin.users.destroy', $superAdmin));
+        $resSelf->assertRedirect(route('admin.users.index'));
+        $resSelf->assertSessionHas('error');
+        $this->assertDatabaseHas('users', ['id' => $superAdmin->id]);
+
+        // 4. User with assessments -> status = INACTIVE, not deleted
+        $resUsr = $this->actingAs($superAdmin)->delete(route('admin.users.destroy', $asesi));
+        $resUsr->assertRedirect(route('admin.users.index'));
+        $resUsr->assertSessionHas('warning');
+        $asesi->refresh();
+        $this->assertEquals('INACTIVE', $asesi->status);
+        $this->assertDatabaseHas('users', ['id' => $asesi->id]);
     }
 }

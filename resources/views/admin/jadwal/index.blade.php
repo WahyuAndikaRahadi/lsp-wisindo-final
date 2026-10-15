@@ -60,6 +60,9 @@
                                 </td>
                                 <td class="px-6 py-4 text-right">
                                     <div class="flex items-center justify-end space-x-2">
+                                        <a href="{{ route('admin.jadwal.show', $sch->id) }}" class="px-3 py-1 text-xs font-semibold text-emerald-700 hover:text-emerald-900 bg-emerald-50 rounded">
+                                            Peserta
+                                        </a>
                                         <a href="{{ route('admin.jadwal.edit', $sch->id) }}" class="px-3 py-1 text-xs font-semibold text-brand-600 hover:text-brand-800 bg-brand-50 rounded">
                                             Edit
                                         </a>

@@ -75,7 +75,7 @@ class QuestionBankController extends Controller
 
         $questionBank->update($validated);
 
-        return redirect()->route('admin.question-banks.index')
+        return redirect()->route('admin.question-banks.show', $questionBank->id)
             ->with('success', 'Soal berhasil diperbarui.');
     }
 

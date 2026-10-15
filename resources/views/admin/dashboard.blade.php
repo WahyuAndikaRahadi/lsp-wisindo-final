@@ -106,7 +106,7 @@
                                 <span>{{ \Carbon\Carbon::parse($sch->date)->isoFormat('D MMM Y') }}</span>
                             </div>
                         </div>
-                        <a href="{{ route('admin.jadwal.edit', $sch->id) }}" class="text-xs font-bold text-brand-600 hover:text-brand-700">
+                        <a href="{{ route('admin.jadwal.show', $sch->id) }}" class="text-xs font-bold text-brand-600 hover:text-brand-700">
                             Kelola &rarr;
                         </a>
                     </div>

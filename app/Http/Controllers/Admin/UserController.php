@@ -76,12 +76,24 @@ class UserController extends Controller
 
         $user->update($validated);
 
-        return redirect()->route('admin.users.index')
+        return redirect()->route('admin.users.show', $user->id)
             ->with('success', 'User berhasil diperbarui.');
     }
 
     public function destroy(User $user): RedirectResponse
     {
+        if ($user->id === auth()->id()) {
+            return redirect()->route('admin.users.index')
+                ->with('error', 'Anda tidak dapat menghapus akun Anda sendiri.');
+        }
+
+        if ($user->assessments()->exists() || $user->assessorAssessments()->exists() || $user->assignedSchedules()->exists()) {
+            $user->update(['status' => 'INACTIVE']);
+
+            return redirect()->route('admin.users.index')
+                ->with('warning', 'Pengguna tidak dapat dihapus permanen karena memiliki riwayat asesmen atau jadwal. Status pengguna telah dinonaktifkan.');
+        }
+
         $user->delete();
 
         return redirect()->route('admin.users.index')

@@ -55,6 +55,11 @@ class User extends Authenticatable
         return $this->hasMany(Assessment::class, 'asesi_id');
     }
 
+    public function assessments(): HasMany
+    {
+        return $this->scheduleAssessments();
+    }
+
     public function assessorAssessments(): HasMany
     {
         return $this->hasMany(Assessment::class, 'assessor_id');

@@ -69,12 +69,19 @@ class SchemeController extends Controller
 
         $scheme->update($validated);
 
-        return redirect()->route('admin.schemes.index')
+        return redirect()->route('admin.schemes.show', $scheme->id)
             ->with('success', 'Skema berhasil diperbarui.');
     }
 
     public function destroy(Scheme $scheme): RedirectResponse
     {
+        if ($scheme->schedules()->exists()) {
+            $scheme->update(['is_active' => false]);
+
+            return redirect()->route('admin.schemes.index')
+                ->with('warning', 'Skema tidak dapat dihapus permanen karena sudah digunakan dalam jadwal asesmen. Status skema telah dinonaktifkan.');
+        }
+
         $scheme->delete();
 
         return redirect()->route('admin.schemes.index')

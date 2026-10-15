@@ -102,22 +102,35 @@ class JadwalController extends Controller
             'end_time' => 'nullable|string',
             'duration_minutes' => 'nullable|integer|min:1',
             'selected_instruments' => 'nullable|array',
+            'instruments' => 'nullable|array',
             'notes' => 'nullable|string',
             'assessor_ids' => 'nullable|array',
         ]);
 
+        $instruments = $request->input('selected_instruments', $request->input('instruments', $jadwal->selected_instruments));
+        $validated['selected_instruments'] = $instruments;
+        unset($validated['instruments']);
+
         $jadwal->update($validated);
 
         if ($request->has('assessor_ids')) {
-            $jadwal->assessors()->sync($request->input('assessor_ids'));
+            $jadwal->assessors()->sync($request->input('assessor_ids', []));
         }
 
-        return redirect()->route('admin.jadwal.index')
+        return redirect()->route('admin.jadwal.show', $jadwal->id)
             ->with('success', 'Jadwal berhasil diperbarui.');
     }
 
     public function destroy(Schedule $jadwal): RedirectResponse
     {
+        if ($jadwal->assessments()->exists()) {
+            $jadwal->update(['status' => 'FINISHED']);
+
+            return redirect()->route('admin.jadwal.index')
+                ->with('warning', 'Jadwal tidak dapat dihapus permanen karena sudah memiliki peserta terdaftar. Status jadwal telah ditutup (FINISHED).');
+        }
+
+        $jadwal->assessors()->detach();
         $jadwal->delete();
 
         return redirect()->route('admin.jadwal.index')
