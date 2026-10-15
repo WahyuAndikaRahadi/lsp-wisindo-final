@@ -8,6 +8,7 @@ use App\Models\AssessmentApl02Item;
 use App\Models\AssessmentProof;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class AplController extends Controller
@@ -31,6 +32,15 @@ class AplController extends Controller
     {
         abort_if($assessment->asesi_id !== auth()->id(), 403);
 
+        if ($assessment->schedule && $assessment->schedule->is_closed) {
+            return back()->with('error', 'Jadwal asesmen sudah resmi ditutup.');
+        }
+
+        if ($assessment->apl_status === 'APPROVED') {
+            return redirect()->route('asesi.assessment.ruang-uji', $assessment)
+                ->with('info', 'Permohonan APL Anda sudah disetujui oleh Asesor.');
+        }
+
         $proofCategories = [
             'IJAZAH_SMK' => 'PERSYARATAN_DASAR',
             'SURAT_SISWA_AKTIF' => 'PERSYARATAN_DASAR',
@@ -40,24 +50,26 @@ class AplController extends Controller
             'PAS_FOTO' => 'ADMINISTRATIF',
         ];
 
-        foreach ($proofCategories as $type => $category) {
-            $file = $request->file("proofs.{$type}")
-                ?? $request->file(strtolower($type))
-                ?? $request->file("proof_{$type}")
-                ?? $request->file('proof_'.strtolower($type));
+        DB::transaction(function () use ($assessment, $request, $proofCategories) {
+            foreach ($proofCategories as $type => $category) {
+                $file = $request->file("proofs.{$type}")
+                    ?? $request->file(strtolower($type))
+                    ?? $request->file("proof_{$type}")
+                    ?? $request->file('proof_'.strtolower($type));
 
-            if ($file) {
-                $path = $file->store('proofs', 'public');
-                AssessmentProof::updateOrCreate(
-                    ['assessment_id' => $assessment->id, 'proof_type' => $type],
-                    [
-                        'proof_category' => $category,
-                        'file_path' => $path,
-                        'original_filename' => $file->getClientOriginalName(),
-                    ]
-                );
+                if ($file) {
+                    $path = $file->store('proofs', 'public');
+                    AssessmentProof::updateOrCreate(
+                        ['assessment_id' => $assessment->id, 'proof_type' => $type],
+                        [
+                            'proof_category' => $category,
+                            'file_path' => $path,
+                            'original_filename' => $file->getClientOriginalName(),
+                        ]
+                    );
+                }
             }
-        }
+        });
 
         $savedProofTypes = $assessment->proofs()->pluck('proof_type')->toArray();
         $hasKtp = in_array('KTP', $savedProofTypes);
@@ -80,27 +92,30 @@ class AplController extends Controller
         ]);
 
         $kukInputs = $request->input('kuks', $request->input('apl02', []));
-        foreach ($kukInputs as $kukId => $data) {
-            $val = is_array($data) ? ($data['assessment_value'] ?? $data['value'] ?? 'K') : $data;
-            $proofType = is_array($data)
-                ? ($data['selected_proof_type'] ?? $data['proof_type'] ?? null)
-                : $request->input("proof_type.{$kukId}");
 
-            if (in_array($val, ['K', 'BK'])) {
-                AssessmentApl02Item::updateOrCreate(
-                    ['assessment_id' => $assessment->id, 'kuk_id' => $kukId],
-                    [
-                        'assessment_value' => $val,
-                        'selected_proof_type' => $proofType,
-                    ]
-                );
+        DB::transaction(function () use ($assessment, $kukInputs, $request) {
+            foreach ($kukInputs as $kukId => $data) {
+                $val = is_array($data) ? ($data['assessment_value'] ?? $data['value'] ?? 'K') : $data;
+                $proofType = is_array($data)
+                    ? ($data['selected_proof_type'] ?? $data['proof_type'] ?? null)
+                    : $request->input("proof_type.{$kukId}");
+
+                if (in_array($val, ['K', 'BK'])) {
+                    AssessmentApl02Item::updateOrCreate(
+                        ['assessment_id' => $assessment->id, 'kuk_id' => $kukId],
+                        [
+                            'assessment_value' => $val,
+                            'selected_proof_type' => $proofType,
+                        ]
+                    );
+                }
             }
-        }
 
-        $assessment->update([
-            'apl_status' => 'SUBMITTED',
-            'last_active_step' => 'apl',
-        ]);
+            $assessment->update([
+                'apl_status' => 'SUBMITTED',
+                'last_active_step' => 'apl',
+            ]);
+        });
 
         return redirect()->route('asesi.assessment.apl', $assessment)->with('success', 'Menunggu verifikasi asesor');
     }

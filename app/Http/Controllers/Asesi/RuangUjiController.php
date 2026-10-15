@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Asesi;
 
 use App\Http\Controllers\Controller;
 use App\Models\Assessment;
+use App\Models\AssessmentAppeal;
 use App\Models\AssessmentIaResponse;
 use App\Models\QuestionBank;
 use App\Services\AkWorkflowService;
@@ -11,6 +12,7 @@ use App\Services\AutoGradeService;
 use App\Services\SchemeInstrumentService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class RuangUjiController extends Controller
@@ -28,12 +30,28 @@ class RuangUjiController extends Controller
     {
         abort_if($assessment->asesi_id !== auth()->id(), 403);
 
-        $assessment->update([
-            'last_active_step' => 'ruang-uji',
-        ]);
+        if ($assessment->schedule && $assessment->schedule->is_closed) {
+            return back()->with('error', 'Jadwal asesmen sudah resmi ditutup.');
+        }
+
+        if ($assessment->apl_status !== 'APPROVED') {
+            return back()->with('error', 'FR.AK.01 hanya dapat disetujui setelah permohonan APL Anda disetujui asesor.');
+        }
+
+        $now = now();
+        $signature = $request->input('signature_data') ?? $request->input('asesi_signature') ?? $assessment->asesi_signature;
+
+        DB::transaction(function () use ($assessment, $now, $signature) {
+            $assessment->update([
+                'ak01_agreed_at' => $now,
+                'asesi_signature' => $signature,
+                'asesi_signed_at' => $now,
+                'last_active_step' => 'ruang-uji',
+            ]);
+        });
 
         return redirect()->route('asesi.assessment.ruang-uji', $assessment)
-            ->with('success', 'FR.AK01 berhasil ditandatangani.');
+            ->with('success', 'FR.AK01 berhasil disetujui dan ditandatangani.');
     }
 
     public function hub(Assessment $assessment): View
@@ -79,9 +97,31 @@ class RuangUjiController extends Controller
     {
         abort_if($assessment->asesi_id !== auth()->id(), 403);
 
-        $result = $grader->grade($assessment, $request->input('answers', []));
+        if ($assessment->schedule && $assessment->schedule->is_closed) {
+            return back()->with('error', 'Jadwal asesmen sudah resmi ditutup.');
+        }
 
-        $assessment->update(['last_active_step' => 'ruang-uji']);
+        if ($assessment->apl_status !== 'APPROVED') {
+            return back()->with('error', 'Ujian CBT hanya dapat diikuti setelah permohonan APL Anda disetujui.');
+        }
+
+        // Idempotency: prevent resubmission or resetting score to zero on double click/refresh
+        $existing = AssessmentIaResponse::where('assessment_id', $assessment->id)
+            ->where('instrument_code', 'IA05')
+            ->whereNotNull('asesi_signed_at')
+            ->first();
+
+        if ($existing) {
+            return redirect()->route('asesi.assessment.ruang-uji', $assessment)
+                ->with('info', "Jawaban ujian CBT (IA.05) Anda telah tersimpan sebelumnya dengan skor: {$existing->score}.");
+        }
+
+        $result = DB::transaction(function () use ($assessment, $request, $grader) {
+            $graded = $grader->grade($assessment, $request->input('answers', []));
+            $assessment->update(['last_active_step' => 'ruang-uji']);
+
+            return $graded;
+        });
 
         return redirect()->route('asesi.assessment.ruang-uji', $assessment)
             ->with('success', "Jawaban tersimpan. Skor: {$result->score}");
@@ -184,10 +224,16 @@ class RuangUjiController extends Controller
     {
         abort_if($assessment->asesi_id !== auth()->id(), 403);
 
-        $assessment->update([
-            'status' => 'COMPLETED',
-            'completed_at' => now(),
-        ]);
+        if ($assessment->schedule && $assessment->schedule->is_closed) {
+            return back()->with('error', 'Jadwal asesmen sudah resmi ditutup.');
+        }
+
+        DB::transaction(function () use ($assessment) {
+            $assessment->update([
+                'status' => 'COMPLETED',
+                'completed_at' => now(),
+            ]);
+        });
 
         return redirect()->route('asesi.assessment.ak03', $assessment)
             ->with('success', 'Asesmen teknis selesai. Harap mengisi formulir FR.AK.03 (Umpan Balik Asesi).');
@@ -207,6 +253,10 @@ class RuangUjiController extends Controller
     {
         abort_if($assessment->asesi_id !== auth()->id(), 403);
 
+        if ($assessment->schedule && $assessment->schedule->is_closed) {
+            return back()->with('error', 'Jadwal asesmen sudah resmi ditutup.');
+        }
+
         $validated = $request->validate([
             'ratings' => 'required|array|min:10',
             'ratings.*.value' => 'required|in:YA,TIDAK',
@@ -218,7 +268,9 @@ class RuangUjiController extends Controller
             'ratings.*.value.required' => 'Setiap butir pertanyaan evaluasi wajib dipilih (Ya atau Tidak).',
         ]);
 
-        app(AkWorkflowService::class)->submitAk03Feedback($assessment, $validated['ratings'], $validated['general_notes'] ?? null);
+        DB::transaction(function () use ($assessment, $validated) {
+            app(AkWorkflowService::class)->submitAk03Feedback($assessment, $validated['ratings'], $validated['general_notes'] ?? null);
+        });
 
         return redirect()->route('asesi.jadwal.index')
             ->with('success', 'Formulir FR.AK.03 Umpan Balik Asesi berhasil dikirim.');
@@ -245,16 +297,28 @@ class RuangUjiController extends Controller
     {
         abort_if($assessment->asesi_id !== auth()->id(), 403);
 
+        // Prevent duplicate pending appeals on double click / refresh
+        $existingPending = AssessmentAppeal::where('assessment_id', $assessment->id)
+            ->where('status', 'SUBMITTED')
+            ->first();
+
+        if ($existingPending) {
+            return redirect()->route('asesi.jadwal.index')
+                ->with('info', 'Permohonan banding asesmen Anda sudah tercatat dan sedang dalam peninjauan Tim Banding LSP.');
+        }
+
         $request->validate([
             'appeal_reasons' => 'required|string|min:10',
             'contested_units' => 'nullable|array',
         ]);
 
-        app(AkWorkflowService::class)->submitAppeal(
-            $assessment,
-            $request->input('appeal_reasons'),
-            $request->input('contested_units', [])
-        );
+        DB::transaction(function () use ($assessment, $request) {
+            app(AkWorkflowService::class)->submitAppeal(
+                $assessment,
+                $request->input('appeal_reasons'),
+                $request->input('contested_units', [])
+            );
+        });
 
         return redirect()->route('asesi.jadwal.index')
             ->with('success', 'Pengajuan Banding Asesmen (FR.AK.04) berhasil dikirimkan ke Admin LSP.');

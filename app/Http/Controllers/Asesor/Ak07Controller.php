@@ -7,6 +7,7 @@ use App\Models\AssessmentAk07Item;
 use App\Models\Schedule;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class Ak07Controller extends Controller
@@ -30,6 +31,10 @@ class Ak07Controller extends Controller
 
     public function store(Schedule $schedule, Request $request): RedirectResponse
     {
+        if ($schedule->is_closed) {
+            return back()->with('error', 'Jadwal asesmen sudah resmi ditutup.');
+        }
+
         $unapprovedCount = $schedule->assessments()->where('apl_status', '!=', 'APPROVED')->count();
         if ($unapprovedCount > 0) {
             return redirect()->route('asesor.jadwal.asesi', $schedule->id)
@@ -52,59 +57,72 @@ class Ak07Controller extends Controller
 
         $savedAny = false;
 
-        // Process 8-item table format if present
-        if (! empty($items) && is_array($items)) {
-            foreach ($items as $itemIndex => $itemData) {
-                $needed = strtoupper($itemData['needed'] ?? '');
-                if ($needed === 'YA') {
-                    $selectedOptions = $itemData['options'] ?? [];
-                    $customNote = trim($itemData['custom_note'] ?? '');
-                    $descParts = [];
-                    if (! empty($selectedOptions)) {
-                        $descParts[] = implode('; ', $selectedOptions);
-                    }
-                    if ($customNote !== '') {
-                        $descParts[] = "Catatan: {$customNote}";
-                    }
-                    $detailText = ! empty($descParts) ? implode(' | ', $descParts) : 'Penyesuaian wajar disetujui';
+        DB::transaction(function () use (
+            $ids,
+            $items,
+            $agreementStatus,
+            $agreementNotes,
+            $legacyCategory,
+            $legacyNotes,
+            &$savedAny
+        ) {
+            // Idempotency: clear previous AK07 items for selected assessments to avoid duplicates
+            AssessmentAk07Item::whereIn('assessment_id', $ids)->delete();
 
-                    $categoryName = $itemData['title'] ?? "Karakteristik #{$itemIndex}";
+            // Process 8-item table format if present
+            if (! empty($items) && is_array($items)) {
+                foreach ($items as $itemIndex => $itemData) {
+                    $needed = strtoupper($itemData['needed'] ?? '');
+                    if ($needed === 'YA') {
+                        $selectedOptions = $itemData['options'] ?? [];
+                        $customNote = trim($itemData['custom_note'] ?? '');
+                        $descParts = [];
+                        if (! empty($selectedOptions)) {
+                            $descParts[] = implode('; ', $selectedOptions);
+                        }
+                        if ($customNote !== '') {
+                            $descParts[] = "Catatan: {$customNote}";
+                        }
+                        $detailText = ! empty($descParts) ? implode(' | ', $descParts) : 'Penyesuaian wajar disetujui';
 
-                    foreach ($ids as $assessmentId) {
-                        AssessmentAk07Item::create([
-                            'assessment_id' => $assessmentId,
-                            'adjustment_category' => substr($categoryName, 0, 100),
-                            'adjustment_detail' => $detailText,
-                            'assessor_id' => auth()->id(),
-                        ]);
+                        $categoryName = $itemData['title'] ?? "Karakteristik #{$itemIndex}";
+
+                        foreach ($ids as $assessmentId) {
+                            AssessmentAk07Item::create([
+                                'assessment_id' => $assessmentId,
+                                'adjustment_category' => substr($categoryName, 0, 100),
+                                'adjustment_detail' => $detailText,
+                                'assessor_id' => auth()->id(),
+                            ]);
+                        }
+                        $savedAny = true;
                     }
-                    $savedAny = true;
                 }
             }
-        }
 
-        // Process agreement notes or legacy format
-        if ($legacyCategory && $legacyNotes) {
-            foreach ($ids as $assessmentId) {
-                AssessmentAk07Item::create([
-                    'assessment_id' => $assessmentId,
-                    'adjustment_category' => substr($legacyCategory, 0, 100),
-                    'adjustment_detail' => $legacyNotes,
-                    'assessor_id' => auth()->id(),
-                ]);
+            // Process agreement notes or legacy format
+            if ($legacyCategory && $legacyNotes) {
+                foreach ($ids as $assessmentId) {
+                    AssessmentAk07Item::create([
+                        'assessment_id' => $assessmentId,
+                        'adjustment_category' => substr($legacyCategory, 0, 100),
+                        'adjustment_detail' => $legacyNotes,
+                        'assessor_id' => auth()->id(),
+                    ]);
+                }
+                $savedAny = true;
+            } elseif ($agreementStatus === 'YA' && ! empty($agreementNotes)) {
+                foreach ($ids as $assessmentId) {
+                    AssessmentAk07Item::create([
+                        'assessment_id' => $assessmentId,
+                        'adjustment_category' => 'Kesepakatan Asesor-Asesi',
+                        'adjustment_detail' => $agreementNotes,
+                        'assessor_id' => auth()->id(),
+                    ]);
+                }
+                $savedAny = true;
             }
-            $savedAny = true;
-        } elseif ($agreementStatus === 'YA' && ! empty($agreementNotes)) {
-            foreach ($ids as $assessmentId) {
-                AssessmentAk07Item::create([
-                    'assessment_id' => $assessmentId,
-                    'adjustment_category' => 'Kesepakatan Asesor-Asesi',
-                    'adjustment_detail' => $agreementNotes,
-                    'assessor_id' => auth()->id(),
-                ]);
-            }
-            $savedAny = true;
-        }
+        });
 
         $msg = $savedAny
             ? 'Penyesuaian yang wajar (FR.AK07) berhasil disimpan. Melanjutkan ke FR.AK01 (Persetujuan Asesmen & Kerahasiaan).'

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Assessment;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class AplReviewController extends Controller
@@ -50,18 +51,28 @@ class AplReviewController extends Controller
             return back()->withErrors(['apl_status' => 'Status keputusan tidak valid.']);
         }
 
+        if ($assessment->schedule && $assessment->schedule->is_closed) {
+            return back()->with('error', 'Jadwal asesmen sudah ditutup dan dikunci.');
+        }
+
+        if (in_array($status, ['APPROVED', 'REVISION_REQUESTED']) && ! in_array($assessment->apl_status, ['SUBMITTED', 'REVISION_REQUESTED', 'APPROVED'])) {
+            return back()->with('error', 'Tidak dapat memproses permohonan APL yang belum diajukan oleh asesi (status masih DRAFT).');
+        }
+
         if ($status === 'APPROVED' && $assessment->admin_status !== 'APPROVED') {
             return back()->with('error', 'Pendaftaran asesi belum disetujui oleh Admin LSP. Asesor baru dapat menyetujui APL setelah Admin menyetujui berkas pendaftaran.');
         }
 
         $notes = $request->input('notes') ?? $request->input('apl_revision_notes') ?? $request->input('catatan');
 
-        $assessment->update([
-            'apl_status' => $status,
-            'apl_revision_notes' => $notes,
-            'assessor_id' => auth()->id(),
-            'approved_at' => $status === 'APPROVED' ? now() : null,
-        ]);
+        DB::transaction(function () use ($assessment, $status, $notes) {
+            $assessment->update([
+                'apl_status' => $status,
+                'apl_revision_notes' => $notes,
+                'assessor_id' => auth()->id(),
+                'approved_at' => $status === 'APPROVED' ? now() : null,
+            ]);
+        });
 
         if ($status === 'APPROVED') {
             $schedule = $assessment->schedule;

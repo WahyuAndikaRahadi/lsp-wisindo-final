@@ -772,6 +772,7 @@ class LspWorkflowIntegrationTest extends TestCase
         $fixture = $this->createTestAssessment();
         $asesi = $fixture['asesi'];
         $assessment = $fixture['assessment'];
+        $assessment->update(['apl_status' => 'DRAFT']);
 
         $res = $this->actingAs($asesi)->post(route('asesi.assessment.apl.store', $assessment), [
             'proofs' => [

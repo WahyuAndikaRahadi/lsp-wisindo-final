@@ -9,6 +9,7 @@ use App\Models\Schedule;
 use App\Services\SchemeInstrumentService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 
@@ -306,6 +307,15 @@ class InstrumentController extends Controller
     public function instrumentStore(Assessment $assessment, $code, Request $request): RedirectResponse
     {
         $code = strtoupper($code);
+
+        if ($assessment->schedule && $assessment->schedule->is_closed) {
+            return back()->with('error', 'Jadwal asesmen sudah ditutup dan dikunci.');
+        }
+
+        if ($assessment->apl_status !== 'APPROVED') {
+            return back()->with('error', 'Penilaian instrumen hanya dapat direkam untuk asesi yang permohonan APL-nya telah disetujui.');
+        }
+
         $data = $request->input('data') ?? [
             'kuks' => $request->input('kuks'),
             'tasks' => $request->input('tasks'),
@@ -346,15 +356,17 @@ class InstrumentController extends Controller
 
         Log::info('Asesor ID '.auth()->id()." ({$data['audit_trail']['evaluated_by_name']}) menyimpan penilaian {$code} untuk asesmen #{$assessment->id} (asesi #{$assessment->asesi_id})");
 
-        AssessmentIaResponse::updateOrCreate(
-            ['assessment_id' => $assessment->id, 'instrument_code' => $code],
-            [
-                'data_json' => $data,
-                'assessor_notes' => $request->input('general_notes') ?? $request->input('notes') ?? $request->input('assessor_notes'),
-                'assessor_signature' => $request->input('signature_data') ?? $request->input('assessor_signature'),
-                'assessor_signed_at' => now(),
-            ]
-        );
+        DB::transaction(function () use ($assessment, $code, $data, $request) {
+            AssessmentIaResponse::updateOrCreate(
+                ['assessment_id' => $assessment->id, 'instrument_code' => $code],
+                [
+                    'data_json' => $data,
+                    'assessor_notes' => $request->input('general_notes') ?? $request->input('notes') ?? $request->input('assessor_notes'),
+                    'assessor_signature' => $request->input('signature_data') ?? $request->input('assessor_signature'),
+                    'assessor_signed_at' => now(),
+                ]
+            );
+        });
 
         return redirect()->route('asesor.schedule.instrument', [
             'schedule' => $assessment->schedule_id,

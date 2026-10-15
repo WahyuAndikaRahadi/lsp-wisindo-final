@@ -7,6 +7,7 @@ use App\Models\Assessment;
 use App\Models\Schedule;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class JadwalController extends Controller
@@ -44,31 +45,38 @@ class JadwalController extends Controller
 
         $schedule = Schedule::where('code', $request->code)->first();
 
-        if (! $schedule || $schedule->status !== 'ACTIVE') {
-            return back()->with('error', 'Kode jadwal tidak ditemukan atau jadwal sudah tidak aktif.');
+        if (! $schedule || $schedule->status !== 'ACTIVE' || $schedule->is_closed) {
+            return back()->with('error', 'Kode jadwal tidak ditemukan atau jadwal sudah tidak aktif/ditutup.');
         }
 
         $userId = auth()->id();
-        $existing = Assessment::where('schedule_id', $schedule->id)
-            ->where('asesi_id', $userId)
-            ->first();
 
-        if ($existing) {
-            if ($existing->last_active_step === 'ruang-uji' && $existing->apl_status === 'APPROVED') {
-                return redirect()->route('asesi.assessment.ruang-uji', $existing);
+        $assessment = DB::transaction(function () use ($schedule, $userId) {
+            return Assessment::firstOrCreate(
+                [
+                    'schedule_id' => $schedule->id,
+                    'asesi_id' => $userId,
+                ],
+                [
+                    'apl_status' => 'DRAFT',
+                    'admin_status' => 'PENDING',
+                    'registered_at' => now(),
+                    'last_active_step' => 'apl',
+                ]
+            );
+        });
+
+        if (! $assessment->wasRecentlyCreated) {
+            if ($assessment->last_active_step === 'ruang-uji' && $assessment->apl_status === 'APPROVED') {
+                return redirect()->route('asesi.assessment.ruang-uji', $assessment)
+                    ->with('info', 'Anda sudah terdaftar pada jadwal ini dan telah disetujui untuk Ruang Uji.');
             }
 
-            return redirect()->route('asesi.assessment.apl', $existing);
+            return redirect()->route('asesi.assessment.apl', $assessment)
+                ->with('info', 'Anda sudah terdaftar pada jadwal ini.');
         }
 
-        $assessment = Assessment::create([
-            'schedule_id' => $schedule->id,
-            'asesi_id' => $userId,
-            'apl_status' => 'DRAFT',
-            'registered_at' => now(),
-            'last_active_step' => 'apl',
-        ]);
-
-        return redirect()->route('asesi.assessment.apl', $assessment)->with('success', 'Berhasil bergabung dengan jadwal asesmen.');
+        return redirect()->route('asesi.assessment.apl', $assessment)
+            ->with('success', 'Berhasil bergabung dengan jadwal asesmen.');
     }
 }

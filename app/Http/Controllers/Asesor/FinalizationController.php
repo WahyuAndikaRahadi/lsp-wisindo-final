@@ -9,6 +9,7 @@ use App\Models\Schedule;
 use App\Services\AkWorkflowService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 
@@ -23,14 +24,24 @@ class FinalizationController extends Controller
      */
     public function completeAssessment(Assessment $assessment): RedirectResponse
     {
-        $this->workflowService->syncAk02($assessment);
+        if ($assessment->schedule && $assessment->schedule->is_closed) {
+            return back()->with('error', 'Jadwal asesmen sudah resmi ditutup.');
+        }
 
-        $assessment->update([
-            'status' => 'COMPLETED',
-            'completed_at' => now(),
-            'assessor_id' => auth()->id(),
-            'assessor_signed_at' => now(),
-        ]);
+        if ($assessment->apl_status !== 'APPROVED') {
+            return back()->with('error', 'Asesmen belum dapat diselesaikan karena APL belum disetujui.');
+        }
+
+        DB::transaction(function () use ($assessment) {
+            $this->workflowService->syncAk02($assessment);
+
+            $assessment->update([
+                'status' => 'COMPLETED',
+                'completed_at' => now(),
+                'assessor_id' => auth()->id(),
+                'assessor_signed_at' => now(),
+            ]);
+        });
 
         return back()->with('success', "Asesmen asesi {$assessment->asesi->full_name} berhasil diselesaikan dan FR.AK.02 telah direkapitulasi.");
     }
@@ -64,30 +75,15 @@ class FinalizationController extends Controller
      */
     public function updateAk02(Assessment $assessment, Request $request): RedirectResponse
     {
-        $unitsInput = $request->input('units', []);
-
-        foreach ($unitsInput as $unitId => $data) {
-            $methods = [
-                'observasi_demonstrasi' => ! empty($data['observasi_demonstrasi']),
-                'portofolio' => ! empty($data['portofolio']),
-                'pihak_ketiga' => ! empty($data['pihak_ketiga']),
-                'lisan' => ! empty($data['lisan']),
-                'tulis' => ! empty($data['tulis']),
-                'proyek' => ! empty($data['proyek']),
-                'lainnya' => ! empty($data['lainnya']),
-            ];
-
-            AssessmentAk02Item::updateOrCreate(
-                [
-                    'assessment_id' => $assessment->id,
-                    'competency_unit_id' => $unitId,
-                ],
-                [
-                    'methods_json' => $methods,
-                    'is_competent' => ! empty($data['is_competent']),
-                ]
-            );
+        if ($assessment->schedule && $assessment->schedule->is_closed) {
+            return back()->with('error', 'Jadwal asesmen sudah ditutup dan dikunci.');
         }
+
+        if ($assessment->apl_status !== 'APPROVED') {
+            return back()->with('error', 'FR.AK.02 hanya dapat direkam untuk asesi yang telah disetujui APL-nya.');
+        }
+
+        $unitsInput = $request->input('units', []);
 
         $validated = $request->validate([
             'final_result' => 'required|in:K,BK,KOMPETEN,BELUM_KOMPETEN',
@@ -102,16 +98,42 @@ class FinalizationController extends Controller
         Log::info('Asesor ID '.auth()->id()." memperbarui FR.AK.02 asesmen #{$assessment->id} dengan hasil {$finalResult}");
 
         $now = now();
-        $assessment->update([
-            'final_result' => $finalResult,
-            'final_result_at' => $now,
-            'final_notes' => $validated['final_notes'] ?? null,
-            'follow_up_action' => $validated['follow_up_action'] ?? null,
-            'assessor_signature' => $request->input('assessor_signature') ?? $assessment->assessor_signature,
-            'assessor_signed_at' => $now,
-            'status' => 'COMPLETED',
-            'completed_at' => $now,
-        ]);
+
+        DB::transaction(function () use ($assessment, $unitsInput, $validated, $finalResult, $request, $now) {
+            foreach ($unitsInput as $unitId => $data) {
+                $methods = [
+                    'observasi_demonstrasi' => ! empty($data['observasi_demonstrasi']),
+                    'portofolio' => ! empty($data['portofolio']),
+                    'pihak_ketiga' => ! empty($data['pihak_ketiga']),
+                    'lisan' => ! empty($data['lisan']),
+                    'tulis' => ! empty($data['tulis']),
+                    'proyek' => ! empty($data['proyek']),
+                    'lainnya' => ! empty($data['lainnya']),
+                ];
+
+                AssessmentAk02Item::updateOrCreate(
+                    [
+                        'assessment_id' => $assessment->id,
+                        'competency_unit_id' => $unitId,
+                    ],
+                    [
+                        'methods_json' => $methods,
+                        'is_competent' => ! empty($data['is_competent']),
+                    ]
+                );
+            }
+
+            $assessment->update([
+                'final_result' => $finalResult,
+                'final_result_at' => $now,
+                'final_notes' => $validated['final_notes'] ?? null,
+                'follow_up_action' => $validated['follow_up_action'] ?? null,
+                'assessor_signature' => $request->input('assessor_signature') ?? $assessment->assessor_signature,
+                'assessor_signed_at' => $now,
+                'status' => 'COMPLETED',
+                'completed_at' => $now,
+            ]);
+        });
 
         return redirect()->route('asesor.jadwal.asesi', $assessment->schedule_id)
             ->with('success', 'FR.AK.02 Rekaman Asesmen berhasil diperbarui.');
@@ -172,7 +194,14 @@ class FinalizationController extends Controller
             'catatan_peninjau' => $validated['ak06_catatan_peninjau'],
         ];
 
-        $this->workflowService->submitScheduleReports($schedule, $ak05, $ak06);
+        if ($schedule->is_closed) {
+            return redirect()->route('asesor.jadwal.index')
+                ->with('info', 'Jadwal asesmen ini sudah resmi ditutup sebelumnya.');
+        }
+
+        DB::transaction(function () use ($schedule, $ak05, $ak06) {
+            $this->workflowService->submitScheduleReports($schedule, $ak05, $ak06);
+        });
 
         return redirect()->route('asesor.jadwal.index')
             ->with('success', 'FR.AK.05 Laporan Asesmen dan FR.AK.06 Tinjauan Proses berhasil disimpan. Jadwal resmi ditutup.');
@@ -183,6 +212,11 @@ class FinalizationController extends Controller
      */
     public function finalize(Schedule $schedule): RedirectResponse
     {
+        if ($schedule->is_closed) {
+            return redirect()->route('asesor.jadwal.index')
+                ->with('info', 'Jadwal asesmen ini sudah resmi ditutup sebelumnya.');
+        }
+
         $readiness = $this->workflowService->isScheduleReadyForClosure($schedule);
 
         if (! $readiness['is_ready']) {
@@ -195,11 +229,13 @@ class FinalizationController extends Controller
                 ->with('info', 'Harap melengkapi FR.AK.05 (Laporan Asesmen) dan FR.AK.06 (Tinjauan Proses Asesmen) sebelum menutup jadwal asesmen.');
         }
 
-        $schedule->update([
-            'is_closed' => true,
-            'closed_at' => now(),
-            'status' => 'FINISHED',
-        ]);
+        DB::transaction(function () use ($schedule) {
+            $schedule->update([
+                'is_closed' => true,
+                'closed_at' => now(),
+                'status' => 'FINISHED',
+            ]);
+        });
 
         return redirect()->route('asesor.jadwal.index')
             ->with('success', 'Jadwal asesmen telah resmi ditutup dan dikunci.');

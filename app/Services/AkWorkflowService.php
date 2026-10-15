@@ -9,6 +9,7 @@ use App\Models\AssessmentAppeal;
 use App\Models\Schedule;
 use App\Models\Setting;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class AkWorkflowService
@@ -18,8 +19,18 @@ class AkWorkflowService
      */
     public function syncAk02(Assessment $assessment): array
     {
-        $assessment->load(['schedule.scheme.competencyUnits', 'iaResponses', 'proofs']);
+        $assessment->load(['schedule.scheme.competencyUnits', 'iaResponses', 'proofs', 'ak02Items']);
         $units = $assessment->schedule->scheme->competencyUnits;
+
+        // Idempotency rule: Do NOT overwrite valid manual assessor overrides
+        if (! empty($assessment->assessor_signed_at) && ! empty($assessment->final_result)) {
+            return [
+                'final_result' => $assessment->final_result,
+                'total_units' => $units->count(),
+                'all_competent' => in_array($assessment->final_result, ['KOMPETEN', 'K'], true),
+            ];
+        }
+
         $iaResponses = $assessment->iaResponses->keyBy('instrument_code');
         $hasProofs = $assessment->proofs()->count() > 0;
 
@@ -28,53 +39,66 @@ class AkWorkflowService
         $hasWritten = $iaResponses->has('IA05');
 
         $allUnitsCompetent = true;
+        $finalResult = 'KOMPETEN';
 
-        foreach ($units as $unit) {
-            $methods = [
-                'observasi_demonstrasi' => $hasDemonstration,
-                'portofolio' => $hasProofs,
-                'pihak_ketiga' => false,
-                'lisan' => $hasOral,
-                'tulis' => $hasWritten,
-                'proyek' => false,
-                'lainnya' => false,
-            ];
+        DB::transaction(function () use (
+            $assessment,
+            $units,
+            $hasDemonstration,
+            $hasProofs,
+            $hasOral,
+            $hasWritten,
+            $iaResponses,
+            &$allUnitsCompetent,
+            &$finalResult
+        ) {
+            foreach ($units as $unit) {
+                $methods = [
+                    'observasi_demonstrasi' => $hasDemonstration,
+                    'portofolio' => $hasProofs,
+                    'pihak_ketiga' => false,
+                    'lisan' => $hasOral,
+                    'tulis' => $hasWritten,
+                    'proyek' => false,
+                    'lainnya' => false,
+                ];
 
-            // Determine competence: if IA05 CBT failed (< 75), competence might be false
-            $isUnitCompetent = true;
-            if ($hasWritten && isset($iaResponses['IA05'])) {
-                $score = (float) $iaResponses['IA05']->score;
-                if ($score < 75.0) {
-                    $isUnitCompetent = false;
+                // Determine competence: if IA05 CBT failed (< 75), competence might be false
+                $isUnitCompetent = true;
+                if ($hasWritten && isset($iaResponses['IA05'])) {
+                    $score = (float) $iaResponses['IA05']->score;
+                    if ($score < 75.0) {
+                        $isUnitCompetent = false;
+                    }
                 }
+
+                if (! $isUnitCompetent) {
+                    $allUnitsCompetent = false;
+                }
+
+                AssessmentAk02Item::updateOrCreate(
+                    [
+                        'assessment_id' => $assessment->id,
+                        'competency_unit_id' => $unit->id,
+                    ],
+                    [
+                        'methods_json' => $methods,
+                        'is_competent' => $isUnitCompetent,
+                    ]
+                );
             }
 
-            if (! $isUnitCompetent) {
-                $allUnitsCompetent = false;
-            }
-
-            AssessmentAk02Item::updateOrCreate(
-                [
-                    'assessment_id' => $assessment->id,
-                    'competency_unit_id' => $unit->id,
-                ],
-                [
-                    'methods_json' => $methods,
-                    'is_competent' => $isUnitCompetent,
-                ]
-            );
-        }
-
-        $finalResult = $allUnitsCompetent ? 'KOMPETEN' : 'BELUM_KOMPETEN';
-        $assessment->update([
-            'final_result' => $finalResult,
-            'final_notes' => $finalResult === 'KOMPETEN'
-                ? 'Seluruh unjuk kerja memenuhi Kriteria Unjuk Kerja (KUK) dan standar SKKNI.'
-                : 'Diperlukan tindak lanjut pengayaan dan asesmen ulang pada unit yang belum kompeten.',
-            'follow_up_action' => $finalResult === 'KOMPETEN'
-                ? 'Diusulkan untuk penerbitan Sertifikat Kompetensi BNSP.'
-                : 'Mengikuti asesmen ulang pada unit kompetensi terkait.',
-        ]);
+            $finalResult = $allUnitsCompetent ? 'KOMPETEN' : 'BELUM_KOMPETEN';
+            $assessment->update([
+                'final_result' => $finalResult,
+                'final_notes' => $finalResult === 'KOMPETEN'
+                    ? 'Seluruh unjuk kerja memenuhi Kriteria Unjuk Kerja (KUK) dan standar SKKNI.'
+                    : 'Diperlukan tindak lanjut pengayaan dan asesmen ulang pada unit yang belum kompeten.',
+                'follow_up_action' => $finalResult === 'KOMPETEN'
+                    ? 'Diusulkan untuk penerbitan Sertifikat Kompetensi BNSP.'
+                    : 'Mengikuti asesmen ulang pada unit kompetensi terkait.',
+            ]);
+        });
 
         return [
             'final_result' => $finalResult,
@@ -98,14 +122,16 @@ class AkWorkflowService
         $now = now();
         $reviewerId = $adminId ?? auth()->id();
 
-        $assessment->update([
-            'admin_status' => $statusUpper,
-            'admin_notes' => $notes,
-            'admin_approved_at' => $now,
-            'admin_reviewed_at' => $now,
-            'admin_id' => $reviewerId,
-            'admin_reviewer_id' => $reviewerId,
-        ]);
+        DB::transaction(function () use ($assessment, $statusUpper, $notes, $now, $reviewerId) {
+            $assessment->update([
+                'admin_status' => $statusUpper,
+                'admin_notes' => $notes,
+                'admin_approved_at' => $now,
+                'admin_reviewed_at' => $now,
+                'admin_id' => $reviewerId,
+                'admin_reviewer_id' => $reviewerId,
+            ]);
+        });
 
         return $assessment;
     }
@@ -225,13 +251,15 @@ class AkWorkflowService
             ]);
         }
 
-        return AssessmentAppeal::create([
-            'assessment_id' => $assessment->id,
-            'appeal_date' => $date->toDateString(),
-            'appeal_reasons' => $reasons,
-            'contested_units' => $contestedUnits,
-            'status' => 'SUBMITTED',
-        ]);
+        return DB::transaction(function () use ($assessment, $date, $reasons, $contestedUnits) {
+            return AssessmentAppeal::create([
+                'assessment_id' => $assessment->id,
+                'appeal_date' => $date->toDateString(),
+                'appeal_reasons' => $reasons,
+                'contested_units' => $contestedUnits,
+                'status' => 'SUBMITTED',
+            ]);
+        });
     }
 
     /**
@@ -241,13 +269,15 @@ class AkWorkflowService
     {
         $status = strtoupper($decision) === 'ACCEPTED' ? 'ACCEPTED' : 'REJECTED';
 
-        $appeal->update([
-            'status' => $status,
-            'decision_notes' => $decisionNotes,
-            'decision_date' => now()->toDateString(),
-            'decided_by' => $adminId ?? auth()->id(),
-            'appeals_committee_chair' => $committeeChair ?: $appeal->appeals_committee_chair,
-        ]);
+        DB::transaction(function () use ($appeal, $status, $decisionNotes, $adminId, $committeeChair) {
+            $appeal->update([
+                'status' => $status,
+                'decision_notes' => $decisionNotes,
+                'decision_date' => now()->toDateString(),
+                'decided_by' => $adminId ?? auth()->id(),
+                'appeals_committee_chair' => $committeeChair ?: $appeal->appeals_committee_chair,
+            ]);
+        });
 
         return $appeal;
     }
@@ -257,19 +287,21 @@ class AkWorkflowService
      */
     public function submitScheduleReports(Schedule $schedule, array $ak05Data, array $ak06Data): Schedule
     {
-        $schedule->update([
-            'ak05_report' => array_merge($ak05Data, [
-                'assessor_id' => auth()->id(),
-                'submitted_at' => now()->toIso8601String(),
-            ]),
-            'ak06_review' => array_merge($ak06Data, [
-                'reviewer_id' => auth()->id(),
-                'reviewed_at' => now()->toIso8601String(),
-            ]),
-            'is_closed' => true,
-            'closed_at' => now(),
-            'status' => 'FINISHED',
-        ]);
+        DB::transaction(function () use ($schedule, $ak05Data, $ak06Data) {
+            $schedule->update([
+                'ak05_report' => array_merge($ak05Data, [
+                    'assessor_id' => auth()->id(),
+                    'submitted_at' => now()->toIso8601String(),
+                ]),
+                'ak06_review' => array_merge($ak06Data, [
+                    'reviewer_id' => auth()->id(),
+                    'reviewed_at' => now()->toIso8601String(),
+                ]),
+                'is_closed' => true,
+                'closed_at' => now(),
+                'status' => 'FINISHED',
+            ]);
+        });
 
         return $schedule;
     }
