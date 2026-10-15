@@ -146,6 +146,7 @@ class LspWorkflowIntegrationTest extends TestCase
             ],
             'apl02' => $kukPayload,
             'signature_data' => 'data:image/png;base64,sampleFakeSignatureData',
+            'statement_integrity' => '1',
         ]);
         $aplSubmit->assertRedirect(route('asesi.assessment.apl', $assessment));
 
@@ -221,9 +222,13 @@ class LspWorkflowIntegrationTest extends TestCase
         $assessment->refresh();
         $this->assertEquals('COMPLETED', $assessment->status);
 
-        // 11. Asesi submits FR.AK.03 Umpan Balik
+        // 11. Asesi submits FR.AK.03 Umpan Balik (All 10 items required)
+        $ak03Ratings = [];
+        for ($r = 1; $r <= 10; $r++) {
+            $ak03Ratings[$r] = ['value' => 'YA', 'comment' => 'Memuaskan'];
+        }
         $ak03Submit = $this->actingAs($asesi)->post(route('asesi.assessment.ak03.submit', $assessment), [
-            'ratings' => [1 => ['value' => 'YA', 'comment' => 'Sangat baik']],
+            'ratings' => $ak03Ratings,
             'general_notes' => 'Pelaksanaan asesmen objektif dan profesional.',
         ]);
         $ak03Submit->assertRedirect(route('asesi.jadwal.index'));
@@ -236,8 +241,19 @@ class LspWorkflowIntegrationTest extends TestCase
 
         // 13. Asesor completes schedule with FR.AK.05 & FR.AK.06
         $reportSubmit = $this->actingAs($asesor)->post(route('asesor.schedule.reports.submit', $schedule), [
-            'ak05_aspek_positif' => 'Fasilitas bengkel TUK sangat memadai.',
+            'ak05_aspek_positif' => 'Fasilitas bengkel TUK sangat memadai dan lengkap.',
+            'ak05_aspek_negatif' => 'Tidak ditemukan kendala teknis krusial di lapangan.',
+            'ak05_rekomendasi' => 'Pertahankan kalibrasi peralatan secara berkala.',
             'ak06_valid' => 'YA',
+            'ak06_valid_notes' => 'Bukti mencakup seluruh KUK.',
+            'ak06_reliabel' => 'YA',
+            'ak06_reliabel_notes' => 'Penilaian konsisten dan seragam.',
+            'ak06_fleksibel' => 'YA',
+            'ak06_fleksibel_notes' => 'Penyesuaian wajar difasilitasi jika perlu.',
+            'ak06_adil' => 'YA',
+            'ak06_adil_notes' => 'Seluruh asesi diperlakukan adil.',
+            'ak06_catatan_peninjau' => 'Proses asesmen mematuhi standar BNSP.',
+            'confirm_draft_review' => '1',
         ]);
         $reportSubmit->assertRedirect(route('asesor.jadwal.index'));
         $schedule->refresh();
@@ -643,5 +659,116 @@ class LspWorkflowIntegrationTest extends TestCase
         $this->assertEquals(0, $pendingCount);
         $approvedCount = Assessment::where('schedule_id', $schedule->id)->where('admin_status', 'APPROVED')->count();
         $this->assertEquals(2, $approvedCount);
+    }
+
+    private function createTestAssessment(): array
+    {
+        $admin = User::where('role', 'ADMIN_LSP')->first();
+        $scheme = Scheme::first();
+        $asesor = User::where('role', 'ASESOR')->first();
+        $asesi = User::where('role', 'ASESI')->first();
+
+        $schedule = Schedule::create([
+            'code' => 'SCH-INTEG-'.uniqid(),
+            'name' => 'Schedule Integ Test',
+            'scheme_id' => $scheme->id,
+            'tuk_name' => 'TUK Cikarang',
+            'date' => now()->toDateString(),
+            'start_time' => '08:00:00',
+            'end_time' => '16:00:00',
+            'selected_instruments' => ['AK01', 'AK07', 'IA01', 'IA02', 'IA03', 'IA05'],
+            'status' => 'ACTIVE',
+            'created_by' => $admin->id,
+        ]);
+        $schedule->assessors()->attach($asesor->id);
+
+        $assessment = Assessment::create([
+            'schedule_id' => $schedule->id,
+            'asesi_id' => $asesi->id,
+            'assessor_id' => $asesor->id,
+            'scheme_id' => $scheme->id,
+            'status' => 'IN_PROGRESS',
+            'admin_status' => 'APPROVED',
+            'apl_status' => 'APPROVED',
+        ]);
+
+        return compact('schedule', 'assessment', 'asesor', 'asesi', 'admin');
+    }
+
+    public function test_ak03_rejected_when_empty_or_incomplete(): void
+    {
+        $fixture = $this->createTestAssessment();
+        $asesi = $fixture['asesi'];
+        $assessment = $fixture['assessment'];
+
+        // Submitting only 2 of 10 items should fail
+        $res = $this->actingAs($asesi)->post(route('asesi.assessment.ak03.submit', $assessment), [
+            'ratings' => [
+                1 => ['value' => 'YA'],
+                2 => ['value' => 'TIDAK'],
+            ],
+        ]);
+
+        $res->assertSessionHasErrors(['ratings']);
+    }
+
+    public function test_ak05_ak06_rejected_without_mandatory_confirmation(): void
+    {
+        $fixture = $this->createTestAssessment();
+        $asesor = $fixture['asesor'];
+        $schedule = $fixture['schedule'];
+
+        $res = $this->actingAs($asesor)->post(route('asesor.schedule.reports.submit', $schedule), [
+            'ak05_aspek_positif' => 'Fasilitas sangat memadai.',
+            'ak05_aspek_negatif' => 'Tidak ada kendala teknis.',
+            'ak05_rekomendasi' => 'Pertahankan kualitas sarana TUK.',
+            'ak06_valid' => 'YA',
+            'ak06_valid_notes' => 'Bukti relevan.',
+            'ak06_reliabel' => 'YA',
+            'ak06_reliabel_notes' => 'Instrumen konsisten.',
+            'ak06_fleksibel' => 'YA',
+            'ak06_fleksibel_notes' => 'Penyesuaian wajar siap.',
+            'ak06_adil' => 'YA',
+            'ak06_adil_notes' => 'Perlakuan adil.',
+            'ak06_catatan_peninjau' => 'Sesuai dengan SOP penjaminan mutu BNSP.',
+            // Missing confirm_draft_review
+        ]);
+
+        $res->assertSessionHasErrors(['confirm_draft_review']);
+    }
+
+    public function test_ak02_requires_explicit_final_recommendation(): void
+    {
+        $fixture = $this->createTestAssessment();
+        $asesor = $fixture['asesor'];
+        $assessment = $fixture['assessment'];
+
+        $res = $this->actingAs($asesor)->post(route('asesor.assessment.ak02.update', $assessment), [
+            'final_result' => '', // Empty / missing
+            'final_notes' => 'Catatan asesor.',
+        ]);
+
+        $res->assertSessionHasErrors(['final_result']);
+    }
+
+    public function test_apl02_rejected_without_statement_integrity(): void
+    {
+        $fixture = $this->createTestAssessment();
+        $asesi = $fixture['asesi'];
+        $assessment = $fixture['assessment'];
+
+        $res = $this->actingAs($asesi)->post(route('asesi.assessment.apl.store', $assessment), [
+            'proofs' => [
+                'IJAZAH_SMK' => UploadedFile::fake()->create('ijazah.pdf', 200, 'application/pdf'),
+                'KTP' => UploadedFile::fake()->create('ktp.jpg', 200, 'image/jpeg'),
+                'PAS_FOTO' => UploadedFile::fake()->create('foto.jpg', 200, 'image/jpeg'),
+            ],
+            'apl02' => [
+                1 => ['value' => 'K', 'proof_type' => 'IJAZAH_SMK'],
+            ],
+            // Missing statement_integrity
+        ]);
+
+        $res->assertSessionHasErrors(['statement_integrity']);
     }
 }

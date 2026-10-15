@@ -9,6 +9,7 @@ use App\Models\Schedule;
 use App\Services\SchemeInstrumentService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 
 class InstrumentController extends Controller
@@ -335,6 +336,15 @@ class InstrumentController extends Controller
             $data['evidence_uploaded_at'] = now()->toIso8601String();
             $data['evidence_original_name'] = $request->file('evidence_image')->getClientOriginalName();
         }
+
+        $data['audit_trail'] = [
+            'evaluated_by_id' => auth()->id(),
+            'evaluated_by_name' => auth()->user()?->name,
+            'evaluated_at' => now()->toIso8601String(),
+            'ip_address' => $request->ip(),
+        ];
+
+        Log::info('Asesor ID '.auth()->id()." ({$data['audit_trail']['evaluated_by_name']}) menyimpan penilaian {$code} untuk asesmen #{$assessment->id} (asesi #{$assessment->asesi_id})");
 
         AssessmentIaResponse::updateOrCreate(
             ['assessment_id' => $assessment->id, 'instrument_code' => $code],

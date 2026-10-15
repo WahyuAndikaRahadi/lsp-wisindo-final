@@ -9,6 +9,7 @@ use App\Models\Schedule;
 use App\Services\AkWorkflowService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 
 class FinalizationController extends Controller
@@ -88,11 +89,22 @@ class FinalizationController extends Controller
             );
         }
 
-        $finalResult = $request->input('final_result', 'KOMPETEN');
+        $validated = $request->validate([
+            'final_result' => 'required|in:K,BK,KOMPETEN,BELUM_KOMPETEN',
+            'final_notes' => 'nullable|string|max:1000',
+            'follow_up_action' => 'nullable|string|max:1000',
+        ], [
+            'final_result.required' => 'Rekomendasi hasil asesmen akhir (Kompeten atau Belum Kompeten) wajib dipilih secara eksplisit oleh asesor.',
+        ]);
+
+        $finalResult = in_array($validated['final_result'], ['K', 'KOMPETEN'], true) ? 'KOMPETEN' : 'BELUM_KOMPETEN';
+
+        Log::info('Asesor ID '.auth()->id()." memperbarui FR.AK.02 asesmen #{$assessment->id} dengan hasil {$finalResult}");
+
         $assessment->update([
             'final_result' => $finalResult,
-            'final_notes' => $request->input('final_notes'),
-            'follow_up_action' => $request->input('follow_up_action'),
+            'final_notes' => $validated['final_notes'] ?? null,
+            'follow_up_action' => $validated['follow_up_action'] ?? null,
             'assessor_signature' => $request->input('assessor_signature') ?? $assessment->assessor_signature,
             'assessor_signed_at' => now(),
             'status' => 'COMPLETED',
@@ -118,22 +130,44 @@ class FinalizationController extends Controller
      */
     public function submitReports(Schedule $schedule, Request $request): RedirectResponse
     {
+        $validated = $request->validate([
+            'ak05_aspek_positif' => 'required|string|min:10',
+            'ak05_aspek_negatif' => 'required|string|min:10',
+            'ak05_rekomendasi' => 'required|string|min:10',
+            'ak06_valid' => 'required|in:YA,TIDAK',
+            'ak06_valid_notes' => 'required|string|min:5',
+            'ak06_reliabel' => 'required|in:YA,TIDAK',
+            'ak06_reliabel_notes' => 'required|string|min:5',
+            'ak06_fleksibel' => 'required|in:YA,TIDAK',
+            'ak06_fleksibel_notes' => 'required|string|min:5',
+            'ak06_adil' => 'required|in:YA,TIDAK',
+            'ak06_adil_notes' => 'required|string|min:5',
+            'ak06_catatan_peninjau' => 'required|string|min:10',
+            'confirm_draft_review' => 'accepted',
+        ], [
+            'ak05_aspek_positif.required' => 'Aspek positif laporan asesmen (FR.AK.05) wajib diisi.',
+            'ak05_aspek_negatif.required' => 'Aspek negatif laporan asesmen (FR.AK.05) wajib diisi.',
+            'ak05_rekomendasi.required' => 'Rekomendasi peningkatan mutu (FR.AK.05) wajib diisi.',
+            'ak06_catatan_peninjau.required' => 'Catatan keseluruhan peninjau proses (FR.AK.06) wajib diisi.',
+            'confirm_draft_review.accepted' => 'Anda wajib mencentang konfirmasi peninjauan draf laporan sebelum menyimpan dan menutup jadwal.',
+        ]);
+
         $ak05 = [
-            'aspek_positif' => $request->input('ak05_aspek_positif', 'Kesiapan sarana TUK dan kepatuhan APD/K3 asesi sangat baik.'),
-            'aspek_negatif' => $request->input('ak05_aspek_negatif', 'Tidak ada kendala teknis berarti selama pelaksanaan asesmen.'),
-            'rekomendasi' => $request->input('ak05_rekomendasi', 'Mempertahankan ketersediaan SST terkalibrasi secara berkala.'),
+            'aspek_positif' => $validated['ak05_aspek_positif'],
+            'aspek_negatif' => $validated['ak05_aspek_negatif'],
+            'rekomendasi' => $validated['ak05_rekomendasi'],
         ];
 
         $ak06 = [
-            'valid' => $request->input('ak06_valid', 'YA'),
-            'valid_notes' => $request->input('ak06_valid_notes', 'Bukti dikumpulkan mencakup seluruh elemen kompetensi.'),
-            'reliabel' => $request->input('ak06_reliabel', 'YA'),
-            'reliabel_notes' => $request->input('ak06_reliabel_notes', 'Penerapan rubrik penilaian objektif dan konsisten.'),
-            'fleksibel' => $request->input('ak06_fleksibel', 'YA'),
-            'fleksibel_notes' => $request->input('ak06_fleksibel_notes', 'Penyesuaian wajar diterapkan sesuai kondisi asesi.'),
-            'adil' => $request->input('ak06_adil', 'YA'),
-            'adil_notes' => $request->input('ak06_adil_notes', 'Tidak terdapat diskriminasi.'),
-            'catatan_peninjau' => $request->input('ak06_catatan_peninjau', 'Proses asesmen berjalan tertib dan sesuai panduan mutu BNSP.'),
+            'valid' => $validated['ak06_valid'],
+            'valid_notes' => $validated['ak06_valid_notes'],
+            'reliabel' => $validated['ak06_reliabel'],
+            'reliabel_notes' => $validated['ak06_reliabel_notes'],
+            'fleksibel' => $validated['ak06_fleksibel'],
+            'fleksibel_notes' => $validated['ak06_fleksibel_notes'],
+            'adil' => $validated['ak06_adil'],
+            'adil_notes' => $validated['ak06_adil_notes'],
+            'catatan_peninjau' => $validated['ak06_catatan_peninjau'],
         ];
 
         $this->workflowService->submitScheduleReports($schedule, $ak05, $ak06);

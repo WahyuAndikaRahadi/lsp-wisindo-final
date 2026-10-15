@@ -32,31 +32,57 @@
         </div>
     </div>
 
-    <form action="{{ route('asesor.schedule.reports.submit', $schedule->id) }}" method="POST" class="space-y-6">
+    <form action="{{ route('asesor.schedule.reports.submit', $schedule->id) }}" method="POST" class="space-y-6"
+        x-data="{
+            ak05Positif: '{{ addslashes(old('ak05_aspek_positif', $schedule->ak05_report['aspek_positif'] ?? '')) }}',
+            ak05Negatif: '{{ addslashes(old('ak05_aspek_negatif', $schedule->ak05_report['aspek_negatif'] ?? '')) }}',
+            ak05Rekomendasi: '{{ addslashes(old('ak05_rekomendasi', $schedule->ak05_report['rekomendasi'] ?? '')) }}',
+            ak06ValidNotes: '{{ addslashes(old('ak06_valid_notes', $schedule->ak06_review['valid_notes'] ?? '')) }}',
+            ak06ReliabelNotes: '{{ addslashes(old('ak06_reliabel_notes', $schedule->ak06_review['reliabel_notes'] ?? '')) }}',
+            ak06FleksibelNotes: '{{ addslashes(old('ak06_fleksibel_notes', $schedule->ak06_review['fleksibel_notes'] ?? '')) }}',
+            ak06AdilNotes: '{{ addslashes(old('ak06_adil_notes', $schedule->ak06_review['adil_notes'] ?? '')) }}',
+            ak06Catatan: '{{ addslashes(old('ak06_catatan_peninjau', $schedule->ak06_review['catatan_peninjau'] ?? '')) }}',
+            useDraft() {
+                this.ak05Positif = 'Sarana dan prasarana bengkel TUK lengkap, ketersediaan alat ukur dan APD sesuai standar K3, asesi hadir tepat waktu.';
+                this.ak05Negatif = 'Tidak ditemukan kendala signifikan selama proses asesmen berlangsung.';
+                this.ak05Rekomendasi = 'Mempertahankan konsistensi kalibrasi peralatan tangan dan SST serta peningkatan durasi praktik mandiri.';
+                this.ak06ValidNotes = 'Seluruh bukti dikumpulkan mengacu langsung pada KUK SKKNI.';
+                this.ak06ReliabelNotes = 'Rubrik penilaian dan kunci jawaban diterapkan secara seragam dan konsisten.';
+                this.ak06FleksibelNotes = 'Formulir penyesuaian wajar (FR.AK.07) telah difasilitasi jika asesi membutuhkan.';
+                this.ak06AdilNotes = 'Semua asesi mendapat kesempatan dan hak yang setara tanpa bias ras/gender/latar belakang.';
+                this.ak06Catatan = 'Proses sertifikasi kompetensi telah mematuhi SOP BNSP dan standar mutu LSP PrO Indo.';
+            }
+        }">
         @csrf
 
         {{-- FR.AK.05 Laporan Asesmen --}}
         <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm space-y-4">
-            <div class="border-b border-slate-200 pb-3">
-                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 uppercase">FR.AK.05</span>
-                <h2 class="text-base font-bold text-slate-900 mt-1">Laporan Asesmen</h2>
-                <p class="text-xs text-slate-500">Evaluasi pelaksanaan asesmen kompetensi di Tempat Uji Kompetensi</p>
+            <div class="border-b border-slate-200 pb-3 flex items-center justify-between">
+                <div>
+                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 uppercase">FR.AK.05</span>
+                    <h2 class="text-base font-bold text-slate-900 mt-1">Laporan Asesmen</h2>
+                    <p class="text-xs text-slate-500">Evaluasi pelaksanaan asesmen kompetensi di Tempat Uji Kompetensi</p>
+                </div>
+                <button type="button" @click="useDraft()" class="px-3 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300 rounded text-xs font-bold transition flex items-center gap-1.5 cursor-pointer">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                    Gunakan Draf Saran
+                </button>
             </div>
 
             <div class="space-y-3 text-xs">
                 <div>
                     <label class="block font-bold text-slate-700 mb-1">1. Aspek Positif Pelaksanaan Asesmen:</label>
-                    <textarea name="ak05_aspek_positif" rows="2" class="w-full text-xs rounded-lg border-slate-300 focus:ring-brand-500">{{ $schedule->ak05_report['aspek_positif'] ?? 'Sarana dan prasarana bengkel TUK lengkap, ketersediaan alat ukur dan APD sesuai standar K3, asesi hadir tepat waktu.' }}</textarea>
+                    <textarea name="ak05_aspek_positif" x-model="ak05Positif" rows="2" required class="w-full text-xs rounded-lg border-slate-300 focus:ring-brand-500" placeholder="Tuliskan aspek positif pelaksanaan asesmen di TUK..."></textarea>
                 </div>
 
                 <div>
                     <label class="block font-bold text-slate-700 mb-1">2. Aspek Negatif / Kendala Teknis Lapangan:</label>
-                    <textarea name="ak05_aspek_negatif" rows="2" class="w-full text-xs rounded-lg border-slate-300 focus:ring-brand-500">{{ $schedule->ak05_report['aspek_negatif'] ?? 'Tidak ditemukan kendala signifikan selama proses asesmen berlangsung.' }}</textarea>
+                    <textarea name="ak05_aspek_negatif" x-model="ak05Negatif" rows="2" required class="w-full text-xs rounded-lg border-slate-300 focus:ring-brand-500" placeholder="Tuliskan kendala teknis atau catatan khusus..."></textarea>
                 </div>
 
                 <div>
                     <label class="block font-bold text-slate-700 mb-1">3. Rekomendasi Peningkatan Mutu Asesmen:</label>
-                    <textarea name="ak05_rekomendasi" rows="2" class="w-full text-xs rounded-lg border-slate-300 focus:ring-brand-500">{{ $schedule->ak05_report['rekomendasi'] ?? 'Mempertahankan konsistensi kalibrasi peralatan tangan dan SST serta peningkatan durasi praktik mandiri.' }}</textarea>
+                    <textarea name="ak05_rekomendasi" x-model="ak05Rekomendasi" rows="2" required class="w-full text-xs rounded-lg border-slate-300 focus:ring-brand-500" placeholder="Tuliskan rekomendasi peningkatan mutu..."></textarea>
                 </div>
             </div>
         </div>
@@ -88,7 +114,7 @@
                                 </select>
                             </td>
                             <td class="px-3 py-2.5">
-                                <input type="text" name="ak06_valid_notes" value="Seluruh bukti dikumpulkan mengacu langsung pada KUK SKKNI." class="w-full text-xs rounded border-slate-300">
+                                <input type="text" name="ak06_valid_notes" x-model="ak06ValidNotes" required placeholder="Catatan kesesuaian prinsip validitas..." class="w-full text-xs rounded border-slate-300">
                             </td>
                         </tr>
                         <tr>
@@ -100,7 +126,7 @@
                                 </select>
                             </td>
                             <td class="px-3 py-2.5">
-                                <input type="text" name="ak06_reliabel_notes" value="Rubrik penilaian dan kunci jawaban diterapkan secara seragam dan konsisten." class="w-full text-xs rounded border-slate-300">
+                                <input type="text" name="ak06_reliabel_notes" x-model="ak06ReliabelNotes" required placeholder="Catatan kesesuaian reliabilitas..." class="w-full text-xs rounded border-slate-300">
                             </td>
                         </tr>
                         <tr>
@@ -112,7 +138,7 @@
                                 </select>
                             </td>
                             <td class="px-3 py-2.5">
-                                <input type="text" name="ak06_fleksibel_notes" value="Formulir penyesuaian wajar (FR.AK.07) telah difasilitasi jika asesi membutuhkan." class="w-full text-xs rounded border-slate-300">
+                                <input type="text" name="ak06_fleksibel_notes" x-model="ak06FleksibelNotes" required placeholder="Catatan fleksibilitas..." class="w-full text-xs rounded border-slate-300">
                             </td>
                         </tr>
                         <tr>
@@ -124,7 +150,7 @@
                                 </select>
                             </td>
                             <td class="px-3 py-2.5">
-                                <input type="text" name="ak06_adil_notes" value="Semua asesi mendapat kesempatan dan hak yang setara tanpa bias ras/gender/latar belakang." class="w-full text-xs rounded border-slate-300">
+                                <input type="text" name="ak06_adil_notes" x-model="ak06AdilNotes" required placeholder="Catatan keadilan..." class="w-full text-xs rounded border-slate-300">
                             </td>
                         </tr>
                     </tbody>
@@ -133,8 +159,19 @@
 
             <div class="pt-2 text-xs">
                 <label class="block font-bold text-slate-700 mb-1">Catatan Keseluruhan Peninjau / Lead Asesor:</label>
-                <textarea name="ak06_catatan_peninjau" rows="2" class="w-full text-xs rounded-lg border-slate-300 focus:ring-brand-500">{{ $schedule->ak06_review['catatan_peninjau'] ?? 'Proses sertifikasi kompetensi telah mematuhi SOP BNSP dan standar mutu LSP PrO Indo.' }}</textarea>
+                <textarea name="ak06_catatan_peninjau" x-model="ak06Catatan" rows="2" required class="w-full text-xs rounded-lg border-slate-300 focus:ring-brand-500" placeholder="Tuliskan catatan keseluruhan peninjauan proses asesmen..."></textarea>
             </div>
+        </div>
+
+        {{-- Mandatory Confirmation Checkbox --}}
+        <div class="p-4 bg-amber-50/70 border border-amber-200 rounded-xl">
+            <label class="flex items-start gap-3 cursor-pointer">
+                <input type="checkbox" name="confirm_draft_review" value="1" required class="mt-0.5 rounded border-amber-400 text-brand-600 focus:ring-brand-500">
+                <div class="text-xs text-amber-900">
+                    <span class="font-bold block">Konfirmasi Integritas Peninjauan:</span>
+                    Saya menyatakan telah memeriksa, meninjau, dan memastikan seluruh isi laporan evaluasi FR.AK.05 dan FR.AK.06 sesuai dengan fakta aktual pelaksanaan asesmen di Tempat Uji Kompetensi.
+                </div>
+            </label>
         </div>
 
         <div class="flex items-center justify-between pt-4 border-t border-slate-200">

@@ -154,21 +154,22 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label class="block font-bold text-slate-700 mb-1">Rekomendasi Hasil Asesmen (*):</label>
-                    <select name="final_result" id="finalResultSelect" class="w-full text-xs font-bold rounded-lg border-slate-300 focus:ring-brand-500">
-                        <option value="KOMPETEN" {{ ($assessment->final_result ?? 'KOMPETEN') === 'KOMPETEN' ? 'selected' : '' }}>KOMPETEN (K)</option>
-                        <option value="BELUM_KOMPETEN" {{ ($assessment->final_result ?? '') === 'BELUM_KOMPETEN' ? 'selected' : '' }}>BELUM KOMPETEN (BK)</option>
+                    <select name="final_result" id="finalResultSelect" required class="w-full text-xs font-bold rounded-lg border-slate-300 focus:ring-brand-500">
+                        <option value="" disabled {{ empty($assessment->final_result) ? 'selected' : '' }}>-- Pilih Rekomendasi Akhir (Wajib) --</option>
+                        <option value="KOMPETEN" {{ in_array($assessment->final_result, ['KOMPETEN', 'K']) ? 'selected' : '' }}>KOMPETEN (K)</option>
+                        <option value="BELUM_KOMPETEN" {{ in_array($assessment->final_result, ['BELUM_KOMPETEN', 'BK']) ? 'selected' : '' }}>BELUM KOMPETEN (BK)</option>
                     </select>
                 </div>
 
                 <div>
                     <label class="block font-bold text-slate-700 mb-1">Tindak Lanjut yang Dibutuhkan:</label>
-                    <input type="text" name="follow_up_action" value="{{ $assessment->follow_up_action ?? 'Diusulkan untuk penerbitan Sertifikat Kompetensi BNSP.' }}" class="w-full text-xs rounded-lg border-slate-300 focus:ring-brand-500" placeholder="Pekerjaan tambahan jika BK atau usulan sertifikat jika K">
+                    <input type="text" name="follow_up_action" value="{{ old('follow_up_action', $assessment->follow_up_action ?? '') }}" class="w-full text-xs rounded-lg border-slate-300 focus:ring-brand-500" placeholder="Pekerjaan tambahan jika BK atau usulan sertifikat jika K">
                 </div>
             </div>
 
             <div>
                 <label class="block font-bold text-slate-700 mb-1">Komentar / Catatan Asesor:</label>
-                <textarea name="final_notes" rows="3" class="w-full text-xs rounded-lg border-slate-300 focus:ring-brand-500" placeholder="Catatan objektif mengenai unjuk kerja asesi">{{ $assessment->final_notes ?? 'Seluruh unjuk kerja memenuhi Kriteria Unjuk Kerja (KUK) dan standar SKKNI.' }}</textarea>
+                <textarea name="final_notes" rows="3" class="w-full text-xs rounded-lg border-slate-300 focus:ring-brand-500" placeholder="Catatan objektif mengenai unjuk kerja asesi...">{{ old('final_notes', $assessment->final_notes ?? '') }}</textarea>
             </div>
 
             <div class="flex items-center justify-between pt-4 border-t border-slate-200">

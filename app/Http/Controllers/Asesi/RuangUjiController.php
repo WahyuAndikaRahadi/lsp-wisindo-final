@@ -207,10 +207,18 @@ class RuangUjiController extends Controller
     {
         abort_if($assessment->asesi_id !== auth()->id(), 403);
 
-        $ratings = $request->input('ratings', []);
-        $generalNotes = $request->input('general_notes');
+        $validated = $request->validate([
+            'ratings' => 'required|array|min:10',
+            'ratings.*.value' => 'required|in:YA,TIDAK',
+            'ratings.*.comment' => 'nullable|string|max:500',
+            'general_notes' => 'nullable|string|max:1000',
+        ], [
+            'ratings.required' => 'Seluruh butir evaluasi FR.AK.03 wajib diisi.',
+            'ratings.min' => 'Seluruh 10 butir pernyataan evaluasi wajib dipilih.',
+            'ratings.*.value.required' => 'Setiap butir pertanyaan evaluasi wajib dipilih (Ya atau Tidak).',
+        ]);
 
-        app(AkWorkflowService::class)->submitAk03Feedback($assessment, $ratings, $generalNotes);
+        app(AkWorkflowService::class)->submitAk03Feedback($assessment, $validated['ratings'], $validated['general_notes'] ?? null);
 
         return redirect()->route('asesi.jadwal.index')
             ->with('success', 'Formulir FR.AK.03 Umpan Balik Asesi berhasil dikirim.');

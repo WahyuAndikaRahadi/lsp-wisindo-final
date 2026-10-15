@@ -70,7 +70,7 @@
                     <tbody class="divide-y divide-slate-100">
                         @foreach($items as $no => $text)
                             @php
-                                $val = $savedRatings[$no]['value'] ?? 'YA';
+                                $val = $savedRatings[$no]['value'] ?? null;
                                 $comment = $savedRatings[$no]['comment'] ?? '';
                             @endphp
                             <tr class="hover:bg-slate-50/60">
@@ -79,11 +79,11 @@
                                 <td class="px-3 py-3 text-center">
                                     <div class="inline-flex items-center space-x-2">
                                         <label class="inline-flex items-center space-x-1 cursor-pointer">
-                                            <input type="radio" name="ratings[{{ $no }}][value]" value="YA" {{ $val === 'YA' ? 'checked' : '' }} class="text-brand-600 focus:ring-brand-500">
+                                            <input type="radio" name="ratings[{{ $no }}][value]" value="YA" {{ $val === 'YA' ? 'checked' : '' }} required class="text-brand-600 focus:ring-brand-500">
                                             <span class="font-bold text-emerald-700">Ya</span>
                                         </label>
                                         <label class="inline-flex items-center space-x-1 cursor-pointer">
-                                            <input type="radio" name="ratings[{{ $no }}][value]" value="TIDAK" {{ $val === 'TIDAK' ? 'checked' : '' }} class="text-rose-600 focus:ring-rose-500">
+                                            <input type="radio" name="ratings[{{ $no }}][value]" value="TIDAK" {{ $val === 'TIDAK' ? 'checked' : '' }} required class="text-rose-600 focus:ring-rose-500">
                                             <span class="font-bold text-rose-700">Tidak</span>
                                         </label>
                                     </div>
@@ -99,7 +99,7 @@
 
             <div class="p-6 border-t border-slate-200 bg-slate-50/50 space-y-2">
                 <label class="block text-xs font-bold text-slate-700">Catatan / Komentar Tambahan Lainnya (apabila ada):</label>
-                <textarea name="general_notes" rows="2" class="w-full text-xs rounded-lg border-slate-300 focus:ring-brand-500" placeholder="Kesan, pesan, atau masukan untuk pelaksanaan asesmen...">{{ $ak03?->general_notes ?? 'Pelayanan dan komunikasi asesor sangat baik dan transparan.' }}</textarea>
+                <textarea name="general_notes" rows="2" class="w-full text-xs rounded-lg border-slate-300 focus:ring-brand-500" placeholder="Kesan, pesan, atau masukan untuk pelaksanaan asesmen...">{{ $ak03?->general_notes ?? '' }}</textarea>
             </div>
         </div>
 

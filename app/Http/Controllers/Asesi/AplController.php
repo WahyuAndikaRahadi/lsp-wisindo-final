@@ -73,6 +73,12 @@ class AplController extends Controller
             ]);
         }
 
+        $request->validate([
+            'statement_integrity' => 'accepted',
+        ], [
+            'statement_integrity.accepted' => 'Pernyataan kejujuran dan integritas asesmen mandiri (FR.APL.02) wajib dicentang.',
+        ]);
+
         $kukInputs = $request->input('kuks', $request->input('apl02', []));
         foreach ($kukInputs as $kukId => $data) {
             $val = is_array($data) ? ($data['assessment_value'] ?? $data['value'] ?? 'K') : $data;

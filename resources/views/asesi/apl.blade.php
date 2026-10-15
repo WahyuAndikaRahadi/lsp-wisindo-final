@@ -329,6 +329,14 @@
                             Menunggu Verifikasi Asesor
                         </button>
                     @else
+                        <div class="mb-2 p-3 bg-indigo-50/70 border border-indigo-200 rounded-lg text-left w-full md:max-w-md">
+                            <label class="flex items-start gap-2.5 cursor-pointer">
+                                <input type="checkbox" name="statement_integrity" value="1" required class="mt-0.5 rounded border-indigo-300 text-indigo-600 focus:ring-indigo-500">
+                                <span class="text-xs text-indigo-950 leading-relaxed">
+                                    <strong>Pernyataan Pemohon (Asesi):</strong> Saya menyatakan dengan sesungguhnya bahwa seluruh data asesmen mandiri (FR.APL.02) ini saya isi secara jujur, mandiri, dan bertanggung jawab sesuai bukti yang sah.
+                                </span>
+                            </label>
+                        </div>
                         <button type="submit" class="px-8 py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-md transition transform active:scale-95 flex items-center gap-2">
                             <span>Simpan & Ajukan Permohonan</span>
                             <span>→</span>
