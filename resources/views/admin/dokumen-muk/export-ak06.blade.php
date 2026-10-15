@@ -146,16 +146,23 @@
         </tbody>
     </table>
 
+    {{-- Page Break to Page 2 Matching Master FR.AK.06 --}}
+    <div class="page-break" style="margin-top: 15px;"></div>
+
+    <div class="header-kop" style="margin-bottom: 14px;">
+        <div class="title-lsp">Lembaga Sertifikasi Profesi Praktisi Otomotif LSP-PrO Indo</div>
+    </div>
+
     {{-- Recommendation & Signature --}}
-    <div style="border: 1px solid #000; padding: 6px; margin-top: 10px; font-size: 9pt;">
+    <div style="border: 1px solid #000; padding: 10px; margin-top: 10px; font-size: 9.5pt;">
         <strong>Rekomendasi untuk peningkatan:</strong>
-        <div style="margin-top: 4px; min-height: 35px; color: #1e293b;">
+        <div style="margin-top: 8px; min-height: 80px; color: #1e293b; line-height: 1.5;">
             {{ $ak06Data['improvement_recommendations'] ?? 'MUK yang digunakan sangat komprehensif. Disarankan pembaruan berkelanjutan pada bank soal CBT mengikuti tren teknologi terkini di industri otomotif.' }}
         </div>
     </div>
 
-    <div class="sig-container avoid-break" style="margin-top: 15px;">
-        <table class="bnsp-table" style="font-size: 9pt;">
+    <div class="sig-container avoid-break" style="margin-top: 20px;">
+        <table class="bnsp-table" style="font-size: 9.5pt;">
             <thead>
                 <tr>
                     <th style="width: 35%;">Nama Lead Asesor / Asesor</th>
@@ -165,22 +172,22 @@
             </thead>
             <tbody>
                 <tr>
-                    <td style="vertical-align: middle; padding: 8px;">
+                    <td style="vertical-align: middle; padding: 10px 8px;">
                         <strong>{{ $leadAssessor?->full_name ?? $leadAssessor?->name ?? '-' }}</strong><br>
-                        <span style="font-size: 8pt; color: #64748b;">No. MET: {{ $leadAssessor?->profile?->met_number ?? '-' }}</span>
+                        <span style="font-size: 8.5pt; color: #475569;">No. MET: {{ $leadAssessor?->profile?->met_number ?? '-' }}</span>
                     </td>
-                    <td style="vertical-align: middle; text-align: center; padding: 6px;">
-                        <div style="font-size: 8pt; margin-bottom: 4px;">{{ \Carbon\Carbon::parse($schedule->date)->translatedFormat('d F Y') }}</div>
+                    <td style="vertical-align: middle; text-align: center; padding: 8px;">
+                        <div style="font-size: 8.5pt; margin-bottom: 6px;">{{ \Carbon\Carbon::parse($schedule->date)->translatedFormat('d F Y') }}</div>
                         @if($leadAssessor?->profile?->signature_path)
-                            <img src="{{ asset('storage/' . $leadAssessor->profile->signature_path) }}" style="max-height: 40px; max-width: 110px;" alt="TTD">
-                        @elseif($assessments->first()?->assessor_signature)
-                            <img src="{{ $assessments->first()->assessor_signature }}" style="max-height: 40px; max-width: 110px;" alt="TTD">
+                            <img src="{{ asset('storage/' . $leadAssessor->profile->signature_path) }}" style="max-height: 48px; max-width: 120px;" alt="TTD">
+                        @elseif(isset($assessments) && $assessments->first()?->assessor_signature)
+                            <img src="{{ $assessments->first()->assessor_signature }}" style="max-height: 48px; max-width: 120px;" alt="TTD">
                         @else
-                            <div style="height: 35px;"></div>
+                            <div style="height: 45px;"></div>
                         @endif
                     </td>
-                    <td style="vertical-align: middle; padding: 6px; font-size: 8.5pt;">
-                        Proses asesmen telah memenuhi seluruh standar mutu penjaminan asesmen BNSP.
+                    <td style="vertical-align: middle; padding: 8px; font-size: 9pt;">
+                        {{ $schedule->ak06_assessor_comments ?? 'Proses asesmen telah memenuhi seluruh standar mutu penjaminan asesmen BNSP.' }}
                     </td>
                 </tr>
             </tbody>

@@ -77,6 +77,13 @@
         }
 
         @media print {
+            /* 
+             * STANDAR CETAK DOKUMEN MUK BNSP - LSP PrO INDO
+             * Kertas: A4 Portrait (210mm x 297mm)
+             * Margin: Top/Bottom 15mm, Left/Right 12mm
+             * Engine Target: Google Chrome / Headless Chromium / Edge / WebKit
+             * Print Options: Background graphics = ON, Headers & Footers = OFF
+             */
             .no-print, .screen-toolbar {
                 display: none !important;
             }
@@ -91,13 +98,27 @@
                 width: 100% !important;
                 min-height: auto !important;
             }
+            table {
+                page-break-inside: auto;
+                break-inside: auto;
+            }
+            thead {
+                display: table-header-group !important;
+            }
+            tfoot {
+                display: table-footer-group !important;
+            }
+            tr {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
             .page-break {
                 page-break-after: always;
                 break-after: page;
             }
             .avoid-break {
-                page-break-inside: avoid;
-                break-inside: avoid;
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
             }
         }
 

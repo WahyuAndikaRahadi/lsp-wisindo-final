@@ -64,7 +64,7 @@
         ];
         $ak03Record = $assessment->ak03Item;
         $ratings = $ak03Record?->ratings_json ?? [];
-        $itemsByNumber = ($ak03Items instanceof \Illuminate\Support\Collection && $ak03Items->isNotEmpty()) ? $ak03Items->keyBy('component_number') : collect();
+        $itemsByNumber = (isset($ak03Items) && $ak03Items instanceof \Illuminate\Support\Collection && $ak03Items->isNotEmpty()) ? $ak03Items->keyBy('component_number') : collect();
     @endphp
 
     <table class="bnsp-table" style="font-size: 8.5pt;">
