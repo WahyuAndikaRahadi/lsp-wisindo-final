@@ -101,14 +101,16 @@ class FinalizationController extends Controller
 
         Log::info('Asesor ID '.auth()->id()." memperbarui FR.AK.02 asesmen #{$assessment->id} dengan hasil {$finalResult}");
 
+        $now = now();
         $assessment->update([
             'final_result' => $finalResult,
+            'final_result_at' => $now,
             'final_notes' => $validated['final_notes'] ?? null,
             'follow_up_action' => $validated['follow_up_action'] ?? null,
             'assessor_signature' => $request->input('assessor_signature') ?? $assessment->assessor_signature,
-            'assessor_signed_at' => now(),
+            'assessor_signed_at' => $now,
             'status' => 'COMPLETED',
-            'completed_at' => now(),
+            'completed_at' => $now,
         ]);
 
         return redirect()->route('asesor.jadwal.asesi', $assessment->schedule_id)

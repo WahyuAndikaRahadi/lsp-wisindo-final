@@ -33,6 +33,7 @@ class Assessment extends Model
         'admin_reviewed_at',
         'admin_reviewer_id',
         'final_result',
+        'final_result_at',
         'final_notes',
         'follow_up_action',
         'ak01_agreed_at',
@@ -52,6 +53,7 @@ class Assessment extends Model
             'admin_approved_at' => 'datetime',
             'admin_reviewed_at' => 'datetime',
             'ak01_agreed_at' => 'datetime',
+            'final_result_at' => 'datetime',
             'assessor_signed_at' => 'datetime',
             'asesi_signed_at' => 'datetime',
         ];

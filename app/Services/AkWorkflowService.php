@@ -174,14 +174,34 @@ class AkWorkflowService
     }
 
     /**
+     * Get the start date for appeal countdown.
+     * Priority: final_result_at (when K/BK was determined/announced) -> completed_at -> schedule->date -> now().
+     * Note: calculating from final_result_at is BNSP standard, pending LSP PrO Indo SOP confirmation.
+     */
+    public function getAppealBaseDate(Assessment $assessment): Carbon
+    {
+        if ($assessment->final_result_at) {
+            return Carbon::parse($assessment->final_result_at);
+        }
+
+        if ($assessment->completed_at) {
+            return Carbon::parse($assessment->completed_at);
+        }
+
+        if ($assessment->schedule?->date) {
+            return Carbon::parse($assessment->schedule->date);
+        }
+
+        return now();
+    }
+
+    /**
      * Check if given assessment appeal date is within allowed business days deadline.
      */
     public function isWithinAppealDeadline(Assessment $assessment, ?Carbon $targetDate = null): bool
     {
         $target = $targetDate ? $targetDate->copy() : now();
-        $baseDate = $assessment->completed_at
-            ? Carbon::parse($assessment->completed_at)
-            : ($assessment->schedule?->date ? Carbon::parse($assessment->schedule->date) : now());
+        $baseDate = $this->getAppealBaseDate($assessment);
 
         $deadline = $this->calculateAppealDeadline($baseDate);
 
@@ -197,9 +217,7 @@ class AkWorkflowService
 
         if (! $this->isWithinAppealDeadline($assessment, $date)) {
             $days = $this->getAppealWindowDays();
-            $baseDate = $assessment->completed_at
-                ? Carbon::parse($assessment->completed_at)
-                : ($assessment->schedule?->date ? Carbon::parse($assessment->schedule->date) : now());
+            $baseDate = $this->getAppealBaseDate($assessment);
             $deadline = $this->calculateAppealDeadline($baseDate);
 
             throw ValidationException::withMessages([

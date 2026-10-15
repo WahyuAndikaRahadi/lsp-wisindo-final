@@ -5,41 +5,7 @@
 ])
 
 @section('print-content')
-{{-- Metadata Box --}}
-<table class="w-full text-xs border border-black mb-4">
-    <tr>
-        <td class="w-1/3 p-2 font-bold bg-slate-100 border-r border-black align-top">
-            Skema Sertifikasi<br>
-            <span class="font-normal text-[10px] text-slate-600">(KKNI / Okupasi / Klaster)</span>
-        </td>
-        <td class="w-2/3 p-2 border-black">
-            <div class="grid grid-cols-12 gap-1">
-                <span class="col-span-2 font-semibold">Judul</span>
-                <span class="col-span-10">: <strong>{{ $scheme->name }}</strong></span>
-                <span class="col-span-2 font-semibold">Nomor</span>
-                <span class="col-span-10 font-mono">: {{ $scheme->code }}</span>
-            </div>
-        </td>
-    </tr>
-    <tr class="border-t border-black">
-        <td class="p-2 font-bold bg-slate-100 border-r border-black">TUK</td>
-        <td class="p-2 font-bold">{{ $schedule->tuk_name ?? 'Sewaktu / Tempat Kerja / Mandiri' }}</td>
-    </tr>
-    <tr class="border-t border-black">
-        <td class="p-2 font-bold bg-slate-100 border-r border-black">Nama Asesor</td>
-        <td class="p-2">
-            @forelse($assessors as $asr)
-                <span class="font-semibold">{{ $asr->full_name }}</span> (No. Reg: {{ $asr->profile?->no_reg_asesor ?? '-' }}){{ !$loop->last ? '; ' : '' }}
-            @empty
-                <span>-</span>
-            @endforelse
-        </td>
-    </tr>
-    <tr class="border-t border-black">
-        <td class="p-2 font-bold bg-slate-100 border-r border-black">Tanggal Pelaksanaan</td>
-        <td class="p-2">{{ \Carbon\Carbon::parse($schedule->date)->translatedFormat('d F Y') }}</td>
-    </tr>
-</table>
+@include('admin.dokumen-muk.partials.meta-box')
 
 <div class="mb-3">
     <h3 class="text-xs font-bold uppercase tracking-wider text-slate-800">Kunci Jawaban Pertanyaan Tertulis – Pilihan Ganda (DPT)</h3>
