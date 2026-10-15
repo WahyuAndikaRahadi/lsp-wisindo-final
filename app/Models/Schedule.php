@@ -49,6 +49,21 @@ class Schedule extends Model
         ];
     }
 
+    public function getPicTukNameAttribute(): ?string
+    {
+        return $this->pic_name;
+    }
+
+    public function getPicTukPositionAttribute(): ?string
+    {
+        return $this->pic_position;
+    }
+
+    public function getPicTukSignatureAttribute(): ?string
+    {
+        return $this->pic_signature;
+    }
+
     /**
      * Get effective list of instruments, defaulting to full standard suite when empty.
      */

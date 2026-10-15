@@ -99,6 +99,11 @@ class Assessment extends Model
         return $this->hasOne(AssessmentAk03Item::class);
     }
 
+    public function ak03Items(): HasMany
+    {
+        return $this->hasMany(AssessmentAk03Item::class);
+    }
+
     public function appeals(): HasMany
     {
         return $this->hasMany(AssessmentAppeal::class)->latest();

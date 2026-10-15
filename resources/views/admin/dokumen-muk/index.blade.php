@@ -28,24 +28,36 @@
                     </div>
 
                     {{-- Schedule-level Exports --}}
-                    <div class="flex items-center space-x-2 flex-wrap gap-y-1">
-                        <a href="{{ route('admin.dokumen-muk.export-sertifikat', $sch->id) }}" class="px-2.5 py-1 text-xs font-semibold bg-emerald-50 text-emerald-700 hover:bg-emerald-100 rounded border border-emerald-200 transition">
-                            Sertifikat
-                        </a>
-                        <a href="{{ route('admin.dokumen-muk.export-ba', $sch->id) }}" class="px-2.5 py-1 text-xs font-semibold bg-blue-50 text-brand-700 hover:bg-blue-100 rounded border border-blue-200 transition">
+                    <div class="flex items-center space-x-1.5 flex-wrap gap-y-1">
+                        <a href="{{ route('admin.dokumen-muk.export-ba', $sch->id) }}" target="_blank" class="px-2.5 py-1 text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white rounded shadow-sm transition">
                             Berita Acara (BA)
                         </a>
-                        <a href="{{ route('admin.dokumen-muk.export-hadir-asesor', $sch->id) }}" class="px-2.5 py-1 text-xs font-semibold bg-purple-50 text-purple-700 hover:bg-purple-100 rounded border border-purple-200 transition">
-                            Daftar Hadir Asesor
+                        <a href="{{ route('admin.dokumen-muk.export-hadir-asesor', $sch->id) }}" target="_blank" class="px-2.5 py-1 text-xs font-semibold bg-purple-50 text-purple-700 hover:bg-purple-100 rounded border border-purple-200 transition">
+                            Hadir Asesor
                         </a>
-                        <a href="{{ route('admin.dokumen-muk.export-hadir-asesi', $sch->id) }}" class="px-2.5 py-1 text-xs font-semibold bg-amber-50 text-amber-700 hover:bg-amber-100 rounded border border-amber-200 transition">
-                            Daftar Hadir Asesi
+                        <a href="{{ route('admin.dokumen-muk.export-hadir-asesi', $sch->id) }}" target="_blank" class="px-2.5 py-1 text-xs font-semibold bg-amber-50 text-amber-700 hover:bg-amber-100 rounded border border-amber-200 transition">
+                            Hadir Asesi
                         </a>
-                        <a href="{{ route('admin.dokumen-muk.export-excel-biodata', $sch->id) }}" class="px-2.5 py-1 text-xs font-semibold bg-teal-50 text-teal-700 hover:bg-teal-100 rounded border border-teal-200 transition">
-                            Excel Data Diri
+                        <a href="{{ route('admin.dokumen-muk.export', ['schedule' => $sch->id, 'type' => 'ak05']) }}" target="_blank" class="px-2.5 py-1 text-xs font-semibold bg-rose-50 text-rose-700 hover:bg-rose-100 rounded border border-rose-200 transition">
+                            FR.AK.05 (Laporan)
+                        </a>
+                        <a href="{{ route('admin.dokumen-muk.export', ['schedule' => $sch->id, 'type' => 'ak06']) }}" target="_blank" class="px-2.5 py-1 text-xs font-semibold bg-indigo-50 text-indigo-700 hover:bg-indigo-100 rounded border border-indigo-200 transition">
+                            FR.AK.06 (Tinjauan)
+                        </a>
+                        <a href="{{ route('admin.dokumen-muk.export', ['schedule' => $sch->id, 'type' => 'cover']) }}" target="_blank" class="px-2 py-1 text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 rounded border border-slate-300 transition">
+                            Cover MUK
+                        </a>
+                        <a href="{{ route('admin.dokumen-muk.export', ['schedule' => $sch->id, 'type' => 'daftar-periksa']) }}" target="_blank" class="px-2 py-1 text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 rounded border border-slate-300 transition">
+                            Daftar Periksa
+                        </a>
+                        <a href="{{ route('admin.dokumen-muk.export-sertifikat', $sch->id) }}" target="_blank" class="px-2.5 py-1 text-xs font-semibold bg-emerald-50 text-emerald-700 hover:bg-emerald-100 rounded border border-emerald-200 transition">
+                            Sertifikat
+                        </a>
+                        <a href="{{ route('admin.dokumen-muk.export-excel-biodata', $sch->id) }}" class="px-2 py-1 text-xs font-semibold bg-teal-50 text-teal-700 hover:bg-teal-100 rounded border border-teal-200 transition">
+                            Excel
                         </a>
 
-                        <button type="button" @click="open = !open" class="px-3 py-1 text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 rounded transition flex items-center space-x-1">
+                        <button type="button" @click="open = !open" class="px-3 py-1 text-xs font-bold bg-slate-800 hover:bg-slate-900 text-white rounded transition flex items-center space-x-1 ml-1">
                             <span x-text="open ? 'Tutup Asesi' : 'Daftar Asesi'"></span>
                             <svg class="w-3.5 h-3.5 transform transition-transform" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
@@ -65,47 +77,54 @@
                             <table class="w-full text-xs">
                                 <thead class="bg-slate-50 text-left font-semibold text-slate-600 border-b border-slate-200">
                                     <tr>
-                                        <th class="px-4 py-2.5">No</th>
-                                        <th class="px-4 py-2.5">Nama Asesi</th>
-                                        <th class="px-4 py-2.5">Status APL</th>
-                                        <th class="px-4 py-2.5">Status Asesmen</th>
-                                        <th class="px-4 py-2.5 text-right">Download Dokumen PDF Individual</th>
+                                        <th class="px-3 py-2.5">No</th>
+                                        <th class="px-3 py-2.5">Nama Asesi</th>
+                                        <th class="px-3 py-2.5">Hasil Akhir</th>
+                                        <th class="px-3 py-2.5 text-right">Cetak Dokumen MUK Individual</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-slate-100">
                                     @foreach($sch->assessments as $idx => $assessment)
                                         <tr class="hover:bg-slate-50/70">
-                                            <td class="px-4 py-2.5 text-slate-500 font-mono">{{ $idx + 1 }}</td>
-                                            <td class="px-4 py-2.5">
+                                            <td class="px-3 py-2.5 text-slate-500 font-mono">{{ $idx + 1 }}</td>
+                                            <td class="px-3 py-2.5">
                                                 <div class="font-bold text-slate-800">{{ $assessment->asesi->full_name }}</div>
-                                                <div class="text-[11px] text-slate-400">{{ $assessment->asesi->email }}</div>
+                                                <div class="text-[11px] text-slate-400">{{ $assessment->asesi->email }} &bull; NIK: {{ $assessment->asesi->profile?->nik ?? '-' }}</div>
                                             </td>
-                                            <td class="px-4 py-2.5">
-                                                <span class="px-2 py-0.5 rounded text-[10px] font-semibold border bg-slate-50 text-slate-700">
-                                                    {{ $assessment->apl_status }}
-                                                </span>
+                                            <td class="px-3 py-2.5">
+                                                @if($assessment->final_result === 'K')
+                                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">KOMPETEN (K)</span>
+                                                @elseif($assessment->final_result === 'BK')
+                                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-300">BELUM KOMPETEN (BK)</span>
+                                                @else
+                                                    <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-700">{{ $assessment->status ?? 'PENDING' }}</span>
+                                                @endif
                                             </td>
-                                            <td class="px-4 py-2.5">
-                                                <span class="px-2 py-0.5 rounded text-[10px] font-semibold border bg-slate-50 text-slate-700">
-                                                    {{ $assessment->status ?? 'PENDING' }}
-                                                </span>
-                                            </td>
-                                            <td class="px-4 py-2.5 text-right">
-                                                <div class="flex items-center justify-end space-x-1.5 flex-wrap gap-y-1">
-                                                    <a href="{{ route('admin.dokumen-muk.export-individual', ['assessment' => $assessment->id, 'type' => 'apl01']) }}" target="_blank" class="px-2 py-0.5 text-[10px] font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 rounded border border-slate-300">
-                                                        APL-01
+                                            <td class="px-3 py-2.5 text-right">
+                                                <div class="flex items-center justify-end space-x-1 flex-wrap gap-y-1">
+                                                    <a href="{{ route('admin.dokumen-muk.export-individual', ['assessment' => $assessment->id, 'type' => 'ak02']) }}" target="_blank" class="px-2 py-0.5 text-[10px] font-bold bg-brand-50 hover:bg-brand-100 text-brand-700 rounded border border-brand-200">
+                                                        AK.02 Rekaman
                                                     </a>
-                                                    <a href="{{ route('admin.dokumen-muk.export-individual', ['assessment' => $assessment->id, 'type' => 'apl02']) }}" target="_blank" class="px-2 py-0.5 text-[10px] font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 rounded border border-slate-300">
-                                                        APL-02
+                                                    <a href="{{ route('admin.dokumen-muk.export-individual', ['assessment' => $assessment->id, 'type' => 'ak03']) }}" target="_blank" class="px-2 py-0.5 text-[10px] font-medium bg-amber-50 hover:bg-amber-100 text-amber-700 rounded border border-amber-200">
+                                                        AK.03 Umpan Balik
                                                     </a>
-                                                    <a href="{{ route('admin.dokumen-muk.export-individual', ['assessment' => $assessment->id, 'type' => 'mapa']) }}" target="_blank" class="px-2 py-0.5 text-[10px] font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 rounded border border-slate-300">
-                                                        MAPA
+                                                    <a href="{{ route('admin.dokumen-muk.export-individual', ['assessment' => $assessment->id, 'type' => 'ak04']) }}" target="_blank" class="px-2 py-0.5 text-[10px] font-medium bg-purple-50 hover:bg-purple-100 text-purple-700 rounded border border-purple-200">
+                                                        AK.04 Banding
                                                     </a>
-                                                    <a href="{{ route('admin.dokumen-muk.export-individual', ['assessment' => $assessment->id, 'type' => 'ak01']) }}" target="_blank" class="px-2 py-0.5 text-[10px] font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 rounded border border-slate-300">
-                                                        AK01
+                                                    <a href="{{ route('admin.dokumen-muk.export-individual', ['assessment' => $assessment->id, 'type' => 'apl01']) }}" target="_blank" class="px-1.5 py-0.5 text-[10px] font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 rounded border border-slate-300">
+                                                        APL.01
                                                     </a>
-                                                    <a href="{{ route('admin.dokumen-muk.export-individual', ['assessment' => $assessment->id, 'type' => 'all']) }}" target="_blank" class="px-2 py-0.5 text-[10px] font-bold bg-brand-600 hover:bg-brand-700 text-white rounded">
-                                                        Semua PDF (ZIP/Gabungan)
+                                                    <a href="{{ route('admin.dokumen-muk.export-individual', ['assessment' => $assessment->id, 'type' => 'apl02']) }}" target="_blank" class="px-1.5 py-0.5 text-[10px] font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 rounded border border-slate-300">
+                                                        APL.02
+                                                    </a>
+                                                    <a href="{{ route('admin.dokumen-muk.export-individual', ['assessment' => $assessment->id, 'type' => 'ak01']) }}" target="_blank" class="px-1.5 py-0.5 text-[10px] font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 rounded border border-slate-300">
+                                                        AK.01
+                                                    </a>
+                                                    <a href="{{ route('admin.dokumen-muk.export-individual', ['assessment' => $assessment->id, 'type' => 'ak07']) }}" target="_blank" class="px-1.5 py-0.5 text-[10px] font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 rounded border border-slate-300">
+                                                        AK.07
+                                                    </a>
+                                                    <a href="{{ route('admin.dokumen-muk.export-individual', ['assessment' => $assessment->id, 'type' => 'pernyataan']) }}" target="_blank" class="px-2 py-0.5 text-[10px] font-medium bg-teal-50 hover:bg-teal-100 text-teal-700 rounded border border-teal-200">
+                                                        Pernyataan
                                                     </a>
                                                 </div>
                                             </td>

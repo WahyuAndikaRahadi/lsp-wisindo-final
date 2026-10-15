@@ -37,6 +37,11 @@ class CompetencyUnit extends Model
         return $this->hasMany(UnitElement::class);
     }
 
+    public function unitElements(): HasMany
+    {
+        return $this->elements();
+    }
+
     public function kuks(): HasManyThrough
     {
         return $this->hasManyThrough(Kuk::class, UnitElement::class);

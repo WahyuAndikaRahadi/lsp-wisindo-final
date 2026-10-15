@@ -41,4 +41,49 @@ class UserProfile extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function getAddressAttribute(): ?string
+    {
+        return $this->alamat_rumah;
+    }
+
+    public function getBirthPlaceAttribute(): ?string
+    {
+        return $this->tempat_lahir;
+    }
+
+    public function getBirthDateAttribute()
+    {
+        return $this->tanggal_lahir;
+    }
+
+    public function getGenderAttribute(): ?string
+    {
+        return $this->jenis_kelamin;
+    }
+
+    public function getInstitutionAttribute(): ?string
+    {
+        return $this->nama_institusi_perusahaan;
+    }
+
+    public function getCompanyAttribute(): ?string
+    {
+        return $this->nama_institusi_perusahaan;
+    }
+
+    public function getJobTitleAttribute(): ?string
+    {
+        return $this->jabatan;
+    }
+
+    public function getOccupationAttribute(): ?string
+    {
+        return $this->jabatan;
+    }
+
+    public function getMetNumberAttribute(): ?string
+    {
+        return $this->user?->assessor_registration_number;
+    }
 }
