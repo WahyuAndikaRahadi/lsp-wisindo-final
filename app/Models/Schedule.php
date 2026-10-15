@@ -23,8 +23,15 @@ class Schedule extends Model
         'start_time',
         'end_time',
         'duration_minutes',
+        'pic_name',
+        'pic_position',
+        'pic_signature',
         'selected_instruments',
         'notes',
+        'ak05_report',
+        'ak06_review',
+        'is_closed',
+        'closed_at',
         'status',
         'created_by',
     ];
@@ -33,6 +40,10 @@ class Schedule extends Model
     {
         return [
             'date' => 'date',
+            'closed_at' => 'datetime',
+            'is_closed' => 'boolean',
+            'ak05_report' => 'array',
+            'ak06_review' => 'array',
             'selected_instruments' => 'array',
             'duration_minutes' => 'integer',
         ];

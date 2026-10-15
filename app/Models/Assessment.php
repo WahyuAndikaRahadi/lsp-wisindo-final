@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Assessment extends Model
 {
@@ -25,6 +26,16 @@ class Assessment extends Model
         'apl_revision_notes',
         'last_active_step',
         'status',
+        'admin_status',
+        'admin_notes',
+        'admin_approved_at',
+        'admin_id',
+        'final_result',
+        'final_notes',
+        'follow_up_action',
+        'ak01_agreed_at',
+        'pleno_decision',
+        'pleno_notes',
         'registered_at',
         'approved_at',
         'completed_at',
@@ -36,6 +47,8 @@ class Assessment extends Model
             'registered_at' => 'datetime',
             'approved_at' => 'datetime',
             'completed_at' => 'datetime',
+            'admin_approved_at' => 'datetime',
+            'ak01_agreed_at' => 'datetime',
             'assessor_signed_at' => 'datetime',
             'asesi_signed_at' => 'datetime',
         ];
@@ -56,6 +69,11 @@ class Assessment extends Model
         return $this->belongsTo(User::class, 'assessor_id');
     }
 
+    public function admin(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'admin_id');
+    }
+
     public function proofs(): HasMany
     {
         return $this->hasMany(AssessmentProof::class);
@@ -69,6 +87,26 @@ class Assessment extends Model
     public function ak07Items(): HasMany
     {
         return $this->hasMany(AssessmentAk07Item::class);
+    }
+
+    public function ak02Items(): HasMany
+    {
+        return $this->hasMany(AssessmentAk02Item::class);
+    }
+
+    public function ak03Item(): HasOne
+    {
+        return $this->hasOne(AssessmentAk03Item::class);
+    }
+
+    public function appeals(): HasMany
+    {
+        return $this->hasMany(AssessmentAppeal::class)->latest();
+    }
+
+    public function latestAppeal(): HasOne
+    {
+        return $this->hasOne(AssessmentAppeal::class)->latestOfMany();
     }
 
     public function iaResponses(): HasMany
