@@ -277,6 +277,22 @@
                 </button>
             </form>
         </div>
+    @else
+        <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-5 sm:p-6 shadow-sm flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+            <div>
+                <span class="text-xs font-bold uppercase tracking-wider text-emerald-800 font-mono">Tahap Pasca Asesmen</span>
+                <h4 class="text-base font-bold text-slate-900">Rangkaian Asesmen Selesai ({{ $assessment->final_result ?? 'KOMPETEN' }})</h4>
+                <p class="text-xs text-slate-600 mt-0.5">Silakan lengkapi umpan balik proses asesmen (FR.AK.03) atau ajukan banding asesmen (FR.AK.04) jika ada sanggahan.</p>
+            </div>
+            <div class="flex items-center space-x-2 shrink-0">
+                <a href="{{ route('asesi.assessment.ak03', $assessment) }}" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold rounded-lg shadow-sm transition">
+                    FR.AK.03 Umpan Balik &rarr;
+                </a>
+                <a href="{{ route('asesi.assessment.appeal', $assessment) }}" class="px-4 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 text-xs font-bold rounded-lg shadow-sm transition">
+                    FR.AK.04 Banding
+                </a>
+            </div>
+        </div>
     @endif
 </div>
 @endsection

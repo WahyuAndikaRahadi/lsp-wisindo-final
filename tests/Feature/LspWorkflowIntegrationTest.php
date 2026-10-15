@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Assessment;
+use App\Models\AssessmentAppeal;
 use App\Models\AssessmentIaResponse;
 use App\Models\QuestionBank;
 use App\Models\Schedule;
@@ -151,7 +152,21 @@ class LspWorkflowIntegrationTest extends TestCase
         $assessment->refresh();
         $this->assertEquals('SUBMITTED', $assessment->apl_status);
 
-        // 4. Asesor reviews APL and APPROVES (redirects to Batch FR.AK07)
+        // 4. Admin candidate approval gate
+        // Asesor cannot approve if admin has not approved candidate registration
+        $earlyAsesorReview = $this->actingAs($asesor)->post(route('asesor.apl.decide', $assessment), [
+            'decision' => 'APPROVED',
+        ]);
+        $earlyAsesorReview->assertSessionHas('error');
+
+        // Admin approves candidate registration
+        $adminApprove = $this->actingAs($admin)->post(route('admin.assessment.review-registration', $assessment), [
+            'admin_status' => 'APPROVED',
+            'admin_notes' => 'Berkas pendaftaran memenuhi persyaratan.',
+        ]);
+        $adminApprove->assertSessionHas('success');
+
+        // Asesor reviews APL and APPROVES (redirects to Batch FR.AK07)
         $reviewResponse = $this->actingAs($asesor)->post(route('asesor.apl.decide', $assessment), [
             'decision' => 'APPROVED',
         ]);
@@ -199,19 +214,51 @@ class LspWorkflowIntegrationTest extends TestCase
         ]);
         $feedbackSubmit->assertSessionHas('success');
 
-        // 10. Asesi completes assessment
+        // 10. Asesi completes assessment and is guided to FR.AK.03 Umpan Balik
         $finishResponse = $this->actingAs($asesi)->post(route('asesi.assessment.finish', $assessment));
-        $finishResponse->assertRedirect(route('asesi.jadwal.index'));
+        $finishResponse->assertRedirect(route('asesi.assessment.ak03', $assessment));
 
         $assessment->refresh();
         $this->assertEquals('COMPLETED', $assessment->status);
 
-        // 11. Asesor finalizes schedule
-        $finalize = $this->actingAs($asesor)->post(route('asesor.schedule.finalize', $schedule));
-        $finalize->assertRedirect(route('asesor.jadwal.index'));
+        // 11. Asesi submits FR.AK.03 Umpan Balik
+        $ak03Submit = $this->actingAs($asesi)->post(route('asesi.assessment.ak03.submit', $assessment), [
+            'ratings' => [1 => ['value' => 'YA', 'comment' => 'Sangat baik']],
+            'general_notes' => 'Pelaksanaan asesmen objektif dan profesional.',
+        ]);
+        $ak03Submit->assertRedirect(route('asesi.jadwal.index'));
+        $this->assertDatabaseHas('t_assessment_ak03_items', ['assessment_id' => $assessment->id]);
 
+        // 12. Asesor checks & finalizes FR.AK.02 Rekaman Asesmen
+        $ak02View = $this->actingAs($asesor)->get(route('asesor.assessment.ak02', $assessment));
+        $ak02View->assertOk();
+        $this->assertDatabaseHas('t_assessment_ak02_items', ['assessment_id' => $assessment->id]);
+
+        // 13. Asesor completes schedule with FR.AK.05 & FR.AK.06
+        $reportSubmit = $this->actingAs($asesor)->post(route('asesor.schedule.reports.submit', $schedule), [
+            'ak05_aspek_positif' => 'Fasilitas bengkel TUK sangat memadai.',
+            'ak06_valid' => 'YA',
+        ]);
+        $reportSubmit->assertRedirect(route('asesor.jadwal.index'));
         $schedule->refresh();
+        $this->assertTrue($schedule->is_closed);
         $this->assertEquals('FINISHED', $schedule->status);
+
+        // 14. Asesi submits FR.AK.04 Banding & Admin decides
+        $appealSubmit = $this->actingAs($asesi)->post(route('asesi.assessment.appeal.submit', $assessment), [
+            'appeal_reasons' => 'Mohon peninjauan ulang terhadap bukti unjuk kerja pada sistem pengapian.',
+        ]);
+        $appealSubmit->assertRedirect(route('asesi.jadwal.index'));
+        $appeal = AssessmentAppeal::where('assessment_id', $assessment->id)->first();
+        $this->assertNotNull($appeal);
+
+        $appealDecide = $this->actingAs($admin)->post(route('admin.appeals.decide', $appeal), [
+            'decision' => 'ACCEPTED',
+            'decision_notes' => 'Banding diterima untuk peninjauan ulang komite teknis.',
+        ]);
+        $appealDecide->assertSessionHas('success');
+        $appeal->refresh();
+        $this->assertEquals('ACCEPTED', $appeal->status);
     }
 
     public function test_admin_dokumen_muk_access(): void
@@ -297,7 +344,18 @@ class LspWorkflowIntegrationTest extends TestCase
         $res->assertSee('ASESMEN MANDIRI');
         $res->assertSee('Formulir Keputusan Review APL');
 
-        // Test assessor approving APL
+        // Test assessor trying to approve APL before admin approval (should fail)
+        $failPostRes = $this->actingAs($asesor)->post(route('asesor.review-apl.update', $assessment), [
+            'apl_status' => 'APPROVED',
+            'notes' => 'Mencoba menyetujui tanpa approval admin.',
+        ]);
+        $failPostRes->assertSessionHas('error');
+        $this->assertEquals('SUBMITTED', $assessment->fresh()->apl_status);
+
+        // Admin approves registration first
+        $assessment->update(['admin_status' => 'APPROVED']);
+
+        // Now assessor approving APL succeeds
         $postRes = $this->actingAs($asesor)->post(route('asesor.review-apl.update', $assessment), [
             'apl_status' => 'APPROVED',
             'notes' => 'Berkas dan asesmen mandiri lengkap memenuhi syarat.',
@@ -331,6 +389,7 @@ class LspWorkflowIntegrationTest extends TestCase
             'asesi_id' => $asesi->id,
             'schedule_id' => $schedule->id,
             'scheme_id' => $scheme->id,
+            'admin_status' => 'APPROVED',
             'apl_status' => 'APPROVED',
         ]);
 
@@ -344,13 +403,13 @@ class LspWorkflowIntegrationTest extends TestCase
         $ak07Res->assertOk();
         $ak07Res->assertSee('AK07');
 
-        // Assessor submits AK07 and continues to actual assessment (Schedule Ruang Uji)
+        // Assessor submits AK07 and continues to AK01 pra-asesmen (urutan diperbaiki: AK07 -> AK01)
         $postAk07 = $this->actingAs($asesor)->post(route('asesor.ak07.store', $schedule), [
             'assessment_ids' => [$assessment->id],
             'category' => 'waktu',
             'notes' => 'Penambahan waktu 15 menit untuk asesi.',
         ]);
-        $postAk07->assertRedirect(route('asesor.schedule.ruang-uji', $schedule->id));
+        $postAk07->assertRedirect(route('asesor.schedule.ak01', $schedule->id));
         $this->assertDatabaseHas('t_assessment_ak07_items', [
             'assessment_id' => $assessment->id,
             'adjustment_category' => 'waktu',

@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Assessment;
 use App\Models\Schedule;
 use App\Models\Scheme;
 use App\Models\User;
+use App\Services\AkWorkflowService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -120,5 +122,20 @@ class JadwalController extends Controller
 
         return redirect()->route('admin.jadwal.index')
             ->with('success', 'Jadwal berhasil dihapus.');
+    }
+
+    public function reviewRegistration(Assessment $assessment, Request $request): RedirectResponse
+    {
+        $status = strtoupper((string) ($request->input('admin_status') ?? 'APPROVED'));
+        $notes = $request->input('admin_notes');
+
+        app(AkWorkflowService::class)->approveCandidateRegistration(
+            $assessment,
+            $status,
+            $notes,
+            auth()->id()
+        );
+
+        return back()->with('success', "Status pendaftaran asesi {$assessment->asesi->full_name} berhasil diperbarui menjadi {$status}.");
     }
 }

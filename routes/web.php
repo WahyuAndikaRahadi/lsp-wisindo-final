@@ -63,6 +63,10 @@ Route::middleware(['auth', 'role:ASESI'])->prefix('asesi')->name('asesi.')->grou
         Route::post('/instrument/{code}/upload-evidence', [Asesi\RuangUjiController::class, 'uploadEvidence'])->name('instrument.upload-evidence');
 
         Route::post('/finish', [Asesi\RuangUjiController::class, 'finish'])->name('finish');
+        Route::get('/ak03', [Asesi\RuangUjiController::class, 'showAk03'])->name('ak03');
+        Route::post('/ak03', [Asesi\RuangUjiController::class, 'submitAk03'])->name('ak03.submit');
+        Route::get('/appeal', [Asesi\RuangUjiController::class, 'showAppeal'])->name('appeal');
+        Route::post('/appeal', [Asesi\RuangUjiController::class, 'submitAppeal'])->name('appeal.submit');
     });
 });
 
@@ -115,6 +119,14 @@ Route::middleware(['auth', 'role:ASESOR'])->prefix('asesor')->name('asesor.')->g
 
     Route::get('/ruang-uji/{assessment}/ia05', fn (Assessment $assessment) => app()->call([app(Asesor\InstrumentController::class), 'instrumentShow'], ['assessment' => $assessment, 'code' => 'ia05']))->name('ruang-uji.ia05');
 
+    // AK02 Rekaman Asesmen
+    Route::get('/assessment/{assessment}/ak02', [Asesor\FinalizationController::class, 'showAk02'])->name('assessment.ak02');
+    Route::post('/assessment/{assessment}/ak02', [Asesor\FinalizationController::class, 'updateAk02'])->name('assessment.ak02.update');
+
+    // AK05 & AK06 Reports
+    Route::get('/schedule/{schedule}/reports', [Asesor\FinalizationController::class, 'showReports'])->name('schedule.reports');
+    Route::post('/schedule/{schedule}/reports', [Asesor\FinalizationController::class, 'submitReports'])->name('schedule.reports.submit');
+
     // Finalize
     Route::post('/schedule/{schedule}/finalize', [Asesor\FinalizationController::class, 'finalize'])->name('schedule.finalize');
     Route::post('/assessment/{assessment}/complete', [Asesor\FinalizationController::class, 'completeAssessment'])->name('assessment.complete');
@@ -123,6 +135,13 @@ Route::middleware(['auth', 'role:ASESOR'])->prefix('asesor')->name('asesor.')->g
 // Admin & Superadmin Routes
 Route::middleware(['auth', 'role:SUPER_ADMIN,ADMIN_LSP,KOMITE_TEKNIS,TUK_ADMIN'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [Admin\DashboardController::class, 'index'])->name('dashboard');
+
+    // Candidate Registration Review
+    Route::post('/assessment/{assessment}/review-registration', [Admin\JadwalController::class, 'reviewRegistration'])->name('assessment.review-registration');
+
+    // Appeals (FR.AK.04)
+    Route::get('/appeals', [Admin\AppealController::class, 'index'])->name('appeals.index');
+    Route::post('/appeals/{appeal}/decide', [Admin\AppealController::class, 'decide'])->name('appeals.decide');
 
     // Jadwal CRUD
     Route::resource('jadwal', Admin\JadwalController::class);

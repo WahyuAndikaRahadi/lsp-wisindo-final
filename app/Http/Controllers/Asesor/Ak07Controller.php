@@ -40,8 +40,8 @@ class Ak07Controller extends Controller
 
         // If asesor submits without selecting any asesi or adjustments (unfilled/optional)
         if (empty($ids)) {
-            return redirect()->route('asesor.schedule.ruang-uji', $schedule->id)
-                ->with('info', 'FR.AK07 dilewati tanpa penyesuaian khusus. Melanjutkan ke Ruang Uji Asesmen.');
+            return redirect()->route('asesor.schedule.ak01', $schedule->id)
+                ->with('info', 'FR.AK07 dilewati tanpa penyesuaian khusus. Melanjutkan ke FR.AK01 (Persetujuan Asesmen & Kerahasiaan).');
         }
 
         $items = $request->input('items', []);
@@ -107,9 +107,9 @@ class Ak07Controller extends Controller
         }
 
         $msg = $savedAny
-            ? 'Penyesuaian yang wajar (FR.AK07) berhasil disimpan. Melanjutkan ke Ruang Uji Asesmen.'
-            : 'FR.AK07 disimpan tanpa penyesuaian khusus. Melanjutkan ke Ruang Uji Asesmen.';
+            ? 'Penyesuaian yang wajar (FR.AK07) berhasil disimpan. Melanjutkan ke FR.AK01 (Persetujuan Asesmen & Kerahasiaan).'
+            : 'FR.AK07 disimpan tanpa penyesuaian khusus. Melanjutkan ke FR.AK01 (Persetujuan Asesmen & Kerahasiaan).';
 
-        return redirect()->route('asesor.schedule.ruang-uji', $schedule->id)->with('success', $msg);
+        return redirect()->route('asesor.schedule.ak01', $schedule->id)->with('success', $msg);
     }
 }

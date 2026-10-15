@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Assessment;
 use App\Models\AssessmentIaResponse;
 use App\Models\QuestionBank;
+use App\Services\AkWorkflowService;
 use App\Services\AutoGradeService;
 use App\Services\SchemeInstrumentService;
 use Illuminate\Http\RedirectResponse;
@@ -188,7 +189,60 @@ class RuangUjiController extends Controller
             'completed_at' => now(),
         ]);
 
+        return redirect()->route('asesi.assessment.ak03', $assessment)
+            ->with('success', 'Asesmen teknis selesai. Harap mengisi formulir FR.AK.03 (Umpan Balik Asesi).');
+    }
+
+    public function showAk03(Assessment $assessment): View
+    {
+        abort_if($assessment->asesi_id !== auth()->id(), 403);
+
+        $assessment->load('schedule.scheme', 'assessor', 'ak03Item');
+        $ak03 = $assessment->ak03Item;
+
+        return view('asesi.ruang-uji.ak03', compact('assessment', 'ak03'));
+    }
+
+    public function submitAk03(Assessment $assessment, Request $request): RedirectResponse
+    {
+        abort_if($assessment->asesi_id !== auth()->id(), 403);
+
+        $ratings = $request->input('ratings', []);
+        $generalNotes = $request->input('general_notes');
+
+        app(AkWorkflowService::class)->submitAk03Feedback($assessment, $ratings, $generalNotes);
+
         return redirect()->route('asesi.jadwal.index')
-            ->with('success', 'Asesmen telah diselesaikan.');
+            ->with('success', 'Formulir FR.AK.03 Umpan Balik Asesi berhasil dikirim.');
+    }
+
+    public function showAppeal(Assessment $assessment): View
+    {
+        abort_if($assessment->asesi_id !== auth()->id(), 403);
+
+        $assessment->load('schedule.scheme.competencyUnits', 'assessor', 'appeals');
+        $units = $assessment->schedule->scheme->competencyUnits;
+        $appeal = $assessment->latestAppeal;
+
+        return view('asesi.ruang-uji.ak04-appeal', compact('assessment', 'units', 'appeal'));
+    }
+
+    public function submitAppeal(Assessment $assessment, Request $request): RedirectResponse
+    {
+        abort_if($assessment->asesi_id !== auth()->id(), 403);
+
+        $request->validate([
+            'appeal_reasons' => 'required|string|min:10',
+            'contested_units' => 'nullable|array',
+        ]);
+
+        app(AkWorkflowService::class)->submitAppeal(
+            $assessment,
+            $request->input('appeal_reasons'),
+            $request->input('contested_units', [])
+        );
+
+        return redirect()->route('asesi.jadwal.index')
+            ->with('success', 'Pengajuan Banding Asesmen (FR.AK.04) berhasil dikirimkan ke Admin LSP.');
     }
 }

@@ -19,10 +19,19 @@
                 <span>{{ substr($jadwal->start_time, 0, 5) }} - {{ substr($jadwal->end_time, 0, 5) }} WIB</span>
             </div>
         </div>
-        <div class="flex items-center space-x-2">
+        <div class="flex items-center space-x-2 flex-wrap gap-y-2">
             @if($allApproved)
-                <a href="{{ route('asesor.ak07.create', $jadwal->id) }}" class="inline-flex items-center px-4 py-2 text-xs font-bold uppercase tracking-wider bg-brand-600 hover:bg-brand-700 text-white rounded-lg shadow-sm transition">
-                    Lanjut ke FR.AK07 &rarr;
+                <a href="{{ route('asesor.ak07.create', $jadwal->id) }}" class="inline-flex items-center px-3 py-1.5 text-xs font-bold bg-amber-500 hover:bg-amber-600 text-white rounded-lg shadow-xs transition" title="FR.AK.07 Penyesuaian Wajar">
+                    1. FR.AK.07
+                </a>
+                <a href="{{ route('asesor.schedule.ak01', $jadwal->id) }}" class="inline-flex items-center px-3 py-1.5 text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-xs transition" title="FR.AK.01 Persetujuan Asesmen">
+                    2. FR.AK.01
+                </a>
+                <a href="{{ route('asesor.schedule.ruang-uji', $jadwal->id) }}" class="inline-flex items-center px-3 py-1.5 text-xs font-bold bg-brand-600 hover:bg-brand-700 text-white rounded-lg shadow-xs transition">
+                    3. Ruang Uji &rarr;
+                </a>
+                <a href="{{ route('asesor.schedule.reports', $jadwal->id) }}" class="inline-flex items-center px-3 py-1.5 text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 border border-slate-300 rounded-lg shadow-xs transition" title="FR.AK.05 & FR.AK.06">
+                    4. Tutup Jadwal
                 </a>
             @else
                 <div class="inline-flex items-center px-3.5 py-2 text-xs font-semibold text-amber-800 bg-amber-50 border border-amber-200 rounded-lg shadow-xs">
@@ -49,61 +58,87 @@
                 <table class="w-full text-sm">
                     <thead class="bg-slate-50 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
                         <tr>
-                            <th class="px-6 py-3">No</th>
-                            <th class="px-6 py-3">Nama Asesi</th>
-                            <th class="px-6 py-3">Status APL</th>
-                            <th class="px-6 py-3">Status Asesmen</th>
-                            <th class="px-6 py-3 text-right">Aksi</th>
+                            <th class="px-4 py-3 text-center w-10">No</th>
+                            <th class="px-4 py-3">Nama Asesi</th>
+                            <th class="px-3 py-3 text-center">1. Approval Admin</th>
+                            <th class="px-3 py-3 text-center">2. Approval Asesor</th>
+                            <th class="px-3 py-3 text-center">3. Hasil Asesmen</th>
+                            <th class="px-3 py-3 text-center">4. Banding (AK.04)</th>
+                            <th class="px-4 py-3 text-right">Aksi Asesor</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100">
                         @foreach($assessments as $i => $assessment)
                             @php
-                                $aplBadge = match($assessment->apl_status) {
+                                $adminBadge = match($assessment->admin_status ?? 'PENDING') {
+                                    'APPROVED' => 'bg-emerald-50 text-emerald-700 border-emerald-300',
+                                    'REVISION' => 'bg-amber-50 text-amber-700 border-amber-300',
+                                    'REJECTED' => 'bg-rose-50 text-rose-700 border-rose-300',
+                                    default => 'bg-slate-100 text-slate-600 border-slate-300',
+                                };
+                                $aplBadge = match($assessment->apl_status ?? 'DRAFT') {
                                     'APPROVED' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
                                     'SUBMITTED' => 'bg-blue-50 text-blue-700 border-blue-200',
                                     'REVISION_REQUESTED' => 'bg-amber-50 text-amber-700 border-amber-200',
                                     'REJECTED' => 'bg-rose-50 text-rose-700 border-rose-200',
                                     default => 'bg-slate-50 text-slate-600 border-slate-200',
                                 };
-                                $statusBadge = match($assessment->status ?? 'PENDING') {
-                                    'COMPLETED' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
-                                    'IN_PROGRESS' => 'bg-blue-50 text-blue-700 border-blue-200',
-                                    default => 'bg-slate-50 text-slate-600 border-slate-200',
+                                $hasilBadge = match($assessment->final_result ?? 'BELUM_SELESAI') {
+                                    'KOMPETEN' => 'bg-emerald-100 text-emerald-800 border-emerald-400 font-black',
+                                    'BELUM_KOMPETEN' => 'bg-rose-100 text-rose-800 border-rose-400 font-black',
+                                    default => 'bg-slate-100 text-slate-600 border-slate-200',
                                 };
+                                $appeal = $assessment->latestAppeal;
                             @endphp
                             <tr class="hover:bg-slate-50/60 transition">
-                                <td class="px-6 py-4 text-slate-500 font-mono text-xs">{{ $i + 1 }}</td>
-                                <td class="px-6 py-4">
+                                <td class="px-4 py-3 text-slate-500 font-mono text-xs text-center">{{ $i + 1 }}</td>
+                                <td class="px-4 py-3">
                                     <div class="font-semibold text-slate-900">{{ $assessment->asesi->full_name }}</div>
                                     <div class="text-xs text-slate-500">{{ $assessment->asesi->email }}</div>
                                 </td>
-                                <td class="px-6 py-4">
-                                    <span class="px-2 py-0.5 rounded text-xs font-semibold border {{ $aplBadge }}">
-                                        {{ str_replace('_', ' ', $assessment->apl_status) }}
+                                <td class="px-3 py-3 text-center">
+                                    <span class="px-2 py-0.5 rounded text-[11px] font-bold border {{ $adminBadge }}">
+                                        {{ $assessment->admin_status ?? 'PENDING' }}
                                     </span>
                                 </td>
-                                <td class="px-6 py-4">
-                                    <span class="px-2 py-0.5 rounded text-xs font-semibold border {{ $statusBadge }}">
-                                        {{ str_replace('_', ' ', $assessment->status ?? 'PENDING') }}
+                                <td class="px-3 py-3 text-center">
+                                    <span class="px-2 py-0.5 rounded text-[11px] font-semibold border {{ $aplBadge }}">
+                                        {{ str_replace('_', ' ', $assessment->apl_status ?? 'DRAFT') }}
                                     </span>
                                 </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center justify-end space-x-2 flex-wrap gap-y-1">
+                                <td class="px-3 py-3 text-center">
+                                    <span class="px-2 py-0.5 rounded text-[11px] border {{ $hasilBadge }}">
+                                        {{ $assessment->final_result ?? ($assessment->status === 'COMPLETED' ? 'KOMPETEN' : 'BELUM SELESAI') }}
+                                    </span>
+                                </td>
+                                <td class="px-3 py-3 text-center">
+                                    @if($appeal)
+                                        <span class="px-2 py-0.5 rounded text-[11px] font-bold border bg-purple-50 text-purple-700 border-purple-300">
+                                            {{ $appeal->status }}
+                                        </span>
+                                    @else
+                                        <span class="text-slate-400 text-xs">-</span>
+                                    @endif
+                                </td>
+                                <td class="px-4 py-3 text-right">
+                                    <div class="flex items-center justify-end space-x-1.5 flex-wrap gap-y-1">
                                         @if(in_array($assessment->apl_status, ['SUBMITTED', 'REVISION_REQUESTED']))
-                                            <a href="{{ route('asesor.review-apl', $assessment->id) }}" class="px-3 py-1.5 text-xs font-bold bg-amber-500 hover:bg-amber-600 text-white rounded-lg border border-black shadow-sm transition">
+                                            <a href="{{ route('asesor.review-apl', $assessment->id) }}" class="px-2.5 py-1 text-xs font-bold bg-amber-500 hover:bg-amber-600 text-white rounded border border-amber-600 shadow-xs transition">
                                                 Review APL
                                             </a>
                                         @elseif($assessment->apl_status === 'APPROVED')
-                                            <span class="px-2.5 py-1 text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-300 rounded">
-                                                ✓ Siap Diuji
-                                            </span>
+                                            <a href="{{ route('asesor.assessment.ruang-uji', $assessment->id) }}" class="px-2.5 py-1 text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 rounded shadow-xs transition">
+                                                Ruang Uji
+                                            </a>
+                                            <a href="{{ route('asesor.assessment.ak02', $assessment->id) }}" class="px-2.5 py-1 text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 border border-slate-300 rounded shadow-xs transition" title="Rekaman Asesmen Kompetensi">
+                                                FR.AK.02
+                                            </a>
                                         @elseif($assessment->apl_status === 'REJECTED')
-                                            <span class="px-2.5 py-1 text-xs font-bold text-rose-700 bg-rose-50 border border-rose-300 rounded">
+                                            <span class="px-2 py-0.5 text-xs font-bold text-rose-700 bg-rose-50 border border-rose-300 rounded">
                                                 Ditolak
                                             </span>
                                         @else
-                                            <span class="px-2.5 py-1 text-xs font-medium text-slate-500 bg-slate-50 border border-slate-200 rounded">
+                                            <span class="px-2 py-0.5 text-xs font-medium text-slate-500 bg-slate-50 border border-slate-200 rounded">
                                                 Draft
                                             </span>
                                         @endif

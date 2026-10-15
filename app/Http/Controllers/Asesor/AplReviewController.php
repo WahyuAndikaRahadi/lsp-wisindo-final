@@ -50,6 +50,10 @@ class AplReviewController extends Controller
             return back()->withErrors(['apl_status' => 'Status keputusan tidak valid.']);
         }
 
+        if ($status === 'APPROVED' && $assessment->admin_status !== 'APPROVED') {
+            return back()->with('error', 'Pendaftaran asesi belum disetujui oleh Admin LSP. Asesor baru dapat menyetujui APL setelah Admin menyetujui berkas pendaftaran.');
+        }
+
         $notes = $request->input('notes') ?? $request->input('apl_revision_notes') ?? $request->input('catatan');
 
         $assessment->update([
