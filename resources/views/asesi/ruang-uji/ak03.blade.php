@@ -4,7 +4,7 @@
 <div class="max-w-4xl mx-auto space-y-6">
     <div class="flex items-center justify-between">
         <div>
-            <a href="{{ route('asesi.ruang-uji', $assessment->id) }}" class="text-xs text-brand-600 hover:text-brand-700 font-semibold">&larr; Kembali ke Ruang Uji</a>
+            <a href="{{ route('asesi.assessment.ruang-uji', $assessment->id) }}" class="text-xs text-brand-600 hover:text-brand-700 font-semibold">&larr; Kembali ke Ruang Uji</a>
             <h1 class="text-2xl font-black text-slate-900 tracking-tight mt-1">FR.AK.03 Umpan Balik dan Catatan Asesmen</h1>
             <p class="text-xs text-slate-500">Evaluasi pengalaman asesi terhadap transparansi dan kenyamanan pelaksanaan uji kompetensi</p>
         </div>
