@@ -9,6 +9,7 @@ use App\Models\QuestionBank;
 use App\Services\AkWorkflowService;
 use App\Services\AutoGradeService;
 use App\Services\SchemeInstrumentService;
+use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -232,7 +233,15 @@ class RuangUjiController extends Controller
         $units = $assessment->schedule->scheme->competencyUnits;
         $appeal = $assessment->latestAppeal;
 
-        return view('asesi.ruang-uji.ak04-appeal', compact('assessment', 'units', 'appeal'));
+        $workflowService = app(AkWorkflowService::class);
+        $appealWindowDays = $workflowService->getAppealWindowDays();
+        $baseDate = $assessment->completed_at
+            ? Carbon::parse($assessment->completed_at)
+            : ($assessment->schedule?->date ? Carbon::parse($assessment->schedule->date) : now());
+        $deadline = $workflowService->calculateAppealDeadline($baseDate);
+        $isWithinDeadline = $workflowService->isWithinAppealDeadline($assessment);
+
+        return view('asesi.ruang-uji.ak04-appeal', compact('assessment', 'units', 'appeal', 'appealWindowDays', 'deadline', 'isWithinDeadline'));
     }
 
     public function submitAppeal(Assessment $assessment, Request $request): RedirectResponse

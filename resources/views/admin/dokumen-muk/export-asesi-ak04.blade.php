@@ -111,6 +111,13 @@
                     <td style="width: 3%;">:</td>
                     <td style="width: 72%;"><strong>{{ in_array($latestAppeal->status, ['ACCEPTED', 'UPHELD']) || $latestAppeal->decision === 'UPHELD' ? 'DITERIMA (Hasil Asesmen Diubah/Diuji Ulang)' : 'DITOLAK (Keputusan Asesor Tetap)' }}</strong></td>
                 </tr>
+                @if($latestAppeal->appeals_committee_chair)
+                    <tr>
+                        <td>Ketua Tim Banding</td>
+                        <td>:</td>
+                        <td><strong>{{ $latestAppeal->appeals_committee_chair }}</strong></td>
+                    </tr>
+                @endif
                 <tr>
                     <td style="vertical-align: top; padding-top: 4px;">Catatan Pertimbangan</td>
                     <td style="vertical-align: top; padding-top: 4px;">:</td>
@@ -147,7 +154,9 @@
             </div>
 
             <div class="sig-col" style="padding-right: 0; width: 50%;">
-                <div style="font-weight: bold; margin-bottom: 6px;">Admin LSP / Tim Banding :</div>
+                <div style="font-weight: bold; margin-bottom: 6px;">
+                    {{ $latestAppeal?->appeals_committee_chair ? 'Ketua Tim Banding :' : 'Admin LSP / Tim Banding :' }}
+                </div>
                 <div style="font-size: 9pt;">
                     Tanda tangan :
                 </div>
@@ -156,6 +165,9 @@
                     <div style="border-bottom: 1px dotted #000; width: 85%;"></div>
                 </div>
                 <div style="font-size: 9pt; margin-top: 4px;">
+                    @if($latestAppeal?->appeals_committee_chair)
+                        <strong>{{ $latestAppeal->appeals_committee_chair }}</strong><br>
+                    @endif
                     Tanggal : {{ \Carbon\Carbon::parse($schedule->date)->translatedFormat('d F Y') }}
                 </div>
             </div>

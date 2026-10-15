@@ -29,13 +29,15 @@ class AppealController extends Controller
         $request->validate([
             'decision' => 'required|in:ACCEPTED,REJECTED',
             'decision_notes' => 'nullable|string',
+            'appeals_committee_chair' => 'nullable|string|max:255',
         ]);
 
         $this->workflowService->decideAppeal(
             $appeal,
             $request->input('decision'),
             $request->input('decision_notes'),
-            auth()->id()
+            auth()->id(),
+            $request->input('appeals_committee_chair')
         );
 
         return back()->with('success', 'Keputusan banding asesmen (FR.AK.04) berhasil disimpan.');

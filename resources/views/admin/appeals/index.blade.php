@@ -43,8 +43,9 @@
                         </div>
 
                         @if($appeal->status === 'SUBMITTED' || $appeal->status === 'UNDER_REVIEW')
-                            <form action="{{ route('admin.appeals.decide', $appeal->id) }}" method="POST" class="pt-2 flex flex-col sm:flex-row items-center gap-3 text-xs">
+                            <form action="{{ route('admin.appeals.decide', $appeal->id) }}" method="POST" class="pt-2 flex flex-col md:flex-row items-center gap-3 text-xs">
                                 @csrf
+                                <input type="text" name="appeals_committee_chair" class="w-full md:w-56 text-xs rounded-lg border-slate-300 focus:ring-brand-500" placeholder="Nama Ketua Tim Banding (opsional)..." value="{{ old('appeals_committee_chair', $appeal->appeals_committee_chair) }}">
                                 <input type="text" name="decision_notes" class="flex-1 text-xs rounded-lg border-slate-300 focus:ring-brand-500" placeholder="Catatan keputusan banding (tindak lanjut/asesmen ulang)..." required>
                                 <div class="flex items-center space-x-2">
                                     <button type="submit" name="decision" value="ACCEPTED" class="px-4 py-2 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg shadow-sm transition">
@@ -58,7 +59,10 @@
                         @else
                             <div class="text-xs text-slate-600 bg-slate-100 p-3 rounded-lg border border-slate-200">
                                 <strong>Catatan Keputusan:</strong> {{ $appeal->decision_notes ?? '-' }}
-                                <span class="text-slate-400 ml-2">Diputuskan oleh: {{ $appeal->decider->full_name ?? 'Admin' }} pada {{ $appeal->decision_date }}</span>
+                                @if($appeal->appeals_committee_chair)
+                                    <div class="text-slate-800 mt-1"><strong>Ketua Tim Banding:</strong> {{ $appeal->appeals_committee_chair }}</div>
+                                @endif
+                                <span class="text-slate-400 block mt-1">Diputuskan oleh: {{ $appeal->decider->full_name ?? 'Admin' }} pada {{ $appeal->decision_date ? \Carbon\Carbon::parse($appeal->decision_date)->isoFormat('D MMMM Y') : '-' }}</span>
                             </div>
                         @endif
                     </div>

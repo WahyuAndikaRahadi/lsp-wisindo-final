@@ -21,6 +21,7 @@ class AssessmentAppeal extends Model
         'decision_notes',
         'decision_date',
         'decided_by',
+        'appeals_committee_chair',
         'assessor_notes',
     ];
 

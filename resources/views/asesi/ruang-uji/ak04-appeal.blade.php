@@ -35,6 +35,22 @@
         </div>
     </div>
 
+    {{-- Appeal Deadline Information Banner --}}
+    <div class="p-4 rounded-xl border {{ $isWithinDeadline ? 'bg-amber-50 border-amber-200 text-amber-900' : 'bg-rose-50 border-rose-200 text-rose-900' }} text-xs space-y-1">
+        <div class="flex items-center justify-between">
+            <span class="font-bold flex items-center gap-1.5">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                Batas Pengajuan Banding: {{ $appealWindowDays }} Hari Kerja (hingga {{ $deadline->isoFormat('dddd, D MMMM Y') }})
+            </span>
+            <span class="text-[10px] uppercase font-extrabold px-2 py-0.5 rounded-full {{ $isWithinDeadline ? 'bg-amber-200 text-amber-800' : 'bg-rose-200 text-rose-800' }}">
+                {{ $isWithinDeadline ? 'Tenggat Terbuka' : 'Tenggat Berakhir' }}
+            </span>
+        </div>
+        <p class="text-[11px] {{ $isWithinDeadline ? 'text-amber-800' : 'text-rose-800' }}">
+            * Catatan Regulasi: Batas {{ $appealWindowDays }} hari kerja dihitung hari kerja resmi (Senin-Jumat, mengabaikan Sabtu dan Minggu). Batas 3 hari kerja diambil dari praktik umum BNSP, belum dikonfirmasi dengan SOP LSP PrO Indo.
+        </p>
+    </div>
+
     @if($appeal && $appeal->status !== 'SUBMITTED')
         {{-- Decision Result Box --}}
         <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm space-y-3 text-xs">
@@ -82,9 +98,18 @@
                 <a href="{{ route('asesi.jadwal.index') }}" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-900">
                     Batal
                 </a>
-                <button type="submit" class="px-6 py-2.5 text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 rounded-lg shadow-sm transition">
-                    {{ $appeal ? 'Perbarui Pengajuan Banding' : 'Kirim Pengajuan Banding (FR.AK.04)' }}
-                </button>
+                @if(! $isWithinDeadline && ! $appeal)
+                    <div class="text-right">
+                        <span class="text-xs text-rose-600 font-bold block">Tenggat pengajuan banding telah berakhir.</span>
+                        <button type="button" disabled class="mt-1 px-6 py-2.5 text-xs font-bold text-white bg-slate-400 rounded-lg cursor-not-allowed">
+                            Batas Waktu Habis
+                        </button>
+                    </div>
+                @else
+                    <button type="submit" class="px-6 py-2.5 text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 rounded-lg shadow-sm transition">
+                        {{ $appeal ? 'Perbarui Pengajuan Banding' : 'Kirim Pengajuan Banding (FR.AK.04)' }}
+                    </button>
+                @endif
             </div>
         </div>
     </form>

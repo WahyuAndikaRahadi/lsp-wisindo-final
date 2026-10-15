@@ -787,4 +787,150 @@ class LspWorkflowIntegrationTest extends TestCase
 
         $res->assertSessionHasErrors(['statement_integrity']);
     }
+
+    public function test_appeal_allowed_within_business_days_window(): void
+    {
+        $fixture = $this->createTestAssessment();
+        $asesi = $fixture['asesi'];
+        $assessment = $fixture['assessment'];
+
+        // Monday assessment completion
+        $monday = Carbon::parse('2026-10-12 10:00:00'); // Monday
+        $assessment->update([
+            'completed_at' => $monday,
+            'status' => 'COMPLETED',
+            'final_result' => 'BELUM_KOMPETEN',
+        ]);
+
+        // Day 1: Tuesday -> Allowed
+        $tuesday = Carbon::parse('2026-10-13 14:00:00');
+        Carbon::setTestNow($tuesday);
+
+        $resDay1 = $this->actingAs($asesi)->post(route('asesi.assessment.appeal.submit', $assessment), [
+            'appeal_reasons' => 'Alasan keberatan hari ke-1 sangat jelas dan terperinci.',
+        ]);
+        $resDay1->assertRedirect();
+        $resDay1->assertSessionHas('success');
+        $this->assertEquals(1, $assessment->appeals()->count());
+
+        // Reset appeals
+        $assessment->appeals()->delete();
+
+        // Day 3: Thursday -> Allowed
+        $thursday = Carbon::parse('2026-10-15 16:30:00');
+        Carbon::setTestNow($thursday);
+
+        $resDay3 = $this->actingAs($asesi)->post(route('asesi.assessment.appeal.submit', $assessment), [
+            'appeal_reasons' => 'Alasan keberatan hari ke-3 diajukan sebelum batas akhir.',
+        ]);
+        $resDay3->assertRedirect();
+        $resDay3->assertSessionHas('success');
+        $this->assertEquals(1, $assessment->appeals()->count());
+
+        Carbon::setTestNow();
+    }
+
+    public function test_appeal_rejected_past_business_days_deadline(): void
+    {
+        $fixture = $this->createTestAssessment();
+        $asesi = $fixture['asesi'];
+        $assessment = $fixture['assessment'];
+
+        // Monday assessment completion
+        $monday = Carbon::parse('2026-10-12 10:00:00'); // Monday
+        $assessment->update([
+            'completed_at' => $monday,
+            'status' => 'COMPLETED',
+            'final_result' => 'BELUM_KOMPETEN',
+        ]);
+
+        // Day 4: Friday -> Rejected
+        $friday = Carbon::parse('2026-10-16 09:00:00');
+        Carbon::setTestNow($friday);
+
+        $res = $this->actingAs($asesi)->post(route('asesi.assessment.appeal.submit', $assessment), [
+            'appeal_reasons' => 'Pengajuan terlambat di hari ke-4.',
+        ]);
+
+        $res->assertSessionHasErrors(['appeal_reasons']);
+        $this->assertEquals(0, $assessment->appeals()->count());
+
+        Carbon::setTestNow();
+    }
+
+    public function test_appeal_skips_weekends_in_business_days_calculation(): void
+    {
+        $fixture = $this->createTestAssessment();
+        $asesi = $fixture['asesi'];
+        $assessment = $fixture['assessment'];
+
+        // Thursday assessment completion
+        $thursday = Carbon::parse('2026-10-15 10:00:00'); // Thursday
+        $assessment->update([
+            'completed_at' => $thursday,
+            'status' => 'COMPLETED',
+            'final_result' => 'BELUM_KOMPETEN',
+        ]);
+
+        // Next Tuesday is Day 3 of business days (Friday=1, Mon=2, Tue=3; Sat/Sun skipped) -> Allowed
+        $nextTuesday = Carbon::parse('2026-10-20 15:00:00');
+        Carbon::setTestNow($nextTuesday);
+
+        $resTue = $this->actingAs($asesi)->post(route('asesi.assessment.appeal.submit', $assessment), [
+            'appeal_reasons' => 'Diajukan hari Selasa berikutnya setelah melewati akhir pekan.',
+        ]);
+        $resTue->assertRedirect();
+        $resTue->assertSessionHas('success');
+        $this->assertEquals(1, $assessment->appeals()->count());
+
+        // Reset appeals
+        $assessment->appeals()->delete();
+
+        // Next Wednesday is Day 4 -> Rejected
+        $nextWednesday = Carbon::parse('2026-10-21 09:00:00');
+        Carbon::setTestNow($nextWednesday);
+
+        $resWed = $this->actingAs($asesi)->post(route('asesi.assessment.appeal.submit', $assessment), [
+            'appeal_reasons' => 'Diajukan hari Rabu berikutnya (hari ke-4 kerja).',
+        ]);
+        $resWed->assertSessionHasErrors(['appeal_reasons']);
+        $this->assertEquals(0, $assessment->appeals()->count());
+
+        Carbon::setTestNow();
+    }
+
+    public function test_admin_can_decide_appeal_with_committee_chair(): void
+    {
+        $fixture = $this->createTestAssessment();
+        $admin = $fixture['admin'];
+        $asesi = $fixture['asesi'];
+        $assessment = $fixture['assessment'];
+
+        $appeal = AssessmentAppeal::create([
+            'assessment_id' => $assessment->id,
+            'appeal_date' => now()->toDateString(),
+            'appeal_reasons' => 'Bukti demonstrasi perlu ditinjau ulang oleh tim independen.',
+            'status' => 'SUBMITTED',
+        ]);
+
+        $res = $this->actingAs($admin)->post(route('admin.appeals.decide', $appeal), [
+            'decision' => 'ACCEPTED',
+            'decision_notes' => 'Banding diterima, direkomendasikan uji ulang untuk unit terkait.',
+            'appeals_committee_chair' => 'Dr. Ir. Bambang Supriyadi, M.T.',
+        ]);
+
+        $res->assertRedirect();
+        $res->assertSessionHas('success');
+
+        $appeal->refresh();
+        $this->assertEquals('ACCEPTED', $appeal->status);
+        $this->assertEquals('Dr. Ir. Bambang Supriyadi, M.T.', $appeal->appeals_committee_chair);
+        $this->assertEquals($admin->id, $appeal->decided_by);
+
+        // Verify print view for FR.AK.04 displays Ketua Tim Banding
+        $printRes = $this->actingAs($admin)->get(route('admin.dokumen-muk.export-asesi', [$assessment, 'ak04']));
+        $printRes->assertOk();
+        $printRes->assertSee('Dr. Ir. Bambang Supriyadi, M.T.');
+        $printRes->assertSee('Ketua Tim Banding');
+    }
 }
