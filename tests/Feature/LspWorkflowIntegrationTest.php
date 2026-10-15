@@ -858,6 +858,48 @@ class LspWorkflowIntegrationTest extends TestCase
         Carbon::setTestNow();
     }
 
+    public function test_appeal_countdown_starts_from_final_result_at_with_fallback(): void
+    {
+        $fixture = $this->createTestAssessment();
+        $asesi = $fixture['asesi'];
+        $assessment = $fixture['assessment'];
+
+        // Assessment completed on Monday, but final result determined on Wednesday
+        $monday = Carbon::parse('2026-10-12 10:00:00');
+        $wednesday = Carbon::parse('2026-10-14 10:00:00');
+        $assessment->update([
+            'completed_at' => $monday,
+            'final_result_at' => $wednesday,
+            'status' => 'COMPLETED',
+            'final_result' => 'BELUM_KOMPETEN',
+        ]);
+
+        // Friday is Day 2 from Wednesday (final_result_at) -> Allowed!
+        // (If it incorrectly counted from Monday completed_at, Friday would be Day 4 and fail)
+        $friday = Carbon::parse('2026-10-16 14:00:00');
+        Carbon::setTestNow($friday);
+
+        $resWithResultAt = $this->actingAs($asesi)->post(route('asesi.assessment.appeal.submit', $assessment), [
+            'appeal_reasons' => 'Banding diajukan 2 hari setelah hasil ditetapkan pada hari Rabu.',
+        ]);
+        $resWithResultAt->assertRedirect();
+        $resWithResultAt->assertSessionHas('success');
+        $this->assertEquals(1, $assessment->appeals()->count());
+
+        // Reset appeals and test fallback when final_result_at is null
+        $assessment->appeals()->delete();
+        $assessment->update(['final_result_at' => null]);
+
+        // Without final_result_at, countdown falls back to completed_at (Monday), so Friday is Day 4 -> Rejected!
+        $resFallback = $this->actingAs($asesi)->post(route('asesi.assessment.appeal.submit', $assessment), [
+            'appeal_reasons' => 'Banding tanpa final_result_at harus mengacu pada completed_at.',
+        ]);
+        $resFallback->assertSessionHasErrors(['appeal_reasons']);
+        $this->assertEquals(0, $assessment->appeals()->count());
+
+        Carbon::setTestNow();
+    }
+
     public function test_appeal_skips_weekends_in_business_days_calculation(): void
     {
         $fixture = $this->createTestAssessment();
@@ -932,5 +974,59 @@ class LspWorkflowIntegrationTest extends TestCase
         $printRes->assertOk();
         $printRes->assertSee('Dr. Ir. Bambang Supriyadi, M.T.');
         $printRes->assertSee('Ketua Tim Banding');
+    }
+
+    public function test_all_24_muk_print_views_render_successfully(): void
+    {
+        $fixture = $this->createTestAssessment();
+        $admin = $fixture['admin'];
+        $schedule = $fixture['schedule'];
+        $assessment = $fixture['assessment'];
+
+        // 1. Schedule-level documents
+        $scheduleDocExpectations = [
+            'ba' => 'BERITA ACARA',
+            'hadir-asesor' => 'DAFTAR HADIR ASESOR',
+            'hadir-asesi' => 'DAFTAR HADIR',
+            'cover' => 'PERANGKAT ASESMEN',
+            'mapa01' => 'FR.MAPA.01',
+            'mapa02' => 'FR.MAPA.02',
+            'daftar-periksa' => 'DAFTAR PERIKSA',
+            'ak05' => 'FR.AK.05',
+            'ak06' => 'FR.AK.06',
+            'ia05b' => 'FR.IA.05.B',
+            'ia11' => 'FR.IA.11',
+        ];
+
+        foreach ($scheduleDocExpectations as $type => $expectedSnippet) {
+            $res = $this->actingAs($admin)->get(route('admin.dokumen-muk.export', [$schedule, $type]));
+            $res->assertOk();
+            $res->assertSee($expectedSnippet);
+        }
+
+        // 2. Asesi-level individual documents
+        $asesiDocExpectations = [
+            'apl01' => 'FR.APL.01',
+            'apl02' => 'FR.APL.02',
+            'ak01' => 'FR.AK.01',
+            'ak02' => 'FR.AK.02',
+            'ak03' => 'FR.AK.03',
+            'ak04' => 'FR.AK.04',
+            'ak07' => 'FR.AK.07',
+            'ia01' => 'FR.IA.01',
+            'ia01b' => 'FR.IA.01B',
+            'ia02' => 'FR.IA.02',
+            'ia03' => 'FR.IA.03',
+            'ia05a' => 'FR.IA.05.A',
+            'ia05c' => 'FR.IA.05.C',
+            'ia07' => 'FR.IA.07',
+            'pernyataan' => 'SURAT PERNYATAAN',
+        ];
+
+        foreach ($asesiDocExpectations as $type => $expectedSnippet) {
+            $res = $this->actingAs($admin)->get(route('admin.dokumen-muk.export-asesi', [$assessment, $type]));
+            $res->assertOk();
+            $res->assertSee($expectedSnippet);
+        }
     }
 }
