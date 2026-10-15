@@ -132,11 +132,13 @@
                     @php
                         $sch = $item->schedule;
 
+                        $hasFinalDecision = ($item->status === 'COMPLETED') || in_array($item->final_result, ['KOMPETEN', 'BELUM_KOMPETEN', 'K', 'BK'], true);
+
                         // 5-Stage progress determination
-                        if ($item->status === 'COMPLETED' || $item->final_result) {
+                        if ($hasFinalDecision) {
                             $stageNumber = 5;
                             $stageTitle = 'Tahap 5 dari 5: Hasil Keputusan Asesmen (' . ($item->final_result ?? 'Selesai') . ')';
-                            $stageBadgeColor = ($item->final_result === 'KOMPETEN') ? 'bg-emerald-100 text-emerald-800 border-emerald-300' : 'bg-rose-100 text-rose-800 border-rose-300';
+                            $stageBadgeColor = in_array($item->final_result, ['KOMPETEN', 'K'], true) ? 'bg-emerald-100 text-emerald-800 border-emerald-300' : 'bg-rose-100 text-rose-800 border-rose-300';
                             $targetUrl = route('asesi.assessment.ruang-uji', $item->id);
                         } elseif ($item->apl_status === 'APPROVED' && !empty($item->ak01_agreed_at)) {
                             $stageNumber = 4;
@@ -215,7 +217,7 @@
 
                         {{-- Action Buttons --}}
                         <div class="flex items-center space-x-2 shrink-0 w-full sm:w-auto flex-wrap gap-y-2">
-                            @if($item->status === 'COMPLETED' || $item->final_result)
+                            @if($hasFinalDecision)
                                 <a href="{{ route('asesi.assessment.ruang-uji', $item->id) }}" class="px-3 py-2 text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 border border-slate-300 rounded-lg shadow-xs transition">
                                     Lihat Rekap Hasil
                                 </a>

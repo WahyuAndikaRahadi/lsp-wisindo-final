@@ -139,8 +139,8 @@ class JadwalController extends Controller
 
     public function reviewRegistration(Assessment $assessment, Request $request): RedirectResponse
     {
-        $status = strtoupper((string) ($request->input('admin_status') ?? 'APPROVED'));
-        $notes = $request->input('admin_notes');
+        $status = strtoupper((string) ($request->input('admin_status') ?? $request->input('status') ?? 'APPROVED'));
+        $notes = $request->input('admin_notes') ?? $request->input('notes');
 
         app(AkWorkflowService::class)->approveCandidateRegistration(
             $assessment,
