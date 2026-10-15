@@ -27,13 +27,30 @@
                 <h2 class="text-sm font-bold text-slate-900">Tabel Status & Review Peserta Uji ({{ $jadwal->assessments->count() }})</h2>
                 <p class="text-xs text-slate-500">Pantau 4 komponen status: Approval Admin, Approval Asesor, Hasil Asesmen, dan Status Banding</p>
             </div>
-            @if($jadwal->assessments->where('admin_status', '!=', 'APPROVED')->count() > 0)
-                <form action="{{ route('admin.jadwal.batch-review-registration', $jadwal->id) }}" method="POST" onsubmit="return confirm('Setujui semua pendaftar pada jadwal ini?')">
+            @php
+                $unapproved = $jadwal->assessments->where('admin_status', '!=', 'APPROVED');
+                $workflowSvc = app(\App\Services\AkWorkflowService::class);
+                $eligibleCount = 0;
+                $ineligibleCount = 0;
+                foreach ($unapproved as $asm) {
+                    if ($workflowSvc->isCandidateDocumentComplete($asm)) {
+                        $eligibleCount++;
+                    } else {
+                        $ineligibleCount++;
+                    }
+                }
+            @endphp
+            @if($unapproved->count() > 0)
+                <form action="{{ route('admin.jadwal.batch-review-registration', $jadwal->id) }}" method="POST"
+                    onsubmit="return confirm('Konfirmasi Persetujuan Berkas Pendaftar:\n\n- {{ $eligibleCount }} peserta berkas LENGKAP akan disetujui.\n- {{ $ineligibleCount }} peserta berkas BELUM LENGKAP akan DILEWATI.\n\nLanjutkan proses persetujuan?')">
                     @csrf
                     <input type="hidden" name="admin_status" value="APPROVED">
-                    <button type="submit" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold shadow-xs transition flex items-center gap-1.5">
+                    <button type="submit" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold shadow-xs transition flex items-center gap-1.5 cursor-pointer">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
-                        Setujui Semua Pendaftar (Batch)
+                        <span>Setujui Berkas Lengkap ({{ $eligibleCount }})</span>
+                        @if($ineligibleCount > 0)
+                            <span class="px-1.5 py-0.5 rounded text-[10px] bg-emerald-800 text-emerald-100" title="{{ $ineligibleCount }} peserta belum melengkapi berkas">{{ $ineligibleCount }} dilewati</span>
+                        @endif
                     </button>
                 </form>
             @endif
@@ -85,6 +102,14 @@
                                 <span class="px-2 py-0.5 rounded text-[11px] font-bold border {{ $adminBadge }}">
                                     {{ $assessment->admin_status ?? 'PENDING' }}
                                 </span>
+                                @if($assessment->admin_reviewed_at || $assessment->admin_approved_at)
+                                    <div class="text-[10px] text-slate-400 mt-1 leading-tight">
+                                        {{ \Carbon\Carbon::parse($assessment->admin_reviewed_at ?? $assessment->admin_approved_at)->format('d/m/y H:i') }}
+                                        @if($assessment->adminReviewer)
+                                            <span class="block text-slate-500 font-medium">oleh {{ $assessment->adminReviewer->name }}</span>
+                                        @endif
+                                    </div>
+                                @endif
                             </td>
                             <td class="px-3 py-3 text-center">
                                 <span class="px-2 py-0.5 rounded text-[11px] font-bold border {{ $asesorBadge }}">

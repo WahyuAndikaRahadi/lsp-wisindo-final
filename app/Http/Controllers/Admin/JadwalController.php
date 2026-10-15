@@ -142,11 +142,22 @@ class JadwalController extends Controller
     public function batchReviewRegistration(Schedule $jadwal, Request $request): RedirectResponse
     {
         $status = strtoupper((string) ($request->input('admin_status') ?? 'APPROVED'));
-        $notes = $request->input('admin_notes', 'Persetujuan batch admin');
+        $notes = $request->input('admin_notes', 'Persetujuan batch verifikasi berkas admin');
         $workflowService = app(AkWorkflowService::class);
-        $count = 0;
+        $approvedCount = 0;
+        $skippedCandidates = [];
+
+        $jadwal->load('assessments.proofs', 'assessments.asesi');
 
         foreach ($jadwal->assessments as $assessment) {
+            // When approving, only allow candidates with complete proofs (KTP + Pas Foto + Bukti Dasar)
+            if ($status === 'APPROVED') {
+                if (! $workflowService->isCandidateDocumentComplete($assessment)) {
+                    $skippedCandidates[] = $assessment->asesi->full_name ?? "Asesi #{$assessment->id}";
+                    continue;
+                }
+            }
+
             if (($assessment->admin_status ?? 'PENDING') !== $status) {
                 $workflowService->approveCandidateRegistration(
                     $assessment,
@@ -154,10 +165,17 @@ class JadwalController extends Controller
                     $notes,
                     auth()->id()
                 );
-                $count++;
+                $approvedCount++;
             }
         }
 
-        return back()->with('success', "Berhasil memperbarui status {$count} pendaftar menjadi {$status}.");
+        if (count($skippedCandidates) > 0) {
+            $skippedNames = implode(', ', $skippedCandidates);
+
+            return back()->with('success', "Berhasil menyetujui {$approvedCount} peserta dengan berkas lengkap.")
+                ->with('warning', 'Sebanyak '.count($skippedCandidates)." peserta dilewati karena berkas belum lengkap (KTP, Pas Foto, atau Bukti Dasar): {$skippedNames}.");
+        }
+
+        return back()->with('success', "Berhasil memperbarui status {$approvedCount} pendaftar menjadi {$status}.");
     }
 }

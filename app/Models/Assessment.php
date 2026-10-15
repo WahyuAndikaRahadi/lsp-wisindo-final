@@ -30,6 +30,8 @@ class Assessment extends Model
         'admin_notes',
         'admin_approved_at',
         'admin_id',
+        'admin_reviewed_at',
+        'admin_reviewer_id',
         'final_result',
         'final_notes',
         'follow_up_action',
@@ -48,6 +50,7 @@ class Assessment extends Model
             'approved_at' => 'datetime',
             'completed_at' => 'datetime',
             'admin_approved_at' => 'datetime',
+            'admin_reviewed_at' => 'datetime',
             'ak01_agreed_at' => 'datetime',
             'assessor_signed_at' => 'datetime',
             'asesi_signed_at' => 'datetime',
@@ -117,5 +120,10 @@ class Assessment extends Model
     public function iaResponses(): HasMany
     {
         return $this->hasMany(AssessmentIaResponse::class);
+    }
+
+    public function adminReviewer(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'admin_reviewer_id');
     }
 }

@@ -7,6 +7,9 @@ use App\Models\AssessmentAk02Item;
 use App\Models\AssessmentAk03Item;
 use App\Models\AssessmentAppeal;
 use App\Models\Schedule;
+use App\Models\Setting;
+use Carbon\Carbon;
+use Illuminate\Validation\ValidationException;
 
 class AkWorkflowService
 {
@@ -92,14 +95,40 @@ class AkWorkflowService
             $statusUpper = 'APPROVED';
         }
 
+        $now = now();
+        $reviewerId = $adminId ?? auth()->id();
+
         $assessment->update([
             'admin_status' => $statusUpper,
             'admin_notes' => $notes,
-            'admin_approved_at' => now(),
-            'admin_id' => $adminId ?? auth()->id(),
+            'admin_approved_at' => $now,
+            'admin_reviewed_at' => $now,
+            'admin_id' => $reviewerId,
+            'admin_reviewer_id' => $reviewerId,
         ]);
 
         return $assessment;
+    }
+
+    /**
+     * Check whether an asesi candidate has complete required documents.
+     * Rule: minimum 1 basic proof (IJAZAH_SMK, SURAT_SISWA_AKTIF, IJAZAH_SMA_SERTIFIKAT, PENGALAMAN_KERJA) + KTP + PAS_FOTO.
+     */
+    public function isCandidateDocumentComplete(Assessment $assessment): bool
+    {
+        if (! $assessment->relationLoaded('proofs')) {
+            $assessment->load('proofs');
+        }
+
+        $proofTypes = $assessment->proofs->pluck('proof_type')->map(fn ($t) => strtoupper((string) $t))->all();
+        $hasKtp = in_array('KTP', $proofTypes, true);
+        $hasPasFoto = in_array('PAS_FOTO', $proofTypes, true);
+        $hasDasar = (bool) array_intersect(
+            ['IJAZAH_SMK', 'SURAT_SISWA_AKTIF', 'IJAZAH_SMA_SERTIFIKAT', 'PENGALAMAN_KERJA'],
+            $proofTypes
+        );
+
+        return $hasKtp && $hasPasFoto && $hasDasar;
     }
 
     /**
@@ -117,13 +146,70 @@ class AkWorkflowService
     }
 
     /**
+     * Get appeal window in business days (default: 3 days).
+     * Note: 3 days is standard BNSP practice, pending official confirmation by LSP PrO Indo SOP.
+     */
+    public function getAppealWindowDays(): int
+    {
+        return (int) Setting::get('appeal_window_days', 3);
+    }
+
+    /**
+     * Calculate appeal deadline in Monday-Friday business days (skipping Saturday and Sunday).
+     */
+    public function calculateAppealDeadline(Carbon $startDate, ?int $windowDays = null): Carbon
+    {
+        $days = $windowDays ?? $this->getAppealWindowDays();
+        $current = $startDate->copy()->startOfDay();
+        $added = 0;
+
+        while ($added < $days) {
+            $current->addDay();
+            if (! $current->isWeekend()) {
+                $added++;
+            }
+        }
+
+        return $current->endOfDay();
+    }
+
+    /**
+     * Check if given assessment appeal date is within allowed business days deadline.
+     */
+    public function isWithinAppealDeadline(Assessment $assessment, ?Carbon $targetDate = null): bool
+    {
+        $target = $targetDate ? $targetDate->copy() : now();
+        $baseDate = $assessment->completed_at
+            ? Carbon::parse($assessment->completed_at)
+            : ($assessment->schedule?->date ? Carbon::parse($assessment->schedule->date) : now());
+
+        $deadline = $this->calculateAppealDeadline($baseDate);
+
+        return $target->lte($deadline);
+    }
+
+    /**
      * Submit FR.AK.04 Banding Asesmen by Asesi.
      */
-    public function submitAppeal(Assessment $assessment, string $reasons, array $contestedUnits = []): AssessmentAppeal
+    public function submitAppeal(Assessment $assessment, string $reasons, array $contestedUnits = [], ?Carbon $appealDate = null): AssessmentAppeal
     {
+        $date = $appealDate ?? now();
+
+        if (! $this->isWithinAppealDeadline($assessment, $date)) {
+            $days = $this->getAppealWindowDays();
+            $baseDate = $assessment->completed_at
+                ? Carbon::parse($assessment->completed_at)
+                : ($assessment->schedule?->date ? Carbon::parse($assessment->schedule->date) : now());
+            $deadline = $this->calculateAppealDeadline($baseDate);
+
+            throw ValidationException::withMessages([
+                'appeal_reasons' => "Batas waktu pengajuan banding ({$days} hari kerja) telah berakhir pada " . $deadline->translatedFormat('d F Y') . ". Sesuai ketentuan, pengajuan banding tidak dapat diproses.",
+            ]);
+        }
+
         return AssessmentAppeal::create([
             'assessment_id' => $assessment->id,
-            'appeal_date' => now()->toDateString(),
+            'appeal_date' => $date->toDateString(),
             'appeal_reasons' => $reasons,
             'contested_units' => $contestedUnits,
             'status' => 'SUBMITTED',
@@ -131,9 +217,9 @@ class AkWorkflowService
     }
 
     /**
-     * Decide appeal by Admin LSP.
+     * Decide appeal by Admin LSP (optionally specifying Appeals Committee Chair).
      */
-    public function decideAppeal(AssessmentAppeal $appeal, string $decision, ?string $decisionNotes = null, ?int $adminId = null): AssessmentAppeal
+    public function decideAppeal(AssessmentAppeal $appeal, string $decision, ?string $decisionNotes = null, ?int $adminId = null, ?string $committeeChair = null): AssessmentAppeal
     {
         $status = strtoupper($decision) === 'ACCEPTED' ? 'ACCEPTED' : 'REJECTED';
 
@@ -142,6 +228,7 @@ class AkWorkflowService
             'decision_notes' => $decisionNotes,
             'decision_date' => now()->toDateString(),
             'decided_by' => $adminId ?? auth()->id(),
+            'appeals_committee_chair' => $committeeChair ?: $appeal->appeals_committee_chair,
         ]);
 
         return $appeal;

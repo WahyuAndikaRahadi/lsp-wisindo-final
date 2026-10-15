@@ -5,10 +5,12 @@ namespace Tests\Feature;
 use App\Models\Assessment;
 use App\Models\AssessmentAppeal;
 use App\Models\AssessmentIaResponse;
+use App\Models\AssessmentProof;
 use App\Models\QuestionBank;
 use App\Models\Schedule;
 use App\Models\Scheme;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -629,7 +631,7 @@ class LspWorkflowIntegrationTest extends TestCase
             'status' => 'ACTIVE',
         ]);
 
-        Assessment::create([
+        $asm1 = Assessment::create([
             'schedule_id' => $schedule->id,
             'asesi_id' => $asesi1->id,
             'scheme_id' => $schedule->scheme_id,
@@ -638,7 +640,7 @@ class LspWorkflowIntegrationTest extends TestCase
             'apl_status' => 'SUBMITTED',
         ]);
 
-        Assessment::create([
+        $asm2 = Assessment::create([
             'schedule_id' => $schedule->id,
             'asesi_id' => $asesi2->id,
             'scheme_id' => $schedule->scheme_id,
@@ -647,6 +649,14 @@ class LspWorkflowIntegrationTest extends TestCase
             'apl_status' => 'SUBMITTED',
         ]);
 
+        // asm1 has complete proofs (KTP, PAS_FOTO, IJAZAH_SMK)
+        AssessmentProof::create(['assessment_id' => $asm1->id, 'proof_type' => 'KTP', 'proof_category' => 'ADMINISTRATIF', 'file_path' => 'ktp.jpg', 'original_filename' => 'ktp.jpg']);
+        AssessmentProof::create(['assessment_id' => $asm1->id, 'proof_type' => 'PAS_FOTO', 'proof_category' => 'ADMINISTRATIF', 'file_path' => 'foto.jpg', 'original_filename' => 'foto.jpg']);
+        AssessmentProof::create(['assessment_id' => $asm1->id, 'proof_type' => 'IJAZAH_SMK', 'proof_category' => 'PERSYARATAN_DASAR', 'file_path' => 'ijazah.pdf', 'original_filename' => 'ijazah.pdf']);
+
+        // asm2 only has KTP (incomplete, missing PAS_FOTO and basic proof)
+        AssessmentProof::create(['assessment_id' => $asm2->id, 'proof_type' => 'KTP', 'proof_category' => 'ADMINISTRATIF', 'file_path' => 'ktp.jpg', 'original_filename' => 'ktp.jpg']);
+
         $res = $this->actingAs($admin)->post(
             route('admin.jadwal.batch-review-registration', $schedule),
             ['admin_status' => 'APPROVED']
@@ -654,11 +664,17 @@ class LspWorkflowIntegrationTest extends TestCase
 
         $res->assertRedirect();
         $res->assertSessionHas('success');
+        $res->assertSessionHas('warning'); // Warning reports skipped candidate
 
-        $pendingCount = Assessment::where('schedule_id', $schedule->id)->where('admin_status', 'PENDING')->count();
-        $this->assertEquals(0, $pendingCount);
-        $approvedCount = Assessment::where('schedule_id', $schedule->id)->where('admin_status', 'APPROVED')->count();
-        $this->assertEquals(2, $approvedCount);
+        $asm1->refresh();
+        $asm2->refresh();
+        $this->assertEquals('APPROVED', $asm1->admin_status);
+        $this->assertEquals($admin->id, $asm1->admin_reviewer_id);
+        $this->assertNotNull($asm1->admin_reviewed_at);
+
+        // asm2 was skipped because proofs were incomplete
+        $this->assertEquals('PENDING', $asm2->admin_status);
+        $this->assertNull($asm2->admin_reviewed_at);
     }
 
     private function createTestAssessment(): array
