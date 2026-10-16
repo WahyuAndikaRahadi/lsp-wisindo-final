@@ -1,8 +1,7 @@
 # ARSITEKTUR SISTEM DAN SPESIFIKASI FITUR (SPECIFICATION DOCUMENT)
 ## DIGITALISASI PROSES ASESMEN KOMPETENSI LSP PrO INDO
 
-**Dokumen Standar:** `spec-driven-development.md`  
-**Target Repositori:** `C:\Users\IRHAM\Documents\codes\lsp-proindo-new`  
+**Dokumen Standar:** `system_architecture_and_spec.md`  
 **Stack Teknologi:** Laravel 12, Blade Engine, Tailwind CSS, Alpine.js / Vanilla JS (Zero-Bloat), MySQL/SQLite  
 
 ---
@@ -14,10 +13,9 @@ Membangun web application monolitik yang *lean*, *clean-code*, dan berkinerja ti
 
 ## 2. Existing State & Inventory Analisis
 
-### 2.1 Kondisi Repositori Saat Ini (`lsp-proindo-new`)
-- Folder dokumen master: [`all-document-lsp-ProIndo`](file:///C:/Users/IRHAM/Documents/codes/lsp-proindo-new/all-document-lsp-ProIndo) berisi 7 skema MUK lengkap (FR.APL, FR.MAPA, FR.AK, FR.IA, Berita Acara, dan Daftar Hadir).
-- Panduan pengembangan: [`spec-driven-development.md`](file:///C:/Users/IRHAM/Documents/codes/lsp-proindo-new/spec-driven-development.md).
-- Status: **Fresh project** (belum ada kode aplikasi).
+### 2.1 Kondisi Repositori Saat Ini
+- Folder dokumen master: [`all-document-lsp-ProIndo`](file:///all-document-lsp-ProIndo) berisi 7 skema MUK lengkap (FR.APL, FR.MAPA, FR.AK, FR.IA, Berita Acara, dan Daftar Hadir).
+- Status: **Aplikasi MVP Selesai & Teruji** (Role Admin, Asesor, Asesi, dan 24 template cetak MUK terverifikasi).
 
 ### 2.2 Pola yang Diadopsi (Inspirasi & Lessons Learned)
 - **Anti-Bloat:** Mengurangi arsitektur yang berlebihan. Menghilangkan peran pihak luar yang tidak relevan (TUK Admin terpisah & Komite Teknis dihilangkan; fungsi TUK ditangani sebagai lokasi teks di jadwal, dan fungsi komite disederhanakan).
@@ -156,6 +154,11 @@ graph TD
 ---
 
 ## 4. Rancang Bangun Database (Data Model & Schema)
+
+> [!NOTE] Rebaseline Migrasi & Konvensi Skema
+> Seluruh skema database telah direbaseline menjadi migrasi bersih terkelompok per domain (tanpa file parsial add_xxx).
+> Database yang sebelumnya dimigrasi dengan migrasi lama wajib menjalankan `php artisan migrate:fresh --seed`.
+> Konvensi ke depan: satu file per perubahan skema bermakna, dilarang mengedit migrasi yang sudah dirilis.
 
 Struktur tabel dirancang efisien, terindeks dengan baik, dan menghindari redundansi (*zero bloat*):
 
@@ -444,3 +447,12 @@ app/
    - Asesi keluar di tengah Ruang Uji dan saat kembali otomatis di-resume ke halaman terakhir.
 8. **`DokumenMukExportTest`**:
    - Pengujian ketersediaan rute unduh Berita Acara, Daftar Hadir, Excel Data Diri, dan PDF peserta.
+
+---
+
+## 9. Alur Kerja Git & Standar Kolaborasi
+- **Model Percabangan:** Menggunakan 2 branch permanen: `main` (rilis stabil) dan `develop` (pengembangan aktif).
+- **Fitur & Perbaikan:** Branch fitur berumur pendek dibuat dari `develop` dengan prefix `feat/`, `fix/`, atau `chore/` lalu di-merge kembali ke `develop`.
+- **Rilis Produksi:** Penggabungan dari `develop` ke `main` hanya dilakukan saat rilis versi stabil disertai pembuatan tag semver (mis. `v1.0.0`).
+- **Konvensi Pesan Commit:** Wajib mematuhi format Conventional Commits (`feat:`, `fix:`, `chore:`, `docs:`, `test:`).
+- **Integritas Riwayat:** Dilarang keras melakukan force-push (`git push --force`) ke branch `main` maupun `develop`.
