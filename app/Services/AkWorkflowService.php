@@ -63,11 +63,12 @@ class AkWorkflowService
                     'lainnya' => false,
                 ];
 
-                // Determine competence: if IA05 CBT failed (< 75), competence might be false
+                // Determine competence: if IA05 CBT failed (< passing grade), competence is false
                 $isUnitCompetent = true;
                 if ($hasWritten && isset($iaResponses['IA05'])) {
+                    $passingGrade = (float) ($assessment->schedule?->scheme?->passing_grade_theory ?? Setting::get('cbt_passing_grade', 75.0));
                     $score = (float) $iaResponses['IA05']->score;
-                    if ($score < 75.0) {
+                    if ($score < $passingGrade) {
                         $isUnitCompetent = false;
                     }
                 }
@@ -252,8 +253,21 @@ class AkWorkflowService
         }
 
         return DB::transaction(function () use ($assessment, $date, $reasons, $contestedUnits) {
+            $lockedAssessment = Assessment::where('id', $assessment->id)->lockForUpdate()->first();
+
+            $existingAppeal = AssessmentAppeal::where('assessment_id', $lockedAssessment->id)
+                ->whereIn('status', ['SUBMITTED', 'UNDER_REVIEW'])
+                ->lockForUpdate()
+                ->first();
+
+            if ($existingAppeal) {
+                throw ValidationException::withMessages([
+                    'appeal_reasons' => 'Pengajuan banding untuk asesmen ini sedang aktif atau dalam proses peninjauan.',
+                ]);
+            }
+
             return AssessmentAppeal::create([
-                'assessment_id' => $assessment->id,
+                'assessment_id' => $lockedAssessment->id,
                 'appeal_date' => $date->toDateString(),
                 'appeal_reasons' => $reasons,
                 'contested_units' => $contestedUnits,
@@ -306,7 +320,9 @@ class AkWorkflowService
     public function saveScheduleReports(Schedule $schedule, array $ak05Data, array $ak06Data, bool $closeIfReady = true): bool
     {
         return DB::transaction(function () use ($schedule, $ak05Data, $ak06Data, $closeIfReady) {
-            $schedule->update([
+            $lockedSchedule = Schedule::where('id', $schedule->id)->lockForUpdate()->first();
+
+            $lockedSchedule->update([
                 'ak05_report' => array_merge($ak05Data, [
                     'assessor_id' => auth()->id(),
                     'submitted_at' => now()->toIso8601String(),
@@ -318,9 +334,9 @@ class AkWorkflowService
             ]);
 
             if ($closeIfReady) {
-                $readiness = $this->isScheduleReadyForClosure($schedule);
+                $readiness = $this->isScheduleReadyForClosure($lockedSchedule);
                 if ($readiness['is_ready']) {
-                    $schedule->update([
+                    $lockedSchedule->update([
                         'is_closed' => true,
                         'closed_at' => now(),
                         'status' => 'FINISHED',

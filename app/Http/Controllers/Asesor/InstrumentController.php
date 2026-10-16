@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Assessment;
 use App\Models\AssessmentIaResponse;
 use App\Models\Schedule;
+use App\Models\Setting;
 use App\Rules\ValidSignature;
 use App\Services\SchemeInstrumentService;
 use Illuminate\Http\RedirectResponse;
@@ -181,8 +182,9 @@ class InstrumentController extends Controller
                     if ($codeUpper === 'IA05') {
                         $score = $response->score ?? ($assessment->ia05_score ?? 0);
                         $scoreLabel = "Nilai CBT: {$score}%";
-                        $statusLabel = $score >= 70 ? 'Kompeten (K)' : 'Belum Kompeten (BK)';
-                        $statusClass = $score >= 70 ? 'bg-emerald-50 text-emerald-700 border-emerald-300' : 'bg-rose-50 text-rose-700 border-rose-300';
+                        $passingGrade = (float) ($assessment->schedule?->scheme?->passing_grade_theory ?? Setting::get('cbt_passing_grade', 75.0));
+                        $statusLabel = $score >= $passingGrade ? 'Kompeten (K)' : 'Belum Kompeten (BK)';
+                        $statusClass = $score >= $passingGrade ? 'bg-emerald-50 text-emerald-700 border-emerald-300' : 'bg-rose-50 text-rose-700 border-rose-300';
                     } else {
                         $statusLabel = 'Sudah Dinilai';
                         $statusClass = 'bg-emerald-50 text-emerald-700 border-emerald-300';

@@ -105,12 +105,16 @@ class Ak07Controller extends Controller
                         $categoryName = $itemData['title'] ?? "Karakteristik #{$itemIndex}";
 
                         foreach ($ids as $assessmentId) {
-                            AssessmentAk07Item::create([
-                                'assessment_id' => $assessmentId,
-                                'adjustment_category' => substr($categoryName, 0, 100),
-                                'adjustment_detail' => $detailText,
-                                'assessor_id' => auth()->id(),
-                            ]);
+                            AssessmentAk07Item::updateOrCreate(
+                                [
+                                    'assessment_id' => $assessmentId,
+                                    'adjustment_category' => substr($categoryName, 0, 100),
+                                ],
+                                [
+                                    'adjustment_detail' => $detailText,
+                                    'assessor_id' => auth()->id(),
+                                ]
+                            );
                         }
                         $savedAny = true;
                     }
@@ -120,22 +124,30 @@ class Ak07Controller extends Controller
             // Process agreement notes or legacy format
             if ($legacyCategory && $legacyNotes) {
                 foreach ($ids as $assessmentId) {
-                    AssessmentAk07Item::create([
-                        'assessment_id' => $assessmentId,
-                        'adjustment_category' => substr($legacyCategory, 0, 100),
-                        'adjustment_detail' => $legacyNotes,
-                        'assessor_id' => auth()->id(),
-                    ]);
+                    AssessmentAk07Item::updateOrCreate(
+                        [
+                            'assessment_id' => $assessmentId,
+                            'adjustment_category' => substr($legacyCategory, 0, 100),
+                        ],
+                        [
+                            'adjustment_detail' => $legacyNotes,
+                            'assessor_id' => auth()->id(),
+                        ]
+                    );
                 }
                 $savedAny = true;
             } elseif ($agreementStatus === 'YA' && ! empty($agreementNotes)) {
                 foreach ($ids as $assessmentId) {
-                    AssessmentAk07Item::create([
-                        'assessment_id' => $assessmentId,
-                        'adjustment_category' => 'Kesepakatan Asesor-Asesi',
-                        'adjustment_detail' => $agreementNotes,
-                        'assessor_id' => auth()->id(),
-                    ]);
+                    AssessmentAk07Item::updateOrCreate(
+                        [
+                            'assessment_id' => $assessmentId,
+                            'adjustment_category' => 'Kesepakatan Asesor-Asesi',
+                        ],
+                        [
+                            'adjustment_detail' => $agreementNotes,
+                            'assessor_id' => auth()->id(),
+                        ]
+                    );
                 }
                 $savedAny = true;
             }
