@@ -25,6 +25,7 @@ class LspWorkflowIntegrationTest extends TestCase
         parent::setUp();
         $this->seed();
         Storage::fake('public');
+        Storage::fake('local');
     }
 
     public function test_user_seeder_contains_all_23_demo_accounts(): void
@@ -493,7 +494,7 @@ class LspWorkflowIntegrationTest extends TestCase
             ->first();
         $this->assertNotNull($response);
         $this->assertNotEmpty($response->data_json['evidence_image_path']);
-        Storage::disk('public')->assertExists($response->data_json['evidence_image_path']);
+        Storage::disk('local')->assertExists($response->data_json['evidence_image_path']);
 
         // Assessor views IA02 assessment page and sees uploaded evidence
         $asesorRes = $this->actingAs($asesorUser)->get(
@@ -502,7 +503,7 @@ class LspWorkflowIntegrationTest extends TestCase
         $asesorRes->assertOk();
         $asesorRes->assertSee('Pemeriksaan Bukti Lembar Fisik');
         $asesorRes->assertSee('Lembar Jawaban Terunggah');
-        $asesorRes->assertSee(asset('storage/'.$response->data_json['evidence_image_path']));
+        $asesorRes->assertSee(route('secure-file.evidence', $response));
 
         // Assessor stores grades while preserving uploaded evidence
         $storeRes = $this->actingAs($asesorUser)->post(

@@ -48,6 +48,7 @@
             $evidencePath = $response?->data_json['evidence_image_path'] ?? null;
             $evidenceTime = $response?->data_json['evidence_uploaded_at'] ?? null;
             $evidenceName = $response?->data_json['evidence_original_name'] ?? 'Lembar_Jawaban_Fisik.jpg';
+            $evidenceUrl = ($response && $evidencePath) ? route('secure-file.evidence', $response) : '#';
         @endphp
         {{-- Box Khusus Pengumpulan Lembar Kerja Kertas FR.IA.02 --}}
         <div class="bg-white rounded-xl border-2 border-black shadow-[2px_2px_0_0_rgba(0,0,0,0.9)] overflow-hidden">
@@ -117,9 +118,9 @@
                                     <span class="text-[11px] font-bold text-slate-700 block truncate">{{ $evidenceName }}</span>
                                 </div>
                             @else
-                                <img src="{{ asset('storage/' . $evidencePath) }}" alt="Bukti Jawaban Kertas" class="w-full h-full object-cover">
+                                <img src="{{ $evidenceUrl }}" alt="Bukti Jawaban Kertas" class="w-full h-full object-cover">
                             @endif
-                            <a href="{{ asset('storage/' . $evidencePath) }}" target="_blank" class="absolute inset-0 bg-black/60 text-white text-xs font-bold flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
+                            <a href="{{ $evidenceUrl }}" target="_blank" class="absolute inset-0 bg-black/60 text-white text-xs font-bold flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
                                 🔍 Buka Ukuran Penuh
                             </a>
                         </div>
@@ -132,7 +133,7 @@
                                 File: <span class="font-mono">{{ basename($evidencePath) }}</span>
                             </div>
                             <div class="pt-2 flex items-center gap-2">
-                                <a href="{{ asset('storage/' . $evidencePath) }}" target="_blank" class="inline-flex items-center px-3 py-1.5 text-xs font-bold bg-brand-600 text-white rounded-lg hover:bg-brand-700 transition">
+                                <a href="{{ $evidenceUrl }}" target="_blank" class="inline-flex items-center px-3 py-1.5 text-xs font-bold bg-brand-600 text-white rounded-lg hover:bg-brand-700 transition">
                                     Buka Foto di Tab Baru &nearr;
                                 </a>
                             </div>

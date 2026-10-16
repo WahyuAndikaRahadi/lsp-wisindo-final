@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin;
 use App\Http\Controllers\Asesi;
 use App\Http\Controllers\Asesor;
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\SecureFileController;
 use App\Models\Assessment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -20,6 +21,10 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::post('/proxy/switch-back', [AuthController::class, 'proxySwitchBack'])->name('proxy.switch-back');
+
+    // Secure Document & Evidence Access
+    Route::get('/secure-file/proof/{proof}', [SecureFileController::class, 'showProof'])->name('secure-file.proof');
+    Route::get('/secure-file/evidence/{response}', [SecureFileController::class, 'showEvidence'])->name('secure-file.evidence');
     Route::get('/', function () {
         $user = auth()->user();
 

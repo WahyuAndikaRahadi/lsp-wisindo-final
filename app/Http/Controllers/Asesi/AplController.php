@@ -74,7 +74,7 @@ class AplController extends Controller
                     ?? $request->file('proof_'.strtolower($type));
 
                 if ($file) {
-                    $path = $file->store('proofs', 'public');
+                    $path = $file->store('proofs', 'local');
                     AssessmentProof::updateOrCreate(
                         ['assessment_id' => $assessment->id, 'proof_type' => $type],
                         [

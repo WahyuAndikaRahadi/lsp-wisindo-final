@@ -44,6 +44,7 @@
             $evidencePath = $response?->data_json['evidence_image_path'] ?? null;
             $evidenceTime = $response?->data_json['evidence_uploaded_at'] ?? null;
             $evidenceName = $response?->data_json['evidence_original_name'] ?? 'Lembar_Jawaban_Fisik.jpg';
+            $evidenceUrl = ($response && $evidencePath) ? route('secure-file.evidence', $response) : '#';
         @endphp
         <div class="bg-white rounded-xl border-2 border-black shadow-[2px_2px_0_0_rgba(0,0,0,0.9)] overflow-hidden">
             <div class="bg-slate-900 text-white px-6 py-3 border-b-2 border-black flex items-center justify-between">
@@ -75,11 +76,11 @@
                                         <div class="text-[11px] text-slate-500">Dokumen PDF Lembar Jawaban</div>
                                     </div>
                                 @else
-                                    <img src="{{ asset('storage/' . $evidencePath) }}" alt="Lembar Jawaban Kertas Asesi" class="w-full h-full object-contain cursor-pointer transition hover:scale-105" onclick="window.open('{{ asset('storage/' . $evidencePath) }}', '_blank')">
+                                    <img src="{{ $evidenceUrl }}" alt="Lembar Jawaban Kertas Asesi" class="w-full h-full object-contain cursor-pointer transition hover:scale-105" onclick="window.open('{{ $evidenceUrl }}', '_blank')">
                                 @endif
                             </div>
                             <div class="flex items-center justify-between gap-2 pt-1">
-                                <a href="{{ asset('storage/' . $evidencePath) }}" target="_blank" class="w-full text-center px-4 py-2 text-xs font-black uppercase tracking-wider bg-brand-600 hover:bg-brand-700 text-white rounded-lg border-2 border-black shadow-[2px_2px_0_0_rgba(0,0,0,0.9)] transition">
+                                <a href="{{ $evidenceUrl }}" target="_blank" class="w-full text-center px-4 py-2 text-xs font-black uppercase tracking-wider bg-brand-600 hover:bg-brand-700 text-white rounded-lg border-2 border-black shadow-[2px_2px_0_0_rgba(0,0,0,0.9)] transition">
                                     🔍 Buka Lembar Penuh (Tab Baru) &nearr;
                                 </a>
                             </div>

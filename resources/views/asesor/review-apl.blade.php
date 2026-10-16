@@ -177,7 +177,7 @@
                             @php
                                 $proof = $existingProofs[$type] ?? null;
                                 $isImg = $proof ? preg_match('/\.(jpg|jpeg|png|webp)$/i', $proof->file_path) : false;
-                                $fileUrl = $proof ? asset('storage/' . $proof->file_path) : '#';
+                                $fileUrl = $proof ? route('secure-file.proof', $proof) : '#';
                             @endphp
                             <div class="bg-white p-3.5 rounded-lg border {{ $proof ? 'border-emerald-300 ring-1 ring-emerald-200' : 'border-slate-200' }} flex flex-col justify-between">
                                 <div>
@@ -241,7 +241,7 @@
                         @php
                             $ktpProof = $existingProofs['KTP'] ?? null;
                             $ktpIsImg = $ktpProof ? preg_match('/\.(jpg|jpeg|png|webp)$/i', $ktpProof->file_path) : false;
-                            $ktpUrl = $ktpProof ? asset('storage/' . $ktpProof->file_path) : '#';
+                            $ktpUrl = $ktpProof ? route('secure-file.proof', $ktpProof) : '#';
                         @endphp
                         <div class="bg-white p-3.5 rounded-lg border {{ $ktpProof ? 'border-emerald-300 ring-1 ring-emerald-200' : 'border-rose-200 bg-rose-50/20' }} flex flex-col justify-between">
                             <div>
@@ -290,7 +290,7 @@
                         @php
                             $fotoProof = $existingProofs['PAS_FOTO'] ?? null;
                             $fotoIsImg = $fotoProof ? preg_match('/\.(jpg|jpeg|png|webp)$/i', $fotoProof->file_path) : false;
-                            $fotoUrl = $fotoProof ? asset('storage/' . $fotoProof->file_path) : '#';
+                            $fotoUrl = $fotoProof ? route('secure-file.proof', $fotoProof) : '#';
                         @endphp
                         <div class="bg-white p-3.5 rounded-lg border {{ $fotoProof ? 'border-emerald-300 ring-1 ring-emerald-200' : 'border-rose-200 bg-rose-50/20' }} flex flex-col justify-between">
                             <div>
