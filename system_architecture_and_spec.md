@@ -1,8 +1,7 @@
 # ARSITEKTUR SISTEM DAN SPESIFIKASI FITUR (SPECIFICATION DOCUMENT)
 ## DIGITALISASI PROSES ASESMEN KOMPETENSI LSP PrO INDO
 
-**Dokumen Standar:** `spec-driven-development.md`  
-**Target Repositori:** `C:\Users\IRHAM\Documents\codes\lsp-proindo-new`  
+**Dokumen Standar:** `system_architecture_and_spec.md`  
 **Stack Teknologi:** Laravel 12, Blade Engine, Tailwind CSS, Alpine.js / Vanilla JS (Zero-Bloat), MySQL/SQLite  
 
 ---
@@ -14,10 +13,9 @@ Membangun web application monolitik yang *lean*, *clean-code*, dan berkinerja ti
 
 ## 2. Existing State & Inventory Analisis
 
-### 2.1 Kondisi Repositori Saat Ini (`lsp-proindo-new`)
-- Folder dokumen master: [`all-document-lsp-ProIndo`](file:///C:/Users/IRHAM/Documents/codes/lsp-proindo-new/all-document-lsp-ProIndo) berisi 7 skema MUK lengkap (FR.APL, FR.MAPA, FR.AK, FR.IA, Berita Acara, dan Daftar Hadir).
-- Panduan pengembangan: [`spec-driven-development.md`](file:///C:/Users/IRHAM/Documents/codes/lsp-proindo-new/spec-driven-development.md).
-- Status: **Fresh project** (belum ada kode aplikasi).
+### 2.1 Kondisi Repositori Saat Ini
+- Folder dokumen master: [`all-document-lsp-ProIndo`](file:///all-document-lsp-ProIndo) berisi 7 skema MUK lengkap (FR.APL, FR.MAPA, FR.AK, FR.IA, Berita Acara, dan Daftar Hadir).
+- Status: **Aplikasi MVP Selesai & Teruji** (Role Admin, Asesor, Asesi, dan 24 template cetak MUK terverifikasi).
 
 ### 2.2 Pola yang Diadopsi (Inspirasi & Lessons Learned)
 - **Anti-Bloat:** Mengurangi arsitektur yang berlebihan. Menghilangkan peran pihak luar yang tidak relevan (TUK Admin terpisah & Komite Teknis dihilangkan; fungsi TUK ditangani sebagai lokasi teks di jadwal, dan fungsi komite disederhanakan).
