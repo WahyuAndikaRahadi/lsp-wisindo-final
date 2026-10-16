@@ -155,6 +155,11 @@ graph TD
 
 ## 4. Rancang Bangun Database (Data Model & Schema)
 
+> [!NOTE] Rebaseline Migrasi & Konvensi Skema
+> Seluruh skema database telah direbaseline menjadi migrasi bersih terkelompok per domain (tanpa file parsial add_xxx).
+> Database yang sebelumnya dimigrasi dengan migrasi lama wajib menjalankan `php artisan migrate:fresh --seed`.
+> Konvensi ke depan: satu file per perubahan skema bermakna, dilarang mengedit migrasi yang sudah dirilis.
+
 Struktur tabel dirancang efisien, terindeks dengan baik, dan menghindari redundansi (*zero bloat*):
 
 ```mermaid
@@ -442,3 +447,12 @@ app/
    - Asesi keluar di tengah Ruang Uji dan saat kembali otomatis di-resume ke halaman terakhir.
 8. **`DokumenMukExportTest`**:
    - Pengujian ketersediaan rute unduh Berita Acara, Daftar Hadir, Excel Data Diri, dan PDF peserta.
+
+---
+
+## 9. Alur Kerja Git & Standar Kolaborasi
+- **Model Percabangan:** Menggunakan 2 branch permanen: `main` (rilis stabil) dan `develop` (pengembangan aktif).
+- **Fitur & Perbaikan:** Branch fitur berumur pendek dibuat dari `develop` dengan prefix `feat/`, `fix/`, atau `chore/` lalu di-merge kembali ke `develop`.
+- **Rilis Produksi:** Penggabungan dari `develop` ke `main` hanya dilakukan saat rilis versi stabil disertai pembuatan tag semver (mis. `v1.0.0`).
+- **Konvensi Pesan Commit:** Wajib mematuhi format Conventional Commits (`feat:`, `fix:`, `chore:`, `docs:`, `test:`).
+- **Integritas Riwayat:** Dilarang keras melakukan force-push (`git push --force`) ke branch `main` maupun `develop`.
