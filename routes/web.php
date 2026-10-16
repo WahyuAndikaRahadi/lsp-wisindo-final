@@ -141,16 +141,30 @@ Route::middleware(['auth', 'role:ASESOR'])->prefix('asesor')->name('asesor.')->g
 Route::middleware(['auth', 'role:SUPER_ADMIN,ADMIN_LSP,KOMITE_TEKNIS,TUK_ADMIN'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [Admin\DashboardController::class, 'index'])->name('dashboard');
 
-    // Candidate Registration Review
-    Route::post('/assessment/{assessment}/review-registration', [Admin\JadwalController::class, 'reviewRegistration'])->name('assessment.review-registration');
-    Route::post('/jadwal/{jadwal}/batch-review-registration', [Admin\JadwalController::class, 'batchReviewRegistration'])->name('jadwal.batch-review-registration');
-
-    // Appeals (FR.AK.04)
+    // Appeals (FR.AK.04) - Read list
     Route::get('/appeals', [Admin\AppealController::class, 'index'])->name('appeals.index');
-    Route::post('/appeals/{appeal}/decide', [Admin\AppealController::class, 'decide'])->name('appeals.decide');
 
-    // Jadwal CRUD
-    Route::resource('jadwal', Admin\JadwalController::class);
+    // Jadwal - Read list
+    Route::get('/jadwal', [Admin\JadwalController::class, 'index'])->name('jadwal.index');
+
+    // Write actions restricted strictly to SUPER_ADMIN and ADMIN_LSP
+    Route::middleware(['role:SUPER_ADMIN,ADMIN_LSP'])->group(function () {
+        // Candidate Registration Review
+        Route::post('/assessment/{assessment}/review-registration', [Admin\JadwalController::class, 'reviewRegistration'])->name('assessment.review-registration');
+        Route::post('/jadwal/{jadwal}/batch-review-registration', [Admin\JadwalController::class, 'batchReviewRegistration'])->name('jadwal.batch-review-registration');
+
+        // Appeal Decision
+        Route::post('/appeals/{appeal}/decide', [Admin\AppealController::class, 'decide'])->name('appeals.decide');
+
+        // Jadwal Mutating routes
+        Route::get('/jadwal/create', [Admin\JadwalController::class, 'create'])->name('jadwal.create');
+        Route::post('/jadwal', [Admin\JadwalController::class, 'store'])->name('jadwal.store');
+        Route::get('/jadwal/{jadwal}/edit', [Admin\JadwalController::class, 'edit'])->name('jadwal.edit');
+        Route::match(['put', 'patch'], '/jadwal/{jadwal}', [Admin\JadwalController::class, 'update'])->name('jadwal.update');
+        Route::delete('/jadwal/{jadwal}', [Admin\JadwalController::class, 'destroy'])->name('jadwal.destroy');
+    });
+
+    Route::get('/jadwal/{jadwal}', [Admin\JadwalController::class, 'show'])->name('jadwal.show');
 
     // Dokumen MUK
     Route::get('/dokumen-muk', [Admin\DokumenMukController::class, 'index'])->name('dokumen-muk.index');

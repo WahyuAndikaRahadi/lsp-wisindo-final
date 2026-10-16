@@ -18,6 +18,7 @@ class Schedule extends Model
         'code',
         'name',
         'scheme_id',
+        'tuk_id',
         'tuk_name',
         'date',
         'start_time',
@@ -80,6 +81,11 @@ class Schedule extends Model
     public function scheme(): BelongsTo
     {
         return $this->belongsTo(Scheme::class);
+    }
+
+    public function tuk(): BelongsTo
+    {
+        return $this->belongsTo(Tuk::class);
     }
 
     public function creator(): BelongsTo
