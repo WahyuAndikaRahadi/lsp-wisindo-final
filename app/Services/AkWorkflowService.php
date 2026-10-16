@@ -283,11 +283,29 @@ class AkWorkflowService
     }
 
     /**
-     * Submit Schedule Report (FR.AK.05 & FR.AK.06) before closure.
+     * Mark candidate as absent (TIDAK_HADIR).
      */
-    public function submitScheduleReports(Schedule $schedule, array $ak05Data, array $ak06Data): Schedule
+    public function markCandidateAbsent(Assessment $assessment, ?string $notes = null, ?int $userId = null): Assessment
     {
-        DB::transaction(function () use ($schedule, $ak05Data, $ak06Data) {
+        return DB::transaction(function () use ($assessment, $notes) {
+            $assessment->update([
+                'final_result' => 'TIDAK_HADIR',
+                'final_result_at' => now(),
+                'status' => 'COMPLETED',
+                'completed_at' => now(),
+                'final_notes' => $notes ?: 'Peserta tidak hadir pada pelaksanaan uji kompetensi.',
+            ]);
+
+            return $assessment;
+        });
+    }
+
+    /**
+     * Save Schedule Report (FR.AK.05 & FR.AK.06), and close schedule only if closure conditions are met.
+     */
+    public function saveScheduleReports(Schedule $schedule, array $ak05Data, array $ak06Data, bool $closeIfReady = true): bool
+    {
+        return DB::transaction(function () use ($schedule, $ak05Data, $ak06Data, $closeIfReady) {
             $schedule->update([
                 'ak05_report' => array_merge($ak05Data, [
                     'assessor_id' => auth()->id(),
@@ -297,22 +315,46 @@ class AkWorkflowService
                     'reviewer_id' => auth()->id(),
                     'reviewed_at' => now()->toIso8601String(),
                 ]),
-                'is_closed' => true,
-                'closed_at' => now(),
-                'status' => 'FINISHED',
             ]);
-        });
 
-        return $schedule;
+            if ($closeIfReady) {
+                $readiness = $this->isScheduleReadyForClosure($schedule);
+                if ($readiness['is_ready']) {
+                    $schedule->update([
+                        'is_closed' => true,
+                        'closed_at' => now(),
+                        'status' => 'FINISHED',
+                    ]);
+
+                    return true;
+                }
+            }
+
+            return false;
+        });
+    }
+
+    /**
+     * Submit Schedule Report (FR.AK.05 & FR.AK.06) before closure.
+     */
+    public function submitScheduleReports(Schedule $schedule, array $ak05Data, array $ak06Data): Schedule
+    {
+        $this->saveScheduleReports($schedule, $ak05Data, $ak06Data, true);
+
+        return $schedule->refresh();
     }
 
     /**
      * Check if schedule is ready to be closed.
+     * Treats TIDAK_HADIR as resolved/completed for closure.
      */
     public function isScheduleReadyForClosure(Schedule $schedule): array
     {
         $uncompletedAssessments = $schedule->assessments()
-            ->where('status', '!=', 'COMPLETED')
+            ->where(function ($query) {
+                $query->where('status', '!=', 'COMPLETED')
+                    ->where('final_result', '!=', 'TIDAK_HADIR');
+            })
             ->count();
 
         $hasAk05 = ! empty($schedule->ak05_report);

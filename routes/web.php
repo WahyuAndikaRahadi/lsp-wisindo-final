@@ -135,6 +135,7 @@ Route::middleware(['auth', 'role:ASESOR'])->prefix('asesor')->name('asesor.')->g
     // Finalize
     Route::post('/schedule/{schedule}/finalize', [Asesor\FinalizationController::class, 'finalize'])->name('schedule.finalize');
     Route::post('/assessment/{assessment}/complete', [Asesor\FinalizationController::class, 'completeAssessment'])->name('assessment.complete');
+    Route::post('/assessment/{assessment}/mark-absent', [Asesor\FinalizationController::class, 'markAbsent'])->name('assessment.mark-absent');
 });
 
 // Admin & Superadmin Routes
@@ -152,6 +153,7 @@ Route::middleware(['auth', 'role:SUPER_ADMIN,ADMIN_LSP,KOMITE_TEKNIS,TUK_ADMIN']
         // Candidate Registration Review
         Route::post('/assessment/{assessment}/review-registration', [Admin\JadwalController::class, 'reviewRegistration'])->name('assessment.review-registration');
         Route::post('/jadwal/{jadwal}/batch-review-registration', [Admin\JadwalController::class, 'batchReviewRegistration'])->name('jadwal.batch-review-registration');
+        Route::post('/assessment/{assessment}/mark-absent', [Admin\JadwalController::class, 'markAbsent'])->name('assessment.mark-absent');
 
         // Appeal Decision
         Route::post('/appeals/{appeal}/decide', [Admin\AppealController::class, 'decide'])->name('appeals.decide');

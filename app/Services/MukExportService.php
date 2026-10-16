@@ -25,11 +25,14 @@ class MukExportService
         ]);
 
         $totalAsesi = $schedule->assessments->count();
+        $totalTidakHadir = $schedule->assessments->filter(function ($a) {
+            return $a->final_result === 'TIDAK_HADIR';
+        })->count();
         $totalKompeten = $schedule->assessments->filter(function ($a) {
-            return in_array($a->final_result, ['K', 'KOMPETEN']) || ($a->final_result === null && $a->status === 'COMPLETED');
+            return in_array($a->final_result, ['K', 'KOMPETEN'], true) || ($a->final_result === null && $a->status === 'COMPLETED');
         })->count();
         $totalBelumKompeten = $schedule->assessments->filter(function ($a) {
-            return in_array($a->final_result, ['BK', 'BELUM_KOMPETEN']);
+            return in_array($a->final_result, ['BK', 'BELUM_KOMPETEN'], true);
         })->count();
 
         return [
@@ -44,6 +47,8 @@ class MukExportService
             'total_kompeten_terbilang' => self::terbilang($totalKompeten),
             'total_belum_kompeten' => $totalBelumKompeten,
             'total_belum_kompeten_terbilang' => self::terbilang($totalBelumKompeten),
+            'total_tidak_hadir' => $totalTidakHadir,
+            'total_tidak_hadir_terbilang' => self::terbilang($totalTidakHadir),
             'questionBanks' => $schedule->scheme?->questionBanks ?? collect(),
         ];
     }

@@ -212,12 +212,36 @@ class FinalizationController extends Controller
                 ->with('info', 'Jadwal asesmen ini sudah resmi ditutup sebelumnya.');
         }
 
-        DB::transaction(function () use ($schedule, $ak05, $ak06) {
-            $this->workflowService->submitScheduleReports($schedule, $ak05, $ak06);
+        $readiness = $this->workflowService->isScheduleReadyForClosure($schedule);
+
+        DB::transaction(function () use ($schedule, $ak05, $ak06, $readiness) {
+            $this->workflowService->saveScheduleReports($schedule, $ak05, $ak06, $readiness['is_ready']);
         });
+
+        if (! $readiness['is_ready']) {
+            return redirect()->route('asesor.jadwal.asesi', $schedule->id)
+                ->with('warning', "Laporan tersimpan. Jadwal belum dapat ditutup: {$readiness['uncompleted_count']} asesi belum selesai.");
+        }
 
         return redirect()->route('asesor.jadwal.index')
             ->with('success', 'FR.AK.05 Laporan Asesmen dan FR.AK.06 Tinjauan Proses berhasil disimpan. Jadwal resmi ditutup.');
+    }
+
+    /**
+     * Mark candidate as absent (TIDAK_HADIR).
+     */
+    public function markAbsent(Assessment $assessment, Request $request): RedirectResponse
+    {
+        $this->authorizeAssessorAssessment($assessment);
+
+        if ($assessment->schedule && $assessment->schedule->is_closed) {
+            return back()->with('error', 'Jadwal asesmen sudah ditutup dan dikunci.');
+        }
+
+        $notes = $request->input('notes') ?? $request->input('final_notes');
+        $this->workflowService->markCandidateAbsent($assessment, $notes, auth()->id());
+
+        return back()->with('success', "Asesi {$assessment->asesi->full_name} berhasil ditandai TIDAK HADIR.");
     }
 
     /**

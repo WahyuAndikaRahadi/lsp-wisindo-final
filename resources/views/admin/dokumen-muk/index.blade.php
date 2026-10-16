@@ -101,10 +101,12 @@
                                                 <div class="text-[11px] text-slate-400">{{ $assessment->asesi->email }} &bull; NIK: {{ $assessment->asesi->profile?->nik ?? '-' }}</div>
                                             </td>
                                             <td class="px-3 py-2.5">
-                                                @if($assessment->final_result === 'K')
+                                                @if(in_array($assessment->final_result, ['K', 'KOMPETEN'], true))
                                                     <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">KOMPETEN (K)</span>
-                                                @elseif($assessment->final_result === 'BK')
+                                                @elseif(in_array($assessment->final_result, ['BK', 'BELUM_KOMPETEN'], true))
                                                     <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-300">BELUM KOMPETEN (BK)</span>
+                                                @elseif($assessment->final_result === 'TIDAK_HADIR')
+                                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-200 text-slate-700 border border-slate-300">TIDAK HADIR</span>
                                                 @else
                                                     <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-700">{{ $assessment->status ?? 'PENDING' }}</span>
                                                 @endif

@@ -61,8 +61,9 @@
             @for($i = 0; $i < $rowCount; $i++)
                 @php
                     $a = $assessments[$i] ?? null;
-                    $isK = $a ? (in_array($a->final_result, ['K', 'KOMPETEN']) || ($a->final_result === null && $a->status === 'COMPLETED')) : false;
-                    $isBK = $a ? in_array($a->final_result, ['BK', 'BELUM_KOMPETEN']) : false;
+                    $isAbsent = $a && $a->final_result === 'TIDAK_HADIR';
+                    $isK = ($a && ! $isAbsent) ? (in_array($a->final_result, ['K', 'KOMPETEN'], true) || ($a->final_result === null && $a->status === 'COMPLETED')) : false;
+                    $isBK = ($a && ! $isAbsent) ? in_array($a->final_result, ['BK', 'BELUM_KOMPETEN'], true) : false;
                 @endphp
                 <tr>
                     <td style="text-align: center; height: 28px; vertical-align: middle;">{{ $i + 1 }}.</td>
@@ -70,9 +71,11 @@
                     <td style="text-align: center; vertical-align: middle; font-weight: bold;">{!! $isK ? '&radic;' : '' !!}</td>
                     <td style="text-align: center; vertical-align: middle; font-weight: bold;">{!! $isBK ? '&radic;' : '' !!}</td>
                     <td style="vertical-align: middle; font-size: 8.5pt;">
-                        @if($a && $isBK)
+                        @if($isAbsent)
+                            <span style="font-style: italic; color: #475569;">Tidak Hadir</span>
+                        @elseif($a && $isBK)
                             Perlu uji ulang
-                        @elseif($a)
+                        @elseif($a && $isK)
                             Memenuhi seluruh KUK
                         @endif
                     </td>

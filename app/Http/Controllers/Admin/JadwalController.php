@@ -206,4 +206,16 @@ class JadwalController extends Controller
 
         return back()->with('success', "Berhasil memperbarui status {$approvedCount} pendaftar menjadi {$status}.");
     }
+
+    public function markAbsent(Assessment $assessment, Request $request): RedirectResponse
+    {
+        if ($assessment->schedule && $assessment->schedule->is_closed) {
+            return back()->with('error', 'Jadwal asesmen sudah ditutup dan dikunci.');
+        }
+
+        $notes = $request->input('notes') ?? $request->input('final_notes');
+        app(AkWorkflowService::class)->markCandidateAbsent($assessment, $notes, auth()->id());
+
+        return back()->with('success', "Asesi {$assessment->asesi->full_name} berhasil ditandai TIDAK HADIR.");
+    }
 }

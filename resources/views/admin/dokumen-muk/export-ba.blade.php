@@ -56,8 +56,24 @@
             @for($i = 0; $i < $rowCount; $i++)
                 @php
                     $assessment = $assessments[$i] ?? null;
-                    $rawRes = $assessment ? ($assessment->final_result ?? ($assessment->status === 'COMPLETED' ? 'KOMPETEN' : ($assessment->status === 'IN_PROGRESS' ? '-' : 'BELUM_KOMPETEN'))) : null;
-                    $res = in_array($rawRes, ['K', 'KOMPETEN']) ? 'K' : (in_array($rawRes, ['BK', 'BELUM_KOMPETEN']) ? 'BK' : $rawRes);
+                    if ($assessment) {
+                        if ($assessment->final_result === 'TIDAK_HADIR') {
+                            $res = 'Tidak Hadir';
+                            $keterangan = $assessment->final_notes ?: 'Peserta Tidak Hadir';
+                        } elseif (in_array($assessment->final_result, ['K', 'KOMPETEN'], true) || ($assessment->final_result === null && $assessment->status === 'COMPLETED')) {
+                            $res = 'K';
+                            $keterangan = $assessment->assessor_notes ?: 'Direkomendasikan Kompeten';
+                        } elseif (in_array($assessment->final_result, ['BK', 'BELUM_KOMPETEN'], true)) {
+                            $res = 'BK';
+                            $keterangan = $assessment->assessor_notes ?: 'Perlu Asesmen Ulang';
+                        } else {
+                            $res = ($assessment->status === 'IN_PROGRESS') ? '-' : 'BELUM_KOMPETEN';
+                            $keterangan = $assessment->assessor_notes ?: '-';
+                        }
+                    } else {
+                        $res = '';
+                        $keterangan = '';
+                    }
                 @endphp
                 <tr>
                     <td style="text-align: center; height: 26px;">{{ $i + 1 }}</td>
@@ -67,14 +83,14 @@
                             <span style="color: #047857;">K</span>
                         @elseif($res === 'BK')
                             <span style="color: #b91c1c;">BK</span>
+                        @elseif($res === 'Tidak Hadir')
+                            <span style="color: #64748b; font-size: 8pt;">Tidak Hadir</span>
                         @else
                             {{ $res ?? '' }}
                         @endif
                     </td>
                     <td>
-                        @if($assessment)
-                            {{ $assessment->assessor_notes ?? ($res === 'K' ? 'Direkomendasikan Kompeten' : ($res === 'BK' ? 'Perlu Asesmen Ulang' : '-')) }}
-                        @endif
+                        {{ $keterangan }}
                     </td>
                     <td>
                         @if($assessment)
