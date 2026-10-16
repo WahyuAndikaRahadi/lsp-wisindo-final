@@ -52,8 +52,18 @@ class Ak07Controller extends Controller
 
         // If asesor submits without selecting any asesi or adjustments (unfilled/optional)
         if (empty($ids)) {
+            foreach ($schedule->assessments as $assessment) {
+                AssessmentAk07Item::firstOrCreate([
+                    'assessment_id' => $assessment->id,
+                ], [
+                    'adjustment_category' => 'Standar',
+                    'adjustment_detail' => 'Tidak ada penyesuaian khusus yang diperlukan (asesmen standar).',
+                    'assessor_id' => auth()->id(),
+                ]);
+            }
+
             return redirect()->route('asesor.schedule.ak01', $schedule->id)
-                ->with('info', 'FR.AK07 dilewati tanpa penyesuaian khusus. Melanjutkan ke FR.AK01 (Persetujuan Asesmen & Kerahasiaan).');
+                ->with('info', 'FR.AK07 ditetapkan tanpa penyesuaian khusus. Melanjutkan ke FR.AK01 (Persetujuan Asesmen & Kerahasiaan).');
         }
 
         $items = $request->input('items', []);
@@ -128,6 +138,18 @@ class Ak07Controller extends Controller
                     ]);
                 }
                 $savedAny = true;
+            }
+
+            if (! $savedAny) {
+                foreach ($ids as $assessmentId) {
+                    AssessmentAk07Item::firstOrCreate([
+                        'assessment_id' => $assessmentId,
+                    ], [
+                        'adjustment_category' => 'Standar',
+                        'adjustment_detail' => 'Tidak ada penyesuaian khusus yang diperlukan (asesmen standar).',
+                        'assessor_id' => auth()->id(),
+                    ]);
+                }
             }
         });
 

@@ -136,6 +136,12 @@ class MvpEndToEndWorkflowTest extends TestCase
         $assessment->refresh();
         $this->assertEquals('APPROVED', $assessment->apl_status);
 
+        // 5b. Asesor establishes FR.AK.07
+        $this->actingAs($asesor)->post(route('asesor.ak07.store', $schedule), [
+            'assessment_ids' => [$assessment->id],
+            'items' => [],
+        ]);
+
         // 6. Asesi signs AK.01 & Asesor signs AK.01
         $asesiSignAk01 = $this->actingAs($asesi)->post(route('asesi.assessment.ak01.sign', $assessment), [
             'asesi_signature' => $validPng,

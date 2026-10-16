@@ -42,9 +42,9 @@ class FinalizationController extends Controller
 
             $assessment->update([
                 'status' => 'COMPLETED',
-                'completed_at' => now(),
+                'completed_at' => $assessment->completed_at ?? now(),
                 'assessor_id' => auth()->id(),
-                'assessor_signed_at' => now(),
+                'assessor_signed_at' => $assessment->assessor_signed_at ?? now(),
             ]);
         });
 
@@ -132,15 +132,20 @@ class FinalizationController extends Controller
                 );
             }
 
+            $newAssessorSig = $request->input('assessor_signature') ?? $assessment->assessor_signature;
+            if ($assessment->assessor_signature && $newAssessorSig !== $assessment->assessor_signature) {
+                Log::info("Signature updated for assessment #{$assessment->id} by assessor #".auth()->id());
+            }
+
             $assessment->update([
                 'final_result' => $finalResult,
-                'final_result_at' => $now,
+                'final_result_at' => $assessment->final_result_at ?? $now,
                 'final_notes' => $validated['final_notes'] ?? null,
                 'follow_up_action' => $validated['follow_up_action'] ?? null,
-                'assessor_signature' => $request->input('assessor_signature') ?? $assessment->assessor_signature,
-                'assessor_signed_at' => $now,
+                'assessor_signature' => $newAssessorSig,
+                'assessor_signed_at' => $assessment->assessor_signed_at ?? $now,
                 'status' => 'COMPLETED',
-                'completed_at' => $now,
+                'completed_at' => $assessment->completed_at ?? $now,
             ]);
         });
 

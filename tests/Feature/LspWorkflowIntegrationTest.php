@@ -179,6 +179,17 @@ class LspWorkflowIntegrationTest extends TestCase
         $assessment->refresh();
         $this->assertEquals('APPROVED', $assessment->apl_status);
 
+        // 4b. Asesi cannot enter AK01 before Asesor submits FR.AK07
+        $blockedAk01 = $this->actingAs($asesi)->get(route('asesi.assessment.ak01', $assessment));
+        $blockedAk01->assertRedirect(route('asesi.dashboard'));
+
+        // Asesor records FR.AK07 (Batch Penyesuaian yang Wajar)
+        $ak07Store = $this->actingAs($asesor)->post(route('asesor.ak07.store', $schedule), [
+            'assessment_ids' => [$assessment->id],
+            'items' => [],
+        ]);
+        $ak07Store->assertRedirect(route('asesor.schedule.ak01', $schedule->id));
+
         // 5. Asesi can now enter AK01 (Gate is unlocked)
         $ak01Response = $this->actingAs($asesi)->get(route('asesi.assessment.ak01', $assessment));
         $ak01Response->assertStatus(200);

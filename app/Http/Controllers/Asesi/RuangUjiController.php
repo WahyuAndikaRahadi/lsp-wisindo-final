@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Asesi;
 
 use App\Http\Controllers\Controller;
 use App\Models\Assessment;
+use App\Models\AssessmentAk07Item;
 use App\Models\AssessmentAppeal;
 use App\Models\AssessmentIaResponse;
 use App\Models\QuestionBank;
@@ -14,13 +15,19 @@ use App\Services\SchemeInstrumentService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 
 class RuangUjiController extends Controller
 {
-    public function ak01(Assessment $assessment): View
+    public function ak01(Assessment $assessment): View|RedirectResponse
     {
         abort_if($assessment->asesi_id !== auth()->id(), 403);
+
+        if (AssessmentAk07Item::where('assessment_id', $assessment->id)->count() === 0) {
+            return redirect()->route('asesi.dashboard')
+                ->with('warning', 'Asesor belum menetapkan formulir penyesuaian asesmen (FR.AK.07). FR.AK.01 persetujuan asesmen baru dapat diakses setelah FR.AK.07 ditetapkan.');
+        }
 
         $assessment->load('schedule.scheme');
 
@@ -39,6 +46,10 @@ class RuangUjiController extends Controller
             return back()->with('error', 'FR.AK.01 hanya dapat disetujui setelah permohonan APL Anda disetujui asesor.');
         }
 
+        if (AssessmentAk07Item::where('assessment_id', $assessment->id)->count() === 0) {
+            return back()->with('error', 'FR.AK.01 belum dapat ditandatangani karena formulir penyesuaian asesmen (FR.AK.07) belum ditetapkan asesor.');
+        }
+
         $request->validate([
             'signature_data' => ['nullable', 'string', new ValidSignature],
             'asesi_signature' => ['nullable', 'string', new ValidSignature],
@@ -47,11 +58,15 @@ class RuangUjiController extends Controller
         $now = now();
         $signature = $request->input('signature_data') ?? $request->input('asesi_signature') ?? $assessment->asesi_signature;
 
+        if ($assessment->asesi_signature && $signature !== $assessment->asesi_signature) {
+            Log::info("Signature updated for assessment #{$assessment->id} by asesi #{$assessment->asesi_id}");
+        }
+
         DB::transaction(function () use ($assessment, $now, $signature) {
             $assessment->update([
-                'ak01_agreed_at' => $now,
+                'ak01_agreed_at' => $assessment->ak01_agreed_at ?? $now,
                 'asesi_signature' => $signature,
-                'asesi_signed_at' => $now,
+                'asesi_signed_at' => $assessment->asesi_signed_at ?? $now,
                 'last_active_step' => 'ruang-uji',
             ]);
         });
