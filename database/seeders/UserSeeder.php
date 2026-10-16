@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Tuk;
 use App\Models\User;
+use App\Models\UserProfile;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -15,7 +16,16 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         $tuk = Tuk::where('name', 'TUK Cikarang')->first();
-        $password = Hash::make('@Kompeten86');
+
+        $seedPassword = env('SEED_PASSWORD', app()->isProduction() ? null : '@Kompeten86');
+
+        if (app()->isProduction()) {
+            if (empty($seedPassword) || $seedPassword === '@Kompeten86') {
+                throw new \RuntimeException('SEED_PASSWORD wajib disetel di environment production dan tidak boleh menggunakan password default @Kompeten86.');
+            }
+        }
+
+        $password = Hash::make($seedPassword);
 
         $users = [
             // 1. Super Admin
@@ -234,10 +244,28 @@ class UserSeeder extends Seeder
         ];
 
         foreach ($users as $userData) {
-            User::updateOrCreate(
+            $user = User::updateOrCreate(
                 ['email' => $userData['email']],
                 $userData
             );
+
+            if ($user->role === 'ASESI') {
+                UserProfile::firstOrCreate(
+                    ['user_id' => $user->id],
+                    [
+                        'nik' => '321601'.str_pad((string) $user->id, 10, '0', STR_PAD_LEFT),
+                        'tempat_lahir' => 'Bekasi',
+                        'tanggal_lahir' => '2000-01-01',
+                        'jenis_kelamin' => 'L',
+                        'kebangsaan' => 'Indonesia',
+                        'alamat_rumah' => 'Jl. Industri No. 1, Cikarang',
+                        'no_telepon_rumah' => $user->phone,
+                        'pendidikan_terakhir' => 'SMK Otomotif',
+                        'nama_institusi_perusahaan' => 'SMK Negeri 1 Cikarang',
+                        'jabatan' => 'Siswa / Teknisi Junior',
+                    ]
+                );
+            }
         }
     }
 }
