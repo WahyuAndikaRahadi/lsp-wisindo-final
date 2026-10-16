@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\CheckAplApproved;
 use App\Http\Middleware\RoleMiddleware;
+use App\Http\Middleware\SecurityHeadersMiddleware;
 use App\Http\Middleware\TrackLastStep;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -15,6 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->append(SecurityHeadersMiddleware::class);
         $middleware->alias([
             'role' => RoleMiddleware::class,
             'apl.approved' => CheckAplApproved::class,

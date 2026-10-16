@@ -8,6 +8,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Password;
 use Illuminate\View\View;
 
 class UserController extends Controller
@@ -30,7 +31,7 @@ class UserController extends Controller
             'full_name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'phone' => 'nullable|string|max:30',
-            'password' => 'required|string|min:6',
+            'password' => ['required', 'string', Password::min(8)->letters()->numbers()],
             'role' => 'required|in:SUPER_ADMIN,ADMIN_LSP,ASESOR,ASESI,KOMITE_TEKNIS,TUK_ADMIN',
             'status' => 'required|in:ACTIVE,INACTIVE,SUSPENDED',
             'assessor_registration_number' => 'nullable|string|max:50',
@@ -62,7 +63,7 @@ class UserController extends Controller
             'full_name' => 'required|string|max:255',
             'email' => ['required', 'email', Rule::unique('users')->ignore($user->id)],
             'phone' => 'nullable|string|max:30',
-            'password' => 'nullable|string|min:6',
+            'password' => ['nullable', 'string', Password::min(8)->letters()->numbers()],
             'role' => 'required|in:SUPER_ADMIN,ADMIN_LSP,ASESOR,ASESI,KOMITE_TEKNIS,TUK_ADMIN',
             'status' => 'required|in:ACTIVE,INACTIVE,SUSPENDED',
             'assessor_registration_number' => 'nullable|string|max:50',

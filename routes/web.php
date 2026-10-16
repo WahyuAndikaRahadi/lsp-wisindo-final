@@ -12,9 +12,9 @@ use Illuminate\Support\Facades\Route;
 // Guest Routes
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1');
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
-    Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:5,1');
 });
 
 // Authenticated Global Routes
@@ -45,7 +45,7 @@ Route::middleware(['auth', 'role:ASESI'])->prefix('asesi')->name('asesi.')->grou
 
     // Jadwal
     Route::get('/jadwal', [Asesi\JadwalController::class, 'index'])->name('jadwal.index');
-    Route::post('/jadwal/join', [Asesi\JadwalController::class, 'join'])->name('jadwal.join');
+    Route::post('/jadwal/join', [Asesi\JadwalController::class, 'join'])->middleware('throttle:10,1')->name('jadwal.join');
 
     // Asesmen & APL
     Route::get('/assessment/{assessment}/apl', [Asesi\AplController::class, 'show'])->name('assessment.apl');
