@@ -458,9 +458,14 @@
 
             <div>
                 <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Asesor Penilai</h4>
+                @if(auth()->user()->profile?->signature_data)
+                    <div class="bg-white p-2.5 rounded-lg border border-slate-200 inline-block mb-2">
+                        <img src="{{ auth()->user()->profile->signature_data }}" alt="Tanda Tangan Asesor" class="max-h-20 object-contain">
+                    </div>
+                @endif
                 <div class="text-xs text-slate-700 space-y-1">
                     <p>Nama Asesor: <strong class="text-slate-900">{{ auth()->user()->full_name }}</strong></p>
-                    <p>No. Registrasi: <span class="font-mono text-slate-900">{{ auth()->user()->profile?->no_reg_asesor ?? 'MET.000.000000 2026' }}</span></p>
+                    <p>No. Registrasi: <span class="font-mono text-slate-900">{{ auth()->user()->assessor_registration_number ?? (auth()->user()->profile?->no_reg_asesor ?? 'Belum diatur') }}</span></p>
                     <p>Status Review: 
                         <span class="font-bold {{ $assessment->apl_status === 'APPROVED' ? 'text-emerald-600' : ($assessment->apl_status === 'REVISION_REQUESTED' ? 'text-rose-600' : 'text-amber-600') }}">
                             {{ $statusLabel }}
