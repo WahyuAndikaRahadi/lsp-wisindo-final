@@ -241,6 +241,15 @@ class UserSeeder extends Seeder
                 'status' => 'ACTIVE',
                 'password' => $password,
             ],
+            // 24. Asesi Wahyu Andika Rahadi
+            [
+                'full_name' => 'Wahyu Andika Rahadi',
+                'email' => 'wahyu@gmail.com',
+                'phone' => '083816927804',
+                'role' => 'ASESI',
+                'status' => 'ACTIVE',
+                'password' => $password,
+            ],
         ];
 
         foreach ($users as $userData) {
