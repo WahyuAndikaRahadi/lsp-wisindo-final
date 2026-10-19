@@ -164,7 +164,7 @@ class InstrumentController extends Controller
             'route_code' => $codeLower,
         ];
 
-        $asesiList = $schedule->assessments->map(function ($assessment) use ($codeUpper, $codeLower) {
+        $asesiList = $schedule->assessments->map(function ($assessment) use ($codeUpper, $codeLower, $schedule) {
             $response = $assessment->iaResponses->firstWhere('instrument_code', $codeUpper);
             $isCompleted = false;
             $scoreLabel = null;
@@ -195,6 +195,10 @@ class InstrumentController extends Controller
 
             $hasEvidence = ! empty($response?->data_json['evidence_image_path']);
 
+            $user = auth()->user();
+            $isSingleAssessor = $schedule->assessors->count() === 1 && $schedule->assessors->first()?->id === $user?->id;
+            $isMyCandidate = (int) $assessment->assessor_id === (int) $user?->id || (empty($assessment->assessor_id) && $isSingleAssessor);
+
             return (object) [
                 'assessment' => $assessment,
                 'asesi' => $assessment->asesi,
@@ -204,6 +208,7 @@ class InstrumentController extends Controller
                 'score_label' => $scoreLabel,
                 'inspect_url' => $inspectUrl,
                 'has_evidence' => $hasEvidence,
+                'is_my_candidate' => $isMyCandidate,
             ];
         });
 

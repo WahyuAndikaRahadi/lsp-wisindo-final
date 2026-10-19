@@ -89,6 +89,15 @@
                                                     &bull; <span class="font-mono">NIK: {{ $item->asesi->profile->nik }}</span>
                                                 @endif
                                             </div>
+                                            @if($item->is_my_candidate)
+                                                <span class="inline-flex items-center text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200 mt-1">
+                                                    ✓ Plottingan Anda
+                                                </span>
+                                            @else
+                                                <span class="inline-flex items-center text-[10px] font-medium text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200 mt-1">
+                                                    Asesor: {{ $item->assessment->assessor?->full_name ?? 'Lain' }}
+                                                </span>
+                                            @endif
                                         </div>
                                     </div>
                                 </td>
@@ -121,13 +130,22 @@
                                     </div>
                                 </td>
                                 <td class="px-6 py-4 text-right">
-                                    <a href="{{ $item->inspect_url }}"
-                                       class="inline-flex items-center space-x-1.5 px-4 py-2 text-xs font-bold {{ $item->is_completed ? 'bg-slate-900 hover:bg-slate-800 text-white' : 'bg-brand-600 hover:bg-brand-700 text-white' }} rounded-lg shadow-sm transition">
-                                        <span>{{ $item->is_completed ? 'Tinjau / Ubah Penilaian' : 'Periksa Hasil Asesi' }}</span>
-                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                                        </svg>
-                                    </a>
+                                    @if($item->is_my_candidate)
+                                        <a href="{{ $item->inspect_url }}"
+                                           class="inline-flex items-center space-x-1.5 px-4 py-2 text-xs font-bold {{ $item->is_completed ? 'bg-slate-900 hover:bg-slate-800 text-white' : 'bg-brand-600 hover:bg-brand-700 text-white' }} rounded-lg shadow-sm transition">
+                                            <span>{{ $item->is_completed ? 'Tinjau / Ubah Penilaian' : 'Periksa Hasil Asesi' }}</span>
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                            </svg>
+                                        </a>
+                                    @else
+                                        <button type="button" disabled 
+                                            class="inline-flex items-center space-x-1.5 px-3.5 py-2 text-xs font-semibold bg-slate-100 text-slate-400 border border-slate-200 rounded-lg cursor-not-allowed select-none" 
+                                            title="Asesi ini di-plot kepada {{ $item->assessment->assessor?->full_name ?? 'rekan asesor lain' }}. Anda tidak dapat menilai asesi ini.">
+                                            <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                                            <span>Terkunci (Asesor Lain)</span>
+                                        </button>
+                                    @endif
                                 </td>
                             </tr>
                         @endforeach

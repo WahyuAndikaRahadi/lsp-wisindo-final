@@ -53,10 +53,10 @@ class JadwalController extends Controller
     {
         $this->authorizeAssessorSchedule($schedule);
 
-        $schedule->load('scheme');
+        $schedule->load(['scheme', 'assessors']);
         $jadwal = $schedule;
         $assessments = $schedule->assessments()
-            ->with('asesi.profile')
+            ->with(['asesi.profile', 'assessor', 'latestAppeal'])
             ->get();
 
         return view('asesor.jadwal.asesi', compact('schedule', 'jadwal', 'assessments'));
