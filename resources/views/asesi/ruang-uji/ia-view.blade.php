@@ -555,6 +555,7 @@
                                     <x-signature-pad 
                                         name="signature_data" 
                                         :value="$response->asesi_signature" 
+                                        :profileSignature="auth()->user()->profile?->signature_data"
                                         label="Tanda Tangan Baru (Opsional)" 
                                         height="130" 
                                     />
@@ -580,7 +581,8 @@
                     <div class="w-full md:w-80">
                         <x-signature-pad 
                             name="signature_data" 
-                            :value="auth()->user()->profile?->signature_data" 
+                            :value="old('signature_data')" 
+                            :profileSignature="auth()->user()->profile?->signature_data" 
                             label="Tanda Tangan Digital Asesi" 
                             height="130" 
                         />

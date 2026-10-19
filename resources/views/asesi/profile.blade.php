@@ -228,6 +228,7 @@
             <x-signature-pad 
                 name="signature_data" 
                 :value="old('signature_data', $p->signature_data)"
+                :profileSignature="''"
                 label="Goreskan Tanda Tangan Anda"
                 :required="true"
                 height="180"

@@ -42,6 +42,10 @@ class AplController extends Controller
                 ->with('info', 'Permohonan APL Anda sudah disetujui oleh Asesor.');
         }
 
+        if ($assessment->apl_status === 'SUBMITTED') {
+            return back()->with('info', 'Permohonan APL Anda sudah diajukan dan sedang menunggu verifikasi asesor.');
+        }
+
         $scheduleAssessors = $assessment->schedule->assessors ?? collect();
         if ($scheduleAssessors->isNotEmpty() && empty($assessment->assessor_id)) {
             $request->validate([
@@ -148,6 +152,13 @@ class AplController extends Controller
 
             if ($request->filled('assessor_id')) {
                 $updateData['assessor_id'] = $request->assessor_id;
+            }
+
+            $profile = auth()->user()->profile;
+            $signature = $request->input('signature_data') ?: $profile?->signature_data;
+            if ($signature) {
+                $updateData['asesi_signature'] = $signature;
+                $updateData['asesi_signed_at'] = now();
             }
 
             $assessment->update($updateData);

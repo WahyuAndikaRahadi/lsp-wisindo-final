@@ -60,22 +60,15 @@
                         <tr>
                             <th class="px-4 py-3 text-center w-10">No</th>
                             <th class="px-4 py-3">Nama Asesi</th>
-                            <th class="px-3 py-3 text-center">1. Approval Admin</th>
-                            <th class="px-3 py-3 text-center">2. Approval Asesor</th>
-                            <th class="px-3 py-3 text-center">3. Hasil Asesmen</th>
-                            <th class="px-3 py-3 text-center">4. Banding (AK.04)</th>
+                            <th class="px-3 py-3 text-center">Status APL</th>
+                            <th class="px-3 py-3 text-center">Hasil Asesmen</th>
+                            <th class="px-3 py-3 text-center">Banding (AK.04)</th>
                             <th class="px-4 py-3 text-right">Aksi Asesor</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100">
                         @foreach($assessments as $i => $assessment)
                             @php
-                                $adminBadge = match($assessment->admin_status ?? 'PENDING') {
-                                    'APPROVED' => 'bg-emerald-50 text-emerald-700 border-emerald-300',
-                                    'REVISION' => 'bg-amber-50 text-amber-700 border-amber-300',
-                                    'REJECTED' => 'bg-rose-50 text-rose-700 border-rose-300',
-                                    default => 'bg-slate-100 text-slate-600 border-slate-300',
-                                };
                                 $aplBadge = match($assessment->apl_status ?? 'DRAFT') {
                                     'APPROVED' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
                                     'SUBMITTED' => 'bg-blue-50 text-blue-700 border-blue-200',
@@ -95,11 +88,6 @@
                                 <td class="px-4 py-3">
                                     <div class="font-semibold text-slate-900">{{ $assessment->asesi->full_name }}</div>
                                     <div class="text-xs text-slate-500">{{ $assessment->asesi->email }}</div>
-                                </td>
-                                <td class="px-3 py-3 text-center">
-                                    <span class="px-2 py-0.5 rounded text-[11px] font-bold border {{ $adminBadge }}">
-                                        {{ $assessment->admin_status ?? 'PENDING' }}
-                                    </span>
                                 </td>
                                 <td class="px-3 py-3 text-center">
                                     <span class="px-2 py-0.5 rounded text-[11px] font-semibold border {{ $aplBadge }}">

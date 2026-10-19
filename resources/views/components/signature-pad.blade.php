@@ -6,64 +6,78 @@
     'required' => false,
     'height' => 160,
     'profileSignature' => null,
+    'disabled' => false,
 ])
 
 @php
     $initialValue = $value ?? $signature ?? old($name);
     $userProfileSignature = $profileSignature ?? auth()->user()?->profile?->signature_data;
     $padId = 'sig_pad_' . md5($name . microtime());
+    $isDisabled = (bool) $disabled;
 @endphp
 
 <div x-data="signaturePadComponent({
     canvasId: '{{ $padId }}',
     inputName: '{{ $name }}',
     initialImage: @js($initialValue),
-    profileSignature: @js($userProfileSignature)
+    profileSignature: @js($userProfileSignature),
+    disabled: @js($isDisabled)
 })" x-init="initPad()" class="w-full">
     @if($label)
-        <label class="block text-sm font-semibold text-slate-700 mb-1.5 flex items-center justify-between">
-            <span>{{ $label }} @if($required)<span class="text-rose-500">*</span>@endif</span>
-            <span class="text-xs text-slate-400 font-normal">Gunakan mouse atau sentuhan jari</span>
-        </label>
+        <div class="flex items-center justify-between mb-1.5">
+            <label class="block text-sm font-semibold text-slate-700">
+                {{ $label }} @if($required && ! $isDisabled)<span class="text-rose-500">*</span>@endif
+            </label>
+            @if($isDisabled)
+                <span class="inline-flex items-center text-[11px] font-semibold text-slate-500 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                    <svg class="w-3 h-3 mr-1 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                    Terkunci (Telah Disimpan)
+                </span>
+            @else
+                <span class="text-xs text-slate-400 font-normal">Gunakan mouse, stylus, atau sentuhan</span>
+            @endif
+        </div>
     @endif
 
-    <div class="relative border-2 border-dashed border-slate-300 rounded-lg bg-slate-50 overflow-hidden hover:border-slate-400 transition">
+    <div class="relative border-2 @if($isDisabled) border-slate-200 bg-slate-100/70 @else border-dashed border-slate-300 bg-slate-50 hover:border-slate-400 @endif rounded-lg overflow-hidden transition">
         <canvas 
             id="{{ $padId }}" 
-            class="w-full bg-white touch-none cursor-crosshair block" 
+            class="w-full bg-white block @if($isDisabled) pointer-events-none cursor-default @else touch-none cursor-crosshair @endif" 
             style="height: {{ $height }}px;"
         ></canvas>
 
-        <div class="absolute bottom-2 right-2 flex items-center space-x-2">
-            <button 
-                type="button" 
-                @click="clearCanvas()" 
-                class="px-2.5 py-1 text-xs font-medium text-slate-600 bg-white/90 hover:bg-slate-100 border border-slate-200 rounded shadow-sm transition"
-            >
-                Hapus / Reset
-            </button>
-        </div>
+        @if(! $isDisabled)
+            <div class="absolute bottom-2 right-2 flex items-center space-x-2">
+                <button 
+                    type="button" 
+                    @click="clearCanvas()" 
+                    class="px-2.5 py-1 text-xs font-medium text-slate-600 bg-white/95 hover:bg-slate-100 border border-slate-200 rounded shadow-xs transition"
+                >
+                    Hapus / Reset
+                </button>
+            </div>
 
-        <div x-show="isEmpty && !hasDrawn" class="absolute inset-0 flex items-center justify-center pointer-events-none text-slate-400 text-xs italic">
-            Tanda tangani di area ini
-        </div>
+            <div x-show="isEmpty && !hasDrawn" class="absolute inset-0 flex items-center justify-center pointer-events-none text-slate-400 text-xs italic select-none">
+                Goreskan tanda tangan di area ini
+            </div>
+        @endif
     </div>
 
-    @if($userProfileSignature)
+    @if(! $isDisabled && $userProfileSignature)
         <div class="mt-2 flex items-center">
             <label class="inline-flex items-center text-xs font-semibold text-slate-700 cursor-pointer select-none">
                 <input 
                     type="checkbox" 
                     x-model="useProfileSignature" 
                     @change="toggleProfileSignature()" 
-                    class="rounded border-slate-300 text-brand-600 focus:ring-brand-500 mr-2"
+                    class="rounded border-slate-300 text-brand-600 focus:ring-brand-500 mr-2 cursor-pointer"
                 >
                 <span>Gunakan tanda tangan dari profil saya</span>
             </label>
         </div>
     @endif
 
-    <input type="hidden" name="{{ $name }}" :value="signatureData" @if($required) required @endif>
+    <input type="hidden" name="{{ $name }}" :value="signatureData" @if($required && ! $isDisabled) required @endif>
 
     @error($name)
         <p class="text-rose-600 text-xs mt-1">{{ $message }}</p>
@@ -78,14 +92,16 @@ function signaturePadComponent(config) {
         canvasId: config.canvasId,
         signatureData: config.initialImage || '',
         profileSignature: config.profileSignature || '',
+        disabled: Boolean(config.disabled),
         useProfileSignature: false,
         isEmpty: !config.initialImage,
-        hasDrawn: false,
+        hasDrawn: Boolean(config.initialImage),
         isDrawing: false,
         ctx: null,
         canvas: null,
 
         toggleProfileSignature() {
+            if (this.disabled) return;
             if (this.useProfileSignature && this.profileSignature) {
                 this.loadInitialImage(this.profileSignature);
                 this.signatureData = this.profileSignature;
@@ -105,46 +121,66 @@ function signaturePadComponent(config) {
                 this.resizeCanvas();
                 window.addEventListener('resize', () => this.resizeCanvas());
 
-                // Mouse events
-                this.canvas.addEventListener('mousedown', (e) => this.startDrawing(e));
-                this.canvas.addEventListener('mousemove', (e) => this.draw(e));
-                window.addEventListener('mouseup', () => this.stopDrawing());
+                if (this.disabled) {
+                    if (config.initialImage) {
+                        this.loadInitialImage(config.initialImage);
+                    }
+                    return;
+                }
 
-                // Touch events
-                this.canvas.addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    this.startDrawing(e.touches[0]);
-                }, { passive: false });
-                this.canvas.addEventListener('touchmove', (e) => {
-                    e.preventDefault();
-                    this.draw(e.touches[0]);
-                }, { passive: false });
-                this.canvas.addEventListener('touchend', (e) => {
-                    this.stopDrawing();
-                });
+                // Pointer Events for smooth unified handling across mouse, pen, and touch
+                this.canvas.addEventListener('pointerdown', (e) => this.handlePointerDown(e));
+                this.canvas.addEventListener('pointermove', (e) => this.handlePointerMove(e));
+                this.canvas.addEventListener('pointerup', (e) => this.handlePointerUp(e));
+                this.canvas.addEventListener('pointercancel', (e) => this.handlePointerUp(e));
+
+                // Hook to form submit to guarantee latest signature data is captured
+                const form = this.canvas.closest('form');
+                if (form) {
+                    form.addEventListener('submit', () => {
+                        if (!this.disabled && !this.isEmpty && this.hasDrawn) {
+                            this.saveData();
+                        }
+                    });
+                }
 
                 if (config.initialImage) {
                     this.loadInitialImage(config.initialImage);
+                    if (config.profileSignature && config.initialImage === config.profileSignature) {
+                        this.useProfileSignature = true;
+                    }
                 }
             });
+        },
+
+        setupContext() {
+            if (!this.ctx) return;
+            this.ctx.lineWidth = 2.5;
+            this.ctx.lineCap = 'round';
+            this.ctx.lineJoin = 'round';
+            this.ctx.strokeStyle = '#0f172a'; // slate-900
+            this.ctx.fillStyle = '#0f172a';
         },
 
         resizeCanvas() {
             if (!this.canvas) return;
             const rect = this.canvas.getBoundingClientRect();
-            const prevData = this.canvas.toDataURL();
+            const displayWidth = Math.round(rect.width) || this.canvas.offsetWidth || 350;
+            const displayHeight = Math.round(rect.height) || this.canvas.offsetHeight || 150;
 
-            // Set actual canvas size to match element display size
-            this.canvas.width = rect.width;
-            this.canvas.height = rect.height;
+            if (this.canvas.width === displayWidth && this.canvas.height === displayHeight) {
+                return;
+            }
 
-            this.ctx.lineWidth = 2.5;
-            this.ctx.lineCap = 'round';
-            this.ctx.lineJoin = 'round';
-            this.ctx.strokeStyle = '#0f172a'; // slate-900
+            const currentData = this.signatureData;
 
-            if (this.signatureData) {
-                this.loadInitialImage(this.signatureData);
+            this.canvas.width = displayWidth;
+            this.canvas.height = displayHeight;
+
+            this.setupContext();
+
+            if (currentData) {
+                this.loadInitialImage(currentData);
             }
         },
 
@@ -152,46 +188,67 @@ function signaturePadComponent(config) {
             if (!dataUrl || !this.ctx) return;
             const img = new Image();
             img.onload = () => {
+                if (!this.canvas || !this.ctx) return;
                 this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
                 this.ctx.drawImage(img, 0, 0, this.canvas.width, this.canvas.height);
                 this.isEmpty = false;
+                this.hasDrawn = true;
             };
             img.src = dataUrl;
         },
 
-        getCoordinates(event) {
+        getCoordinates(e) {
             const rect = this.canvas.getBoundingClientRect();
+            const scaleX = rect.width > 0 ? this.canvas.width / rect.width : 1;
+            const scaleY = rect.height > 0 ? this.canvas.height / rect.height : 1;
             return {
-                x: event.clientX - rect.left,
-                y: event.clientY - rect.top
+                x: (e.clientX - rect.left) * scaleX,
+                y: (e.clientY - rect.top) * scaleY
             };
         },
 
-        startDrawing(e) {
-            this.useProfileSignature = false;
+        handlePointerDown(e) {
+            if (this.disabled) return;
+            try {
+                this.canvas.setPointerCapture(e.pointerId);
+            } catch (err) {}
+
             this.isDrawing = true;
             this.hasDrawn = true;
             this.isEmpty = false;
+            this.useProfileSignature = false;
+
             const coords = this.getCoordinates(e);
+
+            // Draw initial dot immediately on touch/click
+            this.ctx.beginPath();
+            this.ctx.arc(coords.x, coords.y, this.ctx.lineWidth / 2, 0, Math.PI * 2);
+            this.ctx.fill();
+
+            // Begin continuous stroke
             this.ctx.beginPath();
             this.ctx.moveTo(coords.x, coords.y);
         },
 
-        draw(e) {
-            if (!this.isDrawing) return;
+        handlePointerMove(e) {
+            if (!this.isDrawing || this.disabled) return;
             const coords = this.getCoordinates(e);
             this.ctx.lineTo(coords.x, coords.y);
             this.ctx.stroke();
         },
 
-        stopDrawing() {
+        handlePointerUp(e) {
             if (!this.isDrawing) return;
             this.isDrawing = false;
             this.ctx.closePath();
+            try {
+                this.canvas.releasePointerCapture(e.pointerId);
+            } catch (err) {}
             this.saveData();
         },
 
         clearCanvas() {
+            if (this.disabled) return;
             if (!this.canvas || !this.ctx) return;
             this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
             this.signatureData = '';

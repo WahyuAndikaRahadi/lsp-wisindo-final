@@ -77,7 +77,8 @@
                 <div class="w-full md:w-80">
                     <x-signature-pad 
                         name="signature_data" 
-                        :value="auth()->user()->profile?->signature_data" 
+                        :value="old('signature_data')" 
+                        :profileSignature="auth()->user()->profile?->signature_data"
                         label="Tanda Tangan Persetujuan Asesi" 
                         height="140" 
                     />

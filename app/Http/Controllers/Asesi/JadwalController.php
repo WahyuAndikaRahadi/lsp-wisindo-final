@@ -64,7 +64,7 @@ class JadwalController extends Controller
                 ],
                 [
                     'apl_status' => 'DRAFT',
-                    'admin_status' => 'PENDING',
+                    'admin_status' => 'APPROVED',
                     'registered_at' => now(),
                     'last_active_step' => 'apl',
                 ]

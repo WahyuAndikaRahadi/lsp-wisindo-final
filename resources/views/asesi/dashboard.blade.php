@@ -147,19 +147,22 @@
                             $targetUrl = route('asesi.assessment.ruang-uji', $item->id);
                         } elseif ($item->apl_status === 'APPROVED') {
                             $stageNumber = 3;
-                            $stageTitle = 'Tahap 3 dari 5: Persetujuan Asesmen & Kerahasiaan (FR.AK.01)';
-                            $stageBadgeColor = 'bg-blue-100 text-blue-800 border-blue-200';
-                            $targetUrl = route('asesi.assessment.ak01', $item->id);
-                        } elseif ($item->admin_status === 'APPROVED' || $item->apl_status === 'SUBMITTED' || $item->apl_status === 'REVISION_REQUESTED') {
+                            $stageTitle = 'Disetujui: Siap Uji Kompetensi (Ruang Uji & CBT)';
+                            $stageBadgeColor = 'bg-emerald-100 text-emerald-800 border-emerald-200';
+                            $targetUrl = route('asesi.assessment.ruang-uji', $item->id);
+                        } elseif ($item->apl_status === 'SUBMITTED') {
                             $stageNumber = 2;
-                            $stageTitle = ($item->apl_status === 'REVISION_REQUESTED')
-                                ? 'Tahap 2 dari 5: Perbaikan Dokumen / Asesmen Mandiri (APL-02)'
-                                : (($item->apl_status === 'SUBMITTED') ? 'Tahap 2 dari 5: Menunggu Verifikasi APL oleh Asesor' : 'Tahap 2 dari 5: Mengisi Asesmen Mandiri (APL-02)');
-                            $stageBadgeColor = ($item->apl_status === 'REVISION_REQUESTED') ? 'bg-rose-100 text-rose-800 border-rose-300' : 'bg-amber-100 text-amber-800 border-amber-200';
+                            $stageTitle = 'Menunggu Verifikasi APL oleh Asesor';
+                            $stageBadgeColor = 'bg-amber-100 text-amber-800 border-amber-200';
+                            $targetUrl = route('asesi.assessment.apl', $item->id);
+                        } elseif ($item->apl_status === 'REVISION_REQUESTED') {
+                            $stageNumber = 2;
+                            $stageTitle = 'Perbaikan Dokumen / Asesmen Mandiri (APL-02)';
+                            $stageBadgeColor = 'bg-rose-100 text-rose-800 border-rose-300';
                             $targetUrl = route('asesi.assessment.apl', $item->id);
                         } else {
                             $stageNumber = 1;
-                            $stageTitle = 'Tahap 1 dari 5: Pendaftaran & Verifikasi Berkas (APL-01)';
+                            $stageTitle = 'Pengisian Formulir APL.01 & APL.02';
                             $stageBadgeColor = 'bg-slate-100 text-slate-800 border-slate-300';
                             $targetUrl = route('asesi.assessment.apl', $item->id);
                         }

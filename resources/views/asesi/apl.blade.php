@@ -334,15 +334,17 @@
                 <div class="w-full md:w-80">
                     <x-signature-pad 
                         name="signature_data" 
-                        :value="$profile?->signature_data" 
+                        :value="$assessment->asesi_signature ?? old('signature_data')" 
+                        :profileSignature="$profile?->signature_data"
                         label="Tanda Tangan Pemohon (Asesi)" 
                         height="140" 
+                        :disabled="$assessment->apl_status === 'SUBMITTED' || $assessment->apl_status === 'APPROVED'"
                     />
                 </div>
 
                 <div class="w-full md:w-auto flex flex-col items-end gap-2">
                     @if($assessment->apl_status === 'APPROVED')
-                        <a href="{{ route('asesi.assessment.ak01', $assessment) }}" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-md transition flex items-center gap-2">
+                        <a href="{{ route('asesi.assessment.ruang-uji', $assessment) }}" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-md transition flex items-center gap-2">
                             <span>Lanjut ke Ruang Uji</span>
                             <span>→</span>
                         </a>
