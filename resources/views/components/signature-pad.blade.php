@@ -5,17 +5,20 @@
     'label' => 'Tanda Tangan Digital',
     'required' => false,
     'height' => 160,
+    'profileSignature' => null,
 ])
 
 @php
     $initialValue = $value ?? $signature ?? old($name);
+    $userProfileSignature = $profileSignature ?? auth()->user()?->profile?->signature_data;
     $padId = 'sig_pad_' . md5($name . microtime());
 @endphp
 
 <div x-data="signaturePadComponent({
     canvasId: '{{ $padId }}',
     inputName: '{{ $name }}',
-    initialImage: @js($initialValue)
+    initialImage: @js($initialValue),
+    profileSignature: @js($userProfileSignature)
 })" x-init="initPad()" class="w-full">
     @if($label)
         <label class="block text-sm font-semibold text-slate-700 mb-1.5 flex items-center justify-between">
@@ -46,6 +49,20 @@
         </div>
     </div>
 
+    @if($userProfileSignature)
+        <div class="mt-2 flex items-center">
+            <label class="inline-flex items-center text-xs font-semibold text-slate-700 cursor-pointer select-none">
+                <input 
+                    type="checkbox" 
+                    x-model="useProfileSignature" 
+                    @change="toggleProfileSignature()" 
+                    class="rounded border-slate-300 text-brand-600 focus:ring-brand-500 mr-2"
+                >
+                <span>Gunakan tanda tangan dari profil saya</span>
+            </label>
+        </div>
+    @endif
+
     <input type="hidden" name="{{ $name }}" :value="signatureData" @if($required) required @endif>
 
     @error($name)
@@ -60,11 +77,24 @@ function signaturePadComponent(config) {
     return {
         canvasId: config.canvasId,
         signatureData: config.initialImage || '',
+        profileSignature: config.profileSignature || '',
+        useProfileSignature: false,
         isEmpty: !config.initialImage,
         hasDrawn: false,
         isDrawing: false,
         ctx: null,
         canvas: null,
+
+        toggleProfileSignature() {
+            if (this.useProfileSignature && this.profileSignature) {
+                this.loadInitialImage(this.profileSignature);
+                this.signatureData = this.profileSignature;
+                this.isEmpty = false;
+                this.hasDrawn = true;
+            } else {
+                this.clearCanvas();
+            }
+        },
 
         initPad() {
             this.$nextTick(() => {
@@ -138,6 +168,7 @@ function signaturePadComponent(config) {
         },
 
         startDrawing(e) {
+            this.useProfileSignature = false;
             this.isDrawing = true;
             this.hasDrawn = true;
             this.isEmpty = false;
@@ -166,6 +197,7 @@ function signaturePadComponent(config) {
             this.signatureData = '';
             this.isEmpty = true;
             this.hasDrawn = false;
+            this.useProfileSignature = false;
         },
 
         saveData() {

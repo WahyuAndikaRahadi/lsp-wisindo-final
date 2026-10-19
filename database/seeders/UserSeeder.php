@@ -272,6 +272,7 @@ class UserSeeder extends Seeder
                         'pendidikan_terakhir' => 'SMK Otomotif',
                         'nama_institusi_perusahaan' => 'SMK Negeri 1 Cikarang',
                         'jabatan' => 'Siswa / Teknisi Junior',
+                        'signature_data' => 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
                     ]
                 );
             }

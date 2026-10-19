@@ -89,4 +89,13 @@ class User extends Authenticatable
     {
         return in_array($this->role, ['SUPER_ADMIN', 'ADMIN_LSP']);
     }
+
+    public function isProfileComplete(): bool
+    {
+        if ($this->role !== 'ASESI') {
+            return true;
+        }
+
+        return $this->profile !== null && $this->profile->isComplete();
+    }
 }

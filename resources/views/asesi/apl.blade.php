@@ -22,7 +22,7 @@
                     <span class="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-semibold bg-emerald-500 text-white shadow-sm">
                         ✓ Disetujui Asesor
                     </span>
-                    <a href="{{ route('asesi.assessment.ak01', $assessment) }}" class="mt-2 inline-block text-sm text-indigo-600 hover:underline font-medium">
+                    <a href="{{ route('asesi.assessment.ruang-uji', $assessment) }}" class="mt-2 inline-block text-sm text-indigo-600 hover:underline font-medium">
                         Lanjut ke Ruang Uji →
                     </a>
                 </div>
@@ -114,6 +114,28 @@
                         <span class="font-semibold text-slate-800">{{ $profile?->nama_institusi_perusahaan ?? '-' }} ({{ $profile?->jabatan ?? '-' }})</span>
                     </div>
                 </div>
+
+                {{-- Pemilihan Asesor Penguji --}}
+                @php
+                    $scheduleAssessors = $assessment->schedule->assessors ?? collect();
+                @endphp
+                @if($scheduleAssessors->isNotEmpty())
+                    <div class="mt-4 p-4 rounded-xl border border-indigo-100 bg-indigo-50/50 mb-6">
+                        <label class="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+                            <span>Pilih Asesor Penguji <span class="text-rose-500">*</span></span>
+                            <span class="text-[11px] text-slate-500 font-normal lowercase">Asesor yang akan memverifikasi berkas & menguji Anda</span>
+                        </label>
+                        <select name="assessor_id" required class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 bg-white text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none" @disabled($assessment->apl_status === 'APPROVED' || $assessment->apl_status === 'SUBMITTED')>
+                            <option value="">-- Pilih Salah Satu Asesor Penguji --</option>
+                            @foreach($scheduleAssessors as $asesor)
+                                <option value="{{ $asesor->id }}" {{ old('assessor_id', $assessment->assessor_id) == $asesor->id || $scheduleAssessors->count() === 1 ? 'selected' : '' }}>
+                                    {{ $asesor->full_name }} (No. Reg: {{ $asesor->assessor_registration_number ?? '-' }})
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('assessor_id') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
+                    </div>
+                @endif
 
                 {{-- BUKTI PERSYARATAN UPLOAD SECTION (IMAGE 2 STYLE) --}}
                 <div class="mt-6">

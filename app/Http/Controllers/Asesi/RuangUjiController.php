@@ -24,6 +24,15 @@ class RuangUjiController extends Controller
     {
         abort_if($assessment->asesi_id !== auth()->id(), 403);
 
+        if ($assessment->ak01_agreed_at) {
+            return redirect()->route('asesi.assessment.ruang-uji', $assessment);
+        }
+
+        if ($assessment->apl_status !== 'APPROVED') {
+            return redirect()->route('asesi.assessment.apl', $assessment)
+                ->with('error', 'FR.AK.01 hanya dapat diakses setelah permohonan APL Anda disetujui asesor.');
+        }
+
         if (AssessmentAk07Item::where('assessment_id', $assessment->id)->count() === 0) {
             return redirect()->route('asesi.dashboard')
                 ->with('warning', 'Asesor belum menetapkan formulir penyesuaian asesmen (FR.AK.07). FR.AK.01 persetujuan asesmen baru dapat diakses setelah FR.AK.07 ditetapkan.');
@@ -75,9 +84,14 @@ class RuangUjiController extends Controller
             ->with('success', 'FR.AK01 berhasil disetujui dan ditandatangani.');
     }
 
-    public function hub(Assessment $assessment): View
+    public function hub(Assessment $assessment): View|RedirectResponse
     {
         abort_if($assessment->asesi_id !== auth()->id(), 403);
+
+        if ($assessment->apl_status !== 'APPROVED') {
+            return redirect()->route('asesi.assessment.apl', $assessment)
+                ->with('warning', 'Ruang Uji baru dapat diakses setelah permohonan APL Anda disetujui.');
+        }
 
         $assessment->load('schedule.scheme', 'schedule.assessors', 'iaResponses', 'assessor');
         $selectedInstruments = $assessment->schedule->getEffectiveInstruments();

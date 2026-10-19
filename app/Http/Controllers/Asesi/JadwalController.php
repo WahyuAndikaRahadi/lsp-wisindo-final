@@ -39,6 +39,11 @@ class JadwalController extends Controller
 
     public function join(Request $request): RedirectResponse
     {
+        if (! auth()->user()->isProfileComplete()) {
+            return redirect()->route('asesi.profile.edit')
+                ->with('error', 'Silakan lengkapi biodata dan tanda tangan profil Anda terlebih dahulu sebelum bergabung dengan jadwal asesmen.');
+        }
+
         $request->validate([
             'code' => 'required|string',
         ]);

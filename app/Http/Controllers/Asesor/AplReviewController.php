@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Asesor;
 use App\Http\Controllers\Concerns\AuthorizesAssessor;
 use App\Http\Controllers\Controller;
 use App\Models\Assessment;
+use App\Models\AssessmentAk07Item;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -66,37 +67,48 @@ class AplReviewController extends Controller
             return back()->with('error', 'Tidak dapat memproses permohonan APL yang belum diajukan oleh asesi (status masih DRAFT).');
         }
 
-        if ($status === 'APPROVED' && $assessment->admin_status !== 'APPROVED') {
-            return back()->with('error', 'Pendaftaran asesi belum disetujui oleh Admin LSP. Asesor baru dapat menyetujui APL setelah Admin menyetujui berkas pendaftaran.');
+        if ($assessment->admin_status === 'REJECTED') {
+            return back()->with('error', 'Pendaftaran asesi telah ditolak oleh Admin LSP.');
         }
 
         $notes = $request->input('notes') ?? $request->input('apl_revision_notes') ?? $request->input('catatan');
 
         DB::transaction(function () use ($assessment, $status, $notes) {
+            $assessorId = $assessment->assessor_id ?? auth()->id();
+            $now = now();
+
             $assessment->update([
                 'apl_status' => $status,
                 'apl_revision_notes' => $notes,
-                'assessor_id' => auth()->id(),
-                'approved_at' => $status === 'APPROVED' ? now() : null,
+                'assessor_id' => $assessorId,
+                'approved_at' => $status === 'APPROVED' ? $now : null,
+                'admin_status' => 'APPROVED',
             ]);
+
+            if ($status === 'APPROVED') {
+                // 1. Auto-generate standard FR.AK.07
+                AssessmentAk07Item::firstOrCreate([
+                    'assessment_id' => $assessment->id,
+                ], [
+                    'adjustment_category' => 'Standar',
+                    'adjustment_detail' => 'Tidak ada penyesuaian khusus yang diperlukan (asesmen standar).',
+                    'assessor_id' => $assessorId,
+                ]);
+
+                // 2. Auto-agree FR.AK.01 with signatures
+                $asesiSig = $assessment->asesi_signature ?? $assessment->asesi?->profile?->signature_data;
+                $assessorSig = $assessment->assessor_signature ?? auth()->user()->profile?->signature_data;
+
+                $assessment->update([
+                    'ak01_agreed_at' => $assessment->ak01_agreed_at ?? $now,
+                    'asesi_signature' => $asesiSig,
+                    'asesi_signed_at' => $assessment->asesi_signed_at ?? $now,
+                    'last_active_step' => 'ruang-uji',
+                ]);
+            }
         });
 
-        if ($status === 'APPROVED') {
-            $schedule = $assessment->schedule;
-            $allApproved = $schedule && $schedule->assessments()->where('apl_status', '!=', 'APPROVED')->count() === 0;
-
-            if ($allApproved) {
-                return redirect()->route('asesor.ak07.create', [
-                    'schedule' => $assessment->schedule_id,
-                    'assessment' => $assessment->id,
-                ])->with('success', 'Semua asesi dalam jadwal ini telah disetujui. Melanjutkan ke Formulir FR.AK07 (Penyesuaian Asesmen).');
-            }
-
-            return redirect()->route('asesor.jadwal.asesi', $assessment->schedule_id)
-                ->with('success', 'APL asesi berhasil disetujui. Selesaikan verifikasi asesi lainnya sebelum melanjutkan ke FR.AK07.');
-        }
-
         return redirect()->route('asesor.jadwal.asesi', $assessment->schedule_id)
-            ->with('success', 'Keputusan review APL berhasil disimpan.');
+            ->with('success', $status === 'APPROVED' ? 'APL asesi berhasil disetujui. Asesi telah siap memasuki Ruang Uji.' : 'Keputusan review APL berhasil disimpan.');
     }
 }

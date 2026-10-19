@@ -66,9 +66,7 @@ class AuthController extends Controller
             'status' => 'ACTIVE',
         ]);
 
-        Auth::login($user);
-
-        return redirect()->route('asesi.profile.edit')->with('success', 'Registrasi berhasil! Silakan lengkapi data diri Anda.');
+        return redirect()->route('login')->with('success', 'Registrasi berhasil! Silakan masuk menggunakan akun baru Anda.');
     }
 
     public function logout(Request $request)

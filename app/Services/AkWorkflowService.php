@@ -23,7 +23,7 @@ class AkWorkflowService
         $units = $assessment->schedule->scheme->competencyUnits;
 
         // Idempotency rule: Do NOT overwrite valid manual assessor overrides
-        if (! empty($assessment->assessor_signed_at) && ! empty($assessment->final_result)) {
+        if (! empty($assessment->assessor_signed_at) && in_array($assessment->final_result, ['KOMPETEN', 'BELUM_KOMPETEN', 'K', 'BK'], true)) {
             return [
                 'final_result' => $assessment->final_result,
                 'total_units' => $units->count(),

@@ -12,12 +12,33 @@
     </div>
 
     {{-- Join Schedule Form Box --}}
+    @php
+        $profileComplete = auth()->user()->isProfileComplete();
+    @endphp
+
     <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
         <div class="max-w-2xl">
             <h2 class="text-base font-bold text-slate-900">Gabung Jadwal Asesmen Baru</h2>
             <p class="text-xs text-slate-500 mt-0.5 mb-4">
                 Masukkan kode verifikasi jadwal (contoh: <code class="px-1.5 py-0.5 bg-slate-100 rounded text-brand-700 font-semibold font-mono">LSP-xxxx</code>) yang diberikan oleh penyelenggara atau sekolah Anda.
             </p>
+
+            @if(! $profileComplete)
+                <div class="p-4 rounded-xl border border-amber-200 bg-amber-50 text-amber-900 mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div class="flex items-start space-x-3">
+                        <svg class="w-5 h-5 text-amber-600 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
+                        <div>
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-amber-800">Biodata & Tanda Tangan Belum Lengkap</h3>
+                            <p class="text-xs text-amber-700 mt-0.5">Form pendaftaran jadwal dikunci sampai Anda melengkapi seluruh data profil dan tanda tangan digital Anda.</p>
+                        </div>
+                    </div>
+                    <a href="{{ route('asesi.profile.edit') }}" class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-lg transition shrink-0 text-center">
+                        Lengkapi Profil & TTD &rarr;
+                    </a>
+                </div>
+            @endif
 
             <form action="{{ route('asesi.jadwal.join') }}" method="POST" class="flex flex-col sm:flex-row gap-3">
                 @csrf
@@ -26,15 +47,16 @@
                         type="text" 
                         name="code" 
                         required 
+                        @disabled(! $profileComplete)
                         placeholder="Masukkan Kode Jadwal (Misal: LSP-K9P2)" 
                         value="{{ old('code') }}"
-                        class="w-full px-4 py-2.5 rounded-lg border border-slate-300 font-mono uppercase tracking-wider text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none placeholder-normal"
+                        class="w-full px-4 py-2.5 rounded-lg border border-slate-300 font-mono uppercase tracking-wider text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none placeholder-normal @if(! $profileComplete) bg-slate-100 cursor-not-allowed opacity-60 @endif"
                     >
                     @error('code')
                         <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
                     @enderror
                 </div>
-                <button type="submit" class="px-6 py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm rounded-lg shadow-sm transition shrink-0 flex items-center justify-center space-x-2">
+                <button type="submit" @disabled(! $profileComplete) class="px-6 py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm rounded-lg shadow-sm transition shrink-0 flex items-center justify-center space-x-2 @if(! $profileComplete) opacity-50 cursor-not-allowed pointer-events-none @endif">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                     </svg>
@@ -83,12 +105,7 @@
                         $actionUrl = route('asesi.assessment.apl', $item->id);
 
                         if ($aplStatus === 'APPROVED') {
-                            $actionUrl = match($item->last_active_step) {
-                                'ak01' => route('asesi.assessment.ak01', $item->id),
-                                'ruang-uji' => route('asesi.assessment.ruang-uji', $item->id),
-                                'ia05' => route('asesi.assessment.instrument.ia05', $item->id),
-                                default => route('asesi.assessment.ruang-uji', $item->id),
-                            };
+                            $actionUrl = route('asesi.assessment.ruang-uji', $item->id);
                         }
                     @endphp
 

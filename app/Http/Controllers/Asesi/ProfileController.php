@@ -37,6 +37,13 @@ class ProfileController extends Controller
             'signature_data' => ['nullable', 'string', new ValidSignature],
         ]);
 
+        if ($request->filled('full_name') || $request->filled('phone')) {
+            auth()->user()->update(array_filter([
+                'full_name' => $request->input('full_name'),
+                'phone' => $request->input('phone'),
+            ]));
+        }
+
         UserProfile::updateOrCreate(
             ['user_id' => auth()->id()],
             $validated

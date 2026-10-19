@@ -86,4 +86,18 @@ class UserProfile extends Model
     {
         return $this->user?->assessor_registration_number;
     }
+
+    public function isComplete(): bool
+    {
+        return ! empty($this->nik)
+            && ! empty($this->tempat_lahir)
+            && ! empty($this->tanggal_lahir)
+            && ! empty($this->jenis_kelamin)
+            && ! empty($this->kebangsaan)
+            && ! empty($this->alamat_rumah)
+            && ! empty($this->pendidikan_terakhir)
+            && ! empty($this->jabatan)
+            && ! empty($this->signature_data)
+            && ! empty($this->user?->phone);
+    }
 }

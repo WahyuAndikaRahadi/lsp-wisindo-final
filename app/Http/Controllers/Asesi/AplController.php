@@ -19,6 +19,7 @@ class AplController extends Controller
 
         $assessment->load([
             'schedule.scheme.competencyUnits.elements.kuks',
+            'schedule.assessors',
             'proofs',
             'apl02Items',
         ]);
@@ -39,6 +40,19 @@ class AplController extends Controller
         if ($assessment->apl_status === 'APPROVED') {
             return redirect()->route('asesi.assessment.ruang-uji', $assessment)
                 ->with('info', 'Permohonan APL Anda sudah disetujui oleh Asesor.');
+        }
+
+        $scheduleAssessors = $assessment->schedule->assessors ?? collect();
+        if ($scheduleAssessors->isNotEmpty() && empty($assessment->assessor_id)) {
+            $request->validate([
+                'assessor_id' => ['required', 'exists:users,id'],
+            ], [
+                'assessor_id.required' => 'Pilih salah satu asesor penguji yang ditugaskan pada jadwal ini.',
+            ]);
+        } elseif ($request->filled('assessor_id')) {
+            $request->validate([
+                'assessor_id' => ['exists:users,id'],
+            ]);
         }
 
         $request->validate([
@@ -127,10 +141,16 @@ class AplController extends Controller
                 }
             }
 
-            $assessment->update([
+            $updateData = [
                 'apl_status' => 'SUBMITTED',
                 'last_active_step' => 'apl',
-            ]);
+            ];
+
+            if ($request->filled('assessor_id')) {
+                $updateData['assessor_id'] = $request->assessor_id;
+            }
+
+            $assessment->update($updateData);
         });
 
         return redirect()->route('asesi.assessment.apl', $assessment)->with('success', 'Menunggu verifikasi asesor');

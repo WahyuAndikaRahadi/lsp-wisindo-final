@@ -81,9 +81,21 @@ class IdempotencyAndStatusGuardTest extends TestCase
         $asesi = User::create([
             'full_name' => 'Calon Asesi Baru',
             'email' => 'asesibaru.'.uniqid().'@test.com',
+            'phone' => '081234567890',
             'password' => bcrypt('password'),
             'role' => 'ASESI',
             'status' => 'ACTIVE',
+        ]);
+        $asesi->profile()->create([
+            'nik' => '3216010000000099',
+            'tempat_lahir' => 'Bekasi',
+            'tanggal_lahir' => '2000-01-01',
+            'jenis_kelamin' => 'L',
+            'kebangsaan' => 'Indonesia',
+            'alamat_rumah' => 'Jl. Cikarang No. 1',
+            'pendidikan_terakhir' => 'SMA/Sederajat',
+            'jabatan' => 'Pelajar / Siswa SMK',
+            'signature_data' => 'data:image/png;base64,sample',
         ]);
         $schedule = $f['schedule'];
         $schedule->update(['status' => 'FINISHED']);
@@ -97,7 +109,7 @@ class IdempotencyAndStatusGuardTest extends TestCase
         $this->assertEquals(0, Assessment::where('schedule_id', $schedule->id)->where('asesi_id', $asesi->id)->count());
     }
 
-    public function test_asesor_cannot_approve_apl_if_admin_has_not_approved(): void
+    public function test_asesor_can_approve_apl_directly_without_admin_approval_gate(): void
     {
         $f = $this->getFixture();
         $asesor = $f['asesor'];
@@ -112,10 +124,11 @@ class IdempotencyAndStatusGuardTest extends TestCase
             'notes' => 'Catatan verifikasi',
         ]);
 
-        $res->assertRedirect();
-        $res->assertSessionHas('error');
+        $res->assertRedirect(route('asesor.jadwal.asesi', $assessment->schedule_id));
+        $res->assertSessionHas('success');
         $assessment->refresh();
-        $this->assertEquals('SUBMITTED', $assessment->apl_status);
+        $this->assertEquals('APPROVED', $assessment->apl_status);
+        $this->assertNotNull($assessment->ak01_agreed_at);
     }
 
     public function test_asesi_cannot_resubmit_ia05_cbt_once_submitted(): void

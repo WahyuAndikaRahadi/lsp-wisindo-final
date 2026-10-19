@@ -71,7 +71,7 @@ class MvpEndToEndWorkflowTest extends TestCase
             'password' => 'Password123!',
             'password_confirmation' => 'Password123!',
         ]);
-        $registerRes->assertRedirect(route('asesi.profile.edit'));
+        $registerRes->assertRedirect(route('login'));
         $asesi = User::where('email', $asesiEmail)->first();
         $this->assertNotNull($asesi);
 
@@ -83,6 +83,8 @@ class MvpEndToEndWorkflowTest extends TestCase
             'jenis_kelamin' => 'L',
             'kebangsaan' => 'Indonesia',
             'alamat_rumah' => 'Jl. Merdeka No. 45, Cikarang',
+            'pendidikan_terakhir' => 'SMA/Sederajat',
+            'jabatan' => 'Pelajar / Siswa SMK',
             'signature_data' => $validPng,
         ]);
         $profileRes->assertRedirect(route('asesi.profile.edit'));
@@ -104,6 +106,7 @@ class MvpEndToEndWorkflowTest extends TestCase
         }
 
         $aplSubmit = $this->actingAs($asesi)->post(route('asesi.assessment.apl.store', $assessment), [
+            'assessor_id' => $asesor->id,
             'proofs' => [
                 'KTP' => UploadedFile::fake()->create('ktp_asli.pdf', 300, 'application/pdf'),
                 'PAS_FOTO' => UploadedFile::fake()->create('pas_foto_formal.jpg', 200, 'image/jpeg'),

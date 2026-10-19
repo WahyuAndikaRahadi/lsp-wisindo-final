@@ -102,7 +102,7 @@
                     </label>
                     <select name="pendidikan_terakhir" required class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
                         <option value="">-- Pilih Pendidikan --</option>
-                        @foreach(['SMK', 'SMA', 'D3', 'D4', 'S1', 'Lainnya'] as $opt)
+                        @foreach(['SD', 'SMP', 'SMA/Sederajat', 'D1', 'D2', 'D3', 'D4', 'S1', 'S2', 'S3'] as $opt)
                             <option value="{{ $opt }}" {{ old('pendidikan_terakhir', $p->pendidikan_terakhir) === $opt ? 'selected' : '' }}>{{ $opt }}</option>
                         @endforeach
                     </select>
@@ -173,11 +173,29 @@
 
                 <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                        Jabatan / Posisi / Status
+                        Jabatan / Posisi / Status <span class="text-rose-500">*</span>
                     </label>
-                    <input type="text" name="jabatan" value="{{ old('jabatan', $p->jabatan) }}"
-                        placeholder="Contoh: Siswa / Teknisi Junior / Mekanik"
-                        class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                    @php
+                        $jobOptions = [
+                            'Pelajar / Siswa SMK',
+                            'Mahasiswa',
+                            'Karyawan Swasta / Teknisi / Mekanik',
+                            'Pegawai Negeri / BUMN',
+                            'Wirausaha / Pemilik Usaha',
+                            'Belum Bekerja / Fresh Graduate',
+                            'Lainnya',
+                        ];
+                    @endphp
+                    <select name="jabatan" required class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                        <option value="">-- Pilih Jabatan / Posisi / Status --</option>
+                        @foreach($jobOptions as $opt)
+                            <option value="{{ $opt }}" {{ old('jabatan', $p->jabatan) === $opt ? 'selected' : '' }}>{{ $opt }}</option>
+                        @endforeach
+                        @if($p->jabatan && !in_array($p->jabatan, $jobOptions))
+                            <option value="{{ $p->jabatan }}" selected>{{ $p->jabatan }}</option>
+                        @endif
+                    </select>
+                    @error('jabatan') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
                 </div>
 
                 <div class="md:col-span-2">

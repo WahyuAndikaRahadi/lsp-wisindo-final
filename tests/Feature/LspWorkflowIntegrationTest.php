@@ -142,6 +142,7 @@ class LspWorkflowIntegrationTest extends TestCase
         }
 
         $aplSubmit = $this->actingAs($asesi)->post(route('asesi.assessment.apl.store', $assessment), [
+            'assessor_id' => $asesor->id,
             'proofs' => [
                 'IJAZAH_SMK' => UploadedFile::fake()->create('ijazah.pdf', 500, 'application/pdf'),
                 'KTP' => UploadedFile::fake()->create('ktp.jpg', 300, 'image/jpeg'),
@@ -156,47 +157,19 @@ class LspWorkflowIntegrationTest extends TestCase
         $assessment->refresh();
         $this->assertEquals('SUBMITTED', $assessment->apl_status);
 
-        // 4. Admin candidate approval gate
-        // Asesor cannot approve if admin has not approved candidate registration
-        $earlyAsesorReview = $this->actingAs($asesor)->post(route('asesor.apl.decide', $assessment), [
-            'decision' => 'APPROVED',
-        ]);
-        $earlyAsesorReview->assertSessionHas('error');
-
-        // Admin approves candidate registration
-        $adminApprove = $this->actingAs($admin)->post(route('admin.assessment.review-registration', $assessment), [
-            'admin_status' => 'APPROVED',
-            'admin_notes' => 'Berkas pendaftaran memenuhi persyaratan.',
-        ]);
-        $adminApprove->assertSessionHas('success');
-
-        // Asesor reviews APL and APPROVES (redirects to Batch FR.AK07)
+        // 4. Asesor reviews APL directly and APPROVES (redirects to asesi list with auto-generated AK07 & AK01)
         $reviewResponse = $this->actingAs($asesor)->post(route('asesor.apl.decide', $assessment), [
             'decision' => 'APPROVED',
         ]);
-        $reviewResponse->assertRedirect(route('asesor.ak07.create', ['schedule' => $schedule->id, 'assessment' => $assessment->id]));
+        $reviewResponse->assertRedirect(route('asesor.jadwal.asesi', $schedule->id));
 
         $assessment->refresh();
         $this->assertEquals('APPROVED', $assessment->apl_status);
+        $this->assertNotNull($assessment->ak01_agreed_at);
 
-        // 4b. Asesi cannot enter AK01 before Asesor submits FR.AK07
-        $blockedAk01 = $this->actingAs($asesi)->get(route('asesi.assessment.ak01', $assessment));
-        $blockedAk01->assertRedirect(route('asesi.dashboard'));
-
-        // Asesor records FR.AK07 (Batch Penyesuaian yang Wajar)
-        $ak07Store = $this->actingAs($asesor)->post(route('asesor.ak07.store', $schedule), [
-            'assessment_ids' => [$assessment->id],
-            'items' => [],
-        ]);
-        $ak07Store->assertRedirect(route('asesor.schedule.ak01', $schedule->id));
-
-        // 5. Asesi can now enter AK01 (Gate is unlocked)
-        $ak01Response = $this->actingAs($asesi)->get(route('asesi.assessment.ak01', $assessment));
-        $ak01Response->assertStatus(200);
-
-        // 6. Asesi signs AK01
-        $signAk01 = $this->actingAs($asesi)->post(route('asesi.assessment.ak01.sign', $assessment));
-        $signAk01->assertRedirect(route('asesi.assessment.ruang-uji', $assessment));
+        // 5. Asesi can now directly enter Ruang Uji
+        $ruangUjiResponse = $this->actingAs($asesi)->get(route('asesi.assessment.ruang-uji', $assessment));
+        $ruangUjiResponse->assertStatus(200);
 
         // 7. Asesi does CBT exam (FR.IA.05)
         $questions = QuestionBank::where('scheme_id', $scheme->id)->get();
@@ -374,24 +347,14 @@ class LspWorkflowIntegrationTest extends TestCase
         $res->assertSee('ASESMEN MANDIRI');
         $res->assertSee('Formulir Keputusan Review APL');
 
-        // Test assessor trying to approve APL before admin approval (should fail)
-        $failPostRes = $this->actingAs($asesor)->post(route('asesor.review-apl.update', $assessment), [
-            'apl_status' => 'APPROVED',
-            'notes' => 'Mencoba menyetujui tanpa approval admin.',
-        ]);
-        $failPostRes->assertSessionHas('error');
-        $this->assertEquals('SUBMITTED', $assessment->fresh()->apl_status);
-
-        // Admin approves registration first
-        $assessment->update(['admin_status' => 'APPROVED']);
-
-        // Now assessor approving APL succeeds
+        // Assessor approves APL directly without waiting for admin approval
         $postRes = $this->actingAs($asesor)->post(route('asesor.review-apl.update', $assessment), [
             'apl_status' => 'APPROVED',
             'notes' => 'Berkas dan asesmen mandiri lengkap memenuhi syarat.',
         ]);
-        $postRes->assertRedirect(route('asesor.ak07.create', ['schedule' => $schedule->id, 'assessment' => $assessment->id]));
+        $postRes->assertRedirect(route('asesor.jadwal.asesi', $schedule->id));
         $this->assertEquals('APPROVED', $assessment->fresh()->apl_status);
+        $this->assertNotNull($assessment->fresh()->ak01_agreed_at);
     }
 
     public function test_assessor_can_view_and_submit_ak07(): void
