@@ -1,0 +1,1095 @@
+[
+  {
+    "page": 1,
+    "tables": [
+      {
+        "bbox": [
+          61.7,
+          36.2,
+          546.3,
+          99.6
+        ],
+        "rows": [
+          {
+            "bbox": [
+              61.7,
+              36.2,
+              546.3,
+              99.6
+            ],
+            "cells": [
+              "",
+              "Lembaga Sertifikasi Profesi Praktisi Otomotif LSP-PrO Indo"
+            ]
+          }
+        ]
+      },
+      {
+        "bbox": [
+          61.7,
+          139.2,
+          556.9,
+          244.9
+        ],
+        "rows": [
+          {
+            "bbox": [
+              61.7,
+              139.2,
+              556.9,
+              174.6
+            ],
+            "cells": [
+              "Skema Sertifikasi\n(KKNI/Okupasi/Klaster)",
+              "Judul",
+              ":",
+              "Maintenance Gasoline Engine Injection System"
+            ]
+          },
+          {
+            "bbox": [
+              193.7,
+              157.1,
+              556.9,
+              174.6
+            ],
+            "cells": [
+              "",
+              "Nomor",
+              ":",
+              "02/LSP PrO Indo/I/2026"
+            ]
+          },
+          {
+            "bbox": [
+              61.7,
+              174.6,
+              556.9,
+              191.9
+            ],
+            "cells": [
+              "TUK",
+              "",
+              ":",
+              "Sewaktu/Tempat Kerja/Mandiri*"
+            ]
+          },
+          {
+            "bbox": [
+              61.7,
+              191.9,
+              556.9,
+              209.4
+            ],
+            "cells": [
+              "Nama Asesor",
+              "",
+              ":",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              61.7,
+              209.4,
+              556.9,
+              226.8
+            ],
+            "cells": [
+              "Nama Asesi",
+              "",
+              ":",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              61.7,
+              226.8,
+              556.9,
+              244.9
+            ],
+            "cells": [
+              "Tanggal",
+              "",
+              ":",
+              ""
+            ]
+          }
+        ]
+      },
+      {
+        "bbox": [
+          61.7,
+          271.5,
+          556.9,
+          486.9
+        ],
+        "rows": [
+          {
+            "bbox": [
+              61.7,
+              271.5,
+              556.9,
+              298.7
+            ],
+            "cells": [
+              "PANDUAN BAGI ASESOR"
+            ]
+          },
+          {
+            "bbox": [
+              61.7,
+              298.7,
+              556.9,
+              486.9
+            ],
+            "cells": [
+              "• Formulir ini dapat digunakan (sebelum pra asesmen, saat pelaksanaan pra asesmen, setelah pra\nasesmen)* jika ada asesi yang mempunyai keterbatasan sesuai karakteristik yang dimilikinya sehinga\ndiperlukan penyesuaian yang wajar dan beralasan atau jika rencana asesmen dan perangkat asesmen\ntidak sesuai dengan acuan pembanding, potensi asesi dan konteks asesi atau ika asesi merasa\nkeletihan, sakit, serta jika kondisi alam, listrik padam,……..\n• Coretlah pada tanda * yang tidak sesuai.\n• Berilah tanda √ pada kotak ‘☐ ‘ pada kolom potensi asesi\n• Jika jawaban Ya pada tanda ** berilah tanda √ di kotak ‘☐‘ kolom Ya dan selanjutanya pada kolom\nketerangan berilah tanda √ di kotak ‘☐‘ yang tersedia, pilihan boleh lebih dari satu.\n• atau jika jawaban Tidak pada tanda ** berilah tanda √ di kotak ‘☐ ‘ kolom tidak, dan tidak perlu\nmemberi tanda tanda √ di kotak ‘☐ ‘ kolom keterangan."
+            ]
+          }
+        ]
+      },
+      {
+        "bbox": [
+          61.7,
+          500.9,
+          556.9,
+          645.5
+        ],
+        "rows": [
+          {
+            "bbox": [
+              61.7,
+              500.9,
+              556.9,
+              645.5
+            ],
+            "cells": [
+              "Potensi Asesi",
+              "☐",
+              "Hasil pelatihan dan / atau pendidikan, dimana Kurikulum dan\nfasilitaspraktek mampu telusur terhadap standar kompetensi"
+            ]
+          },
+          {
+            "bbox": [
+              211.5,
+              528.3,
+              556.9,
+              555.7
+            ],
+            "cells": [
+              "",
+              "☐",
+              "Hasil pelatihan dan / atau pendidikan, dimana kurikulum belum\nberbasiskompetensi."
+            ]
+          },
+          {
+            "bbox": [
+              211.5,
+              555.7,
+              556.9,
+              596.5
+            ],
+            "cells": [
+              "",
+              "☐",
+              "Pekerja berpengalaman, dimana berasal dari industri/tempat kerja\nyangdalam operasionalnya mampu telusur dengan standar\nkompetensi"
+            ]
+          },
+          {
+            "bbox": [
+              211.5,
+              596.5,
+              556.9,
+              623.7
+            ],
+            "cells": [
+              "",
+              "☐",
+              "Pekerja berpengalaman, dimana berasal dari industri/tempat kerja\nyangdalam operasionalnya belum berbasis kompetensi."
+            ]
+          },
+          {
+            "bbox": [
+              211.5,
+              623.7,
+              556.9,
+              645.5
+            ],
+            "cells": [
+              "",
+              "☐",
+              "Pelatihan / belajar mandiri atau otodidak."
+            ]
+          }
+        ]
+      },
+      {
+        "bbox": [
+          61.7,
+          659.5,
+          556.9,
+          772.1
+        ],
+        "rows": [
+          {
+            "bbox": [
+              61.7,
+              659.5,
+              556.9,
+              703.9
+            ],
+            "cells": [
+              "No",
+              "Mengidentifikasi Persyaratan\nModifikasi dan Kontekstualisa\nsi (karaktersitik asesi):",
+              "Diperlukan\npenyesuaian)**",
+              "",
+              "Keterangan",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              261.0,
+              686.9,
+              353.5,
+              703.9
+            ],
+            "cells": [
+              "",
+              "",
+              "Ya",
+              "Tidak",
+              "",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              61.7,
+              703.9,
+              556.9,
+              772.1
+            ],
+            "cells": [
+              "",
+              "Keterbatasan asesi terhadap\npersyaratan bahasa, literasi,\nnumerasi.",
+              "",
+              "",
+              "☐",
+              "Memerlukan dukungan pembaca,\n☐ penerjemah, pelayan, penulis. untuk\nmerekam jawaban asesi."
+            ]
+          },
+          {
+            "bbox": [
+              353.5,
+              744.7,
+              556.9,
+              772.1
+            ],
+            "cells": [
+              "",
+              "",
+              "",
+              "",
+              "☐",
+              "Melakukan asesmen verbal (gunakan\n☐\npertanyaan lisan/pertanyaan"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "page": 2,
+    "tables": [
+      {
+        "bbox": [
+          62.5,
+          36.2,
+          546.3,
+          99.6
+        ],
+        "rows": [
+          {
+            "bbox": [
+              62.5,
+              36.2,
+              546.3,
+              99.6
+            ],
+            "cells": [
+              "",
+              "Lembaga Sertifikasi Profesi Praktisi Otomotif LSP-PrO Indo"
+            ]
+          }
+        ]
+      },
+      {
+        "bbox": [
+          62.5,
+          112.9,
+          557.8,
+          760.5
+        ],
+        "rows": [
+          {
+            "bbox": [
+              62.5,
+              112.9,
+              557.8,
+              238.6
+            ],
+            "cells": [
+              "",
+              "",
+              "",
+              "",
+              "",
+              "wawancara) dengan dilengkapi gambar\ndiagram dan bentuk-benbentuk visual."
+            ]
+          },
+          {
+            "bbox": [
+              353.5,
+              140.3,
+              557.8,
+              162.1
+            ],
+            "cells": [
+              "",
+              "",
+              "",
+              "",
+              "☐",
+              "☐ Menggunakan Hasil produksi"
+            ]
+          },
+          {
+            "bbox": [
+              353.5,
+              162.1,
+              557.8,
+              189.4
+            ],
+            "cells": [
+              "",
+              "",
+              "",
+              "",
+              "☐",
+              "Mengunakan Ceklis\n☐\nobservasi/demonstrasi."
+            ]
+          },
+          {
+            "bbox": [
+              353.5,
+              189.4,
+              557.8,
+              216.7
+            ],
+            "cells": [
+              "",
+              "",
+              "",
+              "",
+              "☐",
+              "Menggunakan daftar instruksi\n☐\nterstruktur."
+            ]
+          },
+          {
+            "bbox": [
+              353.5,
+              216.7,
+              557.8,
+              238.6
+            ],
+            "cells": [
+              "",
+              "",
+              "",
+              "",
+              "☐",
+              "☐ …………………………………."
+            ]
+          },
+          {
+            "bbox": [
+              62.5,
+              238.6,
+              557.8,
+              355.2
+            ],
+            "cells": [
+              "",
+              "Penyediaan dukungan pemba\nca,penerjemah, pelayan,\npenulis.",
+              "",
+              "",
+              "☐",
+              "Menggunakan pertanyaan lisan\n☐ dengan dilengkapi gambar diagram\ndan bentuk-bentuk visual."
+            ]
+          },
+          {
+            "bbox": [
+              353.5,
+              279.3,
+              557.8,
+              333.5
+            ],
+            "cells": [
+              "",
+              "",
+              "",
+              "",
+              "☐",
+              "Menggunakan pertanyaan\nwawancara dengan dilengkapi\n☐\ngambar diagram dan bentuk-bentuk\nvisual."
+            ]
+          },
+          {
+            "bbox": [
+              353.5,
+              333.5,
+              557.8,
+              355.2
+            ],
+            "cells": [
+              "",
+              "",
+              "",
+              "",
+              "☐",
+              "☐ …………………………………….."
+            ]
+          },
+          {
+            "bbox": [
+              62.5,
+              355.2,
+              557.8,
+              540.4
+            ],
+            "cells": [
+              "3",
+              "Penggunaan teknologi adaptif\natau peralatan khusus. (Tidak\ndapat menggunakan teknologi\nadaptif (misal: mengoperasikan\nkomputer dan printer, peralatan\ndigital dsb).",
+              "",
+              "",
+              "☐",
+              "Ceklis observasi/demonstrasi\n☐\nDemonstrasi."
+            ]
+          },
+          {
+            "bbox": [
+              353.5,
+              382.5,
+              557.8,
+              404.3
+            ],
+            "cells": [
+              "",
+              "",
+              "",
+              "",
+              "☐",
+              "☐ Pertanyaan lisan"
+            ]
+          },
+          {
+            "bbox": [
+              353.5,
+              404.3,
+              557.8,
+              426.1
+            ],
+            "cells": [
+              "",
+              "",
+              "",
+              "",
+              "☐",
+              "☐ Pertanyaan tertulis."
+            ]
+          },
+          {
+            "bbox": [
+              353.5,
+              426.1,
+              557.8,
+              447.8
+            ],
+            "cells": [
+              "",
+              "",
+              "",
+              "",
+              "☐",
+              "☐ Pertanyaan wawancara."
+            ]
+          },
+          {
+            "bbox": [
+              353.5,
+              447.8,
+              557.8,
+              469.6
+            ],
+            "cells": [
+              "",
+              "",
+              "",
+              "",
+              "☐",
+              "☐ Daftar instruksi terstruktur."
+            ]
+          },
+          {
+            "bbox": [
+              353.5,
+              469.6,
+              557.8,
+              491.5
+            ],
+            "cells": [
+              "",
+              "",
+              "",
+              "",
+              "☐",
+              "☐ Ceklis verifikasi portofolio."
+            ]
+          },
+          {
+            "bbox": [
+              353.5,
+              491.5,
+              557.8,
+              518.7
+            ],
+            "cells": [
+              "",
+              "",
+              "",
+              "",
+              "☐",
+              "Menggunakan dukungan operator\n☐\nkomputer."
+            ]
+          },
+          {
+            "bbox": [
+              353.5,
+              518.7,
+              557.8,
+              540.4
+            ],
+            "cells": [
+              "",
+              "",
+              "",
+              "",
+              "☐",
+              "☐ ……………………………………….."
+            ]
+          },
+          {
+            "bbox": [
+              62.5,
+              540.4,
+              557.8,
+              760.5
+            ],
+            "cells": [
+              "",
+              "Pelaksanaan asesmen secara\nfleksibel karena alasan\nkeletihan atau keperluan\npengobatan.",
+              "",
+              "",
+              "☐",
+              "☐ Menggunakan juru tulis."
+            ]
+          },
+          {
+            "bbox": [
+              353.5,
+              562.3,
+              557.8,
+              589.6
+            ],
+            "cells": [
+              "",
+              "",
+              "",
+              "",
+              "☐",
+              "Menggunakan kamaramen perekam\n☐\nvidio/ataudio."
+            ]
+          },
+          {
+            "bbox": [
+              353.5,
+              589.6,
+              557.8,
+              643.9
+            ],
+            "cells": [
+              "",
+              "",
+              "",
+              "",
+              "☐",
+              "Memperbolehkan periode waktu yang\nlebih panjang untuk menyelesaikan\n☐\ntugas pekrejaan dalam asesmen."
+            ]
+          },
+          {
+            "bbox": [
+              353.5,
+              643.9,
+              557.8,
+              684.6
+            ],
+            "cells": [
+              "",
+              "",
+              "",
+              "",
+              "☐",
+              "Melakukan tugas pekerjaan dalam\n☐ asesmen dengan waktu lebih pendek."
+            ]
+          },
+          {
+            "bbox": [
+              353.5,
+              684.6,
+              557.8,
+              738.8
+            ],
+            "cells": [
+              "",
+              "",
+              "",
+              "",
+              "☐",
+              "Menggunakan instruksi-instruksi\nspesifik pada proyek yang dapat\n☐\ndilakukan pada berbagai tingkatan."
+            ]
+          },
+          {
+            "bbox": [
+              353.5,
+              738.8,
+              557.8,
+              760.5
+            ],
+            "cells": [
+              "",
+              "",
+              "",
+              "",
+              "☐",
+              "☐ ………………………………………….."
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "page": 3,
+    "tables": [
+      {
+        "bbox": [
+          62.5,
+          36.2,
+          546.3,
+          99.6
+        ],
+        "rows": [
+          {
+            "bbox": [
+              62.5,
+              36.2,
+              546.3,
+              99.6
+            ],
+            "cells": [
+              "",
+              "Lembaga Sertifikasi Profesi Praktisi Otomotif LSP-PrO Indo"
+            ]
+          }
+        ]
+      },
+      {
+        "bbox": [
+          62.5,
+          112.9,
+          557.8,
+          665.3
+        ],
+        "rows": [
+          {
+            "bbox": [
+              62.5,
+              112.9,
+              557.8,
+              183.7
+            ],
+            "cells": [
+              "",
+              "Penyediaan peralatan\nasesmen berupa braille,\naudio/video-tape.",
+              "",
+              "",
+              "☐",
+              "☐ Menggunakan pertanyaan lisan."
+            ]
+          },
+          {
+            "bbox": [
+              353.5,
+              134.7,
+              557.8,
+              162.1
+            ],
+            "cells": [
+              "",
+              "",
+              "",
+              "",
+              "☐",
+              "Menggunakan pertanyaan\n☐\nwawancara."
+            ]
+          },
+          {
+            "bbox": [
+              353.5,
+              162.1,
+              557.8,
+              183.7
+            ],
+            "cells": [
+              "",
+              "",
+              "",
+              "",
+              "☐",
+              "☐ …………………………………….."
+            ]
+          },
+          {
+            "bbox": [
+              62.5,
+              183.7,
+              557.8,
+              336.2
+            ],
+            "cells": [
+              "",
+              "Penyesuaian tempat\nfisik/lingkungan asesmen",
+              "",
+              "",
+              "☐",
+              "☐ Pertanyaan lisan."
+            ]
+          },
+          {
+            "bbox": [
+              353.5,
+              205.6,
+              557.8,
+              227.4
+            ],
+            "cells": [
+              "",
+              "",
+              "",
+              "",
+              "☐",
+              "☐ Pertanyaan tulis."
+            ]
+          },
+          {
+            "bbox": [
+              353.5,
+              227.4,
+              557.8,
+              249.1
+            ],
+            "cells": [
+              "",
+              "",
+              "",
+              "",
+              "☐",
+              "☐ Pertanyaan wawancara."
+            ]
+          },
+          {
+            "bbox": [
+              353.5,
+              249.1,
+              557.8,
+              270.9
+            ],
+            "cells": [
+              "",
+              "",
+              "",
+              "",
+              "☐",
+              "☐ Ceklis Verifikasi portofolio."
+            ]
+          },
+          {
+            "bbox": [
+              353.5,
+              270.9,
+              557.8,
+              292.7
+            ],
+            "cells": [
+              "",
+              "",
+              "",
+              "",
+              "☐",
+              "☐ Ceklis reviu produk."
+            ]
+          },
+          {
+            "bbox": [
+              353.5,
+              292.7,
+              557.8,
+              314.5
+            ],
+            "cells": [
+              "",
+              "",
+              "",
+              "",
+              "☐",
+              "☐ Daftar instruksi terstruktur."
+            ]
+          },
+          {
+            "bbox": [
+              353.5,
+              314.5,
+              557.8,
+              336.2
+            ],
+            "cells": [
+              "",
+              "",
+              "",
+              "",
+              "☐",
+              "☐ …………………………………….."
+            ]
+          },
+          {
+            "bbox": [
+              62.5,
+              336.2,
+              557.8,
+              548.0
+            ],
+            "cells": [
+              "",
+              "Pertimbangan umur/usia\nlanjut/gender asesi.\n(Adanya perbedaan usia dengan\nasesor yang lebih muda).",
+              "",
+              "",
+              "☐",
+              "Menggunakan studi kasus/daftar\n☐\ninstruksi terstrukut"
+            ]
+          },
+          {
+            "bbox": [
+              353.5,
+              363.5,
+              557.8,
+              404.3
+            ],
+            "cells": [
+              "",
+              "",
+              "",
+              "",
+              "☐",
+              "Menggunakan instrumen asesmen\n☐ dengan huruf normal jangan terlalu\nkecil."
+            ]
+          },
+          {
+            "bbox": [
+              353.5,
+              404.3,
+              557.8,
+              431.7
+            ],
+            "cells": [
+              "",
+              "",
+              "",
+              "",
+              "☐",
+              "Menggunakan asesor dengan jenis\n☐\nkelamin yang sama dengan asesi."
+            ]
+          },
+          {
+            "bbox": [
+              353.5,
+              431.7,
+              557.8,
+              526.1
+            ],
+            "cells": [
+              "",
+              "",
+              "",
+              "",
+              "☐",
+              "Menggunakan instrumen asesmen\nyang sama walaupun berbeda jenis\nkelamain (tidak boleh memberi\n☐ tanda tambahan pada instrumen\nasesmen yang digunakan dengan\ntujuan untuk membedakan jenis\nkelamin)."
+            ]
+          },
+          {
+            "bbox": [
+              353.5,
+              526.1,
+              557.8,
+              548.0
+            ],
+            "cells": [
+              "",
+              "",
+              "",
+              "",
+              "☐",
+              "☐ …………………………………….."
+            ]
+          },
+          {
+            "bbox": [
+              62.5,
+              548.0,
+              557.8,
+              665.3
+            ],
+            "cells": [
+              "8",
+              "Pertimbangan\nbudaya/tradisi/agama.",
+              "",
+              "",
+              "☐",
+              "Menggunakan studi kasus daftar\ninstruksi terstrukut"
+            ]
+          },
+          {
+            "bbox": [
+              353.5,
+              575.5,
+              557.8,
+              602.7
+            ],
+            "cells": [
+              "",
+              "",
+              "",
+              "",
+              "☐",
+              "Menggunakan asesor tanpa\npertimbangan budaya/tradisi/agama."
+            ]
+          },
+          {
+            "bbox": [
+              353.5,
+              602.7,
+              557.8,
+              643.5
+            ],
+            "cells": [
+              "",
+              "",
+              "",
+              "",
+              "☐",
+              "Menggunakan instrumen asesmen yang\nsama walaupun berbeda\nbudaya/tradisi/agama)."
+            ]
+          },
+          {
+            "bbox": [
+              353.5,
+              643.5,
+              557.8,
+              665.3
+            ],
+            "cells": [
+              "",
+              "",
+              "",
+              "",
+              "☐",
+              "…………………………………….."
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "page": 4,
+    "tables": [
+      {
+        "bbox": [
+          61.7,
+          36.2,
+          546.3,
+          99.6
+        ],
+        "rows": [
+          {
+            "bbox": [
+              61.7,
+              36.2,
+              546.3,
+              99.6
+            ],
+            "cells": [
+              "",
+              "Lembaga Sertifikasi Profesi Praktisi Otomotif LSP-PrO Indo"
+            ]
+          }
+        ]
+      },
+      {
+        "bbox": [
+          67.2,
+          255.5,
+          556.3,
+          352.7
+        ],
+        "rows": [
+          {
+            "bbox": [
+              67.2,
+              255.5,
+              556.3,
+              304.1
+            ],
+            "cells": [
+              "Nama Asesor :",
+              "Tanggal dan Tanda Tangan Asesor:"
+            ]
+          },
+          {
+            "bbox": [
+              67.2,
+              304.1,
+              556.3,
+              352.7
+            ],
+            "cells": [
+              "Nama Asesi:",
+              "Tanggal dan Tanda Tangan Asesi:"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

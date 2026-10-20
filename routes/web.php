@@ -26,7 +26,7 @@ Route::prefix('print-example')->group(function () {
                 'title' => 'Asesmen Mandiri',
                 'url' => url('/print-example/apl02'),
                 'ref_url' => url('/print-example/apl02?ref=1'),
-                'pages' => 'Multi-halaman Dinamis',
+                'pages' => '6 Halaman',
                 'desc' => 'Asesmen Mandiri 9 Unit Kompetensi, 21 Elemen, 74 KUK & Rekomendasi Asesor (Tanpa Watermark)',
             ],
             [
@@ -62,6 +62,62 @@ Route::prefix('print-example')->group(function () {
                 'desc' => 'Formulir Pengajuan Banding Hasil Asesmen, Alasan & Pernyataan Hak Asesi (Tanpa Watermark)',
             ],
             [
+                'code' => 'FR.AK.07',
+                'title' => 'Penyesuaian Wajar dan Beralasan',
+                'url' => url('/print-example/ak07'),
+                'ref_url' => url('/print-example/ak07?ref=1'),
+                'pages' => '4 Halaman',
+                'desc' => 'Formulir Identifikasi Kebutuhan Khusus Asesi, Potensi Hambatan & Kesepakatan (Tanpa Watermark)',
+            ],
+            [
+                'code' => 'FR.IA.01',
+                'title' => 'Ceklis Observasi Aktivitas Praktik',
+                'url' => url('/print-example/ia01'),
+                'ref_url' => url('/print-example/ia01?ref=1'),
+                'pages' => '9 Halaman',
+                'desc' => 'Ceklis Observasi 3 Kelompok Pekerjaan, 9 Unit Kompetensi & 74 KUK Praktik (Tanpa Watermark)',
+            ],
+            [
+                'code' => 'FR.IA.01.B',
+                'title' => 'Report Sheet Observasi Praktik',
+                'url' => url('/print-example/ia01b'),
+                'ref_url' => url('/print-example/ia01b?ref=1'),
+                'pages' => '3 Halaman',
+                'desc' => 'Lembar Kerja Pengukuran Engine, Baterai, Pengaman & Manajemen Engine EFI (Tanpa Watermark)',
+            ],
+            [
+                'code' => 'FR.IA.03',
+                'title' => 'Pertanyaan Mendukung Observasi (PMO)',
+                'url' => url('/print-example/ia03'),
+                'ref_url' => url('/print-example/ia03?ref=1'),
+                'pages' => '4 Halaman',
+                'desc' => 'Daftar Pertanyaan Lisan & Bukti Tanggapan Asesi K3, Alat Ukur, Engine & EFI (Tanpa Watermark)',
+            ],
+            [
+                'code' => 'FR.IA.05.C',
+                'title' => 'Lembar Jawaban Pilihan Ganda',
+                'url' => url('/print-example/ia05c'),
+                'ref_url' => url('/print-example/ia05c?ref=1'),
+                'pages' => '2 Halaman',
+                'desc' => 'Kisi Lembar Jawaban 40 Butir Pilihan Ganda A/B/C/D & Hasil Penilaian (Tanpa Watermark)',
+            ],
+            [
+                'code' => 'BA & HADIR',
+                'title' => 'Berita Acara & Daftar Hadir Peserta',
+                'url' => url('/print-example/berita-acara'),
+                'ref_url' => url('/print-example/berita-acara?ref=1'),
+                'pages' => '2 Halaman (Portrait + Landscape)',
+                'desc' => 'Berita Acara Hasil Uji BNSP & Presensi Peserta Uji Kompetensi TUK (Tanpa Watermark)',
+            ],
+            [
+                'code' => 'HADIR ASESOR',
+                'title' => 'Daftar Hadir Asesor Kompetensi',
+                'url' => url('/print-example/hadir-asesor'),
+                'ref_url' => url('/print-example/hadir-asesor?ref=1'),
+                'pages' => '1 Halaman',
+                'desc' => 'Presensi Resmi Asesor Kompetensi Bersama Penanggung Jawab TUK (Tanpa Watermark)',
+            ],
+            [
                 'code' => 'PERNYATAAN',
                 'title' => 'Surat Pernyataan Pemegang Sertifikat',
                 'url' => url('/print-example/pernyataan'),
@@ -84,7 +140,7 @@ Route::prefix('print-example')->group(function () {
               .'<div class="max-w-4xl mx-auto space-y-6">'
               .'<div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">'
               .'<span class="text-xs font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded">Rute Sementara (Untuk Verifikasi/Audit)</span>'
-              .'<h1 class="text-2xl font-black text-slate-900 mt-2">Pratinjau Dokumen Cetak MUK (LSP PrO Indo)</h1>'
+              .'<h1 class="text-2xl font-black text-slate-900 mt-2">Pratinjau Dokumen Cetak MUK Dinamis (LSP PrO Indo)</h1>'
               .'<p class="text-xs text-slate-600 mt-1">Bandingkan hasil render dokumen Python ReportLab dengan PDF Master resmi secara langsung.</p>'
               .'</div>'
               .'<div class="grid grid-cols-1 gap-4">';
@@ -115,7 +171,7 @@ Route::prefix('print-example')->group(function () {
 
     Route::get('/apl01', function (Request $request) {
         $path = $request->query('ref')
-            ? base_path('all-document-lsp-ProIndo/MUK SKEMA 2 Klaster Maintenance Gasoline Engine Injection/2. FR.APL.01. Permohonan Sertifikasi Kompetensi.pdf')
+            ? base_path('lsp-document-dynamic/MUK SKEMA 2 Klaster Maintenance Gasoline Engine Injection/2. FR.APL.01. Permohonan Sertifikasi Kompetensi.pdf')
             : base_path('tests/Fixtures/muk/FR_APL_01_generated.pdf');
         abort_unless(file_exists($path), 404, 'File PDF belum ditemukan.');
 
@@ -124,7 +180,7 @@ Route::prefix('print-example')->group(function () {
 
     Route::get('/apl02', function (Request $request) {
         $path = $request->query('ref')
-            ? base_path('all-document-lsp-ProIndo/MUK SKEMA 2 Klaster Maintenance Gasoline Engine Injection/3. FR.APL 02. Asesmen Mandiri.pdf')
+            ? base_path('lsp-document-dynamic/MUK SKEMA 2 Klaster Maintenance Gasoline Engine Injection/3. FR.APL 02. Asesmen Mandiri.pdf')
             : base_path('tests/Fixtures/muk/FR_APL_02_generated.pdf');
         abort_unless(file_exists($path), 404, 'File PDF belum ditemukan.');
 
@@ -133,7 +189,7 @@ Route::prefix('print-example')->group(function () {
 
     Route::get('/ak01', function (Request $request) {
         $path = $request->query('ref')
-            ? base_path('all-document-lsp-ProIndo/MUK SKEMA 2 Klaster Maintenance Gasoline Engine Injection/7. FR.AK.01. Persetujuan Asesmen dan Kerahasian  Rev 19 docx.pdf')
+            ? base_path('lsp-document-dynamic/MUK SKEMA 2 Klaster Maintenance Gasoline Engine Injection/7. FR.AK.01. Persetujuan Asesmen dan Kerahasian  Rev 19 docx.pdf')
             : base_path('tests/Fixtures/muk/FR_AK_01_generated.pdf');
         abort_unless(file_exists($path), 404, 'File PDF belum ditemukan.');
 
@@ -142,7 +198,7 @@ Route::prefix('print-example')->group(function () {
 
     Route::get('/ak02', function (Request $request) {
         $path = $request->query('ref')
-            ? base_path('all-document-lsp-ProIndo/MUK SKEMA 2 Klaster Maintenance Gasoline Engine Injection/13. FR.AK.02. Rekaman Asesmen Kompetensi.pdf')
+            ? base_path('lsp-document-dynamic/MUK SKEMA 2 Klaster Maintenance Gasoline Engine Injection/13. FR.AK.02. Rekaman Asesmen Kompetensi.pdf')
             : base_path('tests/Fixtures/muk/FR_AK_02_generated.pdf');
         abort_unless(file_exists($path), 404, 'File PDF belum ditemukan.');
 
@@ -151,7 +207,7 @@ Route::prefix('print-example')->group(function () {
 
     Route::get('/ak03', function (Request $request) {
         $path = $request->query('ref')
-            ? base_path('all-document-lsp-ProIndo/MUK SKEMA 2 Klaster Maintenance Gasoline Engine Injection/14. FR.AK.03. Umpan Balik dan Catatan Asesmen.pdf')
+            ? base_path('lsp-document-dynamic/MUK SKEMA 2 Klaster Maintenance Gasoline Engine Injection/14. FR.AK.03. Umpan Balik dan Catatan Asesmen.pdf')
             : base_path('tests/Fixtures/muk/FR_AK_03_generated.pdf');
         abort_unless(file_exists($path), 404, 'File PDF belum ditemukan.');
 
@@ -160,8 +216,71 @@ Route::prefix('print-example')->group(function () {
 
     Route::get('/ak04', function (Request $request) {
         $path = $request->query('ref')
-            ? base_path('all-document-lsp-ProIndo/MUK SKEMA 2 Klaster Maintenance Gasoline Engine Injection/6. FR.AK.04. Banding Asesmen.pdf')
+            ? base_path('lsp-document-dynamic/MUK SKEMA 2 Klaster Maintenance Gasoline Engine Injection/6. FR.AK.04. Banding Asesmen.pdf')
             : base_path('tests/Fixtures/muk/FR_AK_04_generated.pdf');
+        abort_unless(file_exists($path), 404, 'File PDF belum ditemukan.');
+
+        return response()->file($path, ['Content-Type' => 'application/pdf', 'Content-Disposition' => 'inline']);
+    });
+
+    Route::get('/ak07', function (Request $request) {
+        $path = $request->query('ref')
+            ? base_path('lsp-document-dynamic/MUK SKEMA 2 Klaster Maintenance Gasoline Engine Injection/5. FR.AK.07-Penyesuan-wajar-alasan.pdf')
+            : base_path('tests/Fixtures/muk/FR_AK_07_generated.pdf');
+        abort_unless(file_exists($path), 404, 'File PDF belum ditemukan.');
+
+        return response()->file($path, ['Content-Type' => 'application/pdf', 'Content-Disposition' => 'inline']);
+    });
+
+    Route::get('/ia01', function (Request $request) {
+        $path = $request->query('ref')
+            ? base_path('lsp-document-dynamic/MUK SKEMA 2 Klaster Maintenance Gasoline Engine Injection/8A. FR.IA.01.Ceklis Observasi Aktivitas Praktik.pdf')
+            : base_path('tests/Fixtures/muk/FR_IA_01_generated.pdf');
+        abort_unless(file_exists($path), 404, 'File PDF belum ditemukan.');
+
+        return response()->file($path, ['Content-Type' => 'application/pdf', 'Content-Disposition' => 'inline']);
+    });
+
+    Route::get('/ia01b', function (Request $request) {
+        $path = $request->query('ref')
+            ? base_path('lsp-document-dynamic/MUK SKEMA 2 Klaster Maintenance Gasoline Engine Injection/9B. FR.IA.01B Report Sheet_.pdf')
+            : base_path('tests/Fixtures/muk/FR_IA_01_B_generated.pdf');
+        abort_unless(file_exists($path), 404, 'File PDF belum ditemukan.');
+
+        return response()->file($path, ['Content-Type' => 'application/pdf', 'Content-Disposition' => 'inline']);
+    });
+
+    Route::get('/ia03', function (Request $request) {
+        $path = $request->query('ref')
+            ? base_path('lsp-document-dynamic/MUK SKEMA 2 Klaster Maintenance Gasoline Engine Injection/10. FR.IA.03. Pertanyaan Mendukung Observasi (PMO) docx.pdf')
+            : base_path('tests/Fixtures/muk/FR_IA_03_generated.pdf');
+        abort_unless(file_exists($path), 404, 'File PDF belum ditemukan.');
+
+        return response()->file($path, ['Content-Type' => 'application/pdf', 'Content-Disposition' => 'inline']);
+    });
+
+    Route::get('/ia05c', function (Request $request) {
+        $path = $request->query('ref')
+            ? base_path('lsp-document-dynamic/MUK SKEMA 2 Klaster Maintenance Gasoline Engine Injection/12. FR.IA.05.C. Lembar Jawaban Pilihan Ganda.pdf')
+            : base_path('tests/Fixtures/muk/FR_IA_05_C_generated.pdf');
+        abort_unless(file_exists($path), 404, 'File PDF belum ditemukan.');
+
+        return response()->file($path, ['Content-Type' => 'application/pdf', 'Content-Disposition' => 'inline']);
+    });
+
+    Route::get('/berita-acara', function (Request $request) {
+        $path = $request->query('ref')
+            ? base_path('lsp-document-dynamic/2.2 & 2.3 Berita  Acara Pelaksanaan Uji Kompetensi dan Daftar Hadir Peserta.docx.pdf')
+            : base_path('tests/Fixtures/muk/Berita_Acara_Peserta_generated.pdf');
+        abort_unless(file_exists($path), 404, 'File PDF belum ditemukan.');
+
+        return response()->file($path, ['Content-Type' => 'application/pdf', 'Content-Disposition' => 'inline']);
+    });
+
+    Route::get('/hadir-asesor', function (Request $request) {
+        $path = $request->query('ref')
+            ? base_path('lsp-document-dynamic/2.4 DAFTAR HADIR ASESOR.docx.pdf')
+            : base_path('tests/Fixtures/muk/Daftar_Hadir_Asesor_generated.pdf');
         abort_unless(file_exists($path), 404, 'File PDF belum ditemukan.');
 
         return response()->file($path, ['Content-Type' => 'application/pdf', 'Content-Disposition' => 'inline']);
@@ -169,8 +288,11 @@ Route::prefix('print-example')->group(function () {
 
     Route::get('/pernyataan', function (Request $request) {
         $path = $request->query('ref')
-            ? base_path('all-document-lsp-ProIndo/MUK SKEMA 2 Klaster Maintenance Gasoline Engine Injection/15 Surat Pernyataan Pemegang Sertifikat.pdf')
+            ? base_path('lsp-document-fixed/15 Surat Pernyataan Pemegang Sertifikat.pdf')
             : base_path('tests/Fixtures/muk/Surat_Pernyataan_generated.pdf');
+        if (! file_exists($path)) {
+            $path = base_path('tests/Fixtures/muk/Surat_Pernyataan_generated.pdf');
+        }
         abort_unless(file_exists($path), 404, 'File PDF belum ditemukan.');
 
         return response()->file($path, ['Content-Type' => 'application/pdf', 'Content-Disposition' => 'inline']);
@@ -178,8 +300,11 @@ Route::prefix('print-example')->group(function () {
 
     Route::get('/daftar-periksa', function (Request $request) {
         $path = $request->query('ref')
-            ? base_path('all-document-lsp-ProIndo/MUK SKEMA 2 Klaster Maintenance Gasoline Engine Injection/1. Daftar Periksa Kelengkapan Dokumen Pelatihan.pdf')
+            ? base_path('lsp-document-fixed/1. Daftar Periksa Kelengkapan Dokumen Pelatihan.pdf')
             : base_path('tests/Fixtures/muk/Daftar_Periksa_generated.pdf');
+        if (! file_exists($path)) {
+            $path = base_path('tests/Fixtures/muk/Daftar_Periksa_generated.pdf');
+        }
         abort_unless(file_exists($path), 404, 'File PDF belum ditemukan.');
 
         return response()->file($path, ['Content-Type' => 'application/pdf', 'Content-Disposition' => 'inline']);

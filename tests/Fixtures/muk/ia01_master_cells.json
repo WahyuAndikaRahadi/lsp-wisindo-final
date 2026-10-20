@@ -1,0 +1,2764 @@
+[
+  {
+    "page": 1,
+    "tables": [
+      {
+        "bbox": [
+          72.6,
+          21.5,
+          556.6,
+          67.0
+        ],
+        "rows": [
+          {
+            "bbox": [
+              72.6,
+              21.5,
+              556.6,
+              67.0
+            ],
+            "cells": [
+              "",
+              "Lembaga Sertifikasi Profesi Praktisi Otomotif LSP-PrO Indo"
+            ]
+          }
+        ]
+      },
+      {
+        "bbox": [
+          72.6,
+          123.8,
+          556.6,
+          229.5
+        ],
+        "rows": [
+          {
+            "bbox": [
+              72.6,
+              123.8,
+              556.6,
+              159.3
+            ],
+            "cells": [
+              "Skema Sertifikasi\n(KKNI/Okupasi/Klaster)",
+              "Judul",
+              ":",
+              "Maintenance Gasoline Engine Injection System"
+            ]
+          },
+          {
+            "bbox": [
+              200.3,
+              141.8,
+              556.6,
+              159.3
+            ],
+            "cells": [
+              "",
+              "Nomor",
+              ":",
+              "02/LSP PrO Indo/I/2026"
+            ]
+          },
+          {
+            "bbox": [
+              72.6,
+              159.3,
+              556.6,
+              176.8
+            ],
+            "cells": [
+              "TUK",
+              "",
+              ":",
+              "Sewaktu/Tempat Kerja/Mandiri*"
+            ]
+          },
+          {
+            "bbox": [
+              72.6,
+              176.8,
+              556.6,
+              194.3
+            ],
+            "cells": [
+              "Nama Asesor",
+              "",
+              ":",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              72.6,
+              194.3,
+              556.6,
+              211.6
+            ],
+            "cells": [
+              "Nama Asesi",
+              "",
+              ":",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              72.6,
+              211.6,
+              556.6,
+              229.5
+            ],
+            "cells": [
+              "Tanggal",
+              "",
+              ":",
+              ""
+            ]
+          }
+        ]
+      },
+      {
+        "bbox": [
+          72.6,
+          258.4,
+          556.6,
+          386.3
+        ],
+        "rows": [
+          {
+            "bbox": [
+              72.6,
+              258.4,
+              556.6,
+              286.8
+            ],
+            "cells": [
+              "PANDUAN BAGI ASESOR"
+            ]
+          },
+          {
+            "bbox": [
+              72.6,
+              286.8,
+              556.6,
+              386.3
+            ],
+            "cells": [
+              "• Lengkapi nama unit kompetensi, elemen, dan kriteria unjuk kerja sesuai kolom dalam tabel.\n• Isilah standar industri atau tempat kerja\n• Beri tanda centang () pada kolom “YA” jika Anda yakin asesi dapat melakukan/ mendemonstrasikan\ntugas sesuai KUK, atau centang () pada kolom “Tidak” bila sebaliknya.\n• Penilaian Lanjut diisi bila hasil belum dapat disimpulkan, untuk itu gunakan metode lain\nsehingga keputusan dapat dibuat.\n• Isilah kolom KUK sesuai dengan Unit Kompetensi/ SKKNI"
+            ]
+          }
+        ]
+      },
+      {
+        "bbox": [
+          72.6,
+          401.5,
+          556.6,
+          570.9
+        ],
+        "rows": [
+          {
+            "bbox": [
+              72.6,
+              401.5,
+              556.6,
+              570.9
+            ],
+            "cells": [
+              "Kelompok\nPekerjaan 1\nGeneral\nService",
+              "No",
+              "Kode Unit",
+              "Judul Unit"
+            ]
+          },
+          {
+            "bbox": [
+              150.6,
+              440.0,
+              556.6,
+              466.6
+            ],
+            "cells": [
+              "",
+              "1.",
+              "G.45OTO01.001.2",
+              "Melaksanakan Keselamatan dan Kesehatan Kerja"
+            ]
+          },
+          {
+            "bbox": [
+              150.6,
+              466.6,
+              556.6,
+              492.5
+            ],
+            "cells": [
+              "",
+              "2.",
+              "G.45OTO01.002.2",
+              "Menggunakan Peralatan dan Perlengkapan Tempat Kerja"
+            ]
+          },
+          {
+            "bbox": [
+              150.6,
+              492.5,
+              556.6,
+              518.4
+            ],
+            "cells": [
+              "",
+              "3.",
+              "G.45OTO01.007.2",
+              "Membaca Gambar Teknik"
+            ]
+          },
+          {
+            "bbox": [
+              150.6,
+              518.4,
+              556.6,
+              544.3
+            ],
+            "cells": [
+              "",
+              "4.",
+              "G.45OTO01.008.2",
+              "Menggunakan Alat Ukur"
+            ]
+          },
+          {
+            "bbox": [
+              150.6,
+              544.3,
+              556.6,
+              570.9
+            ],
+            "cells": [
+              "",
+              "5.",
+              "G.45OTO01.009.2",
+              "Melaksanakan Diagnosis"
+            ]
+          }
+        ]
+      },
+      {
+        "bbox": [
+          72.6,
+          586.1,
+          556.6,
+          633.2
+        ],
+        "rows": [
+          {
+            "bbox": [
+              72.6,
+              586.1,
+              556.6,
+              633.2
+            ],
+            "cells": [
+              "Unit Kompetensi 1",
+              "Kode Unit",
+              ":",
+              "G.45OTO01.001.2"
+            ]
+          },
+          {
+            "bbox": [
+              194.6,
+              609.5,
+              556.6,
+              633.2
+            ],
+            "cells": [
+              "",
+              "Judul Unit",
+              ":",
+              "Melaksanakan Keselamatan dan Kesehatan Kerja"
+            ]
+          }
+        ]
+      },
+      {
+        "bbox": [
+          72.6,
+          647.8,
+          556.6,
+          772.1
+        ],
+        "rows": [
+          {
+            "bbox": [
+              72.6,
+              647.8,
+              556.6,
+              702.3
+            ],
+            "cells": [
+              "No.",
+              "Elemen",
+              "Kriteria Unjuk Kerja",
+              "Standar\nIndustri\natau Tempat\nKerja",
+              "Pencapaian",
+              "",
+              "Penilaian\nLanjut"
+            ]
+          },
+          {
+            "bbox": [
+              414.7,
+              679.5,
+              556.6,
+              702.3
+            ],
+            "cells": [
+              "",
+              "",
+              "",
+              "",
+              "Ya",
+              "Tidak",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              72.6,
+              702.3,
+              556.6,
+              772.1
+            ],
+            "cells": [
+              "1",
+              "Menyiapkan\nprosedur\nKeselamatan dan\nKesehatan Kerja",
+              "1.1 Potensi bahaya pada area\nkerja diidentifikasi.",
+              "Workshop\nManual\nReport sheet",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              194.6,
+              729.6,
+              556.6,
+              757.0
+            ],
+            "cells": [
+              "",
+              "",
+              "1.2 APD disiapkan di tempat\nkerja.",
+              "",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              72.6,
+              757.0,
+              556.6,
+              772.1
+            ],
+            "cells": [
+              "2",
+              "Melaksanakanan",
+              "2.1 APD digunakan sesuai",
+              "",
+              "☐",
+              "☐",
+              ""
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "page": 2,
+    "tables": [
+      {
+        "bbox": [
+          72.6,
+          21.5,
+          556.4,
+          67.0
+        ],
+        "rows": [
+          {
+            "bbox": [
+              72.6,
+              21.5,
+              556.4,
+              67.0
+            ],
+            "cells": [
+              "",
+              "Lembaga Sertifikasi Profesi Praktisi Otomotif LSP-PrO Indo"
+            ]
+          }
+        ]
+      },
+      {
+        "bbox": [
+          72.6,
+          80.9,
+          556.4,
+          204.4
+        ],
+        "rows": [
+          {
+            "bbox": [
+              72.6,
+              80.9,
+              556.4,
+              204.4
+            ],
+            "cells": [
+              "",
+              "prosedur\nKeselamatan dan\nKesehatan Kerja",
+              "prosedur.",
+              "",
+              "",
+              "",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              195.1,
+              96.0,
+              556.4,
+              150.2
+            ],
+            "cells": [
+              "",
+              "",
+              "2.2 Prosedur kesehatan dan\nkeselamatan kerja\ndilaksanakan di tempat kerja.",
+              "",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              195.1,
+              150.2,
+              556.4,
+              204.4
+            ],
+            "cells": [
+              "",
+              "",
+              "2.3 Pencegahan bahaya\nKeselamatan dan Kesehatan\nKerja dilakukan",
+              "",
+              "☐",
+              "☐",
+              ""
+            ]
+          }
+        ]
+      },
+      {
+        "bbox": [
+          72.6,
+          219.0,
+          556.4,
+          266.2
+        ],
+        "rows": [
+          {
+            "bbox": [
+              72.6,
+              219.0,
+              556.4,
+              266.2
+            ],
+            "cells": [
+              "Unit Kompetensi 2",
+              "Kode Unit",
+              ":",
+              "G.45OTO01.002.2"
+            ]
+          },
+          {
+            "bbox": [
+              195.1,
+              242.6,
+              556.4,
+              266.2
+            ],
+            "cells": [
+              "",
+              "Judul Unit",
+              ":",
+              "Menggunakan Peralatan dan Perlengkapan Tempat Kerja"
+            ]
+          }
+        ]
+      },
+      {
+        "bbox": [
+          72.6,
+          280.9,
+          556.4,
+          476.3
+        ],
+        "rows": [
+          {
+            "bbox": [
+              72.6,
+              280.9,
+              556.4,
+              335.3
+            ],
+            "cells": [
+              "No.",
+              "Elemen",
+              "Kriteria Unjuk Kerja",
+              "Standar\nIndustri\natau Tempat\nKerja",
+              "Pencapaian",
+              "",
+              "Penilaian\nLanjut"
+            ]
+          },
+          {
+            "bbox": [
+              414.8,
+              312.4,
+              556.4,
+              335.3
+            ],
+            "cells": [
+              "",
+              "",
+              "",
+              "",
+              "Ya",
+              "Tidak",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              72.6,
+              335.3,
+              556.4,
+              390.2
+            ],
+            "cells": [
+              "1",
+              "Memilih peralatan\ndan perlengkapan\ntempat kerja secara\naman",
+              "1.1 Peralatan dan perlengkapan\ntempat kerja diidentifikasi.",
+              "Workshop\nManual\nReport sheet",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              195.1,
+              362.7,
+              556.4,
+              390.2
+            ],
+            "cells": [
+              "",
+              "",
+              "1.2 Peralatan dan perlengkapan\ndisiapkan di tempat kerja.",
+              "",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              72.6,
+              390.2,
+              556.4,
+              476.3
+            ],
+            "cells": [
+              "2",
+              "Menggunakan\nperalatan dan\nperlengkapan di\ntempat kerja",
+              "2.1 Peralatan dan perlengkapan\ndikalibrasi sesuai jenis dan\nfungsi.",
+              "Workshop\nManual\nReport sheet",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              195.1,
+              431.3,
+              556.4,
+              476.3
+            ],
+            "cells": [
+              "",
+              "",
+              "2.2 Peralatan dan perlengkapan\ndigunakan sesuai manual\nperbaikan.",
+              "",
+              "☐",
+              "☐",
+              ""
+            ]
+          }
+        ]
+      },
+      {
+        "bbox": [
+          72.6,
+          491.0,
+          556.4,
+          538.2
+        ],
+        "rows": [
+          {
+            "bbox": [
+              72.6,
+              491.0,
+              556.4,
+              538.2
+            ],
+            "cells": [
+              "Unit Kompetensi 3",
+              "Kode Unit",
+              ":",
+              "G.45OTO01.007.2"
+            ]
+          },
+          {
+            "bbox": [
+              195.1,
+              514.5,
+              556.4,
+              538.2
+            ],
+            "cells": [
+              "",
+              "Judul Unit",
+              ":",
+              "Membaca Gambar Teknik"
+            ]
+          }
+        ]
+      },
+      {
+        "bbox": [
+          72.6,
+          552.9,
+          556.4,
+          706.4
+        ],
+        "rows": [
+          {
+            "bbox": [
+              72.6,
+              552.9,
+              556.4,
+              607.3
+            ],
+            "cells": [
+              "No.",
+              "Elemen",
+              "Kriteria Unjuk Kerja",
+              "Standar\nIndustri\natau Tempat\nKerja",
+              "Pencapaian",
+              "",
+              "Penilaian\nLanjut"
+            ]
+          },
+          {
+            "bbox": [
+              414.8,
+              584.5,
+              556.4,
+              607.3
+            ],
+            "cells": [
+              "",
+              "",
+              "",
+              "",
+              "Ya",
+              "Tidak",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              72.6,
+              607.3,
+              556.4,
+              651.5
+            ],
+            "cells": [
+              "1",
+              "Menyiapkan gambar\nteknik",
+              "r 1.1 Gambar teknik diidentifikasi\nsesuai kebutuhan.",
+              "Workshop\nManual",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              195.1,
+              634.7,
+              556.4,
+              651.5
+            ],
+            "cells": [
+              "",
+              "",
+              "1.2 Gambar teknik disiapkan.",
+              "",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              72.6,
+              651.5,
+              556.4,
+              706.4
+            ],
+            "cells": [
+              "2",
+              "Membaca gambar\nteknik",
+              "2.1 Simbol dan kode gambar\nteknik diidentifikasi.",
+              "Workshop\nManual\nReport sheet",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              195.1,
+              679.0,
+              556.4,
+              706.4
+            ],
+            "cells": [
+              "",
+              "",
+              "2.2 Gambar teknik dijelaskan\nsesuai fungsi dan cara kerja.",
+              "",
+              "☐",
+              "☐",
+              ""
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "page": 3,
+    "tables": [
+      {
+        "bbox": [
+          72.8,
+          21.5,
+          556.5,
+          67.0
+        ],
+        "rows": [
+          {
+            "bbox": [
+              72.8,
+              21.5,
+              556.5,
+              67.0
+            ],
+            "cells": [
+              "",
+              "Lembaga Sertifikasi Profesi Praktisi Otomotif LSP-PrO Indo"
+            ]
+          }
+        ]
+      },
+      {
+        "bbox": [
+          72.8,
+          94.9,
+          556.5,
+          142.1
+        ],
+        "rows": [
+          {
+            "bbox": [
+              72.8,
+              94.9,
+              556.5,
+              142.1
+            ],
+            "cells": [
+              "Unit Kompetensi 4",
+              "Kode Unit",
+              ":",
+              "G.45OTO01.008.2"
+            ]
+          },
+          {
+            "bbox": [
+              195.6,
+              118.5,
+              556.5,
+              142.1
+            ],
+            "cells": [
+              "",
+              "Judul Unit",
+              ":",
+              "Menggunakan Alat Ukur"
+            ]
+          }
+        ]
+      },
+      {
+        "bbox": [
+          72.8,
+          156.7,
+          556.5,
+          375.8
+        ],
+        "rows": [
+          {
+            "bbox": [
+              72.8,
+              156.7,
+              556.5,
+              211.2
+            ],
+            "cells": [
+              "No.",
+              "Elemen",
+              "Kriteria Unjuk Kerja",
+              "Standar\nIndustri\natau Tempat\nKerja",
+              "Pencapaian",
+              "",
+              "Penilaian\nLanjut"
+            ]
+          },
+          {
+            "bbox": [
+              415.2,
+              188.4,
+              556.5,
+              211.2
+            ],
+            "cells": [
+              "",
+              "",
+              "",
+              "",
+              "Ya",
+              "Tidak",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              72.8,
+              211.2,
+              556.5,
+              293.3
+            ],
+            "cells": [
+              "1",
+              "Menyiapkan alat\nukur dan komponen",
+              "1.1 Jenis alat ukur dan\nkomponen diidentifikasi.",
+              "Workshop\nManual\nReport sheet",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              195.6,
+              238.5,
+              556.5,
+              265.9
+            ],
+            "cells": [
+              "",
+              "",
+              "1.2 Alat ukur yang sesuai\ndisiapkan di tempat kerja.",
+              "",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              195.6,
+              265.9,
+              556.5,
+              293.3
+            ],
+            "cells": [
+              "",
+              "",
+              "1.3 Alat ukur dikalibrasi sebelum\ndigunakan.",
+              "",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              72.8,
+              293.3,
+              556.5,
+              375.8
+            ],
+            "cells": [
+              "2",
+              "Menggunakan alat\nukur",
+              "2.1 Alat ukur digunakan sesuai\nprosedur.",
+              "Workshop\nManual\nReport sheet",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              195.6,
+              321.1,
+              556.5,
+              348.5
+            ],
+            "cells": [
+              "",
+              "",
+              "2.2 Alat ukur digunakan sesuai\nfungsi dan jenis alat ukur.",
+              "",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              195.6,
+              348.5,
+              556.5,
+              375.8
+            ],
+            "cells": [
+              "",
+              "",
+              "2.3 Hasil pengukuran\ndidokumentasikan.",
+              "",
+              "☐",
+              "☐",
+              ""
+            ]
+          }
+        ]
+      },
+      {
+        "bbox": [
+          72.8,
+          390.5,
+          556.5,
+          437.5
+        ],
+        "rows": [
+          {
+            "bbox": [
+              72.8,
+              390.5,
+              556.5,
+              437.5
+            ],
+            "cells": [
+              "Unit Kompetensi 5",
+              "Kode Unit",
+              ":",
+              "G.45OTO01.009.2"
+            ]
+          },
+          {
+            "bbox": [
+              195.6,
+              413.9,
+              556.5,
+              437.5
+            ],
+            "cells": [
+              "",
+              "Judul Unit",
+              ":",
+              "Melaksanakan Diagnosis"
+            ]
+          }
+        ]
+      },
+      {
+        "bbox": [
+          72.8,
+          452.7,
+          556.5,
+          743.9
+        ],
+        "rows": [
+          {
+            "bbox": [
+              72.8,
+              452.7,
+              556.5,
+              507.3
+            ],
+            "cells": [
+              "No.",
+              "Elemen",
+              "Kriteria Unjuk Kerja",
+              "Standar\nIndustri atau\nTempat\nKerja",
+              "Pencapaian",
+              "",
+              "Penilaian\nLanjut"
+            ]
+          },
+          {
+            "bbox": [
+              415.2,
+              484.8,
+              556.5,
+              507.3
+            ],
+            "cells": [
+              "",
+              "",
+              "",
+              "",
+              "Ya",
+              "Tidak",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              72.8,
+              507.3,
+              556.5,
+              743.9
+            ],
+            "cells": [
+              "1",
+              "Mempersiapkan\ndiagnosis",
+              "1.1 Komponen, alat, SST dan\nDiagnosis tools\ndiidentifikasi.",
+              "Workshop\nManual\nReport sheet",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              195.6,
+              561.6,
+              556.5,
+              603.3
+            ],
+            "cells": [
+              "",
+              "",
+              "1.2 Komponen, alat, SST dan\nDiagnosis tools disiapkan di\ntempat kerja.",
+              "",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              72.8,
+              603.3,
+              556.5,
+              743.9
+            ],
+            "cells": [
+              "2",
+              "Melakukan diagnosis",
+              "Komponen, alat, SST dan\nDiagnosis tools dikalibrasi\nsebelum digunakan.",
+              "",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              195.6,
+              645.1,
+              556.5,
+              686.9
+            ],
+            "cells": [
+              "",
+              "",
+              "Komponen, alat, SST dan\nDiagnosis tools digunakan sesuai\nmanual perbaikan.",
+              "",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              195.6,
+              686.9,
+              556.5,
+              715.3
+            ],
+            "cells": [
+              "",
+              "",
+              "Hasil diagnosis\ndidokumentasikan",
+              "",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              195.6,
+              715.3,
+              556.5,
+              743.9
+            ],
+            "cells": [
+              "",
+              "",
+              "Hasil diagnosis dievaluasi dan\ndipresentasikan.",
+              "",
+              "☐",
+              "☐",
+              ""
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "page": 4,
+    "tables": [
+      {
+        "bbox": [
+          72.6,
+          21.5,
+          555.1,
+          67.0
+        ],
+        "rows": [
+          {
+            "bbox": [
+              72.6,
+              21.5,
+              555.1,
+              67.0
+            ],
+            "cells": [
+              "",
+              "Lembaga Sertifikasi Profesi Praktisi Otomotif LSP-PrO Indo"
+            ]
+          }
+        ]
+      },
+      {
+        "bbox": [
+          72.6,
+          81.4,
+          555.1,
+          146.5
+        ],
+        "rows": [
+          {
+            "bbox": [
+              72.6,
+              81.4,
+              555.1,
+              146.5
+            ],
+            "cells": [
+              "Kelompok\nPekerjaan 2\nEngine",
+              "No.",
+              "Kode Unit",
+              "Judul Unit"
+            ]
+          },
+          {
+            "bbox": [
+              150.8,
+              120.2,
+              555.1,
+              146.5
+            ],
+            "cells": [
+              "",
+              "1.",
+              "G.45OTO01.010.2",
+              "Melakukan Perawatan Berkala Engine"
+            ]
+          }
+        ]
+      },
+      {
+        "bbox": [
+          72.6,
+          161.7,
+          555.1,
+          208.9
+        ],
+        "rows": [
+          {
+            "bbox": [
+              72.6,
+              161.7,
+              555.1,
+              208.9
+            ],
+            "cells": [
+              "Unit Kompetensi 1",
+              "Kode Unit",
+              ":",
+              "G.45OTO01.010.2"
+            ]
+          },
+          {
+            "bbox": [
+              194.9,
+              185.3,
+              555.1,
+              208.9
+            ],
+            "cells": [
+              "",
+              "Judul Unit",
+              ":",
+              "Melakukan Perawatan Berkala Engine"
+            ]
+          }
+        ]
+      },
+      {
+        "bbox": [
+          72.6,
+          223.4,
+          555.1,
+          768.0
+        ],
+        "rows": [
+          {
+            "bbox": [
+              72.6,
+              223.4,
+              555.1,
+              277.8
+            ],
+            "cells": [
+              "No.",
+              "Elemen",
+              "Kriteria Unjuk Kerja",
+              "Standar\nIndustri\natau Tempat\nKerja",
+              "Pencapaian",
+              "",
+              "Penilaian\nLanjut"
+            ]
+          },
+          {
+            "bbox": [
+              414.7,
+              255.1,
+              555.1,
+              277.8
+            ],
+            "cells": [
+              "",
+              "",
+              "",
+              "",
+              "Ya",
+              "Tidak",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              72.6,
+              277.8,
+              555.1,
+              576.4
+            ],
+            "cells": [
+              "1",
+              "Menyiapkan\nPerawatan engine",
+              "1.1 Nama, jenis, spesifikasi,\nfungsi, prinsip kerja engine\ndiidentifikasi sesuai\nprosedur.",
+              "Workshop\nManual\nReport sheet",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              194.9,
+              332.0,
+              555.1,
+              399.7
+            ],
+            "cells": [
+              "",
+              "",
+              "1.2 Prosedur pengoperasian alat\nukur dan peralatan\nkhusus/SST untuk perawatan\nberkala engine diidentifikasi\nsesuai prosedur.",
+              "",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              194.9,
+              399.7,
+              555.1,
+              440.5
+            ],
+            "cells": [
+              "",
+              "",
+              "1.3 Peralatan, perlengkapan dan\nbahan disiapkan di tempat\nkerja sesuai prosedur.",
+              "",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              194.9,
+              440.5,
+              555.1,
+              481.2
+            ],
+            "cells": [
+              "",
+              "",
+              "1.4 Manual perbaikan engine\ndisiapkan di tempat kerja\nsesuai prosedur.",
+              "",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              194.9,
+              481.2,
+              555.1,
+              522.0
+            ],
+            "cells": [
+              "",
+              "",
+              "1.5 Data perawatan berkala\nengine diidentifikasi sesuai\nprosedur.",
+              "",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              194.9,
+              522.0,
+              555.1,
+              576.4
+            ],
+            "cells": [
+              "",
+              "",
+              "1.6 Kendaraan yang akan\ndilakukan perawatan berkala\nengine disiapkan di area\nkerja sesuai prosedur.",
+              "",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              72.6,
+              576.4,
+              555.1,
+              768.0
+            ],
+            "cells": [
+              "2",
+              "Melakukan\nPemeriksaan engine",
+              "2.1 Engine dibersihkan dari\nkotoran sesuai prosedur",
+              "Workshop\nManual\nReport sheet",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              194.9,
+              604.1,
+              555.1,
+              631.5
+            ],
+            "cells": [
+              "",
+              "",
+              "2.2 Sistem pelumasan engine\ndiperiksa sesuai prosedur",
+              "",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              194.9,
+              631.5,
+              555.1,
+              672.2
+            ],
+            "cells": [
+              "",
+              "",
+              "2.3 Sistem pendinginan engine\ndan komponen engine\ndiperiksa sesuai prosedur.",
+              "",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              194.9,
+              672.2,
+              555.1,
+              726.4
+            ],
+            "cells": [
+              "",
+              "",
+              "2.4 Sistem pemasukan udara\ndan sistem gas buang\nengine diperiksa sesuai\nprosedur",
+              "",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              194.9,
+              726.4,
+              555.1,
+              753.8
+            ],
+            "cells": [
+              "",
+              "",
+              "2.5 Sistem pengapian engine\ndiperiksa sesuai prosedur.",
+              "",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              194.9,
+              753.8,
+              555.1,
+              768.0
+            ],
+            "cells": [
+              "",
+              "",
+              "2.6 Sistem bahan bakar",
+              "",
+              "☐",
+              "☐",
+              ""
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "page": 5,
+    "tables": [
+      {
+        "bbox": [
+          72.8,
+          21.5,
+          554.8,
+          67.0
+        ],
+        "rows": [
+          {
+            "bbox": [
+              72.8,
+              21.5,
+              554.8,
+              67.0
+            ],
+            "cells": [
+              "",
+              "Lembaga Sertifikasi Profesi Praktisi Otomotif LSP-PrO Indo"
+            ]
+          }
+        ]
+      },
+      {
+        "bbox": [
+          72.8,
+          80.9,
+          554.8,
+          244.6
+        ],
+        "rows": [
+          {
+            "bbox": [
+              72.8,
+              80.9,
+              554.8,
+              244.6
+            ],
+            "cells": [
+              "",
+              "",
+              "diperiksa sesuai prosedur",
+              "",
+              "",
+              "",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              193.9,
+              94.9,
+              554.8,
+              122.2
+            ],
+            "cells": [
+              "",
+              "",
+              "2.7 Emisi gas buang engine\ndiperiksa sesuai prosedur.",
+              "",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              193.9,
+              122.2,
+              554.8,
+              163.0
+            ],
+            "cells": [
+              "",
+              "",
+              "2.8 Hasil pemeriksaan engine\nditindaklanjuti sesuai\ndengan kondisi.",
+              "",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              193.9,
+              163.0,
+              554.8,
+              203.8
+            ],
+            "cells": [
+              "",
+              "",
+              "2.9 Hasil pemeriksaan engine\ndiuji kinerjanya sesuai\nprosedur.",
+              "",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              193.9,
+              203.8,
+              554.8,
+              244.6
+            ],
+            "cells": [
+              "",
+              "",
+              "2.10 Hasil pemeriksaan engine\ndidokumentasikan dan\ndilaporkan sesuai prosedur.",
+              "",
+              "☐",
+              "☐",
+              ""
+            ]
+          }
+        ]
+      },
+      {
+        "bbox": [
+          72.8,
+          258.9,
+          554.8,
+          379.0
+        ],
+        "rows": [
+          {
+            "bbox": [
+              72.8,
+              258.9,
+              554.8,
+              379.0
+            ],
+            "cells": [
+              "Kelompok\nPekerjaan 3",
+              "No.",
+              "Kode Unit",
+              "Judul Unit"
+            ]
+          },
+          {
+            "bbox": [
+              150.7,
+              297.6,
+              554.8,
+              324.2
+            ],
+            "cells": [
+              "",
+              "",
+              "G.45OTO01.065.2",
+              "Memelihara Baterai"
+            ]
+          },
+          {
+            "bbox": [
+              150.7,
+              324.2,
+              554.8,
+              352.5
+            ],
+            "cells": [
+              "",
+              "",
+              "G.45OTO01.073.2",
+              "Memperbaiki Kerusakan Pada Sistem Pengaman\nKelistrikan"
+            ]
+          },
+          {
+            "bbox": [
+              150.7,
+              352.5,
+              554.8,
+              379.0
+            ],
+            "cells": [
+              "",
+              "",
+              "G.45OTO01.078.2",
+              "Memperbaiki Sistem Manajemen Engine"
+            ]
+          }
+        ]
+      },
+      {
+        "bbox": [
+          72.8,
+          394.2,
+          554.8,
+          441.3
+        ],
+        "rows": [
+          {
+            "bbox": [
+              72.8,
+              394.2,
+              554.8,
+              441.3
+            ],
+            "cells": [
+              "Unit Kompetensi 1",
+              "Kode Unit",
+              ":",
+              "G.45OTO01.065.2"
+            ]
+          },
+          {
+            "bbox": [
+              193.9,
+              417.6,
+              554.8,
+              441.3
+            ],
+            "cells": [
+              "",
+              "Judul Unit",
+              ":",
+              "Memelihara Baterai"
+            ]
+          }
+        ]
+      },
+      {
+        "bbox": [
+          72.8,
+          519.1,
+          554.8,
+          776.5
+        ],
+        "rows": [
+          {
+            "bbox": [
+              72.8,
+              519.1,
+              554.8,
+              573.6
+            ],
+            "cells": [
+              "No.",
+              "Elemen",
+              "Kriteria Unjuk Kerja",
+              "Standar\nIndustri atau\nTempat\nKerja",
+              "Pencapaian",
+              "",
+              "Penilaian\nLanjut"
+            ]
+          },
+          {
+            "bbox": [
+              413.0,
+              550.8,
+              554.8,
+              573.6
+            ],
+            "cells": [
+              "",
+              "",
+              "",
+              "",
+              "Ya",
+              "Tidak",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              72.8,
+              573.6,
+              554.8,
+              776.5
+            ],
+            "cells": [
+              "1.",
+              "Menyiapkan\npemeliharaan\nbaterai\nkendaraan\nringan",
+              "1.1 Manual perbaikan\npemeliharaan baterai\nyang digunakan\ndisiapkan.",
+              "Workshop\nManual\nReport sheet",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              183.0,
+              627.8,
+              554.8,
+              722.3
+            ],
+            "cells": [
+              "",
+              "",
+              "1.2 Peralatan dan\nperangkat kerja\npendukung diperiksa\natas kondisi dan\nkelayakan pakai\nberdasarkan kebutuhan\npemeliharaan.",
+              "",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              183.0,
+              722.3,
+              554.8,
+              776.5
+            ],
+            "cells": [
+              "",
+              "",
+              "1.3 Baterai yang\ndigunakan disiapkan\nuntuk menentukan\nproses pemeliharaan.",
+              "",
+              "☐",
+              "☐",
+              ""
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "page": 6,
+    "tables": [
+      {
+        "bbox": [
+          73.9,
+          21.5,
+          556.3,
+          67.0
+        ],
+        "rows": [
+          {
+            "bbox": [
+              73.9,
+              21.5,
+              556.3,
+              67.0
+            ],
+            "cells": [
+              "",
+              "Lembaga Sertifikasi Profesi Praktisi Otomotif LSP-PrO Indo"
+            ]
+          }
+        ]
+      },
+      {
+        "bbox": [
+          73.9,
+          80.9,
+          556.3,
+          743.4
+        ],
+        "rows": [
+          {
+            "bbox": [
+              73.9,
+              80.9,
+              556.3,
+              256.4
+            ],
+            "cells": [
+              "",
+              "",
+              "1.4 Level cairan elektrolit\ndiperiksa dan\n2.4disesuaikan pada\nlevel yang tepat\nberdasarkan manual\nperbaikan. (Hanya\nberlaku untuk baterai\nbasah).",
+              "",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              183.0,
+              188.8,
+              556.3,
+              256.4
+            ],
+            "cells": [
+              "",
+              "",
+              "1.5 Perlengkapan\npelindung kendaraan\ndipasang berdasarkan\nprosedur di tempat\nkerja.",
+              "",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              73.9,
+              256.4,
+              556.3,
+              635.0
+            ],
+            "cells": [
+              "2.",
+              "Melaksanakan\npemeliharaan\nbaterai",
+              "2.1 Kondisi rumah atau\ncasing baterai,\nterminal baterai dan\nkoneksi ke kabel\nkendaraan diperiksa\nsesuai manual\nperbaikan.",
+              "Workshop\nManual\nReport sheet",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              183.0,
+              351.0,
+              556.3,
+              432.0
+            ],
+            "cells": [
+              "",
+              "",
+              "2.2 Tegangan baterai\ndiperiksa dengan\nmenggunakan alat\nukur yang sesuai\ndengan manual\nperbaikan.",
+              "",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              183.0,
+              432.0,
+              556.3,
+              513.1
+            ],
+            "cells": [
+              "",
+              "",
+              "2.3 Berat jenis air baterai\ndiperiksa\nmenggunakan alat\nukur yang sesuai\ndengan manual\nperbaikan.",
+              "",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              183.0,
+              513.1,
+              556.3,
+              567.3
+            ],
+            "cells": [
+              "",
+              "",
+              "2.4 Baterai dan terminal\ndibersihkan sesuai\ndengan manual\nperbaikan.",
+              "",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              183.0,
+              567.3,
+              556.3,
+              635.0
+            ],
+            "cells": [
+              "",
+              "",
+              "2.5 Dokumen\npemeriksaan baterai\ndiisi sesuai dengan\nhasil pelaksanaan\npemeriksaan baterai.",
+              "",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              73.9,
+              635.0,
+              556.3,
+              743.4
+            ],
+            "cells": [
+              "33.",
+              "Menguji\nbaterai pada\nkendaraan",
+              "3.1 Baterai di uji dengan\nmenggunakan\ndiagnostic tool sesuai\ndengan manual\nperbaikan.",
+              "Workshop\nManual\nReport sheet",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              183.0,
+              702.6,
+              556.3,
+              743.4
+            ],
+            "cells": [
+              "",
+              "",
+              "3.2 Hasil pekerjaan\nmenguji baterai\ndidokumentasikan.",
+              "",
+              "☐",
+              "☐",
+              ""
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "page": 7,
+    "tables": [
+      {
+        "bbox": [
+          73.0,
+          21.5,
+          556.0,
+          67.0
+        ],
+        "rows": [
+          {
+            "bbox": [
+              73.0,
+              21.5,
+              556.0,
+              67.0
+            ],
+            "cells": [
+              "",
+              "Lembaga Sertifikasi Profesi Praktisi Otomotif LSP-PrO Indo"
+            ]
+          }
+        ]
+      },
+      {
+        "bbox": [
+          73.0,
+          81.4,
+          556.0,
+          128.7
+        ],
+        "rows": [
+          {
+            "bbox": [
+              73.0,
+              81.4,
+              556.0,
+              128.7
+            ],
+            "cells": [
+              "Unit Kompetensi 2",
+              "Kode Unit",
+              ": G",
+              "G.45OTO01.073.2"
+            ]
+          },
+          {
+            "bbox": [
+              196.2,
+              104.9,
+              556.0,
+              128.7
+            ],
+            "cells": [
+              "",
+              "Judul Unit",
+              "M\n:",
+              "Memperbaiki Kerusakan Pada Sistem Pengaman Kelistrikan"
+            ]
+          }
+        ]
+      },
+      {
+        "bbox": [
+          73.0,
+          143.8,
+          556.0,
+          733.4
+        ],
+        "rows": [
+          {
+            "bbox": [
+              73.0,
+              143.8,
+              556.0,
+              198.3
+            ],
+            "cells": [
+              "No.",
+              "Elemen",
+              "Kriteria Unjuk Kerja",
+              "Standar\nIndustri atau\nTempat\nKerja",
+              "Pencapaian",
+              "",
+              "Penilaian\nLanjut"
+            ]
+          },
+          {
+            "bbox": [
+              415.4,
+              175.8,
+              556.0,
+              198.3
+            ],
+            "cells": [
+              "",
+              "",
+              "",
+              "",
+              "Ya",
+              "Tidak",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              73.0,
+              198.3,
+              556.0,
+              733.4
+            ],
+            "cells": [
+              "1 M\np\nm\nk\ns\nk",
+              "Menyiapkan\npekerjaan\nmemperbaiki\nkerusakan pada\nsistem pengaman\nkelistrikan",
+              "1.1 Manual perbaikan sistem\npengaman disiapkan sesuai\ndengan kendaraan yang\ndigunakan.",
+              "Workshop\nManual\nReport sheet",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              196.2,
+              252.7,
+              556.0,
+              321.3
+            ],
+            "cells": [
+              "",
+              "",
+              "1.2 Peralatan dan perangkat\nkerja pendukung diperiksa\natas kondisi dan kelayakan\npakai berdasarkan\nkebutuhan perbaikan.",
+              "",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              196.2,
+              321.3,
+              556.0,
+              349.6
+            ],
+            "cells": [
+              "",
+              "",
+              "1.3 Sistem pengaman yang akan\ndiperbaiki disiapkan.",
+              "",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              196.2,
+              349.6,
+              556.0,
+              445.0
+            ],
+            "cells": [
+              "",
+              "",
+              "1.4 Perlengkapan pelindung\nkendaraan dipasang\nberdasarkan prosedur di\ntempat kerja. Perlengkapan\npelindung kendaraan\ndipasang berdasarkan\nprosedur di tempat kerja.",
+              "",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              73.0,
+              445.0,
+              556.0,
+              583.8
+            ],
+            "cells": [
+              "2 M\np\ns\nk",
+              "Melaksanakan\npengujian pada\nsistem pengaman\nkelistrikan",
+              "2.1 Sistem pengaman kelistrikan\ndiuji sesuai manual\nperbaikan.",
+              "",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              196.2,
+              486.9,
+              556.0,
+              542.1
+            ],
+            "cells": [
+              "",
+              "",
+              "2.2 Hasil pengujian sistem\npengaman kelistrikan\nditemukan berdasarkan\nmanual perbaikan.",
+              "",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              196.2,
+              542.1,
+              556.0,
+              583.8
+            ],
+            "cells": [
+              "",
+              "",
+              "2.3 Dokumen pengujian sistem\npengaman kelistrikan diisi\nsesuai hasil pengujian.",
+              "",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              73.0,
+              583.8,
+              556.0,
+              733.4
+            ],
+            "cells": [
+              "3 M\np\ns\nk",
+              "Melaksanakan\nperbaikan pada\nsistem pengaman\nkelistrikan",
+              "3.1 Sistem pengaman kelistrikan\ndiperbaiki berdasarkan hasil\npengujian.",
+              "",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              196.2,
+              625.7,
+              556.0,
+              680.9
+            ],
+            "cells": [
+              "",
+              "",
+              "3.2 Hasil perbaikan sistem\npengaman kelistrikan\ndilakukan berdasarkan hasil\npengujian.",
+              "",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              196.2,
+              680.9,
+              556.0,
+              733.4
+            ],
+            "cells": [
+              "",
+              "",
+              "3.3 Dokumen perbaikan sistem\npengaman kelistrikan diisi\nsesuai hasil pengujian.",
+              "",
+              "☐",
+              "☐",
+              ""
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "page": 8,
+    "tables": [
+      {
+        "bbox": [
+          73.0,
+          21.5,
+          556.7,
+          67.0
+        ],
+        "rows": [
+          {
+            "bbox": [
+              73.0,
+              21.5,
+              556.7,
+              67.0
+            ],
+            "cells": [
+              "",
+              "Lembaga Sertifikasi Profesi Praktisi Otomotif LSP-PrO Indo"
+            ]
+          }
+        ]
+      },
+      {
+        "bbox": [
+          73.0,
+          81.4,
+          556.7,
+          128.6
+        ],
+        "rows": [
+          {
+            "bbox": [
+              73.0,
+              81.4,
+              556.7,
+              128.6
+            ],
+            "cells": [
+              "Unit Kompetensi 3",
+              "Kode Unit",
+              ":",
+              "G.45OTO01.078.2"
+            ]
+          },
+          {
+            "bbox": [
+              196.1,
+              104.9,
+              556.7,
+              128.6
+            ],
+            "cells": [
+              "",
+              "Judul Unit",
+              ":",
+              "Memperbaiki Sistem Manajemen Engine"
+            ]
+          }
+        ]
+      },
+      {
+        "bbox": [
+          73.0,
+          143.8,
+          556.7,
+          761.4
+        ],
+        "rows": [
+          {
+            "bbox": [
+              73.0,
+              143.8,
+              556.7,
+              198.3
+            ],
+            "cells": [
+              "No.",
+              "Elemen",
+              "Kriteria Unjuk Kerja",
+              "Standar\nIndustri atau\nTempat\nKerja",
+              "Pencapaian",
+              "",
+              "Penilaian\nLanjut"
+            ]
+          },
+          {
+            "bbox": [
+              415.3,
+              175.8,
+              556.7,
+              198.3
+            ],
+            "cells": [
+              "",
+              "",
+              "",
+              "",
+              "Ya",
+              "Tidak",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              73.0,
+              198.3,
+              556.7,
+              761.4
+            ],
+            "cells": [
+              "1 M\np\nm",
+              "Menyiapkan\nperbaikan sistem\nmanajemen engine",
+              "1.1 Manual perbaikan\nmemperbaiki sistem\nmanajemen engine\ndisiapkan sesuai prosedur.",
+              "Workshop\nManual\nReport sheet",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              196.1,
+              252.7,
+              556.7,
+              321.3
+            ],
+            "cells": [
+              "",
+              "",
+              "1.2 Peralatan dan bahan serta\nperangkat kerja lain\ndiperiksa atas kondisi dan\nkelayakan pakai berdasarkan\nkebutuhan kerja.",
+              "",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              196.1,
+              321.3,
+              556.7,
+              376.5
+            ],
+            "cells": [
+              "",
+              "",
+              "1.3 Perlengkapan pelindung\nkendaraan dipasang\nberdasarkan prosedur di\ntempat kerja.",
+              "",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              196.1,
+              376.5,
+              556.7,
+              458.4
+            ],
+            "cells": [
+              "",
+              "",
+              "1.4 Sistem manajemen engine\ndiperiksa dengan\nmenggunakan diagnostic\ntool untuk memudahkan\nmengetahui kerusakan pada\nsistem manajemen engine.",
+              "",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              73.0,
+              458.4,
+              556.7,
+              691.2
+            ],
+            "cells": [
+              "2 M\nm",
+              "Mendiagnosa sistem\nmanajemen engine",
+              "2.1 Sistem manajemen engine\ndasar dan elektronis\ndiperiksa menggunakan\ndiagnostic tool untuk\nmengetahui kerusakan atau\nkesalahan sesuai prosedur.",
+              "",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              196.1,
+              540.6,
+              556.7,
+              622.7
+            ],
+            "cells": [
+              "",
+              "",
+              "2.2 Sistem Manajemen engine\ndiperiksa secara visual untuk\nmengetahui kemungkinan\nterjadi kerusakan yang tidak\nbisa diketahui melalui\ndiagnostic tool.",
+              "",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              196.1,
+              622.7,
+              556.7,
+              691.2
+            ],
+            "cells": [
+              "",
+              "",
+              "2.3 Dokumen pekerjaan\nMendiagnosa sistem\nmanajemen engine diisi\nsesuai dengan hasil\ndiagnosa.",
+              "",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              73.0,
+              691.2,
+              556.7,
+              761.4
+            ],
+            "cells": [
+              "3 M\np\ne",
+              "Melaksanakan\nperbaikan sistem\nengine",
+              "3.1 Sistem manajemen engine\ndiperbaiki berdasarkan\nmanual perbaikan.",
+              "",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              196.1,
+              733.1,
+              556.7,
+              761.4
+            ],
+            "cells": [
+              "",
+              "",
+              "3.2 Peralatan, teknik dan bahan\nyang sesuai digunakan",
+              "",
+              "☐",
+              "☐",
+              ""
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "page": 9,
+    "tables": [
+      {
+        "bbox": [
+          74.0,
+          21.5,
+          556.4,
+          67.0
+        ],
+        "rows": [
+          {
+            "bbox": [
+              74.0,
+              21.5,
+              556.4,
+              67.0
+            ],
+            "cells": [
+              "",
+              "Lembaga Sertifikasi Profesi Praktisi Otomotif LSP-PrO Indo"
+            ]
+          }
+        ]
+      },
+      {
+        "bbox": [
+          74.0,
+          81.0,
+          556.4,
+          220.1
+        ],
+        "rows": [
+          {
+            "bbox": [
+              74.0,
+              81.0,
+              556.4,
+              220.1
+            ],
+            "cells": [
+              "",
+              "3\n3",
+              "berdasarkan manual\nperbaikan.",
+              "",
+              "",
+              "",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              197.1,
+              109.5,
+              556.4,
+              164.6
+            ],
+            "cells": [
+              "",
+              "",
+              "3.3 Hasil perbaikan diuji dengan\nmenggunakan diagnostic\ntool sesuai manual\nperbaikan.",
+              "",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              197.1,
+              164.6,
+              556.4,
+              220.1
+            ],
+            "cells": [
+              "",
+              "",
+              "3.4 Dokumen perbaikan sistem\nmanajemen engine diisi\nsesuai hasil perbaikan dan\ndilaporkan sesuai prosedur.",
+              "",
+              "☐",
+              "☐",
+              ""
+            ]
+          }
+        ]
+      },
+      {
+        "bbox": [
+          74.0,
+          312.4,
+          556.4,
+          513.5
+        ],
+        "rows": [
+          {
+            "bbox": [
+              74.0,
+              312.4,
+              556.4,
+              513.5
+            ],
+            "cells": [
+              "Rekomendasi:\n☐ Asesi telah memenuhi pencapaian\nseluruh kriteria unjuk kerja,\ndirekomendasikan KOMPETEN\n☐ Asesi belum memenuhi pencapaian\nseluruh kriteria unjuk kerja,\ndirekomendasikan BELUM\nKOMPETEN\npada:\nKelompok Pekerjaan: …\nUnit: …..\nElemen: …..\nKUK: …….",
+              "Asesi",
+              "",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              266.1,
+              334.2,
+              556.4,
+              363.3
+            ],
+            "cells": [
+              "",
+              "Nama",
+              ":",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              266.1,
+              363.3,
+              556.4,
+              406.4
+            ],
+            "cells": [
+              "",
+              "Tanda tangan/ Tanggal",
+              ":",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              266.1,
+              406.4,
+              556.4,
+              428.3
+            ],
+            "cells": [
+              "",
+              "Asesor",
+              "",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              266.1,
+              428.3,
+              556.4,
+              450.9
+            ],
+            "cells": [
+              "",
+              "Nama",
+              ":",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              266.1,
+              450.9,
+              556.4,
+              473.1
+            ],
+            "cells": [
+              "",
+              "No. Reg",
+              ":",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              266.1,
+              473.1,
+              556.4,
+              513.5
+            ],
+            "cells": [
+              "",
+              "Tanda tangan/ Tanggal",
+              ":",
+              ""
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]
