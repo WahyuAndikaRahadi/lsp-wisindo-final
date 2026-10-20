@@ -9,6 +9,183 @@ use App\Models\Assessment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
+// TEMPORARY MUK PRINT EXAMPLE ROUTES (akan dihapus bersih setelah verifikasi)
+Route::prefix('print-example')->group(function () {
+    Route::get('/', function () {
+        $docs = [
+            [
+                'code' => 'FR.APL.01',
+                'title' => 'Permohonan Sertifikasi Kompetensi',
+                'url' => url('/print-example/apl01'),
+                'ref_url' => url('/print-example/apl01?ref=1'),
+                'pages' => '3 Halaman',
+                'desc' => 'Data Pribadi, Data Pekerjaan, Skema, Unit & Bukti Kelengkapan (Tanpa Watermark)',
+            ],
+            [
+                'code' => 'FR.APL.02',
+                'title' => 'Asesmen Mandiri',
+                'url' => url('/print-example/apl02'),
+                'ref_url' => url('/print-example/apl02?ref=1'),
+                'pages' => 'Multi-halaman Dinamis',
+                'desc' => 'Asesmen Mandiri 9 Unit Kompetensi, 21 Elemen, 74 KUK & Rekomendasi Asesor (Tanpa Watermark)',
+            ],
+            [
+                'code' => 'FR.AK.01',
+                'title' => 'Persetujuan Asesmen dan Kerahasiaan',
+                'url' => url('/print-example/ak01'),
+                'ref_url' => url('/print-example/ak01?ref=1'),
+                'pages' => '1 Halaman',
+                'desc' => 'Persetujuan Kerahasiaan, Rincian Bukti & Tanda Tangan 2 Pihak (Tanpa Watermark)',
+            ],
+            [
+                'code' => 'FR.AK.02',
+                'title' => 'Rekaman Asesmen Kompetensi',
+                'url' => url('/print-example/ak02'),
+                'ref_url' => url('/print-example/ak02?ref=1'),
+                'pages' => '3 Halaman',
+                'desc' => 'Rekaman Bukti 9 Unit Kompetensi, Rekomendasi Asesor, Tindak Lanjut & Tanda Tangan (Tanpa Watermark)',
+            ],
+            [
+                'code' => 'FR.AK.03',
+                'title' => 'Umpan Balik dan Catatan Asesmen',
+                'url' => url('/print-example/ak03'),
+                'ref_url' => url('/print-example/ak03?ref=1'),
+                'pages' => '1 Halaman',
+                'desc' => '10 Komponen Umpan Balik Asesi, Penilaian Pelaksanaan & Catatan Tambahan (Tanpa Watermark)',
+            ],
+            [
+                'code' => 'FR.AK.04',
+                'title' => 'Banding Asesmen',
+                'url' => url('/print-example/ak04'),
+                'ref_url' => url('/print-example/ak04?ref=1'),
+                'pages' => '1 Halaman',
+                'desc' => 'Formulir Pengajuan Banding Hasil Asesmen, Alasan & Pernyataan Hak Asesi (Tanpa Watermark)',
+            ],
+            [
+                'code' => 'PERNYATAAN',
+                'title' => 'Surat Pernyataan Pemegang Sertifikat',
+                'url' => url('/print-example/pernyataan'),
+                'ref_url' => url('/print-example/pernyataan?ref=1'),
+                'pages' => '1 Halaman',
+                'desc' => 'Kop Resmi LSP, Komitmen 4 Poin Kepatuhan Kode Etik & Sertifikasi (Tanpa Watermark)',
+            ],
+            [
+                'code' => 'DAFTAR PERIKSA',
+                'title' => 'Daftar Periksa Kelengkapan Dokumen MUK',
+                'url' => url('/print-example/daftar-periksa'),
+                'ref_url' => url('/print-example/daftar-periksa?ref=1'),
+                'pages' => '1 Halaman',
+                'desc' => 'Ceklis Master 25 Dokumen Asesmen, TUK & Manager Sertifikasi (Tanpa Watermark)',
+            ],
+        ];
+
+        $html = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>MUK Print Preview Dashboard</title>'
+              .'<script src="https://cdn.tailwindcss.com"></script></head><body class="bg-slate-100 p-8 font-sans">'
+              .'<div class="max-w-4xl mx-auto space-y-6">'
+              .'<div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">'
+              .'<span class="text-xs font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded">Rute Sementara (Untuk Verifikasi/Audit)</span>'
+              .'<h1 class="text-2xl font-black text-slate-900 mt-2">Pratinjau Dokumen Cetak MUK (LSP PrO Indo)</h1>'
+              .'<p class="text-xs text-slate-600 mt-1">Bandingkan hasil render dokumen Python ReportLab dengan PDF Master resmi secara langsung.</p>'
+              .'</div>'
+              .'<div class="grid grid-cols-1 gap-4">';
+        foreach ($docs as $d) {
+            $html .= '<div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">'
+                  .'<div>'
+                  .'<div class="flex items-center gap-2">'
+                  .'<span class="font-mono text-xs font-bold bg-indigo-50 text-indigo-700 px-2.5 py-0.5 rounded border border-indigo-200">'.$d['code'].'</span>'
+                  .'<h3 class="text-base font-bold text-slate-800">'.$d['title'].'</h3>'
+                  .'<span class="text-[11px] text-slate-400">('.$d['pages'].')</span>'
+                  .'</div>'
+                  .'<p class="text-xs text-slate-500 mt-1">'.$d['desc'].'</p>'
+                  .'</div>'
+                  .'<div class="flex items-center gap-2 shrink-0">'
+                  .'<a href="'.$d['url'].'" target="_blank" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold shadow-sm transition">Lihat Hasil Render &rarr;</a>'
+                  .'<a href="'.$d['ref_url'].'" target="_blank" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 rounded-lg text-xs font-semibold transition">Buka Master Asli &nearr;</a>'
+                  .'</div>'
+                  .'</div>';
+        }
+        $html .= '</div>'
+              .'<div class="p-4 bg-slate-200/60 rounded-xl text-center text-xs text-slate-500">'
+              .'Setelah Anda selesai mengecek, route dan script sementara ini akan dihapus bersih.'
+              .'</div>'
+              .'</div></body></html>';
+
+        return response($html);
+    });
+
+    Route::get('/apl01', function (Request $request) {
+        $path = $request->query('ref')
+            ? base_path('all-document-lsp-ProIndo/MUK SKEMA 2 Klaster Maintenance Gasoline Engine Injection/2. FR.APL.01. Permohonan Sertifikasi Kompetensi.pdf')
+            : base_path('tests/Fixtures/muk/FR_APL_01_generated.pdf');
+        abort_unless(file_exists($path), 404, 'File PDF belum ditemukan.');
+
+        return response()->file($path, ['Content-Type' => 'application/pdf', 'Content-Disposition' => 'inline']);
+    });
+
+    Route::get('/apl02', function (Request $request) {
+        $path = $request->query('ref')
+            ? base_path('all-document-lsp-ProIndo/MUK SKEMA 2 Klaster Maintenance Gasoline Engine Injection/3. FR.APL 02. Asesmen Mandiri.pdf')
+            : base_path('tests/Fixtures/muk/FR_APL_02_generated.pdf');
+        abort_unless(file_exists($path), 404, 'File PDF belum ditemukan.');
+
+        return response()->file($path, ['Content-Type' => 'application/pdf', 'Content-Disposition' => 'inline']);
+    });
+
+    Route::get('/ak01', function (Request $request) {
+        $path = $request->query('ref')
+            ? base_path('all-document-lsp-ProIndo/MUK SKEMA 2 Klaster Maintenance Gasoline Engine Injection/7. FR.AK.01. Persetujuan Asesmen dan Kerahasian  Rev 19 docx.pdf')
+            : base_path('tests/Fixtures/muk/FR_AK_01_generated.pdf');
+        abort_unless(file_exists($path), 404, 'File PDF belum ditemukan.');
+
+        return response()->file($path, ['Content-Type' => 'application/pdf', 'Content-Disposition' => 'inline']);
+    });
+
+    Route::get('/ak02', function (Request $request) {
+        $path = $request->query('ref')
+            ? base_path('all-document-lsp-ProIndo/MUK SKEMA 2 Klaster Maintenance Gasoline Engine Injection/13. FR.AK.02. Rekaman Asesmen Kompetensi.pdf')
+            : base_path('tests/Fixtures/muk/FR_AK_02_generated.pdf');
+        abort_unless(file_exists($path), 404, 'File PDF belum ditemukan.');
+
+        return response()->file($path, ['Content-Type' => 'application/pdf', 'Content-Disposition' => 'inline']);
+    });
+
+    Route::get('/ak03', function (Request $request) {
+        $path = $request->query('ref')
+            ? base_path('all-document-lsp-ProIndo/MUK SKEMA 2 Klaster Maintenance Gasoline Engine Injection/14. FR.AK.03. Umpan Balik dan Catatan Asesmen.pdf')
+            : base_path('tests/Fixtures/muk/FR_AK_03_generated.pdf');
+        abort_unless(file_exists($path), 404, 'File PDF belum ditemukan.');
+
+        return response()->file($path, ['Content-Type' => 'application/pdf', 'Content-Disposition' => 'inline']);
+    });
+
+    Route::get('/ak04', function (Request $request) {
+        $path = $request->query('ref')
+            ? base_path('all-document-lsp-ProIndo/MUK SKEMA 2 Klaster Maintenance Gasoline Engine Injection/6. FR.AK.04. Banding Asesmen.pdf')
+            : base_path('tests/Fixtures/muk/FR_AK_04_generated.pdf');
+        abort_unless(file_exists($path), 404, 'File PDF belum ditemukan.');
+
+        return response()->file($path, ['Content-Type' => 'application/pdf', 'Content-Disposition' => 'inline']);
+    });
+
+    Route::get('/pernyataan', function (Request $request) {
+        $path = $request->query('ref')
+            ? base_path('all-document-lsp-ProIndo/MUK SKEMA 2 Klaster Maintenance Gasoline Engine Injection/15 Surat Pernyataan Pemegang Sertifikat.pdf')
+            : base_path('tests/Fixtures/muk/Surat_Pernyataan_generated.pdf');
+        abort_unless(file_exists($path), 404, 'File PDF belum ditemukan.');
+
+        return response()->file($path, ['Content-Type' => 'application/pdf', 'Content-Disposition' => 'inline']);
+    });
+
+    Route::get('/daftar-periksa', function (Request $request) {
+        $path = $request->query('ref')
+            ? base_path('all-document-lsp-ProIndo/MUK SKEMA 2 Klaster Maintenance Gasoline Engine Injection/1. Daftar Periksa Kelengkapan Dokumen Pelatihan.pdf')
+            : base_path('tests/Fixtures/muk/Daftar_Periksa_generated.pdf');
+        abort_unless(file_exists($path), 404, 'File PDF belum ditemukan.');
+
+        return response()->file($path, ['Content-Type' => 'application/pdf', 'Content-Disposition' => 'inline']);
+    });
+});
+
 // Guest Routes
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');

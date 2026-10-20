@@ -1,0 +1,1224 @@
+[
+  {
+    "page": 1,
+    "tables": [
+      {
+        "bbox": [
+          53.35238095238091,
+          35.64999999999998,
+          535.95,
+          99.08000000000004
+        ],
+        "rows": [
+          {
+            "bbox": [
+              53.35238095238091,
+              35.64999999999998,
+              535.95,
+              99.08000000000004
+            ],
+            "cells": [
+              "",
+              "Lembaga Sertifikasi Profesi Praktisi Otomotif LSP-PrO Indo"
+            ]
+          }
+        ]
+      },
+      {
+        "bbox": [
+          53.35238095238091,
+          132.43249999999992,
+          541.6225000000001,
+          180.40750000000014
+        ],
+        "rows": [
+          {
+            "bbox": [
+              53.35238095238091,
+              132.43249999999992,
+              541.6225000000001,
+              180.40750000000014
+            ],
+            "cells": [
+              "Skema Sertifikasi\n(KKNI/Okupasi/Klaster)",
+              "Judul",
+              ": S\nI",
+              "Skema Sertifikasi Klaster Maintenance Gasoline Engine\nInjection System"
+            ]
+          },
+          {
+            "bbox": [
+              167.16428571428577,
+              159.29624999999993,
+              541.6225000000001,
+              180.40750000000014
+            ],
+            "cells": [
+              "",
+              "Nomor",
+              ": S",
+              "Skema 02/LSP PrO Indo/XI/2025"
+            ]
+          }
+        ]
+      },
+      {
+        "bbox": [
+          53.35238095238091,
+          192.97000000000003,
+          541.6225000000001,
+          294.17999999999995
+        ],
+        "rows": [
+          {
+            "bbox": [
+              53.35238095238091,
+              192.97000000000003,
+              541.6225000000001,
+              207.58000000000004
+            ],
+            "cells": [
+              "PANDUAN ASESMEN MANDIRI"
+            ]
+          },
+          {
+            "bbox": [
+              53.35238095238091,
+              207.58000000000004,
+              541.6225000000001,
+              294.17999999999995
+            ],
+            "cells": [
+              "Instruksi:\n• Baca setiap pertanyaan di kolom sebelah kiri\n• Beri tanda centang () pada kotak jika Anda yakin dapat melakukan tugas yang dijelaskan.\n• Isi kolom di sebelah kanan dengan menuliskan bukti yang relevan anda miliki untuk menunjukkan\nbahwa anda melakukan pekerjaan"
+            ]
+          }
+        ]
+      },
+      {
+        "bbox": [
+          53.35238095238091,
+          306.20000000000005,
+          541.6225000000001,
+          346.90000000000003
+        ],
+        "rows": [
+          {
+            "bbox": [
+              53.35238095238091,
+              306.20000000000005,
+              541.6225000000001,
+              346.90000000000003
+            ],
+            "cells": [
+              "Unit Kompetensi 1",
+              "Kode Unit",
+              ":",
+              "G.45OTO01.001.2"
+            ]
+          },
+          {
+            "bbox": [
+              160.18000000000004,
+              326.5,
+              541.6225000000001,
+              346.90000000000003
+            ],
+            "cells": [
+              "",
+              "Judul Unit",
+              ":",
+              "Melaksanakan Keselamatan dan Kesehatan Kerja"
+            ]
+          }
+        ]
+      },
+      {
+        "bbox": [
+          53.35238095238091,
+          356.59999999999997,
+          541.6225000000001,
+          532.0299999999999
+        ],
+        "rows": [
+          {
+            "bbox": [
+              53.35238095238091,
+              356.59999999999997,
+              541.6225000000001,
+              368.59999999999997
+            ],
+            "cells": [
+              "Dapatkah Saya ................?",
+              "K",
+              "BK",
+              "Bukti yang relevan"
+            ]
+          },
+          {
+            "bbox": [
+              53.35238095238091,
+              368.59999999999997,
+              541.6225000000001,
+              438.80000000000007
+            ],
+            "cells": [
+              "1. Elemen: Menyiapkan prosedur Keselamatan\ndan Kesehatan Kerja\n• Kriteria Unjuk Kerja:\n1.1 Potensi bahaya pada area kerja\ndiidentifikasi.\n1.2 APD disiapkan di tempat kerja.",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              53.35238095238091,
+              438.80000000000007,
+              541.6225000000001,
+              532.0299999999999
+            ],
+            "cells": [
+              "2. Elemen: Melaksanakanan prosedur\nKeselamatan dan Kesehatan Kerja\n• Kriteria Unjuk Kerja:\n2.1 APD digunakan sesuai prosedur.\n2.2 Prosedur kesehatan dan keselamatan\nkerja dilaksanakan di tempat kerja.\n2.3 Pencegahan bahaya Keselamatan dan\nKesehatan Kerja dilakukan",
+              "☐",
+              "☐",
+              ""
+            ]
+          }
+        ]
+      },
+      {
+        "bbox": [
+          53.35238095238091,
+          541.73,
+          541.6225000000001,
+          582.3299999999999
+        ],
+        "rows": [
+          {
+            "bbox": [
+              53.35238095238091,
+              541.73,
+              541.6225000000001,
+              582.3299999999999
+            ],
+            "cells": [
+              "Unit Kompetensi 2",
+              "Kode Unit",
+              ":",
+              "G.45OTO01.002.2"
+            ]
+          },
+          {
+            "bbox": [
+              160.18000000000004,
+              561.9200000000001,
+              541.6225000000001,
+              582.3299999999999
+            ],
+            "cells": [
+              "",
+              "Judul Unit",
+              ":",
+              "Menggunakan Peralatan dan Perlengkapan Tempat Kerja"
+            ]
+          }
+        ]
+      },
+      {
+        "bbox": [
+          53.35238095238091,
+          594.42,
+          541.6225000000001,
+          769.75
+        ],
+        "rows": [
+          {
+            "bbox": [
+              53.35238095238091,
+              594.42,
+              541.6225000000001,
+              606.42
+            ],
+            "cells": [
+              "Dapatkah Saya ................?",
+              "K",
+              "BK",
+              "Bukti yang relevan"
+            ]
+          },
+          {
+            "bbox": [
+              53.35238095238091,
+              606.42,
+              541.6225000000001,
+              688.0299999999999
+            ],
+            "cells": [
+              "1. Elemen: Memilih peralatan dan perlengkapan\ntempat kerja secara aman\n• Kriteria Unjuk Kerja:\n1.1 Peralatan dan perlengkapan tempat\nkerja diidentifikasi.\n1.2 Peralatan dan perlengkapan\ndisiapkan di tempat kerja.",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              53.35238095238091,
+              688.0299999999999,
+              541.6225000000001,
+              769.75
+            ],
+            "cells": [
+              "2. Elemen: Menggunakan peralatan dan\nperlengkapan di tempat kerja\n• Kriteria Unjuk Kerja:\n2.1 Peralatan dan perlengkapan\ndikalibrasi sesuai jenis dan fungsi.\n2.2 Peralatan dan perlengkapan\ndigunakan sesuai manual perbaikan.",
+              "☐",
+              "☐",
+              ""
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "page": 2,
+    "tables": [
+      {
+        "bbox": [
+          53.64999999999998,
+          35.64999999999998,
+          535.95,
+          99.08000000000004
+        ],
+        "rows": [
+          {
+            "bbox": [
+              53.64999999999998,
+              35.64999999999998,
+              535.95,
+              99.08000000000004
+            ],
+            "cells": [
+              "",
+              "Lembaga Sertifikasi Profesi Praktisi Otomotif LSP-PrO Indo"
+            ]
+          }
+        ]
+      },
+      {
+        "bbox": [
+          53.64999999999998,
+          113.37,
+          541.25,
+          154.08000000000004
+        ],
+        "rows": [
+          {
+            "bbox": [
+              53.64999999999998,
+              113.37,
+              541.25,
+              154.08000000000004
+            ],
+            "cells": [
+              "Unit Kompetensi 3",
+              "Kode Unit",
+              ":",
+              "G.45OTO01.007.2"
+            ]
+          },
+          {
+            "bbox": [
+              160.18000000000004,
+              133.66999999999996,
+              541.25,
+              154.08000000000004
+            ],
+            "cells": [
+              "",
+              "Judul Unit",
+              ":",
+              "Membaca Gambar Teknik"
+            ]
+          }
+        ]
+      },
+      {
+        "bbox": [
+          53.64999999999998,
+          166.08000000000004,
+          541.25,
+          307.0
+        ],
+        "rows": [
+          {
+            "bbox": [
+              53.64999999999998,
+              166.08000000000004,
+              541.25,
+              178.08000000000004
+            ],
+            "cells": [
+              "Dapatkah Saya ................?",
+              "K",
+              "BK",
+              "Bukti yang relevan"
+            ]
+          },
+          {
+            "bbox": [
+              53.64999999999998,
+              178.08000000000004,
+              541.25,
+              236.77999999999997
+            ],
+            "cells": [
+              "1. Elemen: Menyiapkan gambar teknik\n• Kriteria Unjuk Kerja:\n1.1 Gambar Teknik diidentifikasi sesuai\nkebutuhan.\n1.2 Gambar teknik disiapkan.",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              53.64999999999998,
+              236.77999999999997,
+              541.25,
+              307.0
+            ],
+            "cells": [
+              "2. Elemen: Membaca gambar teknik\n• Kriteria Unjuk Kerja:\n2.1 Simbol dan kode gambar teknik\ndiidentifikasi.\n2.2 Gambar teknik dijelaskan sesuai\nfungsi dan cara kerja.",
+              "☐",
+              "☐",
+              ""
+            ]
+          }
+        ]
+      },
+      {
+        "bbox": [
+          53.64999999999998,
+          319.0,
+          541.25,
+          359.59999999999997
+        ],
+        "rows": [
+          {
+            "bbox": [
+              53.64999999999998,
+              319.0,
+              541.25,
+              359.59999999999997
+            ],
+            "cells": [
+              "Unit Kompetensi 4",
+              "Kode Unit",
+              ":",
+              "G.45OTO01.008.2"
+            ]
+          },
+          {
+            "bbox": [
+              160.18000000000004,
+              339.2,
+              541.25,
+              359.59999999999997
+            ],
+            "cells": [
+              "",
+              "Judul Unit",
+              ":",
+              "Menggunakan Alat Ukur"
+            ]
+          }
+        ]
+      },
+      {
+        "bbox": [
+          53.64999999999998,
+          371.69999999999993,
+          541.25,
+          547.0299999999999
+        ],
+        "rows": [
+          {
+            "bbox": [
+              53.64999999999998,
+              371.69999999999993,
+              541.25,
+              383.69999999999993
+            ],
+            "cells": [
+              "Dapatkah Saya ................?",
+              "K",
+              "BK",
+              "Bukti yang relevan"
+            ]
+          },
+          {
+            "bbox": [
+              53.64999999999998,
+              383.69999999999993,
+              541.25,
+              476.80000000000007
+            ],
+            "cells": [
+              "1. Elemen: Menyiapkan alat ukur dan komponen\n• Kriteria Unjuk Kerja:\n1.1 Jenis alat ukur dan komponen\ndiidentifikasi.\n1.2 Alat ukur yang sesuai disiapkan di\ntempat kerja.\n1.3 Alat ukur dikalibrasi sebelum\ndigunakan.",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              53.64999999999998,
+              476.80000000000007,
+              541.25,
+              547.0299999999999
+            ],
+            "cells": [
+              "2. Elemen: Menggunakan alat ukur\n• Kriteria Unjuk Kerja:\n2.1 Alat ukur digunakan sesuai prosedur.\n2.2 Alat ukur digunakan sesuai fungsi\ndan jenis alat ukur.\n2.3 Hasil pengukuran didokumentasikan.",
+              "☐",
+              "☐",
+              ""
+            ]
+          }
+        ]
+      },
+      {
+        "bbox": [
+          53.64999999999998,
+          559.0299999999999,
+          541.25,
+          599.73
+        ],
+        "rows": [
+          {
+            "bbox": [
+              53.64999999999998,
+              559.0299999999999,
+              541.25,
+              599.73
+            ],
+            "cells": [
+              "Unit Kompetensi 5",
+              "Kode Unit",
+              ":",
+              "G.45OTO01.009.2"
+            ]
+          },
+          {
+            "bbox": [
+              160.18000000000004,
+              579.3299999999999,
+              541.25,
+              599.73
+            ],
+            "cells": [
+              "",
+              "Judul Unit",
+              ":",
+              "Melaksanakan Diagnosis"
+            ]
+          }
+        ]
+      },
+      {
+        "bbox": [
+          53.64999999999998,
+          611.73,
+          541.25,
+          775.5500000000001
+        ],
+        "rows": [
+          {
+            "bbox": [
+              53.64999999999998,
+              611.73,
+              541.25,
+              623.73
+            ],
+            "cells": [
+              "Dapatkah Saya ................?",
+              "K",
+              "BK",
+              "Bukti yang relevan"
+            ]
+          },
+          {
+            "bbox": [
+              53.64999999999998,
+              623.73,
+              541.25,
+              693.92
+            ],
+            "cells": [
+              "1. Elemen: Mempersiapkan diagnosis\n• Kriteria Unjuk Kerja:\n1.1 Komponen, alat, SST dan Diagnosis\ntools diidentifikasi.\n1.2 Komponen, alat, SST dan Diagnosis\ntools disiapkan di tempat kerja.",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              53.64999999999998,
+              693.92,
+              541.25,
+              775.5500000000001
+            ],
+            "cells": [
+              "2. Elemen: Melakukan diagnosis\n• Kriteria Unjuk Kerja:\n2.1 Komponen, alat, SST dan Diagnosis\ntools dikalibrasi sebelum digunakan.\n2.2 Komponen, alat, SST dan Diagnosis\ntools digunakan sesuai manual\nperbaikan.",
+              "☐",
+              "☐",
+              ""
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "page": 3,
+    "tables": [
+      {
+        "bbox": [
+          53.39285714285716,
+          35.64999999999998,
+          535.95,
+          99.08000000000004
+        ],
+        "rows": [
+          {
+            "bbox": [
+              53.39285714285716,
+              35.64999999999998,
+              535.95,
+              99.08000000000004
+            ],
+            "cells": [
+              "",
+              "Lembaga Sertifikasi Profesi Praktisi Otomotif LSP-PrO Indo"
+            ]
+          }
+        ]
+      },
+      {
+        "bbox": [
+          53.39285714285716,
+          113.37,
+          541.25,
+          148.37
+        ],
+        "rows": [
+          {
+            "bbox": [
+              53.39285714285716,
+              113.37,
+              541.25,
+              148.37
+            ],
+            "cells": [
+              "2.3 Hasil diagnosis didokumentasikan\n2.4 Hasil diagnosis dievaluasi dan\ndipresentasikan.",
+              "",
+              "",
+              ""
+            ]
+          }
+        ]
+      },
+      {
+        "bbox": [
+          53.39285714285716,
+          160.37,
+          541.25,
+          201.08000000000004
+        ],
+        "rows": [
+          {
+            "bbox": [
+              53.39285714285716,
+              160.37,
+              541.25,
+              201.08000000000004
+            ],
+            "cells": [
+              "Unit Kompetensi 6",
+              "Kode Unit",
+              ":",
+              "G.45OTO01.010.2"
+            ]
+          },
+          {
+            "bbox": [
+              160.18,
+              180.66999999999996,
+              541.25,
+              201.08000000000004
+            ],
+            "cells": [
+              "",
+              "Judul Unit",
+              ":",
+              "Melakukan Perawatan Berkala Engine"
+            ]
+          }
+        ]
+      },
+      {
+        "bbox": [
+          53.39285714285716,
+          213.07999999999998,
+          541.25,
+          733.4499999999999
+        ],
+        "rows": [
+          {
+            "bbox": [
+              53.39285714285716,
+              213.07999999999998,
+              541.25,
+              225.07999999999998
+            ],
+            "cells": [
+              "Dapatkah Saya ................?",
+              "K",
+              "BK",
+              "Bukti yang relevan"
+            ]
+          },
+          {
+            "bbox": [
+              53.39285714285716,
+              225.07999999999998,
+              541.25,
+              444.80000000000007
+            ],
+            "cells": [
+              "1. Elemen: Menyiapkan Perawatan engine\n• Kriteria Unjuk Kerja:\n1.1 Nama, jenis, spesifikasi, fungsi,\nprinsip kerja engine diidentifikasi\nsesuai prosedur.\n1.2 Prosedur pengoperasian alat ukur\ndan peralatan khusus/SST untuk\nperawatan berkala engine\ndiidentifikasi sesuai prosedur.\n1.3 Peralatan, perlengkapan dan bahan\ndisiapkan di tempat kerja sesuai\nprosedur.\n1.4 Manual perbaikan engine disiapkan\ndi tempat kerja sesuai prosedur.\n1.5 Data perawatan berkala engine\ndiidentifikasi sesuai prosedur.\n1.6 Kendaraan yang akan dilakukan\nperawatan berkala engine disiapkan\ndi area kerja sesuai prosedur.",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              53.39285714285716,
+              444.80000000000007,
+              541.25,
+              733.4499999999999
+            ],
+            "cells": [
+              "2. Elemen: Melakukan Pemeriksaan engine\n• Kriteria Unjuk Kerja:\n2.1 Engine dibersihkan dari kotoran\nsesuai prosedur.\n2.2 Sistem pelumasan engine diperiksa\nsesuai prosedur.\n2.3 Sistem pendinginan engine dan\nkomponen engine diperiksa sesuai\nprosedur.\n2.4 Sistem pemasukan udara dan sistem\ngas buang engine diperiksa sesuai\nprosedur.\n2.5 Sistem pengapian engine diperiksa\nsesuai prosedur.\n2.6 Sistem bahan bakar diperiksa sesuai\nprosedur.\n2.7 Emisi gas buang engine diperiksa\nsesuai prosedur.\n2.8 Hasil pemeriksaan engine\nditindaklanjuti sesuai dengan kondisi.\n2.9 Hasil pemeriksaan engine diuji\nkinerjanya sesuai prosedur.\n2.10 Hasil pemeriksaan engine\ndidokumentasikan dan dilaporkan\nsesuai prosedur.",
+              "☐",
+              "☐",
+              ""
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "page": 4,
+    "tables": [
+      {
+        "bbox": [
+          53.55909090909092,
+          35.64999999999998,
+          535.95,
+          99.08000000000004
+        ],
+        "rows": [
+          {
+            "bbox": [
+              53.55909090909092,
+              35.64999999999998,
+              535.95,
+              99.08000000000004
+            ],
+            "cells": [
+              "",
+              "Lembaga Sertifikasi Profesi Praktisi Otomotif LSP-PrO Indo"
+            ]
+          }
+        ]
+      },
+      {
+        "bbox": [
+          53.55909090909092,
+          113.37,
+          541.25,
+          154.08000000000004
+        ],
+        "rows": [
+          {
+            "bbox": [
+              53.55909090909092,
+              113.37,
+              541.25,
+              154.08000000000004
+            ],
+            "cells": [
+              "Unit Kompetensi 7",
+              "Kode Unit",
+              ":",
+              "G.45OTO01.065.2"
+            ]
+          },
+          {
+            "bbox": [
+              160.18000000000004,
+              133.66999999999996,
+              541.25,
+              154.08000000000004
+            ],
+            "cells": [
+              "",
+              "Judul Unit",
+              ":",
+              "Memelihara Baterai"
+            ]
+          }
+        ]
+      },
+      {
+        "bbox": [
+          53.55909090909092,
+          166.08000000000004,
+          541.25,
+          676.12
+        ],
+        "rows": [
+          {
+            "bbox": [
+              53.55909090909092,
+              166.08000000000004,
+              541.25,
+              178.08000000000004
+            ],
+            "cells": [
+              "Dapatkah Saya ................?",
+              "K",
+              "BK",
+              "Bukti yang relevan"
+            ]
+          },
+          {
+            "bbox": [
+              53.55909090909092,
+              178.08000000000004,
+              541.25,
+              397.80000000000007
+            ],
+            "cells": [
+              "1. Elemen: Menyiapkan pemeliharaan baterai\nkendaraan ringan\n• Kriteria Unjuk Kerja:\n1.1 Manual perbaikan pemeliharaan\nbaterai yang digunakan disiapkan.\n1.2 Peralatan dan perangkat kerja\npendukung diperiksa atas kondisi\ndan kelayakan pakai berdasarkan\nkebutuhan pemeliharaan.\n1.3 Baterai yang digunakan disiapkan\nuntuk menentukan proses\npemeliharaan.\n1.4 Level cairan elektrolit diperiksa dan\ndisesuaikan pada level yang tepat\nberdasarkan manual perbaikan.\n(Hanya berlaku untuk baterai basah).\n1.5 Perlengkapan pelindung kendaraan\ndipasang berdasarkan prosedur di\ntempat kerja.",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              53.55909090909092,
+              397.80000000000007,
+              541.25,
+              594.5299999999999
+            ],
+            "cells": [
+              "2. Elemen: Melaksanakan pemeliharaan baterai\n• Kriteria Unjuk Kerja:\n2.1 Kondisi rumah atau casing baterai,\nterminal baterai dan koneksi ke kabel\nkendaraan diperiksa sesuai manual\nperbaikan.\n2.2 Tegangan baterai diperiksa dengan\nmenggunakan alat ukur yang sesuai\ndengan manual perbaikan.\n2.3 Berat jenis air baterai diperiksa\nmenggunakan alat ukur yang sesuai\ndengan manual perbaikan.\n2.4 Baterai dan terminal dibersihkan\nsesuai dengan manual perbaikan.\n2.5 Dokumen pemeriksaan baterai diisi\nsesuai dengan hasil pelaksanaan\npemeriksaan baterai.",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              53.55909090909092,
+              594.5299999999999,
+              541.25,
+              676.12
+            ],
+            "cells": [
+              "3. Elemen: Menguji baterai pada kendaraan\n• Kriteria Unjuk Kerja:\n3.1 Baterai di uji dengan menggunakan\ndiagnostic tool sesuai dengan\nmanual perbaikan.\n3.2 Hasil pekerjaan menguji baterai\ndidokumentasikan.",
+              "☐",
+              "☐",
+              ""
+            ]
+          }
+        ]
+      },
+      {
+        "bbox": [
+          53.55909090909092,
+          688.12,
+          541.25,
+          728.8500000000001
+        ],
+        "rows": [
+          {
+            "bbox": [
+              53.55909090909092,
+              688.12,
+              541.25,
+              728.8500000000001
+            ],
+            "cells": [
+              "Unit Kompetensi 8",
+              "Kode Unit",
+              ":",
+              "G.45OTO01.073.2"
+            ]
+          },
+          {
+            "bbox": [
+              160.18000000000004,
+              708.4374899999999,
+              541.25,
+              728.8500000000001
+            ],
+            "cells": [
+              "",
+              "Judul Unit",
+              ":",
+              "Memperbaiki Kerusakan Pada Sistem Pengaman Kelistrikan"
+            ]
+          }
+        ]
+      },
+      {
+        "bbox": [
+          53.55909090909092,
+          740.8500000000001,
+          541.25,
+          776.3500000000001
+        ],
+        "rows": [
+          {
+            "bbox": [
+              53.55909090909092,
+              740.8500000000001,
+              541.25,
+              752.8500000000001
+            ],
+            "cells": [
+              "Dapatkah Saya ................?",
+              "K",
+              "BK",
+              "Bukti yang relevan"
+            ]
+          },
+          {
+            "bbox": [
+              53.55909090909092,
+              752.8500000000001,
+              541.25,
+              776.3500000000001
+            ],
+            "cells": [
+              "1. Elemen: Menyiapkan pekerjaan memperbaiki\nkerusakan pada sistem pengaman kelistrikan",
+              "☐",
+              "☐",
+              ""
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "page": 5,
+    "tables": [
+      {
+        "bbox": [
+          53.45000000000002,
+          35.64999999999998,
+          535.95,
+          99.08000000000004
+        ],
+        "rows": [
+          {
+            "bbox": [
+              53.45000000000002,
+              35.64999999999998,
+              535.95,
+              99.08000000000004
+            ],
+            "cells": [
+              "",
+              "Lembaga Sertifikasi Profesi Praktisi Otomotif LSP-PrO Indo"
+            ]
+          }
+        ]
+      },
+      {
+        "bbox": [
+          53.45000000000002,
+          113.37,
+          541.25,
+          530.9200000000001
+        ],
+        "rows": [
+          {
+            "bbox": [
+              53.45000000000002,
+              113.37,
+              541.25,
+              264.08
+            ],
+            "cells": [
+              "• Kriteria Unjuk Kerja:\n1.1 Manual perbaikan sistem pengaman\ndisiapkan sesuai dengan kendaraan\nyang digunakan.\n1.2 Peralatan dan perangkat kerja\npendukung diperiksa atas kondisi\ndan kelayakan pakai berdasarkan\nkebutuhan perbaikan.\n1.3 Sistem pengaman yang akan\ndiperbaiki disiapkan.\n1.4 Perlengkapan pelindung kendaraan\ndipasang berdasarkan prosedur di\ntempat kerja.",
+              "",
+              "",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              53.45000000000002,
+              264.08,
+              541.25,
+              391.80000000000007
+            ],
+            "cells": [
+              "2. Elemen: Melaksanakan pengujian pada sistem\npengaman kelistrikan\n• Kriteria Unjuk Kerja:\n2.1 Sistem pengaman kelistrikan diuji\nsesuai manual perbaikan.\n2.2 Hasil pengujian sistem pengaman\nkelistrikan ditemukan berdasarkan\nmanual perbaikan.\n2.3 Dokumen pengujian sistem\npengaman kelistrikan diisi sesuai\nhasil pengujian.",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              53.45000000000002,
+              391.80000000000007,
+              541.25,
+              530.9200000000001
+            ],
+            "cells": [
+              "3. Elemen: Melaksanakan perbaikan pada sistem\npengaman kelistrikan\n• Kriteria Unjuk Kerja:\n3.1 Sistem pengaman kelistrikan\ndiperbaiki berdasarkan hasil\npengujian.\n3.2 Hasil perbaikan sistem pengaman\nkelistrikan dilakukan berdasarkan\nhasil pengujian.\n3.3 Dokumen perbaikan sistem\npengaman kelistrikan diisi sesuai\nhasil pengujian.",
+              "",
+              "",
+              ""
+            ]
+          }
+        ]
+      },
+      {
+        "bbox": [
+          53.45000000000002,
+          542.9200000000001,
+          541.25,
+          583.62
+        ],
+        "rows": [
+          {
+            "bbox": [
+              53.45000000000002,
+              542.9200000000001,
+              541.25,
+              583.62
+            ],
+            "cells": [
+              "Unit Kompetensi 9",
+              "Kode Unit",
+              ":",
+              "G.45OTO01.078.2"
+            ]
+          },
+          {
+            "bbox": [
+              160.18,
+              563.23,
+              541.25,
+              583.62
+            ],
+            "cells": [
+              "",
+              "Judul Unit",
+              ":",
+              "Memperbaiki Sistem Manajemen Engine"
+            ]
+          }
+        ]
+      },
+      {
+        "bbox": [
+          53.45000000000002,
+          595.62,
+          541.25,
+          781.3500000000001
+        ],
+        "rows": [
+          {
+            "bbox": [
+              53.45000000000002,
+              595.62,
+              541.25,
+              607.62
+            ],
+            "cells": [
+              "Dapatkah Saya ................?",
+              "K",
+              "BK",
+              "Bukti yang relevan"
+            ]
+          },
+          {
+            "bbox": [
+              53.45000000000002,
+              607.62,
+              541.25,
+              781.3500000000001
+            ],
+            "cells": [
+              "1. Elemen: Menyiapkan perbaikan sistem\nmanajemen engine\n• Kriteria Unjuk Kerja:\n1.1 Manual perbaikan memperbaiki\nsistem manajemen engine disiapkan\nsesuai prosedur.\n1.2 Peralatan dan bahan serta perangkat\nkerja lain diperiksa atas kondisi dan\nkelayakan pakai berdasarkan\nkebutuhan kerja.\n1.3 Perlengkapan pelindung kendaraan\ndipasang berdasarkan prosedur di\ntempat kerja.\n1.4 Sistem manajemen engine diperiksa\ndengan menggunakan diagnostic tool",
+              "☐",
+              "☐",
+              ""
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "page": 6,
+    "tables": [
+      {
+        "bbox": [
+          55.593333333333334,
+          113.37,
+          538.8666666666666,
+          507.33
+        ],
+        "rows": [
+          {
+            "bbox": [
+              55.593333333333334,
+              113.37,
+              538.8666666666666,
+              148.37
+            ],
+            "cells": [
+              "untuk memudahkan mengetahui\nkerusakan pada sistem manajemen\nengine.",
+              "",
+              "",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              55.593333333333334,
+              148.37,
+              538.8666666666666,
+              333.59999999999997
+            ],
+            "cells": [
+              "2. Elemen: Mendiagnosa sistem manajemen\nengine\n• Kriteria Unjuk Kerja:\n2.1 Sistem manajemen engine dasar dan\nelektronis diperiksa menggunakan\ndiagnostic tool untuk mengetahui\nkerusakan atau kesalahan sesuai\nprosedur.\n2.2 Sistem Manajemen engine diperiksa\nsecara visual untuk mengetahui\nkemungkinan terjadi kerusakan yang\ntidak bisa diketahui melalui\ndiagnostic tool.\n2.3 Dokumen pekerjaan Mendiagnosa\nsistem manajemen engine diisi\nsesuai dengan hasil diagnosa.",
+              "☐",
+              "☐",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              55.593333333333334,
+              333.59999999999997,
+              538.8666666666666,
+              507.33
+            ],
+            "cells": [
+              "3. Elemen: Melaksanakan perbaikan sistem\nengine\n• Kriteria Unjuk Kerja:\n3.1 Sistem manajemen engine diperbaiki\nberdasarkan manual perbaikan.\n3.2 Peralatan, teknik dan bahan yang\nsesuai digunakan berdasarkan\nmanual perbaikan.\n3.3 Hasil perbaikan diuji dengan\nmenggunakan diagnostic tool sesuai\nmanual perbaikan.\n3.4 Dokumen perbaikan sistem\nmanajemen engine diisi sesuai hasil\nperbaikan dan dilaporkan sesuai\nprosedur.",
+              "",
+              "",
+              ""
+            ]
+          }
+        ]
+      },
+      {
+        "bbox": [
+          55.593333333333334,
+          519.9039999999999,
+          538.8666666666666,
+          648.755
+        ],
+        "rows": [
+          {
+            "bbox": [
+              55.593333333333334,
+              519.9039999999999,
+              538.8666666666666,
+              648.755
+            ],
+            "cells": [
+              "Asesmen dapat / tidak dapat dilanjutkan",
+              "Nama",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              283.45999399999994,
+              537.0583233333332,
+              538.8666666666666,
+              567.8583433333333
+            ],
+            "cells": [
+              "",
+              "Tanda tangan/\nTanggal",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              283.45999399999994,
+              567.8583433333333,
+              538.8666666666666,
+              581.5583233333332
+            ],
+            "cells": [
+              "",
+              "Ditinjau Oleh Asesor :",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              283.45999399999994,
+              581.5583233333332,
+              538.8666666666666,
+              599.6633333333333
+            ],
+            "cells": [
+              "",
+              "Nama :",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              283.45999399999994,
+              599.6633333333333,
+              538.8666666666666,
+              617.6633333333333
+            ],
+            "cells": [
+              "",
+              "No. Reg:",
+              ""
+            ]
+          },
+          {
+            "bbox": [
+              283.45999399999994,
+              617.6633333333333,
+              538.8666666666666,
+              648.755
+            ],
+            "cells": [
+              "",
+              "Tanda tangan/\nTanggal",
+              ""
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]
