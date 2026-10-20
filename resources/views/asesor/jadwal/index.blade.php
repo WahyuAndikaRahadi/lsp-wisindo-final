@@ -5,10 +5,36 @@
     $jadwals = $jadwals ?? $schedules ?? collect();
 @endphp
 <div class="space-y-6">
-    <div>
-        <h1 class="text-2xl font-black text-slate-900 tracking-tight">Jadwal Penugasan</h1>
-        <p class="text-sm text-slate-500">Daftar jadwal asesmen yang ditugaskan kepada Anda</p>
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-black text-slate-900 tracking-tight">Jadwal Penugasan</h1>
+            <p class="text-sm text-slate-500">Daftar jadwal asesmen yang ditugaskan kepada Anda</p>
+        </div>
     </div>
+
+    {{-- Banner Reminder if Asesor Signature is Not Set --}}
+    @php
+        $asesorProfile = auth()->user()->profile;
+        $hasSignature = !empty($asesorProfile?->signature_data);
+    @endphp
+    @if(!$hasSignature)
+        <div class="rounded-xl bg-amber-50 border border-amber-200 p-4 text-amber-900 flex items-start gap-3 shadow-sm">
+            <svg class="w-5 h-5 text-amber-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
+            <div class="flex-1 text-sm">
+                <h4 class="font-bold text-amber-900">Tanda Tangan Digital Belum Disimpan!</h4>
+                <p class="mt-0.5 text-xs text-amber-800">
+                    Anda belum menyimpan master tanda tangan digital. Setel tanda tangan Anda sekarang agar otomatis digunakan saat menandatangani persetujuan AK.01 dan rubrik instrumen uji.
+                </p>
+                <div class="mt-2.5">
+                    <a href="{{ route('asesor.profile.edit') }}" class="inline-flex items-center px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-bold shadow-xs transition">
+                        Atur Biodata & TTD Sekarang &rarr;
+                    </a>
+                </div>
+            </div>
+        </div>
+    @endif
 
     {{-- Perhatian Asesor: Tugas Yang Perlu Dikerjakan --}}
     @if((isset($pendingAplAssessments) && $pendingAplAssessments->count() > 0) || (isset($pendingScoringAssessments) && $pendingScoringAssessments->count() > 0))

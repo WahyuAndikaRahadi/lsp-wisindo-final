@@ -11,7 +11,7 @@
     <form action="{{ route('admin.users.store') }}" method="POST" class="space-y-6">
         @csrf
 
-        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 space-y-4">
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 space-y-4" x-data="{ role: '{{ old('role', 'ASESI') }}' }">
             <h2 class="text-base font-bold text-slate-900">Data Akun Pengguna</h2>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -53,13 +53,13 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-1">Peran / Role <span class="text-rose-500">*</span></label>
-                    <select name="role" required class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none bg-white">
-                        <option value="ASESI" {{ old('role') == 'ASESI' ? 'selected' : '' }}>Asesi (Peserta Uji)</option>
-                        <option value="ASESOR" {{ old('role') == 'ASESOR' ? 'selected' : '' }}>Asesor Kompetensi</option>
-                        <option value="ADMIN_LSP" {{ old('role') == 'ADMIN_LSP' ? 'selected' : '' }}>Admin LSP</option>
-                        <option value="SUPER_ADMIN" {{ old('role') == 'SUPER_ADMIN' ? 'selected' : '' }}>Super Admin</option>
-                        <option value="KOMITE_TEKNIS" {{ old('role') == 'KOMITE_TEKNIS' ? 'selected' : '' }}>Komite Teknis</option>
-                        <option value="TUK_ADMIN" {{ old('role') == 'TUK_ADMIN' ? 'selected' : '' }}>Admin TUK</option>
+                    <select name="role" x-model="role" required class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none bg-white">
+                        <option value="ASESI">Asesi (Peserta Uji)</option>
+                        <option value="ASESOR">Asesor Kompetensi</option>
+                        <option value="ADMIN_LSP">Admin LSP</option>
+                        <option value="SUPER_ADMIN">Super Admin</option>
+                        <option value="KOMITE_TEKNIS">Komite Teknis</option>
+                        <option value="TUK_ADMIN">Admin TUK</option>
                     </select>
                     @error('role')
                         <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
@@ -79,10 +79,11 @@
                 </div>
             </div>
 
-            <div>
+            {{-- Hidden by default, only shown when Role is set to Asesor Kompetensi --}}
+            <div x-show="role === 'ASESOR'" x-cloak x-transition class="pt-2 border-t border-slate-100">
                 <label class="block text-sm font-semibold text-slate-700 mb-1">No. Registrasi Asesor (No. MET BNSP)</label>
-                <input type="text" name="assessor_registration_number" value="{{ old('assessor_registration_number') }}" placeholder="Contoh: MET.000.002498 2013 (Khusus Role Asesor)" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm font-mono focus:ring-2 focus:ring-brand-500 focus:outline-none">
-                <p class="text-xs text-slate-400 mt-1">Kosongkan jika pengguna bukan Asesor Kompetensi.</p>
+                <input type="text" name="assessor_registration_number" value="{{ old('assessor_registration_number') }}" placeholder="Contoh: MET.000.002498 2013" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm font-mono focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                <p class="text-xs text-slate-400 mt-1">Dicantumkan pada form verifikasi & dokumen MUK resmi Asesor.</p>
                 @error('assessor_registration_number')
                     <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
                 @enderror

@@ -1,0 +1,68 @@
+<?php
+
+namespace App\Http\Controllers\Asesor;
+
+use App\Http\Controllers\Controller;
+use App\Models\UserProfile;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\View\View;
+
+class ProfileController extends Controller
+{
+    /**
+     * Show the assessor profile & digital signature edit page.
+     */
+    public function edit(): View
+    {
+        $user = auth()->user();
+        $profile = $user->profile;
+
+        return view('asesor.profile', compact('user', 'profile'));
+    }
+
+    /**
+     * Update the assessor profile and signature.
+     */
+    public function update(Request $request): RedirectResponse
+    {
+        $user = auth()->user();
+
+        $validated = $request->validate([
+            'full_name' => 'required|string|max:255',
+            'phone' => 'nullable|string|max:30',
+            'assessor_registration_number' => 'nullable|string|max:50',
+            'nik' => 'nullable|string|max:20',
+            'tempat_lahir' => 'nullable|string|max:100',
+            'tanggal_lahir' => 'nullable|date',
+            'jenis_kelamin' => 'nullable|in:L,P',
+            'kebangsaan' => 'nullable|string|max:50',
+            'alamat_rumah' => 'nullable|string',
+            'kode_pos' => 'nullable|string|max:10',
+            'no_telepon_rumah' => 'nullable|string|max:30',
+            'no_telepon_kantor' => 'nullable|string|max:30',
+            'pendidikan_terakhir' => 'nullable|string|max:50',
+            'nama_institusi_perusahaan' => 'nullable|string|max:255',
+            'jabatan' => 'nullable|string|max:100',
+            'alamat_kantor' => 'nullable|string',
+            'signature_data' => 'nullable|string',
+        ]);
+
+        // Update user direct attributes
+        $user->update([
+            'full_name' => $validated['full_name'],
+            'phone' => $validated['phone'] ?? $user->phone,
+            'assessor_registration_number' => $validated['assessor_registration_number'] ?? $user->assessor_registration_number,
+        ]);
+
+        // Separate user profile fields
+        $profileData = collect($validated)->except(['full_name', 'phone', 'assessor_registration_number'])->toArray();
+
+        UserProfile::updateOrCreate(
+            ['user_id' => $user->id],
+            $profileData
+        );
+
+        return redirect()->route('asesor.profile.edit')->with('success', 'Biodata dan tanda tangan asesor berhasil disimpan.');
+    }
+}

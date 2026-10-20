@@ -107,7 +107,7 @@
                     @else
                         <form action="{{ route('asesor.ak01.sign', $assessment->id) }}" method="POST" class="space-y-3">
                             @csrf
-                            <x-signature-pad name="assessor_signature" label="Tanda tangan di bawah ini" :required="true" />
+                            <x-signature-pad name="assessor_signature" :value="auth()->user()->profile?->signature_data" label="Tanda tangan di bawah ini" :required="true" />
                             <button type="submit" class="px-5 py-2 text-sm font-bold bg-brand-600 hover:bg-brand-700 text-white rounded-lg shadow-sm transition">
                                 Tanda Tangani AK01
                             </button>

@@ -77,6 +77,9 @@ Route::middleware(['auth', 'role:ASESI'])->prefix('asesi')->name('asesi.')->grou
 
 // Asesor Routes
 Route::middleware(['auth', 'role:ASESOR'])->prefix('asesor')->name('asesor.')->group(function () {
+    Route::get('/profile', [Asesor\ProfileController::class, 'edit'])->name('profile.edit');
+    Route::post('/profile', [Asesor\ProfileController::class, 'update'])->name('profile.update');
+
     Route::get('/jadwal', [Asesor\JadwalController::class, 'index'])->name('jadwal.index');
     Route::get('/jadwal/{schedule}/asesi', [Asesor\JadwalController::class, 'asesiList'])->name('jadwal.asesi');
 

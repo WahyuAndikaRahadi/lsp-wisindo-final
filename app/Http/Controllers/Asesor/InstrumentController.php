@@ -303,7 +303,7 @@ class InstrumentController extends Controller
         $savedAnswers = $savedData['answers'] ?? $savedData['kuks'] ?? $savedData['tasks'] ?? $savedData['questions'] ?? $savedData['items'] ?? $savedData;
         $savedNotes = $response?->assessor_notes;
         $savedGeneralNotes = $response?->assessor_notes;
-        $savedSignature = $response?->assessor_signature;
+        $savedSignature = $response?->assessor_signature ?? auth()->user()->profile?->signature_data;
 
         $viewName = "asesor.ruang-uji.{$code}";
         if (! view()->exists($viewName)) {
