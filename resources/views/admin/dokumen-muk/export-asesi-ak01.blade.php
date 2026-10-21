@@ -1,148 +1,306 @@
 @extends('layouts.print-muk')
 
-@section('title', 'FR.AK.01 Persetujuan Asesmen - ' . $asesi->full_name)
+@section('title', 'FR.AK.01 Persetujuan Asesmen - ' . ($asesi->full_name ?? 'Wahyu Andika Rahadi'))
 @section('doc-title', 'FR.AK.01 Persetujuan Asesmen dan Kerahasiaan')
 
+@push('styles')
+<style>
+    .ak01-container {
+        font-family: Calibri, "Liberation Sans", Arial, sans-serif;
+        font-size: 11pt;
+        color: #000;
+        line-height: 1.35;
+        margin: 0 auto;
+        width: 100%;
+        max-width: 190mm;
+    }
+    .header-table {
+        width: 100%;
+        border-collapse: collapse;
+        border: 1px solid #000;
+        margin-bottom: 14px;
+    }
+    .header-table td {
+        border: 1px solid #000;
+        padding: 6px 12px;
+        vertical-align: middle;
+    }
+    .header-logo-cell {
+        width: 110px;
+        text-align: center;
+        padding: 4px !important;
+    }
+    .header-logo-img {
+        max-height: 58px;
+        max-width: 85px;
+        object-fit: contain;
+    }
+    .header-title-cell {
+        font-family: Tahoma, "Liberation Sans", sans-serif;
+        font-size: 11pt;
+        font-weight: bold;
+        padding-left: 16px;
+    }
+    .doc-main-title {
+        font-size: 12pt;
+        font-weight: bold;
+        margin: 12px 0 10px 0;
+        text-align: left;
+    }
+    .master-ak01-table {
+        width: 100%;
+        border-collapse: collapse;
+        border: 1px solid #000;
+        font-size: 11pt;
+    }
+    .master-ak01-table td {
+        border: 1px solid #000;
+        padding: 5px 8px;
+        vertical-align: top;
+    }
+    .cb-box {
+        display: inline-block;
+        width: 13px;
+        height: 13px;
+        border: 1px solid #000;
+        text-align: center;
+        line-height: 12px;
+        font-size: 10pt;
+        font-weight: bold;
+        margin-right: 4px;
+        vertical-align: middle;
+    }
+    .sub-table-clean {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .sub-table-clean td {
+        border: none !important;
+        padding: 3px 2px;
+    }
+    .note-footer {
+        font-size: 11pt;
+        font-style: italic;
+        margin-top: 6px;
+        text-align: left;
+    }
+</style>
+@endpush
+
 @section('content')
-<div style="font-size: 9.5pt; line-height: 1.35;">
-    {{-- Header Kop --}}
-    <div class="header-kop">
-        <div class="title-lsp">Lembaga Sertifikasi Profesi Praktisi Otomotif LSP-PrO Indo</div>
-        <div class="doc-code">FR.AK.01. PERSETUJUAN ASESMEN DAN KERAHASIAAN</div>
-    </div>
+@php
+    $dummySkemaJudul = $scheme->name ?? 'Maintenance Gasoline Engine Injection System';
+    $dummySkemaNomor = $scheme->code ?? '02/LSP PrO Indo/I/2026';
+    $dummyTukTipe = 'Sewaktu/Tempat Kerja/Mandiri*';
+    $dummyTukNama = $schedule->tuk_name ?? 'TUK Otomotif PrO Indo';
+    $dummyAsesorNama = $assessor?->full_name ?? $assessor?->name ?? 'Drs. Budi Santoso, M.T.';
+    $dummyAsesiNama = $asesi->full_name ?? $asesi->name ?? 'Wahyu Andika Rahadi';
+    $dummyHariTgl = !empty($schedule?->date) ? \Carbon\Carbon::parse($schedule->date)->translatedFormat('l, d F Y') : 'Senin, 19 Oktober 2026';
+    $dummyWaktu = (!empty($schedule?->start_time) && !empty($schedule?->end_time))
+        ? \Carbon\Carbon::parse($schedule->start_time)->format('H.i') . ' - ' . \Carbon\Carbon::parse($schedule->end_time)->format('H.i') . ' WIB'
+        : '08.00 - 12.00 WIB';
+    $dummyTglTtd = !empty($schedule?->date) ? \Carbon\Carbon::parse($schedule->date)->translatedFormat('d F Y') : '19 Oktober 2026';
+@endphp
 
-    <div style="font-size: 8.5pt; font-style: italic; margin-bottom: 12px; text-align: center; color: #475569;">
-        Persetujuan Asesmen ini untuk menjamin bahwa Asesi telah diberi arahan secara rinci tentang perencanaan dan proses asesmen
-    </div>
-
-    {{-- Meta Grid --}}
-    <table class="meta-grid" style="border: 1px solid #000; margin-bottom: 12px;">
+<div class="ak01-container">
+    {{-- 1. Header Box (Table 1) --}}
+    <table class="header-table">
         <tr>
-            <td class="label" style="border-right: 1px solid #000; width: 25%; font-weight: bold;" rowspan="2">
-                Skema Sertifikasi<br><span style="font-size: 8.5pt; font-weight: normal;">(KKNI/Okupasi/Klaster)</span>
+            <td class="header-logo-cell">
+                <img src="{{ asset('storage/assets/logo.png') }}" onerror="this.onerror=null; this.src='{{ asset('images/logo.png') }}';" class="header-logo-img" alt="Logo LSP">
             </td>
-            <td style="width: 12%; padding-left: 6px;">Judul</td>
-            <td class="colon">:</td>
-            <td class="value">{{ $scheme->name }}</td>
-        </tr>
-        <tr>
-            <td style="padding-left: 6px;">Nomor</td>
-            <td class="colon">:</td>
-            <td class="value">{{ $scheme->code }}</td>
-        </tr>
-        <tr style="border-top: 1px solid #000;">
-            <td class="label" style="border-right: 1px solid #000; font-weight: bold;">TUK</td>
-            <td colspan="3" style="padding-left: 6px;">Sewaktu/Tempat Kerja/Mandiri* (<strong>{{ $schedule->tuk_name }}</strong>)</td>
-        </tr>
-        <tr style="border-top: 1px solid #000;">
-            <td class="label" style="border-right: 1px solid #000; font-weight: bold;">Nama Asesor</td>
-            <td colspan="3" style="padding-left: 6px; font-weight: bold;">{{ $assessor?->full_name ?? $assessor?->name ?? '-' }}</td>
-        </tr>
-        <tr style="border-top: 1px solid #000;">
-            <td class="label" style="border-right: 1px solid #000; font-weight: bold;">Nama Asesi</td>
-            <td colspan="3" style="padding-left: 6px; font-weight: bold;">{{ $asesi->full_name }}</td>
+            <td class="header-title-cell">
+                Lembaga Sertifikasi Profesi Praktisi Otomotif LSP-PrO Indo
+            </td>
         </tr>
     </table>
 
-    {{-- Evidence Checkbox Block --}}
-    <table class="meta-grid" style="border: 1px solid #000; margin-bottom: 12px;">
+    {{-- 2. Document Title --}}
+    <div class="doc-main-title">
+        FR.AK.01. &nbsp;PERSETUJUAN ASESMEN DAN KERAHASIAAN
+    </div>
+
+    {{-- 3. Main Single Unified Table (Table 2) --}}
+    <table class="master-ak01-table">
+        {{-- Row 0: Persetujuan statement --}}
         <tr>
-            <td style="width: 25%; font-weight: bold; border-right: 1px solid #000; padding: 6px; vertical-align: middle;">
-                Bukti yang akan dikumpulkan
-            </td>
-            <td style="padding: 6px;">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px; font-size: 9pt;">
-                    <div><span class="check-box">&radic;</span> Hasil Verifikasi Portofolio</div>
-                    <div><span class="check-box">&nbsp;</span> Hasil Reviu Produk</div>
-                    <div><span class="check-box">&radic;</span> Hasil Observasi Langsung</div>
-                    <div><span class="check-box">&nbsp;</span> Hasil Kegiatan Terstruktur</div>
-                    <div><span class="check-box">&radic;</span> Hasil Pertanyaan Lisan</div>
-                    <div><span class="check-box">&radic;</span> Hasil Pertanyaan Tertulis</div>
-                    <div><span class="check-box">&radic;</span> Hasil Pertanyaan Wawancara</div>
-                    <div><span class="check-box">&nbsp;</span> Lainnya: ....................</div>
-                </div>
+            <td colspan="4" style="padding: 8px 10px;">
+                Persetujuan Asesmen ini untuk menjamin bahwa Asesi telah diberi arahan secara rinci tentang perencanaan dan proses asesmen
             </td>
         </tr>
-        <tr style="border-top: 1px solid #000;">
-            <td style="font-weight: bold; border-right: 1px solid #000; padding: 6px; vertical-align: top;">
-                Pelaksanaan asesmen disepakati pada:
+
+        {{-- Row 1: Skema Judul --}}
+        <tr>
+            <td rowspan="2" style="width: 26%; vertical-align: middle;">
+                Skema Sertifikasi<br>
+                <span>(KKNI/Okupasi/Klaster)</span>
             </td>
-            <td style="padding: 6px;">
-                <table style="width: 100%; font-size: 9pt; border-collapse: collapse;">
+            <td style="width: 10%;">Judul</td>
+            <td style="width: 3%; text-align: center;">:</td>
+            <td style="font-style: italic;">{{ $dummySkemaJudul }}</td>
+        </tr>
+
+        {{-- Row 2: Skema Nomor --}}
+        <tr>
+            <td>Nomor</td>
+            <td style="text-align: center;">:</td>
+            <td>{{ $dummySkemaNomor }}</td>
+        </tr>
+
+        {{-- Row 3: TUK --}}
+        <tr>
+            <td colspan="2">TUK</td>
+            <td style="text-align: center;">:</td>
+            <td>{{ $dummyTukTipe }}</td>
+        </tr>
+
+        {{-- Row 4: Nama Asesor --}}
+        <tr>
+            <td colspan="2">Nama Asesor</td>
+            <td style="text-align: center;">:</td>
+            <td style="font-weight: bold;">{{ $dummyAsesorNama }}</td>
+        </tr>
+
+        {{-- Row 5: Nama Asesi --}}
+        <tr>
+            <td colspan="2">Nama Asesi</td>
+            <td style="text-align: center;">:</td>
+            <td style="font-weight: bold;">{{ $dummyAsesiNama }}</td>
+        </tr>
+
+        {{-- Row 6 to 9: Bukti-bukti yang dikumpulkan --}}
+        <tr>
+            <td colspan="2" style="vertical-align: middle;">
+                Bukti yang akan dikumpulkan :
+            </td>
+            <td style="text-align: center; vertical-align: top; padding-top: 8px;">
+                :<br><br>:<br><br><br>:<br><br>
+            </td>
+            <td style="padding: 6px 8px;">
+                <table class="sub-table-clean">
                     <tr>
-                        <td style="width: 22%;">Hari/ Tanggal</td>
-                        <td style="width: 3%;">:</td>
-                        <td><strong>{{ \Carbon\Carbon::parse($schedule->date)->translatedFormat('l, d F Y') }}</strong></td>
+                        <td style="width: 50%;">
+                            <span class="cb-box">&#10003;</span> Hasil Verifikasi Portofolio
+                        </td>
+                        <td style="width: 50%;">
+                            <span class="cb-box">&nbsp;</span> Hasil Reviu Produk
+                        </td>
                     </tr>
                     <tr>
-                        <td>Waktu</td>
-                        <td>:</td>
-                        <td><strong>Pkl. {{ \Carbon\Carbon::parse($schedule->start_time)->format('H.i') }} s/d {{ \Carbon\Carbon::parse($schedule->end_time)->format('H.i') }}</strong></td>
+                        <td>
+                            <span class="cb-box">&#10003;</span> Hasil Observasi Langsung
+                        </td>
+                        <td>
+                            <span class="cb-box">&nbsp;</span> Hasil Kegiatan Terstruktur
+                        </td>
                     </tr>
                     <tr>
-                        <td>TUK</td>
-                        <td>:</td>
-                        <td><strong>{{ $schedule->tuk_name }}</strong></td>
+                        <td>
+                            <span class="cb-box">&#10003;</span> Hasil Pertanyaan Lisan
+                        </td>
+                        <td>
+                            <span class="cb-box">&#10003;</span> Hasil Pertanyaan Tertulis
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="vertical-align: top;">
+                            <span class="cb-box">&nbsp;</span> Lainnya ……
+                        </td>
+                        <td style="vertical-align: top;">
+                            <span class="cb-box">&nbsp;</span> Hasil Pertanyaan Wawancara
+                        </td>
                     </tr>
                 </table>
             </td>
         </tr>
+
+        {{-- Row 10 to 12: Pelaksanaan Asesmen --}}
+        <tr>
+            <td colspan="2" style="vertical-align: middle;">
+                Pelaksanaan asesmen disepakati pada:
+            </td>
+            <td colspan="2" style="padding: 4px 8px;">
+                <table class="sub-table-clean">
+                    <tr>
+                        <td style="width: 25%;">Hari/ Tanggal</td>
+                        <td style="width: 3%; text-align: center;">:</td>
+                        <td style="font-weight: bold;">{{ $dummyHariTgl }}</td>
+                    </tr>
+                    <tr>
+                        <td>Waktu</td>
+                        <td style="text-align: center;">:</td>
+                        <td style="font-weight: bold;">{{ $dummyWaktu }}</td>
+                    </tr>
+                    <tr>
+                        <td>TUK</td>
+                        <td style="text-align: center;">:</td>
+                        <td style="font-weight: bold;">{{ $dummyTukNama }}</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+
+        {{-- Row 13: Pernyataan Asesi 1 --}}
+        <tr>
+            <td colspan="4" style="padding: 8px 10px;">
+                <strong>Asesi :</strong><br>
+                Bahwa saya telah mendapatkan penjelasan terkait hak dan prosedur banding asesmen dari asesor.
+            </td>
+        </tr>
+
+        {{-- Row 14: Pernyataan Asesor --}}
+        <tr>
+            <td colspan="4" style="padding: 8px 10px;">
+                <strong>Asesor :</strong><br>
+                Menyatakan tidak akan membuka hasil pekerjaan yang saya peroleh karena penugasan saya sebagai Asesor dalam pekerjaan <em>Asesmen</em> kepada siapapun atau organisasi apapun selain kepada pihak yang berwenang sehubungan dengan kewajiban saya sebagai Asesor yang ditugaskan oleh LSP.
+            </td>
+        </tr>
+
+        {{-- Row 15: Pernyataan Asesi 2 --}}
+        <tr>
+            <td colspan="4" style="padding: 8px 10px;">
+                <strong>Asesi :</strong><br>
+                Saya setuju mengikuti asesmen dengan pemahaman bahwa informasi yang dikumpulkan hanya digunakan untuk pengembangan profesional dan hanya dapat diakses oleh orang tertentu saja.
+            </td>
+        </tr>
+
+        {{-- Row 16: Tanda Tangan Section (Stacked vertically exactly like Master) --}}
+        <tr>
+            <td colspan="4" style="padding: 12px 10px 14px 10px;">
+                <div style="margin-bottom: 12px;">
+                    <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                        <div>
+                            Tanda tangan Asesor : ……………………………
+                        </div>
+                        <div style="margin-right: 180px;">
+                            Tanggal : {{ $dummyTglTtd }}
+                        </div>
+                    </div>
+                    <div style="margin-top: 3px; padding-left: 140px; font-weight: bold; font-size: 10pt;">
+                        ( {{ $dummyAsesorNama }} )
+                    </div>
+                </div>
+
+                <div style="margin-top: 8px;">
+                    <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                        <div>
+                            Tanda tangan Asesi &nbsp;: ……………………………
+                        </div>
+                        <div style="margin-right: 180px;">
+                            Tanggal : {{ $dummyTglTtd }}
+                        </div>
+                    </div>
+                    <div style="margin-top: 3px; padding-left: 140px; font-weight: bold; font-size: 10pt;">
+                        ( {{ $dummyAsesiNama }} )
+                    </div>
+                </div>
+            </td>
+        </tr>
     </table>
 
-    {{-- Statement clauses --}}
-    <div style="border: 1px solid #000; padding: 8px 12px; margin-bottom: 15px; font-size: 8.5pt; line-height: 1.45;">
-        <div style="margin-bottom: 8px;">
-            <strong>Asesi :</strong><br>
-            Bahwa saya telah mendapatkan penjelasan terkait hak dan prosedur banding asesmen dari asesor.
-        </div>
-        <div style="margin-bottom: 8px;">
-            <strong>Asesor :</strong><br>
-            Menyatakan tidak akan membuka hasil pekerjaan yang saya peroleh karena penugasan saya sebagai Asesor dalam pekerjaan Asesmen kepada siapapun atau organisasi apapun selain kepada pihak yang berwenang sehubungan dengan kewajiban saya sebagai Asesor yang ditugaskan oleh LSP.
-        </div>
-        <div>
-            <strong>Asesi :</strong><br>
-            Saya setuju mengikuti asesmen dengan pemahaman bahwa informasi yang dikumpulkan hanya digunakan untuk pengembangan profesional dan hanya dapat diakses oleh orang tertentu saja.
-        </div>
-    </div>
-
-    {{-- Signatures --}}
-    <div class="sig-container avoid-break" style="margin-top: 20px;">
-        <div class="sig-grid">
-            <div class="sig-col" style="padding-left: 0; width: 50%;">
-                <div style="font-size: 9pt; font-weight: bold; margin-bottom: 4px;">Tanda tangan Asesi :</div>
-                <div class="sig-box">
-                    @if($assessment->asesi_signature)
-                        <img src="{{ $assessment->asesi_signature }}" class="sig-img" alt="TTD Asesi">
-                    @else
-                        <div style="height: 45px;"></div>
-                    @endif
-                    <div style="border-bottom: 1px dotted #000; width: 85%;"></div>
-                </div>
-                <div style="font-size: 9pt;">
-                    <strong>{{ $asesi->full_name }}</strong><br>
-                    Tanggal : {{ \Carbon\Carbon::parse($schedule->date)->translatedFormat('d F Y') }}
-                </div>
-            </div>
-
-            <div class="sig-col" style="padding-right: 0; width: 50%;">
-                <div style="font-size: 9pt; font-weight: bold; margin-bottom: 4px;">Tanda tangan Asesor :</div>
-                <div class="sig-box">
-                    @if($assessor?->profile?->signature_path)
-                        <img src="{{ asset('storage/' . $assessor->profile->signature_path) }}" class="sig-img" alt="TTD Asesor">
-                    @elseif($assessment->assessor_signature)
-                        <img src="{{ $assessment->assessor_signature }}" class="sig-img" alt="TTD Asesor">
-                    @else
-                        <div style="height: 45px;"></div>
-                    @endif
-                    <div style="border-bottom: 1px dotted #000; width: 85%;"></div>
-                </div>
-                <div style="font-size: 9pt;">
-                    <strong>{{ $assessor?->full_name ?? $assessor?->name ?? '-' }}</strong><br>
-                    No. MET : {{ $assessor?->profile?->met_number ?? '-' }}<br>
-                    Tanggal : {{ \Carbon\Carbon::parse($schedule->date)->translatedFormat('d F Y') }}
-                </div>
-            </div>
-        </div>
+    {{-- Note below table --}}
+    <div class="note-footer">
+        * Coret yang tidak perlu
     </div>
 </div>
 @endsection
