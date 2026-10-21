@@ -94,7 +94,7 @@ class IdempotencyAndStatusGuardTest extends TestCase
             'kebangsaan' => 'Indonesia',
             'alamat_rumah' => 'Jl. Cikarang No. 1',
             'pendidikan_terakhir' => 'SMA/Sederajat',
-            'jabatan' => 'Pelajar / Siswa SMK',
+            'jabatan' => 'Pelajar / Siswa',
             'signature_data' => 'data:image/png;base64,sample',
         ]);
         $schedule = $f['schedule'];

@@ -56,11 +56,8 @@
                 <a href="{{ route('asesor.schedule.ak01', $jadwal->id) }}" class="inline-flex items-center px-3 py-1.5 text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-xs transition" title="FR.AK.01 Persetujuan Asesmen">
                     2. FR.AK.01
                 </a>
-                <a href="{{ route('asesor.schedule.ruang-uji', $jadwal->id) }}" class="inline-flex items-center px-3 py-1.5 text-xs font-bold bg-brand-600 hover:bg-brand-700 text-white rounded-lg shadow-xs transition">
-                    3. Ruang Uji &rarr;
-                </a>
-                <a href="{{ route('asesor.schedule.reports', $jadwal->id) }}" class="inline-flex items-center px-3 py-1.5 text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 border border-slate-300 rounded-lg shadow-xs transition" title="FR.AK.05 & FR.AK.06">
-                    4. Tutup Jadwal
+                <a href="{{ route('asesor.schedule.reports', $jadwal->id) }}" class="inline-flex items-center px-3 py-1.5 text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 border border-slate-300 rounded-lg shadow-xs transition" title="FR.AK.05 & FR.AK.06 Laporan Asesmen & Tutup Jadwal">
+                    3. Laporan &amp; Tutup Jadwal
                 </a>
             @else
                 <div class="inline-flex items-center px-3.5 py-2 text-xs font-semibold text-amber-800 bg-amber-50 border border-amber-200 rounded-lg shadow-xs">

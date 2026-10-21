@@ -268,6 +268,7 @@ class UserSeeder extends Seeder
                         'jenis_kelamin' => 'L',
                         'kebangsaan' => 'Indonesia',
                         'alamat_rumah' => 'Jl. Industri No. 1, Cikarang',
+                        'kode_pos' => '17530',
                         'no_telepon_rumah' => $user->phone,
                         'pendidikan_terakhir' => 'SMK Otomotif',
                         'nama_institusi_perusahaan' => 'SMK Negeri 1 Cikarang',

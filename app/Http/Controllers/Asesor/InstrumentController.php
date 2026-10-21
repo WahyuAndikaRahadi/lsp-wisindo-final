@@ -292,11 +292,16 @@ class InstrumentController extends Controller
             'title' => $t['instruction'],
         ]);
         $pmoQuestions = $instrumentService->getPmoQuestions($scheme);
-        $questions = collect($pmoQuestions)->map(fn ($q) => (object) [
-            'id' => $q['number'] ?? $q['id'] ?? 1,
-            'question' => $q['question'],
-            'expected_answer' => $q['expected_answer'] ?? '',
-        ]);
+        $questions = collect($pmoQuestions)->values()->map(function ($q, $idx) {
+            $num = $idx + 1;
+
+            return (object) [
+                'id' => $num,
+                'number' => $num,
+                'question' => $q['question'] ?? "Pertanyaan PMO #{$num}",
+                'expected_answer' => $q['expected_answer'] ?? '',
+            ];
+        });
         $reportSheetItems = $instrumentService->getReportSheetItems($scheme);
 
         $savedData = is_array($response?->data_json) ? $response->data_json : (json_decode($response?->data_json ?? '[]', true) ?: []);
@@ -392,7 +397,11 @@ class InstrumentController extends Controller
 
         Log::info('Asesor ID '.auth()->id()." ({$data['audit_trail']['evaluated_by_name']}) menyimpan penilaian {$code} untuk asesmen #{$assessment->id} (asesi #{$assessment->asesi_id})");
 
-        DB::transaction(function () use ($assessment, $code, $data, $request) {
+        // Auto-assign asesi signature from assessment/profile so asesi does not need redundant manual signing
+        $asesiSig = $existing?->asesi_signature ?? $assessment->asesi_signature ?? $assessment->asesi?->profile?->signature_data;
+        $asesiSignedAt = $existing?->asesi_signed_at ?? ($asesiSig ? now() : null);
+
+        DB::transaction(function () use ($assessment, $code, $data, $request, $asesiSig, $asesiSignedAt) {
             AssessmentIaResponse::updateOrCreate(
                 ['assessment_id' => $assessment->id, 'instrument_code' => $code],
                 [
@@ -400,6 +409,8 @@ class InstrumentController extends Controller
                     'assessor_notes' => $request->input('general_notes') ?? $request->input('notes') ?? $request->input('assessor_notes'),
                     'assessor_signature' => $request->input('signature_data') ?? $request->input('assessor_signature'),
                     'assessor_signed_at' => now(),
+                    'asesi_signature' => $asesiSig,
+                    'asesi_signed_at' => $asesiSignedAt,
                 ]
             );
         });

@@ -96,6 +96,8 @@ class User extends Authenticatable
             return true;
         }
 
-        return $this->profile !== null && $this->profile->isComplete();
+        $profile = $this->profile ?? $this->profile()->first();
+
+        return $profile !== null && $profile->isComplete();
     }
 }

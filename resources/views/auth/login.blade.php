@@ -51,6 +51,18 @@
                 Masukkan email dan kata sandi yang telah terdaftar.
             </p>
 
+            @if(session('success'))
+                <div class="mb-5 p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 flex items-start gap-3 shadow-xs">
+                    <svg class="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <div>
+                        <p class="text-xs font-bold text-emerald-900">Pendaftaran Berhasil</p>
+                        <p class="text-xs text-emerald-700 mt-0.5">{{ session('success') }}</p>
+                    </div>
+                </div>
+            @endif
+
             <form method="POST" action="{{ route('login') }}" class="space-y-4">
                 @csrf
 

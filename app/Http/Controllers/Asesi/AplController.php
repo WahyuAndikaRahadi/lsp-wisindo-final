@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Assessment;
 use App\Models\AssessmentApl02Item;
 use App\Models\AssessmentProof;
+use App\Rules\ValidSignature;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -125,9 +126,69 @@ class AplController extends Controller
             'statement_integrity.accepted' => 'Pernyataan kejujuran dan integritas asesmen mandiri (FR.APL.02) wajib dicentang.',
         ]);
 
+        $user = auth()->user();
+        $profile = $user->profile ?? $user->profile()->first();
+
+        // Validasi kelengkapan data diri pemohon FR.APL.01
+        if ($profile && $request->has('signature_data')) {
+            $missingApl01Fields = [];
+            if (empty($user->full_name)) {
+                $missingApl01Fields[] = 'Nama Lengkap';
+            }
+            if (empty($user->phone)) {
+                $missingApl01Fields[] = 'Nomor HP';
+            }
+            if (empty($profile->nik)) {
+                $missingApl01Fields[] = 'NIK';
+            }
+            if (empty($profile->tempat_lahir)) {
+                $missingApl01Fields[] = 'Tempat Lahir';
+            }
+            if (empty($profile->tanggal_lahir)) {
+                $missingApl01Fields[] = 'Tanggal Lahir';
+            }
+            if (empty($profile->jenis_kelamin)) {
+                $missingApl01Fields[] = 'Jenis Kelamin';
+            }
+            if (empty($profile->alamat_rumah)) {
+                $missingApl01Fields[] = 'Alamat Rumah';
+            }
+            if (empty($profile->pendidikan_terakhir)) {
+                $missingApl01Fields[] = 'Pendidikan Terakhir';
+            }
+            if (empty($profile->jabatan)) {
+                $missingApl01Fields[] = 'Jabatan / Posisi Pekerjaan';
+            }
+
+            if (! empty($missingApl01Fields)) {
+                return back()->withErrors([
+                    'profile_incomplete' => 'Data FR.APL.01 belum lengkap: '.implode(', ', $missingApl01Fields).'. Silakan lengkapi profil Anda terlebih dahulu.',
+                ])->withInput();
+            }
+        }
+
+        // Validasi tanda tangan asesi (Wajib diisi di pad atau dari master tanda tangan profil)
+        $signature = $request->input('signature_data')
+            ?: $profile?->signature_data
+            ?: $assessment->asesi_signature;
+
+        if ($request->has('signature_data') && empty($signature)) {
+            return back()->withErrors([
+                'signature_data' => 'Tanda tangan pemohon (asesi) wajib diisi untuk mengajukan permohonan sertifikasi FR.APL.01.',
+            ])->withInput();
+        }
+
+        if ($request->filled('signature_data')) {
+            $request->validate([
+                'signature_data' => ['required', 'string', new ValidSignature],
+            ], [
+                'signature_data.required' => 'Tanda tangan pemohon (asesi) wajib diisi.',
+            ]);
+        }
+
         $kukInputs = $request->input('kuks', $request->input('apl02', []));
 
-        DB::transaction(function () use ($assessment, $kukInputs, $request) {
+        DB::transaction(function () use ($assessment, $kukInputs, $request, $signature, $profile) {
             foreach ($kukInputs as $kukId => $data) {
                 $val = is_array($data) ? ($data['assessment_value'] ?? $data['value'] ?? 'K') : $data;
                 $proofType = is_array($data)
@@ -148,20 +209,19 @@ class AplController extends Controller
             $updateData = [
                 'apl_status' => 'SUBMITTED',
                 'last_active_step' => 'apl',
+                'asesi_signature' => $signature,
+                'asesi_signed_at' => now(),
             ];
 
             if ($request->filled('assessor_id')) {
                 $updateData['assessor_id'] = $request->assessor_id;
             }
 
-            $profile = auth()->user()->profile;
-            $signature = $request->input('signature_data') ?: $profile?->signature_data;
-            if ($signature) {
-                $updateData['asesi_signature'] = $signature;
-                $updateData['asesi_signed_at'] = now();
-            }
-
             $assessment->update($updateData);
+
+            if ($profile && empty($profile->signature_data)) {
+                $profile->update(['signature_data' => $signature]);
+            }
         });
 
         return redirect()->route('asesi.assessment.apl', $assessment)->with('success', 'Menunggu verifikasi asesor');

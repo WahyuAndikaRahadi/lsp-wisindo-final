@@ -82,8 +82,8 @@
                     <label class="block text-xs font-semibold text-slate-800 mb-1" for="phone">
                         Nomor Telepon / WhatsApp
                     </label>
-                    <input id="phone" type="tel" name="phone" value="{{ old('phone') }}"
-                        class="w-full px-3.5 py-2.5 bg-lsp-input-bg border border-slate-300 focus:border-lsp-navy text-sm sm:text-xs rounded-lg text-slate-900 focus:outline-none focus:ring-1 focus:ring-lsp-navy transition @error('phone') border-lsp-red ring-1 ring-lsp-red @enderror"
+                    <input id="phone" type="tel" name="phone" value="{{ old('phone') }}" inputmode="numeric" maxlength="15"
+                        class="numeric-only w-full px-3.5 py-2.5 bg-lsp-input-bg border border-slate-300 focus:border-lsp-navy text-sm sm:text-xs rounded-lg text-slate-900 focus:outline-none focus:ring-1 focus:ring-lsp-navy transition @error('phone') border-lsp-red ring-1 ring-lsp-red @enderror"
                         placeholder="081234567890" />
                     @error('phone')
                         <p class="mt-1 text-[11px] text-lsp-red font-medium">{{ $message }}</p>

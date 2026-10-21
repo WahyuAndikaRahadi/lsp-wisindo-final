@@ -76,6 +76,26 @@
             </div>
 
             <div class="p-6">
+                @php
+                    $isProfileComplete = $profile && !empty($profile->nik) && !empty($profile->tempat_lahir) && !empty($profile->tanggal_lahir) && !empty($profile->jenis_kelamin) && !empty($profile->alamat_rumah) && !empty($profile->kode_pos) && !empty($profile->pendidikan_terakhir) && !empty($profile->jabatan) && !empty(auth()->user()->phone);
+                @endphp
+
+                @if(! $isProfileComplete)
+                    <div class="mb-5 p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
+                        <div class="flex items-start gap-2.5">
+                            <svg class="w-5 h-5 text-amber-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                            <div>
+                                <p class="text-xs font-bold text-amber-900">Perhatian: Data Profil FR.APL.01 Belum Lengkap</p>
+                                <p class="text-xs text-amber-700 mt-0.5">Seluruh data identitas pribadi dan jabatan posisi di APL.01 wajib diisi lengkap sebelum mengajukan permohonan asesmen.</p>
+                            </div>
+                        </div>
+                        <a href="{{ route('asesi.profile.edit') }}" class="shrink-0 px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-lg transition shadow-xs flex items-center gap-1">
+                            <span>Lengkapi Profil</span>
+                            <span>&rarr;</span>
+                        </a>
+                    </div>
+                @endif
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm bg-slate-50 p-4 rounded-lg border border-slate-200 mb-6">
                     <div>
                         <span class="text-xs text-slate-500 block">Nama Lengkap</span>
@@ -247,22 +267,31 @@
                     <p class="text-xs text-indigo-200">Panduan Asesmen Mandiri: Nilai kesiapan Anda pada setiap Kriteria Unjuk Kerja (KUK)</p>
                 </div>
 
-                {{-- Fast Actions --}}
-                <div class="flex items-center gap-2 flex-wrap">
-                    <button type="button" @click="setAll('K')" class="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded text-xs font-bold shadow-sm transition">
-                        ✓ Semua K (Kompeten)
-                    </button>
-                    <button type="button" @click="setAll('BK')" class="px-3 py-1.5 bg-rose-500 hover:bg-rose-600 text-white rounded text-xs font-bold shadow-sm transition">
-                        ✕ Semua BK
-                    </button>
-                    <select @change="setDefaultProof($event.target.value)" class="px-2 py-1.5 bg-white text-slate-800 rounded text-xs font-medium border-0 focus:ring-2 focus:ring-indigo-300">
-                        <option value="">-- Set Bukti Semua --</option>
-                        <option value="IJAZAH_SMK">Ijazah SMK Otomotif</option>
-                        <option value="SURAT_SISWA_AKTIF">Surat Keterangan Siswa Aktif</option>
-                        <option value="IJAZAH_SMA_SERTIFIKAT">Ijazah + Sertifikat</option>
-                        <option value="PENGALAMAN_KERJA">Surat Pengalaman Kerja</option>
-                    </select>
-                </div>
+                @if($assessment->apl_status !== 'APPROVED' && $assessment->apl_status !== 'SUBMITTED')
+                    {{-- Fast Actions --}}
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <button type="button" @click="setAll('K')" class="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded text-xs font-bold shadow-sm transition">
+                            ✓ Semua K (Kompeten)
+                        </button>
+                        <button type="button" @click="setAll('BK')" class="px-3 py-1.5 bg-rose-500 hover:bg-rose-600 text-white rounded text-xs font-bold shadow-sm transition">
+                            ✕ Semua BK
+                        </button>
+                        <select @change="setDefaultProof($event.target.value)" class="px-2 py-1.5 bg-white text-slate-800 rounded text-xs font-medium border-0 focus:ring-2 focus:ring-indigo-300">
+                            <option value="">-- Set Bukti Semua --</option>
+                            <option value="IJAZAH_SMK">Ijazah SMK Otomotif</option>
+                            <option value="SURAT_SISWA_AKTIF">Surat Keterangan Siswa Aktif</option>
+                            <option value="IJAZAH_SMA_SERTIFIKAT">Ijazah + Sertifikat</option>
+                            <option value="PENGALAMAN_KERJA">Surat Pengalaman Kerja</option>
+                        </select>
+                    </div>
+                @else
+                    <div class="flex items-center gap-2">
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-white/20 text-white rounded text-xs font-semibold">
+                            <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                            Formulir Terkunci &amp; Terkirim
+                        </span>
+                    </div>
+                @endif
             </div>
 
             <div class="p-6 overflow-x-auto">
@@ -337,6 +366,7 @@
                         :value="$assessment->asesi_signature ?? old('signature_data')" 
                         :profileSignature="$profile?->signature_data"
                         label="Tanda Tangan Pemohon (Asesi)" 
+                        :required="true"
                         height="140" 
                         :disabled="$assessment->apl_status === 'SUBMITTED' || $assessment->apl_status === 'APPROVED'"
                     />

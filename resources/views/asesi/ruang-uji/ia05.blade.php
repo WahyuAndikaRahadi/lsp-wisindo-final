@@ -11,7 +11,7 @@
                 ← Kembali ke Ruang Uji
             </a>
             <h1 class="text-xl font-bold text-slate-800">FR.IA.05. PERTANYAAN TERTULIS (CBT)</h1>
-            <p class="text-xs text-slate-500 mt-1">Skema: {{ $assessment->schedule->scheme->name }} (Passing Grade: {{ $assessment->schedule->scheme->passing_grade_theory }}%)</p>
+            <p class="text-xs text-slate-500 mt-1">Skema: {{ $assessment->schedule->scheme->name }}</p>
         </div>
 
         @php

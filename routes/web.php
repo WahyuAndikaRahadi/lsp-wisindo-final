@@ -5,6 +5,7 @@ use App\Http\Controllers\Asesi;
 use App\Http\Controllers\Asesor;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\SecureFileController;
+use App\Http\Controllers\WilayahController;
 use App\Models\Assessment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -309,6 +310,13 @@ Route::prefix('print-example')->group(function () {
 
         return response()->file($path, ['Content-Type' => 'application/pdf', 'Content-Disposition' => 'inline']);
     });
+});
+
+// API Wilayah Indonesia (cahyadsn/wilayah Kepmendagri No 300.2.2-2430 Tahun 2025)
+Route::prefix('api/wilayah')->group(function () {
+    Route::get('/all', [WilayahController::class, 'all'])->name('api.wilayah.all');
+    Route::get('/provinces', [WilayahController::class, 'provinces'])->name('api.wilayah.provinces');
+    Route::get('/regencies/{provinceCode?}', [WilayahController::class, 'regencies'])->name('api.wilayah.regencies');
 });
 
 // Guest Routes

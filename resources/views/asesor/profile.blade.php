@@ -60,9 +60,9 @@
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
                         Nomor Induk Kependudukan (NIK)
                     </label>
-                    <input type="text" name="nik" maxlength="20" value="{{ old('nik', $p->nik) }}"
-                        placeholder="16 digit NIK KTP"
-                        class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                    <input type="text" name="nik" maxlength="16" inputmode="numeric" value="{{ old('nik', $p->nik) }}"
+                        placeholder="16 digit NIK KTP (angka)"
+                        class="numeric-only w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
                     @error('nik') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
                 </div>
 
@@ -78,9 +78,9 @@
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
                         Nomor Handphone / WhatsApp
                     </label>
-                    <input type="text" name="phone" value="{{ old('phone', $user->phone) }}"
-                        placeholder="0812xxxxxxxx"
-                        class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                    <input type="text" name="phone" inputmode="numeric" maxlength="15" value="{{ old('phone', $user->phone) }}"
+                        placeholder="Contoh: 081234567890"
+                        class="numeric-only w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
                     @error('phone') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
                 </div>
 
@@ -151,16 +151,20 @@
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
                         Kode Pos
                     </label>
-                    <input type="text" name="kode_pos" maxlength="10" value="{{ old('kode_pos', $p->kode_pos) }}"
-                        class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                    <input type="text" name="kode_pos" maxlength="10" inputmode="numeric" value="{{ old('kode_pos', $p->kode_pos) }}"
+                        placeholder="Contoh: 17530"
+                        class="numeric-only w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                    @error('kode_pos') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
                 </div>
 
                 <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
                         No. Telepon Rumah
                     </label>
-                    <input type="text" name="no_telepon_rumah" value="{{ old('no_telepon_rumah', $p->no_telepon_rumah) }}"
-                        class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                    <input type="text" name="no_telepon_rumah" inputmode="numeric" maxlength="15" value="{{ old('no_telepon_rumah', $p->no_telepon_rumah) }}"
+                        placeholder="Contoh: 0218901234"
+                        class="numeric-only w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                    @error('no_telepon_rumah') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
                 </div>
             </div>
         </div>
@@ -203,8 +207,10 @@
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
                         No. Telepon Kantor
                     </label>
-                    <input type="text" name="no_telepon_kantor" value="{{ old('no_telepon_kantor', $p->no_telepon_kantor) }}"
-                        class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                    <input type="text" name="no_telepon_kantor" inputmode="numeric" maxlength="15" value="{{ old('no_telepon_kantor', $p->no_telepon_kantor) }}"
+                        placeholder="Contoh: 0218905678"
+                        class="numeric-only w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                    @error('no_telepon_kantor') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
                 </div>
             </div>
         </div>

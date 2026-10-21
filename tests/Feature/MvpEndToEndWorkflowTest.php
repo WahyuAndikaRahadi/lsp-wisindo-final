@@ -84,7 +84,7 @@ class MvpEndToEndWorkflowTest extends TestCase
             'kebangsaan' => 'Indonesia',
             'alamat_rumah' => 'Jl. Merdeka No. 45, Cikarang',
             'pendidikan_terakhir' => 'SMA/Sederajat',
-            'jabatan' => 'Pelajar / Siswa SMK',
+            'jabatan' => 'Pelajar / Siswa',
             'signature_data' => $validPng,
         ]);
         $profileRes->assertRedirect(route('asesi.profile.edit'));

@@ -43,9 +43,9 @@
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
                         Nomor Induk Kependudukan (NIK) <span class="text-rose-500">*</span>
                     </label>
-                    <input type="text" name="nik" maxlength="20" required value="{{ old('nik', $p->nik) }}"
-                        placeholder="16 digit NIK KTP"
-                        class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                    <input type="text" name="nik" maxlength="16" inputmode="numeric" required value="{{ old('nik', $p->nik) }}"
+                        placeholder="16 digit NIK KTP (angka)"
+                        class="numeric-only w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
                     @error('nik') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
                 </div>
 
@@ -68,13 +68,44 @@
                     @error('jenis_kelamin') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
                 </div>
 
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                        Tempat Lahir <span class="text-rose-500">*</span>
-                    </label>
-                    <input type="text" name="tempat_lahir" required value="{{ old('tempat_lahir', $p->tempat_lahir) }}"
-                        class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
-                    @error('tempat_lahir') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
+                {{-- Tempat Lahir: Terintegrasi API Wilayah Indonesia (cahyadsn/wilayah Kepmendagri 2025) --}}
+                <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-50/70 p-3.5 rounded-xl border border-slate-200" 
+                     x-data="wilayahSelector('{{ addslashes(old('tempat_lahir', $p->tempat_lahir ?? '')) }}')">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                            Provinsi Tempat Lahir <span class="text-rose-500">*</span>
+                        </label>
+                        <select x-model="selectedProvince" 
+                                @change="onProvinceChange()" 
+                                class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none bg-white">
+                            <option value="">-- Pilih Provinsi Asal --</option>
+                            <template x-for="prov in provinces" :key="prov.code">
+                                <option :value="prov.code" :selected="prov.code === selectedProvince" x-text="prov.name"></option>
+                            </template>
+                        </select>
+                        <p class="text-[11px] text-slate-400 mt-1">Pilih provinsi untuk memfilter daftar kota/kabupaten</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                            Kota / Kabupaten Tempat Lahir <span class="text-rose-500">*</span>
+                        </label>
+                        <select name="tempat_lahir" 
+                                x-model="selectedCity" 
+                                required 
+                                class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none bg-white"
+                                :disabled="!selectedProvince && regencies.length === 0">
+                            <option value="">-- Pilih Kota / Kabupaten --</option>
+                            <template x-for="reg in regencies" :key="reg.code">
+                                <option :value="reg.name" :selected="reg.name === selectedCity" x-text="reg.name"></option>
+                            </template>
+                            <template x-if="selectedCity && !regencies.some(r => r.name === selectedCity)">
+                                <option :value="selectedCity" selected x-text="selectedCity"></option>
+                            </template>
+                        </select>
+                        @error('tempat_lahir') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
+                        <p class="text-[11px] text-slate-400 mt-1">Standar resmi Kepmendagri No. 300.2.2-2430 (cahyadsn/wilayah)</p>
+                    </div>
                 </div>
 
                 <div>
@@ -120,10 +151,11 @@
 
                 <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                        Kode Pos
+                        Kode Pos <span class="text-rose-500">*</span>
                     </label>
-                    <input type="text" name="kode_pos" maxlength="10" value="{{ old('kode_pos', $p->kode_pos) }}"
-                        class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                    <input type="text" name="kode_pos" maxlength="10" inputmode="numeric" required value="{{ old('kode_pos', $p->kode_pos) }}"
+                        placeholder="Contoh: 17530"
+                        class="numeric-only w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
                     @error('kode_pos') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
                 </div>
 
@@ -131,8 +163,9 @@
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
                         Nomor HP / WhatsApp <span class="text-rose-500">*</span>
                     </label>
-                    <input type="text" name="phone" required value="{{ old('phone', $user->phone) }}"
-                        class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                    <input type="text" name="phone" required inputmode="numeric" maxlength="15" value="{{ old('phone', $user->phone) }}"
+                        placeholder="Contoh: 081234567890"
+                        class="numeric-only w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
                     @error('phone') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
                 </div>
 
@@ -140,8 +173,10 @@
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
                         Telepon Rumah (Opsional)
                     </label>
-                    <input type="text" name="no_telepon_rumah" value="{{ old('no_telepon_rumah', $p->no_telepon_rumah) }}"
-                        class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                    <input type="text" name="no_telepon_rumah" inputmode="numeric" maxlength="15" value="{{ old('no_telepon_rumah', $p->no_telepon_rumah) }}"
+                        placeholder="Contoh: 0218901234"
+                        class="numeric-only w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                    @error('no_telepon_rumah') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
                 </div>
 
                 <div>
@@ -164,7 +199,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                        Nama Institusi / Sekolah / Perusahaan
+                        Nama Institusi / Sekolah / Perusahaan (Opsional)
                     </label>
                     <input type="text" name="nama_institusi_perusahaan" value="{{ old('nama_institusi_perusahaan', $p->nama_institusi_perusahaan) }}"
                         placeholder="Contoh: SMK Negeri 1 Cikarang Barat / Bengkel Auto"
@@ -177,7 +212,7 @@
                     </label>
                     @php
                         $jobOptions = [
-                            'Pelajar / Siswa SMK',
+                            'Pelajar / Siswa',
                             'Mahasiswa',
                             'Karyawan Swasta / Teknisi / Mekanik',
                             'Pegawai Negeri / BUMN',
@@ -200,7 +235,7 @@
 
                 <div class="md:col-span-2">
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                        Alamat Kantor / Sekolah
+                        Alamat Kantor / Sekolah (Opsional)
                     </label>
                     <textarea name="alamat_kantor" rows="2"
                         class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">{{ old('alamat_kantor', $p->alamat_kantor) }}</textarea>
@@ -208,10 +243,11 @@
 
                 <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                        No. Telepon Kantor / Sekolah
+                        No. Telepon Kantor / Sekolah (Opsional)
                     </label>
-                    <input type="text" name="no_telepon_kantor" value="{{ old('no_telepon_kantor', $p->no_telepon_kantor) }}"
-                        class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                    <input type="text" name="no_telepon_kantor" inputmode="numeric" maxlength="15" value="{{ old('no_telepon_kantor', $p->no_telepon_kantor) }}"
+                        placeholder="Contoh: 0218905678"
+                        class="numeric-only w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
                 </div>
             </div>
         </div>
@@ -243,3 +279,65 @@
     </form>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    function wilayahSelector(initialCity) {
+        return {
+            provinces: [],
+            regencies: [],
+            allRegenciesMap: {},
+            selectedProvince: '',
+            selectedCity: initialCity || '',
+
+            async init() {
+                try {
+                    const res = await fetch('/api/wilayah/all');
+                    if (res.ok) {
+                        const data = await res.json();
+                        this.provinces = data.provinces || [];
+                        this.allRegenciesMap = data.regencies || {};
+
+                        if (this.selectedCity) {
+                            const target = this.selectedCity.trim().toLowerCase();
+                            const cleanTarget = target.replace(/^(kabupaten|kota)\s+/i, '');
+
+                            for (const provCode in this.allRegenciesMap) {
+                                const list = this.allRegenciesMap[provCode];
+                                const match = list.find(r => {
+                                    const rName = r.name.toLowerCase();
+                                    const rClean = rName.replace(/^(kabupaten|kota)\s+/i, '');
+                                    return rName === target || rClean === cleanTarget;
+                                });
+
+                                if (match) {
+                                    this.selectedProvince = provCode;
+                                    this.regencies = list;
+                                    this.$nextTick(() => {
+                                        this.selectedCity = match.name;
+                                    });
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                } catch (e) {
+                    console.error('Gagal memuat API wilayah:', e);
+                }
+            },
+
+            onProvinceChange() {
+                if (!this.selectedProvince) {
+                    this.regencies = [];
+                    this.selectedCity = '';
+                    return;
+                }
+                this.regencies = this.allRegenciesMap[this.selectedProvince] || [];
+                if (!this.regencies.some(r => r.name === this.selectedCity)) {
+                    this.selectedCity = '';
+                }
+            }
+        };
+    }
+</script>
+@endpush

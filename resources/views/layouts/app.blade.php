@@ -472,6 +472,28 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            // Strict numeric-only input restriction for integer fields (kode pos, nik, phone, etc.)
+            document.addEventListener('keydown', function (e) {
+                const el = e.target;
+                if (!el || el.tagName !== 'INPUT') return;
+                if (el.matches('.numeric-only, [data-numeric-only], [inputmode="numeric"]')) {
+                    if (e.ctrlKey || e.metaKey || (e.key && e.key.length > 1)) {
+                        return;
+                    }
+                    if (!/^[0-9]$/.test(e.key)) {
+                        e.preventDefault();
+                    }
+                }
+            });
+
+            document.addEventListener('input', function (e) {
+                const el = e.target;
+                if (!el || el.tagName !== 'INPUT') return;
+                if (el.matches('.numeric-only, [data-numeric-only], [inputmode="numeric"]')) {
+                    el.value = el.value.replace(/\D/g, '');
+                }
+            });
+
             // Anti-double-click & loading spinner protection for forms
             document.addEventListener('submit', function (e) {
                 const form = e.target;

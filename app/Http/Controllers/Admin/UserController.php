@@ -30,11 +30,13 @@ class UserController extends Controller
         $validated = $request->validate([
             'full_name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'phone' => 'nullable|string|max:30',
+            'phone' => ['nullable', 'string', 'max:20', 'regex:/^[0-9]+$/'],
             'password' => ['required', 'string', Password::min(8)->letters()->numbers()],
             'role' => 'required|in:SUPER_ADMIN,ADMIN_LSP,ASESOR,ASESI,KOMITE_TEKNIS,TUK_ADMIN',
             'status' => 'required|in:ACTIVE,INACTIVE,SUSPENDED',
             'assessor_registration_number' => 'nullable|string|max:50',
+        ], [
+            'phone.regex' => 'Nomor telepon/WhatsApp hanya boleh berupa angka.',
         ]);
 
         $validated['password'] = Hash::make($validated['password']);
@@ -62,11 +64,13 @@ class UserController extends Controller
         $validated = $request->validate([
             'full_name' => 'required|string|max:255',
             'email' => ['required', 'email', Rule::unique('users')->ignore($user->id)],
-            'phone' => 'nullable|string|max:30',
+            'phone' => ['nullable', 'string', 'max:20', 'regex:/^[0-9]+$/'],
             'password' => ['nullable', 'string', Password::min(8)->letters()->numbers()],
             'role' => 'required|in:SUPER_ADMIN,ADMIN_LSP,ASESOR,ASESI,KOMITE_TEKNIS,TUK_ADMIN',
             'status' => 'required|in:ACTIVE,INACTIVE,SUSPENDED',
             'assessor_registration_number' => 'nullable|string|max:50',
+        ], [
+            'phone.regex' => 'Nomor telepon/WhatsApp hanya boleh berupa angka.',
         ]);
 
         if (empty($validated['password'])) {

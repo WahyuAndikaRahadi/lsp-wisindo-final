@@ -84,8 +84,6 @@
                             </span>
                             @if($isDone05)
                                 <span class="text-xs font-black font-mono text-slate-800">Skor: {{ $ia05Resp->score }}%</span>
-                            @else
-                                <span class="text-[11px] font-mono text-slate-500">Min. {{ $passingGrade }}%</span>
                             @endif
                         </div>
                         <h3 class="text-base font-bold text-slate-900">FR.IA.05. Pertanyaan Tertulis (CBT)</h3>

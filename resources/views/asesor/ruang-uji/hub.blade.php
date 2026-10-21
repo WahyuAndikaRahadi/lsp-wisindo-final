@@ -9,17 +9,23 @@
     </div>
 
     {{-- Assessment Instrument Cards --}}
+    @php
+        $ia01Done = $assessment->iaResponses->firstWhere('instrument_code', 'IA01') !== null;
+        $ia01bDone = $assessment->iaResponses->firstWhere('instrument_code', 'IA01B') !== null;
+        $ia02Done = $assessment->iaResponses->firstWhere('instrument_code', 'IA02') !== null;
+        $ia03Done = $assessment->iaResponses->firstWhere('instrument_code', 'IA03') !== null;
+        $ia05Resp = $assessment->iaResponses->firstWhere('instrument_code', 'IA05');
+        $ia05Score = $ia05Resp?->score ?? $assessment->ia05_score;
+        $ia05Done = $ia05Resp !== null || $ia05Score !== null;
+    @endphp
     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
         {{-- IA01: Observasi Langsung --}}
         <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 flex flex-col justify-between hover:shadow-md transition">
             <div class="space-y-3">
                 <div class="flex items-center justify-between">
                     <span class="px-2.5 py-1 rounded bg-blue-50 text-blue-700 font-mono text-xs font-bold">FR.IA.01</span>
-                    @php
-                        $ia01Done = $assessment->ia01_completed ?? false;
-                    @endphp
                     <span class="px-2.5 py-0.5 rounded text-xs font-semibold border {{ $ia01Done ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-50 text-slate-600 border-slate-200' }}">
-                        {{ $ia01Done ? 'Selesai' : 'Belum Selesai' }}
+                        {{ $ia01Done ? '✓ Selesai' : 'Belum Selesai' }}
                     </span>
                 </div>
                 <div>
@@ -39,8 +45,8 @@
             <div class="space-y-3">
                 <div class="flex items-center justify-between">
                     <span class="px-2.5 py-1 rounded bg-indigo-50 text-indigo-700 font-mono text-xs font-bold">FR.IA.01B</span>
-                    <span class="px-2.5 py-0.5 rounded text-xs font-semibold border bg-slate-50 text-slate-600 border-slate-200">
-                        Report Sheet
+                    <span class="px-2.5 py-0.5 rounded text-xs font-semibold border {{ $ia01bDone ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-50 text-slate-600 border-slate-200' }}">
+                        {{ $ia01bDone ? '✓ Selesai' : 'Report Sheet' }}
                     </span>
                 </div>
                 <div>
@@ -60,11 +66,8 @@
             <div class="space-y-3">
                 <div class="flex items-center justify-between">
                     <span class="px-2.5 py-1 rounded bg-purple-50 text-purple-700 font-mono text-xs font-bold">FR.IA.02</span>
-                    @php
-                        $ia02Done = $assessment->ia02_completed ?? false;
-                    @endphp
                     <span class="px-2.5 py-0.5 rounded text-xs font-semibold border {{ $ia02Done ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-50 text-slate-600 border-slate-200' }}">
-                        {{ $ia02Done ? 'Selesai' : 'Belum Selesai' }}
+                        {{ $ia02Done ? '✓ Selesai' : 'Belum Selesai' }}
                     </span>
                 </div>
                 <div>
@@ -84,11 +87,8 @@
             <div class="space-y-3">
                 <div class="flex items-center justify-between">
                     <span class="px-2.5 py-1 rounded bg-amber-50 text-amber-700 font-mono text-xs font-bold">FR.IA.03</span>
-                    @php
-                        $ia03Done = $assessment->ia03_completed ?? false;
-                    @endphp
                     <span class="px-2.5 py-0.5 rounded text-xs font-semibold border {{ $ia03Done ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-50 text-slate-600 border-slate-200' }}">
-                        {{ $ia03Done ? 'Selesai' : 'Belum Selesai' }}
+                        {{ $ia03Done ? '✓ Selesai' : 'Belum Selesai' }}
                     </span>
                 </div>
                 <div>
@@ -108,11 +108,8 @@
             <div class="space-y-3">
                 <div class="flex items-center justify-between">
                     <span class="px-2.5 py-1 rounded bg-emerald-50 text-emerald-700 font-mono text-xs font-bold">FR.IA.05</span>
-                    @php
-                        $ia05Score = $assessment->ia05_score ?? null;
-                    @endphp
-                    <span class="px-2.5 py-0.5 rounded text-xs font-semibold border {{ $ia05Score !== null ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-50 text-slate-600 border-slate-200' }}">
-                        {{ $ia05Score !== null ? 'Skor: ' . $ia05Score : 'Belum Dikerjakan' }}
+                    <span class="px-2.5 py-0.5 rounded text-xs font-semibold border {{ $ia05Done ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-50 text-slate-600 border-slate-200' }}">
+                        {{ $ia05Done ? '✓ Selesai (Skor: ' . ($ia05Score ?? 0) . '%)' : 'Belum Dikerjakan' }}
                     </span>
                 </div>
                 <div>

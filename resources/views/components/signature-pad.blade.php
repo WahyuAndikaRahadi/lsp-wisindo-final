@@ -21,7 +21,8 @@
     inputName: '{{ $name }}',
     initialImage: @js($initialValue),
     profileSignature: @js($userProfileSignature),
-    disabled: @js($isDisabled)
+    disabled: @js($isDisabled),
+    required: @js((bool) $required)
 })" x-init="initPad()" class="w-full">
     @if($label)
         <div class="flex items-center justify-between mb-1.5">
@@ -39,7 +40,8 @@
         </div>
     @endif
 
-    <div class="relative border-2 @if($isDisabled) border-slate-200 bg-slate-100/70 @else border-dashed border-slate-300 bg-slate-50 hover:border-slate-400 @endif rounded-lg overflow-hidden transition">
+    <div class="relative border-2 rounded-lg overflow-hidden transition"
+         :class="hasError ? 'border-rose-500 ring-2 ring-rose-200' : (@js($isDisabled) ? 'border-slate-200 bg-slate-100/70' : 'border-dashed border-slate-300 bg-slate-50 hover:border-slate-400')">
         <canvas 
             id="{{ $padId }}" 
             class="w-full bg-white block @if($isDisabled) pointer-events-none cursor-default @else touch-none cursor-crosshair @endif" 
@@ -63,6 +65,13 @@
         @endif
     </div>
 
+    <template x-if="hasError">
+        <p class="text-rose-600 text-xs mt-1.5 font-semibold flex items-center gap-1">
+            <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span x-text="errorMessage"></span>
+        </p>
+    </template>
+
     @if(! $isDisabled && $userProfileSignature)
         <div class="mt-2 flex items-center">
             <label class="inline-flex items-center text-xs font-semibold text-slate-700 cursor-pointer select-none">
@@ -77,7 +86,7 @@
         </div>
     @endif
 
-    <input type="hidden" name="{{ $name }}" :value="signatureData" @if($required && ! $isDisabled) required @endif>
+    <input type="hidden" name="{{ $name }}" :value="signatureData">
 
     @error($name)
         <p class="text-rose-600 text-xs mt-1">{{ $message }}</p>
@@ -93,6 +102,9 @@ function signaturePadComponent(config) {
         signatureData: config.initialImage || '',
         profileSignature: config.profileSignature || '',
         disabled: Boolean(config.disabled),
+        required: Boolean(config.required),
+        hasError: false,
+        errorMessage: '',
         useProfileSignature: false,
         isEmpty: !config.initialImage,
         hasDrawn: Boolean(config.initialImage),
@@ -107,6 +119,8 @@ function signaturePadComponent(config) {
                 this.signatureData = this.profileSignature;
                 this.isEmpty = false;
                 this.hasDrawn = true;
+                this.hasError = false;
+                this.errorMessage = '';
             } else {
                 this.clearCanvas();
             }
@@ -134,12 +148,20 @@ function signaturePadComponent(config) {
                 this.canvas.addEventListener('pointerup', (e) => this.handlePointerUp(e));
                 this.canvas.addEventListener('pointercancel', (e) => this.handlePointerUp(e));
 
-                // Hook to form submit to guarantee latest signature data is captured
+                // Hook to form submit to guarantee latest signature data is captured & enforce required validation
                 const form = this.canvas.closest('form');
                 if (form) {
-                    form.addEventListener('submit', () => {
+                    form.addEventListener('submit', (e) => {
                         if (!this.disabled && !this.isEmpty && this.hasDrawn) {
                             this.saveData();
+                        }
+                        if (this.required && !this.disabled && (!this.signatureData || this.signatureData.trim() === '' || this.isEmpty)) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            this.hasError = true;
+                            this.errorMessage = 'Tanda tangan digital wajib digoreskan sebelum menyimpan.';
+                            this.canvas.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            return false;
                         }
                     });
                 }
@@ -216,6 +238,8 @@ function signaturePadComponent(config) {
             this.isDrawing = true;
             this.hasDrawn = true;
             this.isEmpty = false;
+            this.hasError = false;
+            this.errorMessage = '';
             this.useProfileSignature = false;
 
             const coords = this.getCoordinates(e);

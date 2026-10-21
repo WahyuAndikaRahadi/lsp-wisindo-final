@@ -109,6 +109,7 @@ class AsesiRuangUjiFeatureTest extends TestCase
 
     public function test_ia02_asesi_view_displays_template_download_and_supports_photo_upload(): void
     {
+        Storage::fake('local');
         $asesi = User::where('role', 'ASESI')->first();
         $scheme = Scheme::first();
         $admin = User::where('role', 'ADMIN_LSP')->first();
@@ -152,7 +153,7 @@ class AsesiRuangUjiFeatureTest extends TestCase
         $record = AssessmentIaResponse::where('assessment_id', $assessment->id)->where('instrument_code', 'IA02')->first();
         $this->assertNotNull($record);
         $this->assertNotEmpty($record->data_json['evidence_image_path']);
-        Storage::disk('public')->assertExists($record->data_json['evidence_image_path']);
+        Storage::disk('local')->assertExists($record->data_json['evidence_image_path']);
     }
 
     public function test_ia05_cbt_flow_and_completion(): void

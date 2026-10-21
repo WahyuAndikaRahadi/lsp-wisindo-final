@@ -53,8 +53,10 @@ class AuthController extends Controller
         $data = $request->validate([
             'full_name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'phone' => 'nullable|string|max:30',
+            'phone' => ['nullable', 'string', 'max:20', 'regex:/^[0-9]+$/'],
             'password' => ['required', 'string', 'confirmed', Password::min(8)->letters()->numbers()],
+        ], [
+            'phone.regex' => 'Nomor WhatsApp / telepon hanya boleh berupa angka.',
         ]);
 
         $user = User::create([
@@ -66,7 +68,7 @@ class AuthController extends Controller
             'status' => 'ACTIVE',
         ]);
 
-        return redirect()->route('login')->with('success', 'Registrasi berhasil! Silakan masuk menggunakan akun baru Anda.');
+        return redirect()->route('login')->with('success', 'Anda sudah mendaftar, silahkan login.');
     }
 
     public function logout(Request $request)

@@ -342,24 +342,30 @@
             <div class="p-6 space-y-4">
                 @foreach($units ?? [] as $unit)
                     <div class="border border-slate-200 rounded-lg overflow-hidden">
-                        <div class="bg-slate-100 px-4 py-2 border-b border-slate-200 flex justify-between items-center">
+                        <div class="bg-slate-100 px-4 py-2.5 border-b border-slate-200 flex justify-between items-center">
                             <div>
-                                <span class="font-mono text-[11px] font-bold text-indigo-700">{{ $unit->code }}</span>
-                                <h4 class="text-xs font-bold text-slate-800">{{ $unit->title }}</h4>
+                                <span class="font-mono text-[11px] font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded">{{ $unit->code }}</span>
+                                <h4 class="text-xs font-bold text-slate-800 mt-1">{{ $unit->title }}</h4>
                             </div>
                         </div>
                         <div class="divide-y divide-slate-100 text-xs">
                             @foreach($unit->elements as $element)
+                                @if(!empty($element->title))
+                                    <div class="px-4 py-1.5 bg-slate-50/70 text-[11px] font-bold text-slate-600 border-b border-slate-100 flex items-center gap-1.5">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
+                                        <span>Elemen: {{ $element->title }}</span>
+                                    </div>
+                                @endif
                                 @foreach($element->kuks as $kuk)
                                     @php
                                         $val = $kukData[$kuk->id]['result'] ?? ($kukData[$kuk->id] ?? null);
                                     @endphp
-                                    <div class="px-4 py-2 flex items-center justify-between hover:bg-slate-50">
-                                        <div class="pr-4">
-                                            <span class="font-mono text-[11px] text-slate-500 font-bold mr-2">{{ $kuk->code }}</span>
-                                            <span class="text-slate-700">{{ $kuk->criteria }}</span>
+                                    <div class="px-4 py-2.5 flex items-start justify-between gap-3 hover:bg-slate-50 transition">
+                                        <div class="pr-2">
+                                            <span class="font-mono text-[11px] text-slate-600 font-bold mr-1.5 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">{{ $kuk->code_number ?? $kuk->code ?? '-' }}</span>
+                                            <span class="text-slate-800 text-xs leading-relaxed">{{ $kuk->statement ?? $kuk->criteria ?? $kuk->description ?? '-' }}</span>
                                         </div>
-                                        <div class="shrink-0">
+                                        <div class="shrink-0 mt-0.5">
                                             @if($val === 'K')
                                                 <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">Kompeten (K)</span>
                                             @elseif($val === 'BK')
@@ -409,22 +415,26 @@
                 <h3 class="text-sm font-bold text-white">Hasil Tanya Jawab Teknis Lisan / Wawancara</h3>
             </div>
             <div class="divide-y divide-slate-200">
-                @foreach($pmoQuestions ?? [] as $idx => $q)
+                @forelse($pmoQuestions ?? [] as $idx => $q)
                     @php
-                        $qRes = $qData[$q['number'] ?? ($idx + 1)] ?? ($qData[$idx] ?? []);
+                        $qNum = $idx + 1;
+                        $qRes = $qData[$qNum] ?? $qData[(string)$qNum] ?? ($qData[$q['number'] ?? $qNum] ?? []);
                         $resStatus = is_array($qRes) ? ($qRes['result'] ?? '') : $qRes;
+                        $isMemuaskan = in_array(strtoupper($resStatus), ['M', 'MEMUASKAN', 'K', 'KOMPETEN', 'YA', 'Y']);
+                        $isTidak = in_array(strtoupper($resStatus), ['TM', 'TIDAK MEMUASKAN', 'BK', 'BELUM KOMPETEN', 'TIDAK', 'T']);
+                        $tanggapan = is_array($qRes) ? ($qRes['response'] ?? null) : null;
                     @endphp
                     <div class="p-4 space-y-2 text-xs">
                         <div class="flex items-start justify-between gap-3">
                             <div class="font-bold text-slate-800">
-                                <span class="font-mono text-indigo-700 mr-1">Pertanyaan #{{ $loop->iteration }}:</span>
-                                {{ $q['question'] }}
+                                <span class="font-mono text-indigo-700 mr-1">Pertanyaan #{{ $qNum }}:</span>
+                                {{ $q['question'] ?? 'Pertanyaan PMO #' . $qNum }}
                             </div>
                             <div class="shrink-0">
-                                @if(strtoupper($resStatus) === 'MEMUASKAN' || strtoupper($resStatus) === 'YA')
-                                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">✓ Memuaskan</span>
-                                @elseif(strtoupper($resStatus) === 'TIDAK MEMUASKAN' || strtoupper($resStatus) === 'TIDAK')
-                                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-300">✗ Tidak Memuaskan</span>
+                                @if($isMemuaskan)
+                                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">✓ Memuaskan (M)</span>
+                                @elseif($isTidak)
+                                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-300">✗ Tidak Memuaskan (TM)</span>
                                 @else
                                     <span class="text-slate-400 text-[10px] italic">Belum Dinilai</span>
                                 @endif
@@ -435,8 +445,17 @@
                                 <span class="font-bold text-slate-700">Kunci Jawaban yang Diharapkan:</span> {{ $q['expected_answer'] }}
                             </div>
                         @endif
+                        @if(!empty($tanggapan))
+                            <div class="bg-indigo-50/50 p-2.5 rounded border border-indigo-100 text-indigo-950">
+                                <span class="font-bold text-indigo-900">Catatan Tanggapan Asesi:</span> {{ $tanggapan }}
+                            </div>
+                        @endif
                     </div>
-                @endforeach
+                @empty
+                    <div class="p-6 text-center text-slate-500 text-xs">
+                        Belum ada pertanyaan lisan terdaftar untuk instrumen ini.
+                    </div>
+                @endforelse
             </div>
         </div>
     @elseif(strtoupper($code) === 'IA02' && isset($response?->data_json['tasks']))
@@ -505,98 +524,63 @@
         @endif
     </div>
 
-    {{-- Form Feedback & Tanda Tangan Asesi --}}
+    {{-- Konfirmasi Tanda Tangan Digital Asesi --}}
+    @php
+        $effectiveAsesiSig = $response?->asesi_signature ?? $assessment->asesi_signature ?? auth()->user()->profile?->signature_data;
+        $effectiveSignedAt = $response?->asesi_signed_at ?? $assessment->asesi_signed_at ?? now();
+    @endphp
     <div class="bg-white rounded-xl border-2 border-black shadow-[2px_2px_0_0_rgba(0,0,0,0.9)] overflow-hidden">
         <div class="bg-slate-900 px-6 py-4 text-white border-b-2 border-black flex items-center justify-between">
             <div>
                 <span class="text-amber-300 font-bold text-xs uppercase tracking-wider font-mono">Tanda Tangan Asesi</span>
-                <h3 class="text-base font-bold text-white">Umpan Balik Asesi & Tanda Tangan Digital</h3>
-                <p class="text-xs text-slate-300">Berikan catatan tanggapan Anda atas jalannya proses pengujian ini</p>
+                <h3 class="text-base font-bold text-white">Status Tanda Tangan Digital Asesi</h3>
+                <p class="text-xs text-slate-300">Disematkan otomatis secara sah dari data permohonan sertifikasi Anda</p>
             </div>
-            @if($response?->asesi_signed_at)
-                <span class="px-2.5 py-1 text-xs font-bold bg-emerald-500 text-white rounded">
+            @if($effectiveAsesiSig)
+                <span class="px-2.5 py-1 text-xs font-bold bg-emerald-500 text-white rounded shadow-xs">
                     ✓ Sudah Ditandatangani
+                </span>
+            @else
+                <span class="px-2.5 py-1 text-xs font-bold bg-slate-700 text-slate-300 rounded">
+                    Menunggu Penilaian Asesor
                 </span>
             @endif
         </div>
 
-        @if($response?->asesi_signed_at && $response?->asesi_signature)
-            <div class="p-6 bg-slate-50 space-y-4">
+        <div class="p-6 bg-slate-50 space-y-4">
+            @if(!empty($response?->asesi_feedback))
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-1">
+                    <div class="text-xs font-bold text-slate-500 uppercase tracking-wider">Umpan Balik yang Diberikan:</div>
+                    <div class="text-sm text-slate-800 italic">
+                        "{{ $response->asesi_feedback }}"
+                    </div>
+                </div>
+            @endif
+
+            @if($effectiveAsesiSig)
                 <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                     <div class="space-y-1">
-                        <div class="text-xs font-bold text-slate-400 uppercase">Umpan Balik yang Diberikan:</div>
-                        <div class="text-sm text-slate-800 italic">
-                            "{{ $response->asesi_feedback ?: 'Saya menyetujui seluruh rangkaian proses asesmen yang telah dilaksanakan.' }}"
-                        </div>
-                        <div class="text-[11px] text-slate-400 mt-1">
-                            Ditandatangani pada: <span class="font-mono font-semibold">{{ \Carbon\Carbon::parse($response->asesi_signed_at)->isoFormat('D MMMM Y, HH:mm') }} WIB</span>
-                        </div>
-                    </div>
-                    <div class="border border-slate-200 rounded p-2 bg-slate-50 shrink-0">
-                        <div class="text-[10px] font-bold text-slate-400 uppercase mb-1">Tanda Tangan Anda:</div>
-                        <img src="{{ $response->asesi_signature }}" alt="Tanda Tangan Asesi" class="max-h-20 object-contain">
-                    </div>
-                </div>
-
-                {{-- Option to update feedback or re-sign --}}
-                <div x-data="{ openEdit: false }" class="pt-2">
-                    <button type="button" @click="openEdit = !openEdit" class="text-xs font-bold text-indigo-600 hover:text-indigo-800 underline">
-                        Perbarui Umpan Balik atau Tanda Tangan Ulang &darr;
-                    </button>
-                    <div x-show="openEdit" class="mt-4 pt-4 border-t border-slate-200" style="display: none;">
-                        <form action="{{ route('asesi.assessment.instrument.feedback', [$assessment, strtoupper($code)]) }}" method="POST" class="space-y-4">
-                            @csrf
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-2">Umpan Balik / Komentar Anda:</label>
-                                <textarea name="asesi_feedback" rows="3" class="w-full text-xs p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">{{ old('asesi_feedback', $response?->asesi_feedback) }}</textarea>
+                        <div class="text-xs font-bold text-slate-500 uppercase tracking-wider">Tanda Tangan Pemohon (Asesi):</div>
+                        <p class="text-xs text-slate-700">
+                            Tanda tangan digital Anda telah disematkan secara otomatis pada instrumen ini sesuai komitmen permohonan sertifikasi (FR.APL.01 / FR.APL.02).
+                        </p>
+                        @if($effectiveSignedAt)
+                            <div class="text-[11px] text-slate-400 font-mono mt-1">
+                                Tercatat pada: {{ \Carbon\Carbon::parse($effectiveSignedAt)->isoFormat('D MMMM Y, HH:mm') }} WIB
                             </div>
-                            <div class="flex flex-col md:flex-row items-end justify-between gap-6">
-                                <div class="w-full md:w-80">
-                                    <x-signature-pad 
-                                        name="signature_data" 
-                                        :value="$response->asesi_signature" 
-                                        :profileSignature="auth()->user()->profile?->signature_data"
-                                        label="Tanda Tangan Baru (Opsional)" 
-                                        height="130" 
-                                    />
-                                </div>
-                                <button type="submit" class="px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-lg border-2 border-black shadow-[2px_2px_0_0_rgba(0,0,0,0.9)]">
-                                    Simpan Perubahan
-                                </button>
-                            </div>
-                        </form>
+                        @endif
+                    </div>
+                    <div class="border border-slate-200 rounded-lg p-2.5 bg-slate-50 shrink-0">
+                        <div class="text-[10px] font-bold text-slate-400 uppercase mb-1">Tanda Tangan Digital Anda:</div>
+                        <img src="{{ $effectiveAsesiSig }}" alt="Tanda Tangan Asesi" class="max-h-16 object-contain">
                     </div>
                 </div>
-            </div>
-        @else
-            <form action="{{ route('asesi.assessment.instrument.feedback', [$assessment, strtoupper($code)]) }}" method="POST" class="p-6 space-y-6">
-                @csrf
-
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-2">Umpan Balik / Komentar Anda terhadap Asesmen Ini:</label>
-                    <textarea name="asesi_feedback" rows="3" class="w-full text-xs p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Contoh: Proses pemeriksaan teknis berjalan objektif, arahan dan instruksi asesor jelas...">{{ old('asesi_feedback', $response?->asesi_feedback) }}</textarea>
+            @else
+                <div class="p-4 bg-slate-100 rounded-lg text-xs text-slate-600 border border-slate-200">
+                    Tanda tangan digital Anda akan otomatis tersemat pada lembar instrumen ini segera setelah Asesor Kompetensi selesai merekam hasil penilaian.
                 </div>
-
-                <div class="flex flex-col md:flex-row items-end justify-between gap-6 pt-4 border-t border-slate-200">
-                    <div class="w-full md:w-80">
-                        <x-signature-pad 
-                            name="signature_data" 
-                            :value="old('signature_data')" 
-                            :profileSignature="auth()->user()->profile?->signature_data" 
-                            label="Tanda Tangan Digital Asesi" 
-                            height="130" 
-                        />
-                    </div>
-
-                    <div class="w-full md:w-auto">
-                        <button type="submit" class="w-full md:w-auto px-6 py-3 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl border-2 border-black shadow-[2px_2px_0_0_rgba(0,0,0,0.9)] transition flex items-center justify-center gap-2">
-                            <span>Kirim Umpan Balik & Tanda Tangan</span>
-                            <span>✓</span>
-                        </button>
-                    </div>
-                </div>
-            </form>
-        @endif
+            @endif
+        </div>
     </div>
 </div>
 @endsection
