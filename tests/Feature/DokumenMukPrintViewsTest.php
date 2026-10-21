@@ -242,6 +242,33 @@ class DokumenMukPrintViewsTest extends TestCase
         $response->assertSee('DITERIMA (Hasil Asesmen Diubah/Diuji Ulang)');
     }
 
+    public function test_can_render_fr_ak07_penyesuaian_wajar(): void
+    {
+        $response = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.export-asesi', [
+            'assessment' => $this->assessment->id,
+            'type' => 'ak07',
+        ]));
+        $response->assertOk();
+        $response->assertSee('FR.AK.07.');
+        $response->assertSee('CEKLIS PENYESUAIAN YANG WAJAR dan BERALASAN');
+        $response->assertSee('PANDUAN BAGI ASESOR');
+        $response->assertSee('Potensi Asesi');
+        $response->assertSee('Hasil kesepakatan antara asesi dengan asesor');
+    }
+
+    public function test_can_render_fr_apl02_asesmen_mandiri(): void
+    {
+        $response = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.export-asesi', [
+            'assessment' => $this->assessment->id,
+            'type' => 'apl02',
+        ]));
+        $response->assertOk();
+        $response->assertSee('FR.APL.02. ASESMEN MANDIRI');
+        $response->assertSee('PANDUAN ASESMEN MANDIRI');
+        $response->assertSee('Dapatkah Saya ................?');
+        $response->assertSee('Rekomendasi Asesor');
+    }
+
     public function test_can_render_fr_ak05_laporan_asesmen(): void
     {
         $response = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.export', [

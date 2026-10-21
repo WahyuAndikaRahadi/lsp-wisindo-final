@@ -239,7 +239,12 @@ Route::prefix('print-example')->group(function () {
             : base_path('tests/Fixtures/muk/FR_IA_01_generated.pdf');
         abort_unless(file_exists($path), 404, 'File PDF belum ditemukan.');
 
-        return response()->file($path, ['Content-Type' => 'application/pdf', 'Content-Disposition' => 'inline']);
+        return response()->file($path, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline',
+            'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
+            'Pragma' => 'no-cache',
+        ]);
     });
 
     Route::get('/ia01b', function (Request $request) {
@@ -248,7 +253,12 @@ Route::prefix('print-example')->group(function () {
             : base_path('tests/Fixtures/muk/FR_IA_01_B_generated.pdf');
         abort_unless(file_exists($path), 404, 'File PDF belum ditemukan.');
 
-        return response()->file($path, ['Content-Type' => 'application/pdf', 'Content-Disposition' => 'inline']);
+        return response()->file($path, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline',
+            'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
+            'Pragma' => 'no-cache',
+        ]);
     });
 
     Route::get('/ia03', function (Request $request) {

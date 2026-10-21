@@ -56,15 +56,54 @@ def run_diff(ref_pdf, gen_pdf):
     print(f"\n3. Pemeriksaan Teks Esensial (pdftotext):")
     res = subprocess.run(["pdftotext", gen_pdf, "-"], capture_output=True, text=True)
     gen_text = res.stdout
-    required_keywords = [
-        "FR.APL.01. PERMOHONAN SERTIFIKASI KOMPETENSI",
-        "Rincian Data Pemohon Sertifikasi",
-        "G.45OTO01.001.2",
-        "SKKNI Nomor 97",
-        "Bukti Persyaratan Dasar Pemohon",
-        "Bukti Administratif",
-        "Rekomendasi (diisi oleh LSP)"
-    ]
+
+    gen_lower = gen_pdf.lower()
+    if "ia_01_b" in gen_lower or "ia01b" in gen_lower:
+        required_keywords = [
+            "FR.IA.01B",
+            "LEMBAR HASIL PENGUKURAN",
+            "REPORT SHEET",
+            "G.45OTO01.065.2",
+            "Tanda tangan",
+        ]
+    elif "ia_01" in gen_lower or "ia01" in gen_lower:
+        required_keywords = [
+            "FR.IA.01.",
+            "CL - CEKLIS OBSERVASI AKTIVITAS",
+            "PANDUAN BAGI ASESOR",
+            "G.45OTO01.001.2",
+            "Melaksanakan Keselamatan dan Kesehatan Kerja",
+            "Engine",
+            "Umpan Balik untuk asesi:",
+            "Rekomendasi:",
+            "direkomendasikan KOMPETEN",
+        ]
+    elif "ak_07" in gen_lower or "ak07" in gen_lower:
+        required_keywords = [
+            "FR.AK.07.",
+            "CEKLIS PENYESUAIAN YANG WAJAR",
+            "PANDUAN BAGI ASESOR",
+            "Hasil kesepakatan antara asesi dengan asesor",
+        ]
+    elif "apl_02" in gen_lower or "apl02" in gen_lower:
+        required_keywords = [
+            "FR.APL.02.",
+            "ASESMEN MANDIRI",
+            "PANDUAN ASESMEN MANDIRI",
+            "G.45OTO01.001.2",
+            "Ditinjau Oleh Asesor",
+        ]
+    else:
+        required_keywords = [
+            "FR.APL.01. PERMOHONAN SERTIFIKASI KOMPETENSI",
+            "Rincian Data Pemohon Sertifikasi",
+            "G.45OTO01.001.2",
+            "SKKNI Nomor 97",
+            "Bukti Persyaratan Dasar Pemohon",
+            "Bukti Administratif",
+            "Rekomendasi (diisi oleh LSP)"
+        ]
+
     for kw in required_keywords:
         found = kw in gen_text
         print(f"   - '{kw}': {'DITEMUKAN' if found else 'TIDAK DITEMUKAN'}")

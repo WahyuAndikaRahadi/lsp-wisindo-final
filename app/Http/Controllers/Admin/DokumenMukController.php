@@ -87,6 +87,14 @@ class DokumenMukController extends Controller
             'fr-ak-05' => 'ak05',
             'fr-ak-06' => 'ak06',
             'fr-ak-07' => 'ak07',
+            'ak7' => 'ak07',
+            'ak-07' => 'ak07',
+            'apl1' => 'apl01',
+            'apl-01' => 'apl01',
+            'fr-apl-01' => 'apl01',
+            'apl2' => 'apl02',
+            'apl-02' => 'apl02',
+            'fr-apl-02' => 'apl02',
         ];
         $targetType = $aliasMap[$normalizedType] ?? $normalizedType;
 
