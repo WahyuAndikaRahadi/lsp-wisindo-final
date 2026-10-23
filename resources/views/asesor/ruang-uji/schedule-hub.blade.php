@@ -8,8 +8,6 @@
             <div class="flex items-center space-x-2 text-xs font-semibold mb-1">
                 <a href="{{ route('asesor.jadwal.index') }}" class="text-brand-600 hover:text-brand-700">&larr; Jadwal</a>
                 <span class="text-slate-300">/</span>
-                <a href="{{ route('asesor.jadwal.asesi', $schedule->id) }}" class="text-slate-600 hover:text-slate-900">Daftar Asesi</a>
-                <span class="text-slate-300">/</span>
                 <span class="text-slate-800">Ruang Uji Jadwal</span>
             </div>
             <h1 class="text-2xl font-black text-slate-900 tracking-tight">{{ $schedule->name ?? $schedule->scheme->name }}</h1>
@@ -18,9 +16,6 @@
         <div class="flex items-center space-x-2">
             <a href="{{ route('asesor.ak07.create', $schedule->id) }}" class="px-4 py-2 text-xs font-semibold bg-white text-slate-800 border border-slate-300 rounded-lg shadow-sm hover:bg-slate-50 transition">
                 FR.AK07 Penyesuaian
-            </a>
-            <a href="{{ route('asesor.jadwal.asesi', $schedule->id) }}" class="px-4 py-2 text-xs font-semibold bg-slate-900 text-white rounded-lg shadow-sm hover:bg-slate-800 transition">
-                Daftar Asesi ({{ $totalAsesi }})
             </a>
         </div>
     </div>
@@ -83,7 +78,7 @@
                     {{-- Progress Bar --}}
                     <div class="pt-2">
                         <div class="flex items-center justify-between text-xs font-semibold mb-1">
-                            <span class="text-slate-600">Progres Penilaian</span>
+                            <span class="text-slate-600">{{ $inst['route_code'] === 'apl' ? 'Progres Verifikasi' : 'Progres Penilaian' }}</span>
                             <span class="text-slate-900 font-bold">{{ $inst['completed_count'] }} / {{ $inst['total_asesi'] }} Asesi</span>
                         </div>
                         <div class="w-full bg-slate-100 rounded-full h-2 border border-slate-200 overflow-hidden">
@@ -93,9 +88,9 @@
                 </div>
 
                 <div class="pt-5 mt-4 border-t border-slate-100">
-                    <a href="{{ route('asesor.schedule.instrument', ['schedule' => $schedule->id, 'code' => $inst['route_code']]) }}"
+                    <a href="{{ $inst['raw_code'] === 'AK01' ? route('asesor.schedule.ak01', $schedule->id) : route('asesor.schedule.instrument', ['schedule' => $schedule->id, 'code' => $inst['route_code']]) }}"
                        class="w-full flex items-center justify-center space-x-2 px-4 py-2.5 text-xs font-bold bg-brand-600 hover:bg-brand-700 text-white rounded-lg shadow-sm transition">
-                        <span>Buka Penilaian Instrumen</span>
+                        <span>{{ $inst['route_code'] === 'apl' ? 'Buka Verifikasi APL' : ($inst['raw_code'] === 'AK01' ? 'Buka Form FR.AK.01' : 'Buka Penilaian Instrumen') }}</span>
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
                         </svg>
@@ -109,20 +104,15 @@
         @endforelse
     </div>
 
-    {{-- Finalize Schedule Banner --}}
-    <div class="bg-slate-900 text-white rounded-xl border border-slate-800 p-5 sm:p-6 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-            <h3 class="text-base font-bold text-white">Selesai Menilai Seluruh Instrumen?</h3>
-            <p class="text-xs text-slate-300 mt-0.5">Setelah semua asesi dinilai pada instrumen terkait, Anda dapat menyelesaikan jadwal uji dan menerbitkan berita acara.</p>
-        </div>
-        <div>
-            <form action="{{ route('asesor.schedule.finalize', $schedule->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menyelesaikan seluruh rangkaian asesmen untuk jadwal ini?')">
-                @csrf
-                <button type="submit" class="w-full sm:w-auto px-5 py-2.5 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg shadow-sm transition">
-                    Selesaikan & Finalisasi Asesmen
-                </button>
-            </form>
-        </div>
+    {{-- Selanjutnya: FR.AK.02 Rekaman Asesmen --}}
+    <div class="flex justify-end">
+        <a href="{{ route('asesor.schedule.ak02', $schedule->id) }}"
+           class="inline-flex items-center space-x-2 px-6 py-3 text-sm font-bold bg-brand-600 hover:bg-brand-700 text-white rounded-lg shadow-sm transition">
+            <span>Selanjutnya: FR.AK.02 Rekaman Asesmen</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+            </svg>
+        </a>
     </div>
 </div>
 @endsection

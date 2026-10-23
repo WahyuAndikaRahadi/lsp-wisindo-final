@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin;
 use App\Http\Controllers\Asesi;
 use App\Http\Controllers\Asesor;
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\PrintExampleController;
 use App\Http\Controllers\SecureFileController;
 use App\Http\Controllers\WilayahController;
 use App\Models\Assessment;
@@ -170,156 +171,21 @@ Route::prefix('print-example')->group(function () {
         return response($html);
     });
 
-    Route::get('/apl01', function (Request $request) {
-        $path = $request->query('ref')
-            ? base_path('lsp-document-dynamic/MUK SKEMA 2 Klaster Maintenance Gasoline Engine Injection/2. FR.APL.01. Permohonan Sertifikasi Kompetensi.pdf')
-            : base_path('tests/Fixtures/muk/FR_APL_01_generated.pdf');
-        abort_unless(file_exists($path), 404, 'File PDF belum ditemukan.');
-
-        return response()->file($path, ['Content-Type' => 'application/pdf', 'Content-Disposition' => 'inline']);
-    });
-
-    Route::get('/apl02', function (Request $request) {
-        $path = $request->query('ref')
-            ? base_path('lsp-document-dynamic/MUK SKEMA 2 Klaster Maintenance Gasoline Engine Injection/3. FR.APL 02. Asesmen Mandiri.pdf')
-            : base_path('tests/Fixtures/muk/FR_APL_02_generated.pdf');
-        abort_unless(file_exists($path), 404, 'File PDF belum ditemukan.');
-
-        return response()->file($path, ['Content-Type' => 'application/pdf', 'Content-Disposition' => 'inline']);
-    });
-
-    Route::get('/ak01', function (Request $request) {
-        $path = $request->query('ref')
-            ? base_path('lsp-document-dynamic/MUK SKEMA 2 Klaster Maintenance Gasoline Engine Injection/7. FR.AK.01. Persetujuan Asesmen dan Kerahasian  Rev 19 docx.pdf')
-            : base_path('tests/Fixtures/muk/FR_AK_01_generated.pdf');
-        abort_unless(file_exists($path), 404, 'File PDF belum ditemukan.');
-
-        return response()->file($path, ['Content-Type' => 'application/pdf', 'Content-Disposition' => 'inline']);
-    });
-
-    Route::get('/ak02', function (Request $request) {
-        $path = $request->query('ref')
-            ? base_path('lsp-document-dynamic/MUK SKEMA 2 Klaster Maintenance Gasoline Engine Injection/13. FR.AK.02. Rekaman Asesmen Kompetensi.pdf')
-            : base_path('tests/Fixtures/muk/FR_AK_02_generated.pdf');
-        abort_unless(file_exists($path), 404, 'File PDF belum ditemukan.');
-
-        return response()->file($path, ['Content-Type' => 'application/pdf', 'Content-Disposition' => 'inline']);
-    });
-
-    Route::get('/ak03', function (Request $request) {
-        $path = $request->query('ref')
-            ? base_path('lsp-document-dynamic/MUK SKEMA 2 Klaster Maintenance Gasoline Engine Injection/14. FR.AK.03. Umpan Balik dan Catatan Asesmen.pdf')
-            : base_path('tests/Fixtures/muk/FR_AK_03_generated.pdf');
-        abort_unless(file_exists($path), 404, 'File PDF belum ditemukan.');
-
-        return response()->file($path, ['Content-Type' => 'application/pdf', 'Content-Disposition' => 'inline']);
-    });
-
-    Route::get('/ak04', function (Request $request) {
-        $path = $request->query('ref')
-            ? base_path('lsp-document-dynamic/MUK SKEMA 2 Klaster Maintenance Gasoline Engine Injection/6. FR.AK.04. Banding Asesmen.pdf')
-            : base_path('tests/Fixtures/muk/FR_AK_04_generated.pdf');
-        abort_unless(file_exists($path), 404, 'File PDF belum ditemukan.');
-
-        return response()->file($path, ['Content-Type' => 'application/pdf', 'Content-Disposition' => 'inline']);
-    });
-
-    Route::get('/ak07', function (Request $request) {
-        $path = $request->query('ref')
-            ? base_path('lsp-document-dynamic/MUK SKEMA 2 Klaster Maintenance Gasoline Engine Injection/5. FR.AK.07-Penyesuan-wajar-alasan.pdf')
-            : base_path('tests/Fixtures/muk/FR_AK_07_generated.pdf');
-        abort_unless(file_exists($path), 404, 'File PDF belum ditemukan.');
-
-        return response()->file($path, ['Content-Type' => 'application/pdf', 'Content-Disposition' => 'inline']);
-    });
-
-    Route::get('/ia01', function (Request $request) {
-        $path = $request->query('ref')
-            ? base_path('lsp-document-dynamic/MUK SKEMA 2 Klaster Maintenance Gasoline Engine Injection/8A. FR.IA.01.Ceklis Observasi Aktivitas Praktik.pdf')
-            : base_path('tests/Fixtures/muk/FR_IA_01_generated.pdf');
-        abort_unless(file_exists($path), 404, 'File PDF belum ditemukan.');
-
-        return response()->file($path, [
-            'Content-Type' => 'application/pdf',
-            'Content-Disposition' => 'inline',
-            'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
-            'Pragma' => 'no-cache',
-        ]);
-    });
-
-    Route::get('/ia01b', function (Request $request) {
-        $path = $request->query('ref')
-            ? base_path('lsp-document-dynamic/MUK SKEMA 2 Klaster Maintenance Gasoline Engine Injection/9B. FR.IA.01B Report Sheet_.pdf')
-            : base_path('tests/Fixtures/muk/FR_IA_01_B_generated.pdf');
-        abort_unless(file_exists($path), 404, 'File PDF belum ditemukan.');
-
-        return response()->file($path, [
-            'Content-Type' => 'application/pdf',
-            'Content-Disposition' => 'inline',
-            'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
-            'Pragma' => 'no-cache',
-        ]);
-    });
-
-    Route::get('/ia03', function (Request $request) {
-        $path = $request->query('ref')
-            ? base_path('lsp-document-dynamic/MUK SKEMA 2 Klaster Maintenance Gasoline Engine Injection/10. FR.IA.03. Pertanyaan Mendukung Observasi (PMO) docx.pdf')
-            : base_path('tests/Fixtures/muk/FR_IA_03_generated.pdf');
-        abort_unless(file_exists($path), 404, 'File PDF belum ditemukan.');
-
-        return response()->file($path, ['Content-Type' => 'application/pdf', 'Content-Disposition' => 'inline']);
-    });
-
-    Route::get('/ia05c', function (Request $request) {
-        $path = $request->query('ref')
-            ? base_path('lsp-document-dynamic/MUK SKEMA 2 Klaster Maintenance Gasoline Engine Injection/12. FR.IA.05.C. Lembar Jawaban Pilihan Ganda.pdf')
-            : base_path('tests/Fixtures/muk/FR_IA_05_C_generated.pdf');
-        abort_unless(file_exists($path), 404, 'File PDF belum ditemukan.');
-
-        return response()->file($path, ['Content-Type' => 'application/pdf', 'Content-Disposition' => 'inline']);
-    });
-
-    Route::get('/berita-acara', function (Request $request) {
-        $path = $request->query('ref')
-            ? base_path('lsp-document-dynamic/2.2 & 2.3 Berita  Acara Pelaksanaan Uji Kompetensi dan Daftar Hadir Peserta.docx.pdf')
-            : base_path('tests/Fixtures/muk/Berita_Acara_Peserta_generated.pdf');
-        abort_unless(file_exists($path), 404, 'File PDF belum ditemukan.');
-
-        return response()->file($path, ['Content-Type' => 'application/pdf', 'Content-Disposition' => 'inline']);
-    });
-
-    Route::get('/hadir-asesor', function (Request $request) {
-        $path = $request->query('ref')
-            ? base_path('lsp-document-dynamic/2.4 DAFTAR HADIR ASESOR.docx.pdf')
-            : base_path('tests/Fixtures/muk/Daftar_Hadir_Asesor_generated.pdf');
-        abort_unless(file_exists($path), 404, 'File PDF belum ditemukan.');
-
-        return response()->file($path, ['Content-Type' => 'application/pdf', 'Content-Disposition' => 'inline']);
-    });
-
-    Route::get('/pernyataan', function (Request $request) {
-        $path = $request->query('ref')
-            ? base_path('lsp-document-fixed/15 Surat Pernyataan Pemegang Sertifikat.pdf')
-            : base_path('tests/Fixtures/muk/Surat_Pernyataan_generated.pdf');
-        if (! file_exists($path)) {
-            $path = base_path('tests/Fixtures/muk/Surat_Pernyataan_generated.pdf');
-        }
-        abort_unless(file_exists($path), 404, 'File PDF belum ditemukan.');
-
-        return response()->file($path, ['Content-Type' => 'application/pdf', 'Content-Disposition' => 'inline']);
-    });
-
-    Route::get('/daftar-periksa', function (Request $request) {
-        $path = $request->query('ref')
-            ? base_path('lsp-document-fixed/1. Daftar Periksa Kelengkapan Dokumen Pelatihan.pdf')
-            : base_path('tests/Fixtures/muk/Daftar_Periksa_generated.pdf');
-        if (! file_exists($path)) {
-            $path = base_path('tests/Fixtures/muk/Daftar_Periksa_generated.pdf');
-        }
-        abort_unless(file_exists($path), 404, 'File PDF belum ditemukan.');
-
-        return response()->file($path, ['Content-Type' => 'application/pdf', 'Content-Disposition' => 'inline']);
-    });
+    Route::get('/apl01', [PrintExampleController::class, 'apl01'])->name('print-example.apl01');
+    Route::get('/apl02', [PrintExampleController::class, 'apl02'])->name('print-example.apl02');
+    Route::get('/ak01', [PrintExampleController::class, 'ak01'])->name('print-example.ak01');
+    Route::get('/ak02', [PrintExampleController::class, 'ak02'])->name('print-example.ak02');
+    Route::get('/ak03', [PrintExampleController::class, 'ak03'])->name('print-example.ak03');
+    Route::get('/ak04', [PrintExampleController::class, 'ak04'])->name('print-example.ak04');
+    Route::get('/ak07', [PrintExampleController::class, 'ak07'])->name('print-example.ak07');
+    Route::get('/ia01', [PrintExampleController::class, 'ia01'])->name('print-example.ia01');
+    Route::get('/ia01b', [PrintExampleController::class, 'ia01b'])->name('print-example.ia01b');
+    Route::get('/ia03', [PrintExampleController::class, 'ia03'])->name('print-example.ia03');
+    Route::get('/ia05c', [PrintExampleController::class, 'ia05c'])->name('print-example.ia05c');
+    Route::get('/berita-acara', [PrintExampleController::class, 'beritaAcara'])->name('print-example.ba');
+    Route::get('/hadir-asesor', [PrintExampleController::class, 'hadirAsesor'])->name('print-example.hadir-asesor');
+    Route::get('/pernyataan', [PrintExampleController::class, 'pernyataan'])->name('print-example.pernyataan');
+    Route::get('/daftar-periksa', [PrintExampleController::class, 'daftarPeriksa'])->name('print-example.daftar-periksa');
 });
 
 // API Wilayah Indonesia (cahyadsn/wilayah Kepmendagri No 300.2.2-2430 Tahun 2025)
@@ -401,7 +267,6 @@ Route::middleware(['auth', 'role:ASESOR'])->prefix('asesor')->name('asesor.')->g
     Route::post('/profile', [Asesor\ProfileController::class, 'update'])->name('profile.update');
 
     Route::get('/jadwal', [Asesor\JadwalController::class, 'index'])->name('jadwal.index');
-    Route::get('/jadwal/{schedule}/asesi', [Asesor\JadwalController::class, 'asesiList'])->name('jadwal.asesi');
 
     // Review APL (both aliases supported)
     Route::get('/assessment/{assessment}/review-apl', [Asesor\AplReviewController::class, 'show'])->name('apl.review');
@@ -410,7 +275,8 @@ Route::middleware(['auth', 'role:ASESOR'])->prefix('asesor')->name('asesor.')->g
     Route::post('/review-apl/{assessment}', [Asesor\AplReviewController::class, 'decide'])->name('review-apl.update');
 
     // AK01
-    Route::get('/schedule/{schedule}/ak01', [Asesor\InstrumentController::class, 'ak01Schedule'])->name('schedule.ak01');
+    Route::get('/schedule/{schedule}/ak01', [Asesor\Ak01Controller::class, 'index'])->name('schedule.ak01');
+    Route::post('/schedule/{schedule}/ak01', [Asesor\Ak01Controller::class, 'store'])->name('schedule.ak01.store');
     Route::post('/assessment/{assessment}/ak01/sign', [Asesor\InstrumentController::class, 'ak01Sign'])->name('ak01.sign');
 
     // AK07 Penyesuaian Wajar (Single & Batch)
@@ -425,9 +291,7 @@ Route::middleware(['auth', 'role:ASESOR'])->prefix('asesor')->name('asesor.')->g
     // Instrument Asesi List (Displays Asesis for a Selected Instrument)
     Route::get('/schedule/{schedule}/instrument/{code}', [Asesor\InstrumentController::class, 'scheduleInstrument'])->name('schedule.instrument');
 
-    // Ruang Uji Asesor per Assessment (Hub legacy & alias)
-    Route::get('/assessment/{assessment}/ruang-uji', [Asesor\InstrumentController::class, 'hub'])->name('assessment.ruang-uji');
-    Route::get('/ruang-uji/{assessment}', [Asesor\InstrumentController::class, 'hub'])->name('ruang-uji.hub');
+    // Legacy hub removed — use schedule-level ruang-uji instead
 
     // Instrument aliases for IA01, IA02, IA03, IA05
     Route::get('/assessment/{assessment}/instrument/{code}', [Asesor\InstrumentController::class, 'instrumentShow'])->name('assessment.instrument');
@@ -447,7 +311,8 @@ Route::middleware(['auth', 'role:ASESOR'])->prefix('asesor')->name('asesor.')->g
 
     Route::get('/ruang-uji/{assessment}/ia05', fn (Assessment $assessment) => app()->call([app(Asesor\InstrumentController::class), 'instrumentShow'], ['assessment' => $assessment, 'code' => 'ia05']))->name('ruang-uji.ia05');
 
-    // AK02 Rekaman Asesmen
+    // AK02 Rekaman Asesmen (schedule-level list + per-assessment form)
+    Route::get('/schedule/{schedule}/ak02', [Asesor\FinalizationController::class, 'scheduleAk02'])->name('schedule.ak02');
     Route::get('/assessment/{assessment}/ak02', [Asesor\FinalizationController::class, 'showAk02'])->name('assessment.ak02');
     Route::post('/assessment/{assessment}/ak02', [Asesor\FinalizationController::class, 'updateAk02'])->name('assessment.ak02.update');
 
@@ -459,6 +324,12 @@ Route::middleware(['auth', 'role:ASESOR'])->prefix('asesor')->name('asesor.')->g
     Route::post('/schedule/{schedule}/finalize', [Asesor\FinalizationController::class, 'finalize'])->name('schedule.finalize');
     Route::post('/assessment/{assessment}/complete', [Asesor\FinalizationController::class, 'completeAssessment'])->name('assessment.complete');
     Route::post('/assessment/{assessment}/mark-absent', [Asesor\FinalizationController::class, 'markAbsent'])->name('assessment.mark-absent');
+
+    // Fixed and Dynamic MUK PDF exports
+    Route::get('/schedule/{schedule}/fixed/{type}', [Admin\DokumenMukController::class, 'exportFixed'])->name('schedule.fixed');
+    Route::get('/assessment/{assessment}/fixed/{type}', [Admin\DokumenMukController::class, 'exportAsesiFixed'])->name('assessment.fixed');
+    Route::get('/schedule/{schedule}/dynamic/{type}', [Admin\DokumenMukController::class, 'exportDynamic'])->name('schedule.dynamic');
+    Route::get('/assessment/{assessment}/dynamic/{type}', [Admin\DokumenMukController::class, 'exportAsesiDynamic'])->name('assessment.dynamic');
 });
 
 // Admin & Superadmin Routes
@@ -493,6 +364,10 @@ Route::middleware(['auth', 'role:SUPER_ADMIN,ADMIN_LSP,KOMITE_TEKNIS,TUK_ADMIN']
 
     // Dokumen MUK
     Route::get('/dokumen-muk', [Admin\DokumenMukController::class, 'index'])->name('dokumen-muk.index');
+    Route::get('/dokumen-muk/{schedule}/fixed/{type}', [Admin\DokumenMukController::class, 'exportFixed'])->name('dokumen-muk.fixed');
+    Route::get('/dokumen-muk/asesi/{assessment}/fixed/{type}', [Admin\DokumenMukController::class, 'exportAsesiFixed'])->name('dokumen-muk.asesi-fixed');
+    Route::get('/dokumen-muk/{schedule}/dynamic/{type}', [Admin\DokumenMukController::class, 'exportDynamic'])->name('dokumen-muk.dynamic');
+    Route::get('/dokumen-muk/asesi/{assessment}/dynamic/{type}', [Admin\DokumenMukController::class, 'exportAsesiDynamic'])->name('dokumen-muk.asesi-dynamic');
     Route::get('/dokumen-muk/{schedule}/export/{type}', [Admin\DokumenMukController::class, 'exportSchedule'])->name('dokumen-muk.export');
     Route::get('/dokumen-muk/asesi/{assessment}/export/{type}', [Admin\DokumenMukController::class, 'exportAsesi'])->name('dokumen-muk.export-asesi');
 

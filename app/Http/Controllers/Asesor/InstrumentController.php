@@ -24,6 +24,14 @@ class InstrumentController extends Controller
      * Metadata definitions for standard BNSP instruments.
      */
     protected array $instrumentsMeta = [
+        'APL' => [
+            'code' => 'FR.APL.01/02',
+            'title' => 'Verifikasi Permohonan & Asesmen Mandiri',
+            'desc' => 'Verifikasi kelengkapan berkas pendaftaran (APL.01) dan asesmen mandiri (APL.02) calon asesi.',
+            'badge' => 'Verifikasi APL',
+            'badge_color' => 'bg-amber-50 text-amber-700 border-amber-200',
+            'route_code' => 'apl',
+        ],
         'AK01' => [
             'code' => 'FR.AK.01',
             'title' => 'Persetujuan Asesmen dan Kerahasiaan',
@@ -77,15 +85,9 @@ class InstrumentController extends Controller
     /**
      * Ruang Uji Jadwal: Menampilkan seluruh instrumen terpilih untuk jadwal uji.
      */
-    public function scheduleRuangUji(Schedule $schedule): View|RedirectResponse
+    public function scheduleRuangUji(Schedule $schedule): View
     {
         $this->authorizeAssessorSchedule($schedule);
-
-        $unapprovedCount = $schedule->assessments()->where('apl_status', '!=', 'APPROVED')->count();
-        if ($unapprovedCount > 0) {
-            return redirect()->route('asesor.jadwal.asesi', $schedule->id)
-                ->with('error', "Ruang Uji belum dapat dibuka. Masih ada {$unapprovedCount} asesi yang belum disetujui APL-nya.");
-        }
 
         $schedule->load([
             'scheme.competencyUnits.elements.kuks',
@@ -97,6 +99,10 @@ class InstrumentController extends Controller
         $selectedCodes = ! empty($schedule->selected_instruments)
             ? (array) $schedule->selected_instruments
             : ['AK01', 'IA01', 'IA01B', 'IA02', 'IA03', 'IA05'];
+
+        if (! in_array('APL', $selectedCodes, true)) {
+            array_unshift($selectedCodes, 'APL');
+        }
 
         $totalAsesi = $schedule->assessments->count();
 
@@ -114,15 +120,19 @@ class InstrumentController extends Controller
 
             // Hitung asesi yang sudah dinilai/selesai pada instrumen ini
             $completedCount = 0;
-            foreach ($schedule->assessments as $ass) {
-                if ($c === 'AK01') {
-                    if (! empty($ass->assessor_signature) || ! empty($ass->approved_at)) {
-                        $completedCount++;
-                    }
-                } else {
-                    $hasResp = $ass->iaResponses->firstWhere('instrument_code', $c);
-                    if ($hasResp) {
-                        $completedCount++;
+            if ($c === 'APL') {
+                $completedCount = $schedule->assessments->where('apl_status', 'APPROVED')->count();
+            } else {
+                foreach ($schedule->assessments as $ass) {
+                    if ($c === 'AK01') {
+                        if (! empty($ass->assessor_signature) || ! empty($ass->ak01_data) || ! empty($schedule->ak01_data)) {
+                            $completedCount++;
+                        }
+                    } else {
+                        $hasResp = $ass->iaResponses->firstWhere('instrument_code', $c);
+                        if ($hasResp) {
+                            $completedCount++;
+                        }
                     }
                 }
             }
@@ -141,12 +151,16 @@ class InstrumentController extends Controller
     /**
      * Halaman Instrumen Jadwal: Menampilkan daftar asesi pada instrumen terpilih.
      */
-    public function scheduleInstrument(Schedule $schedule, string $code, SchemeInstrumentService $instrumentService): View
+    public function scheduleInstrument(Schedule $schedule, string $code, SchemeInstrumentService $instrumentService): View|RedirectResponse
     {
         $this->authorizeAssessorSchedule($schedule);
 
         $codeUpper = strtoupper($code);
         $codeLower = strtolower($code);
+
+        if ($codeUpper === 'AK01') {
+            return redirect()->route('asesor.schedule.ak01', $schedule->id);
+        }
 
         $schedule->load([
             'scheme.competencyUnits.elements.kuks',
@@ -171,8 +185,25 @@ class InstrumentController extends Controller
             $statusLabel = 'Belum Dinilai';
             $statusClass = 'bg-slate-100 text-slate-700 border-slate-300';
 
-            if ($codeUpper === 'AK01') {
-                $isCompleted = ! empty($assessment->assessor_signature) || ! empty($assessment->approved_at);
+            if ($codeUpper === 'APL') {
+                $isCompleted = $assessment->apl_status === 'APPROVED';
+                $statusLabel = match ($assessment->apl_status ?? 'DRAFT') {
+                    'APPROVED' => 'Disetujui',
+                    'SUBMITTED' => 'Menunggu Verifikasi',
+                    'REVISION_REQUESTED' => 'Perlu Revisi',
+                    'REJECTED' => 'Ditolak',
+                    default => 'Draft',
+                };
+                $statusClass = match ($assessment->apl_status ?? 'DRAFT') {
+                    'APPROVED' => 'bg-emerald-50 text-emerald-700 border-emerald-300',
+                    'SUBMITTED' => 'bg-blue-50 text-blue-700 border-blue-300',
+                    'REVISION_REQUESTED' => 'bg-amber-50 text-amber-700 border-amber-300',
+                    'REJECTED' => 'bg-rose-50 text-rose-700 border-rose-300',
+                    default => 'bg-slate-100 text-slate-700 border-slate-300',
+                };
+                $inspectUrl = route('asesor.review-apl', $assessment->id);
+            } elseif ($codeUpper === 'AK01') {
+                $isCompleted = ! empty($assessment->assessor_signature);
                 $statusLabel = $isCompleted ? 'Sudah Ditandatangani' : 'Belum Ditandatangani';
                 $statusClass = $isCompleted ? 'bg-emerald-50 text-emerald-700 border-emerald-300' : 'bg-amber-50 text-amber-700 border-amber-300';
                 $inspectUrl = route('asesor.schedule.ak01', ['schedule' => $assessment->schedule_id, 'assessment' => $assessment->id]);
@@ -256,15 +287,6 @@ class InstrumentController extends Controller
             'schedule' => $assessment->schedule_id,
             'code' => 'ak01',
         ])->with('success', "FR.AK01 untuk {$assessment->asesi->full_name} berhasil ditandatangani.");
-    }
-
-    public function hub(Assessment $assessment): View
-    {
-        $this->authorizeAssessorAssessment($assessment);
-
-        $assessment->load('schedule.scheme', 'asesi.profile', 'iaResponses');
-
-        return view('asesor.ruang-uji.hub', compact('assessment'));
     }
 
     public function instrumentShow(Assessment $assessment, $code, SchemeInstrumentService $instrumentService): View

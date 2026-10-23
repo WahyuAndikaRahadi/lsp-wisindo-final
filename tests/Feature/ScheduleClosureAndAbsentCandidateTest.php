@@ -129,8 +129,8 @@ class ScheduleClosureAndAbsentCandidateTest extends TestCase
             $payload
         );
 
-        // Must redirect to asesi list with warning
-        $response->assertRedirect(route('asesor.jadwal.asesi', $this->schedule->id));
+        // Must redirect to ruang-uji with warning
+        $response->assertRedirect(route('asesor.schedule.ruang-uji', $this->schedule->id));
         $response->assertSessionHas('warning');
 
         $this->schedule->refresh();

@@ -7,10 +7,15 @@ Paginasi persis 4 halaman sesuai master dokumen asli.
 
 import os
 import sys
+import json
+import io
+import base64
+from PIL import Image
 from reportlab.pdfgen import canvas
 from reportlab.lib.colors import black, HexColor, Color
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.lib.utils import ImageReader
 
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 ASSETS = os.path.join(PROJECT_ROOT, "tests", "Fixtures", "muk", "assets")
@@ -63,7 +68,88 @@ DATA = {
     "tanggal": "19 Oktober 2026",
     "tanggal_ttd": "19 Oktober 2026",
     "penyesuaian_diperlukan": False,
+    "signature_asesi": None,
+    "signature_asesor": None,
+    "potensi_asesi_index": 1,
+    "agreement_acuan": "",
+    "agreement_metode": "",
+    "agreement_instrumen": "",
+    "agreement_notes": "",
 }
+
+def clean_signature_image(raw_bytes_or_path):
+    try:
+        if isinstance(raw_bytes_or_path, (bytes, bytearray)):
+            im = Image.open(io.BytesIO(raw_bytes_or_path))
+        else:
+            im = Image.open(raw_bytes_or_path)
+        im = im.convert("RGBA")
+        w, h = im.size
+        if w == 0 or h == 0:
+            return None
+
+        corners = []
+        for pt in ((0, 0), (w - 1, 0), (0, h - 1), (w - 1, h - 1)):
+            px = im.getpixel(pt)
+            if isinstance(px, tuple) and len(px) >= 3:
+                corners.append((px[0], px[1], px[2]))
+            elif isinstance(px, (int, float)):
+                corners.append((int(px), int(px), int(px)))
+
+        if not corners:
+            corners = [(255, 255, 255)]
+
+        bg_r = sum(c[0] for c in corners) / len(corners)
+        bg_g = sum(c[1] for c in corners) / len(corners)
+        bg_b = sum(c[2] for c in corners) / len(corners)
+
+        pixels = im.load()
+        if pixels is None:
+            return None
+
+        for y in range(h):
+            for x in range(w):
+                px = pixels[x, y]
+                if not isinstance(px, tuple) or len(px) < 4:
+                    continue
+                r, g, b, a = int(px[0]), int(px[1]), int(px[2]), int(px[3])
+                if a == 0:
+                    continue
+                is_green = (g > 80 and g > r * 1.15 and g > b * 1.15)
+                dist_bg = ((r - bg_r)**2 + (g - bg_g)**2 + (b - bg_b)**2)**0.5
+                is_bg = dist_bg < 45
+                is_white = (r > 235 and g > 235 and b > 235)
+
+                if is_green or is_bg or is_white:
+                    pixels[x, y] = (0, 0, 0, 0)
+                elif dist_bg < 75 or (g > r and g > b and g > 70):
+                    factor = min(1.0, max(0.0, (dist_bg - 45) / 30.0))
+                    pixels[x, y] = (r, g, b, int(a * factor))
+
+        out_io = io.BytesIO()
+        im.save(out_io, format="PNG")
+        out_io.seek(0)
+        return out_io
+    except Exception:
+        return None
+
+def draw_signature(c, sig_data, x, y_bot, w=75.0, h=26.0):
+    if not sig_data:
+        return
+    try:
+        if isinstance(sig_data, str) and sig_data.startswith("data:image"):
+            sig_data = sig_data.split(",", 1)[1]
+            raw = base64.b64decode(sig_data)
+            cleaned = clean_signature_image(raw)
+            img = ImageReader(cleaned if cleaned else io.BytesIO(raw))
+        elif isinstance(sig_data, str) and os.path.isfile(sig_data):
+            cleaned = clean_signature_image(sig_data)
+            img = ImageReader(cleaned if cleaned else sig_data)
+        else:
+            return
+        c.drawImage(img, x, Y(y_bot), w, h, mask="auto")
+    except Exception:
+        pass
 
 def draw_header_box(c, pnum):
     x0, x1 = 61.7, 546.3
@@ -163,21 +249,25 @@ def render_page_1(c):
     c.setFont("Lib-B", 9.5)
     c.drawString(c1 + 5.5, Y(154.0), "Judul")
     c.drawString(c2 + 3.0, Y(154.0), ":")
-    c.setFont("Lib-I", 9.5)
-    c.drawString(c3 + 5.5, Y(154.0), DATA["skema_nama"])
+    skema_nama = DATA.get("skema_nama") or DATA.get("skema_judul") or "Maintenance Gasoline Engine Injection System"
+    f_sz = 9.5
+    while pdfmetrics.stringWidth(skema_nama, "Lib-I", f_sz) > (R - c3 - 10) and f_sz > 7.0:
+        f_sz -= 0.5
+    c.setFont("Lib-I", f_sz)
+    c.drawString(c3 + 5.5, Y(154.0), skema_nama)
     
     c.setFont("Lib-B", 9.5)
     c.drawString(c1 + 5.5, Y(174.5), "Nomor")
     c.drawString(c2 + 3.0, Y(174.5), ":")
     c.setFont("Lib", 9.5)
-    c.drawString(c3 + 5.5, Y(174.5), DATA["skema_nomor"])
+    c.drawString(c3 + 5.5, Y(174.5), DATA.get("skema_nomor") or "02/LSP PrO Indo/I/2026")
     
     # TUK, Nama Asesor, Nama Asesi, Tanggal
     meta_rows = [
-        (181.1, 197.0, "TUK", DATA["tuk_tipe"]),
-        (197.0, 213.0, "Nama Asesor", DATA["asesor_nama"]),
-        (213.0, 228.9, "Nama Asesi", DATA["asesi_nama"]),
-        (228.9, 244.9, "Tanggal", DATA["tanggal"]),
+        (181.1, 197.0, "TUK", DATA.get("tuk_tipe") or DATA.get("tuk_nama") or "Sewaktu/Tempat Kerja/Mandiri*"),
+        (197.0, 213.0, "Nama Asesor", DATA.get("asesor_nama") or "Drs. Budi Santoso, M.T."),
+        (213.0, 228.9, "Nama Asesi", DATA.get("asesi_nama") or "Wahyu Andika Rahadi"),
+        (228.9, 244.9, "Tanggal", DATA.get("tanggal") or "19 Oktober 2026"),
     ]
     for y_t, y_b, lbl, val in meta_rows:
         y_mid = (y_t + y_b) / 2
@@ -228,27 +318,28 @@ def render_page_1(c):
     c.setFont("Lib-B", 10.0)
     c.drawString(L + 8.0, Y(576.0), "Potensi Asesi")
     
+    pot_idx = int(DATA.get("potensi_asesi_index") or 1)
     pot_rows = [
         (500.9, 534.8, [
             "Hasil pelatihan dan / atau pendidikan, dimana Kurikulum dan",
             "fasilitaspraktek mampu telusur terhadap standar kompetensi"
-        ], True),
+        ], pot_idx == 1),
         (534.8, 563.8, [
             "Hasil pelatihan dan / atau pendidikan, dimana kurikulum belum",
             "berbasiskompetensi."
-        ], False),
+        ], pot_idx == 2),
         (563.8, 604.6, [
             "Pekerja berpengalaman, dimana berasal dari industri/tempat kerja",
             "yangdalam operasionalnya mampu telusur dengan standar",
             "kompetensi"
-        ], False),
+        ], pot_idx == 3),
         (604.6, 631.7, [
             "Pekerja berpengalaman, dimana berasal dari industri/tempat kerja",
             "yangdalam operasionalnya belum berbasis kompetensi."
-        ], False),
+        ], pot_idx == 4),
         (631.7, 645.5, [
             "Pelatihan / belajar mandiri atau otodidak."
-        ], False),
+        ], pot_idx == 5),
     ]
     for r_idx, (y_t, y_b, lines_txt, checked) in enumerate(pot_rows):
         if r_idx > 0:
@@ -595,6 +686,17 @@ def render_page_4(c):
     
     c.setFont("Lib-B", 10.0)
     c.drawString(84.3, Y(125.0), "Hasil kesepakatan antara asesi dengan asesor (Diperlukan penyesuaian atau tidak)*")
+    
+    # Strikethrough according to penyesuaian_diperlukan
+    if not DATA.get("penyesuaian_diperlukan", False):
+        w_p = pdfmetrics.stringWidth("Hasil kesepakatan antara asesi dengan asesor (", "Lib-B", 10.0)
+        w_strike = pdfmetrics.stringWidth("Diperlukan penyesuaian", "Lib-B", 10.0)
+        c.rect(84.3 + w_p, Y(122.0), w_strike, 0.6, fill=1, stroke=0)
+    else:
+        w_p = pdfmetrics.stringWidth("Hasil kesepakatan antara asesi dengan asesor (Diperlukan penyesuaian ", "Lib-B", 10.0)
+        w_strike = pdfmetrics.stringWidth("atau tidak", "Lib-B", 10.0)
+        c.rect(84.3 + w_p, Y(122.0), w_strike, 0.6, fill=1, stroke=0)
+
     c.setFont("Lib", 9.5)
     c.drawString(84.3, Y(139.0), "Jika diperlukan penyesuaian maka, tuliskan kesepakatan dibawah ini:")
     
@@ -602,6 +704,23 @@ def render_page_4(c):
     c.drawString(92.1, Y(167.0), "1) Acuan Pembanding Asesmen: ( tuliskan nama acuan pembanding yang disepakati)")
     c.drawString(92.1, Y(196.0), "2) Metode Asesmen: ( tuliskan nama metode yang disepakati )")
     c.drawString(92.1, Y(224.0), "3) Instrumen Asesmen: (kode formulir instrumen asesmen yang disepakati )")
+
+    # Dynamic agreement text if provided
+    acuan = DATA.get("agreement_acuan") or ""
+    metode = DATA.get("agreement_metode") or ""
+    instrumen = DATA.get("agreement_instrumen") or ""
+    notes = DATA.get("agreement_notes") or ""
+
+    c.setFont("Lib-I", 9.0)
+    if acuan:
+        c.drawString(105.0, Y(180.0), str(acuan)[:75])
+    elif notes:
+        c.drawString(105.0, Y(180.0), str(notes)[:75])
+
+    if metode:
+        c.drawString(105.0, Y(209.0), str(metode)[:75])
+    if instrumen:
+        c.drawString(105.0, Y(237.0), str(instrumen)[:75])
     
     # 2x2 Signatures Table (255.0 to 353.2)
     t_x0, t_x1 = 66.7, 556.5
@@ -612,16 +731,30 @@ def render_page_4(c):
     c.line(t_x0, Y(t_mid), t_x1, Y(t_mid))
     c.line(c_mid, Y(t_bot), c_mid, Y(t_top))
     
+    asesor_nama = DATA.get("asesor_nama") or ""
+    asesi_nama = DATA.get("asesi_nama") or ""
+    tanggal_ttd = DATA.get("tanggal_ttd") or DATA.get("tanggal") or ""
+    sig_asesor = DATA.get("signature_asesor") or DATA.get("assessor_signature")
+    sig_asesi = DATA.get("signature_asesi") or DATA.get("asesi_signature")
+
     # Row 1: Asesor
     c.setFont("Lib", 9.5)
-    c.drawString(73.6, Y(269.0), f"Nama Asesor : {DATA['asesor_nama']}")
-    c.drawString(318.4, Y(269.0), f"Tanggal dan Tanda Tangan Asesor:")
-    c.drawString(318.4, Y(286.0), f"[Ttd Digital] - {DATA['tanggal_ttd']}")
+    c.drawString(73.6, Y(269.0), f"Nama Asesor : {asesor_nama}")
+    c.drawString(318.4, Y(269.0), "Tanggal dan Tanda Tangan Asesor:")
+    c.drawString(318.4, Y(286.0), f"Tanggal: {tanggal_ttd}")
+    if sig_asesor:
+        draw_signature(c, sig_asesor, 435.0, 300.0, w=85.0, h=28.0)
+    else:
+        c.drawString(435.0, Y(286.0), "[Ttd Digital]")
     
     # Row 2: Asesi
-    c.drawString(73.6, Y(318.0), f"Nama Asesi: {DATA['asesi_nama']}")
-    c.drawString(318.4, Y(318.0), f"Tanggal dan Tanda Tangan Asesi:")
-    c.drawString(318.4, Y(335.0), f"[Ttd Digital] - {DATA['tanggal_ttd']}")
+    c.drawString(73.6, Y(318.0), f"Nama Asesi: {asesi_nama}")
+    c.drawString(318.4, Y(318.0), "Tanggal dan Tanda Tangan Asesi:")
+    c.drawString(318.4, Y(335.0), f"Tanggal: {tanggal_ttd}")
+    if sig_asesi:
+        draw_signature(c, sig_asesi, 435.0, 349.0, w=85.0, h=28.0)
+    else:
+        c.drawString(435.0, Y(335.0), "[Ttd Digital]")
     
     # Footnote
     c.setFont("Lib-I", 8.5)
@@ -645,4 +778,18 @@ def render(dest_path):
 if __name__ == "__main__":
     out_dir = os.path.dirname(OUT_FILE)
     os.makedirs(out_dir, exist_ok=True)
-    render(OUT_FILE)
+    out_file = OUT_FILE
+    if len(sys.argv) > 1:
+        arg1 = sys.argv[1]
+        if arg1.endswith(".json") and os.path.isfile(arg1):
+            with open(arg1, "r", encoding="utf-8") as f:
+                DATA.update(json.load(f))
+            if len(sys.argv) > 2:
+                out_file = sys.argv[2]
+        elif len(sys.argv) > 2 and sys.argv[2].endswith(".json") and os.path.isfile(sys.argv[2]):
+            out_file = arg1
+            with open(sys.argv[2], "r", encoding="utf-8") as f:
+                DATA.update(json.load(f))
+        else:
+            out_file = arg1
+    render(out_file)

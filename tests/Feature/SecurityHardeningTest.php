@@ -157,8 +157,8 @@ class SecurityHardeningTest extends TestCase
         $schedule2 = $f['schedule2'];
         $assessment2 = $f['assessment2'];
 
-        // 1. Cannot view candidate list of unassigned schedule
-        $resList = $this->actingAs($unassignedAsesor)->get(route('asesor.jadwal.asesi', $schedule2));
+        // 1. Cannot view AK.02 candidate list of unassigned schedule
+        $resList = $this->actingAs($unassignedAsesor)->get(route('asesor.schedule.ak02', $schedule2));
         $resList->assertStatus(403);
 
         // 2. Cannot view Ruang Uji hub of unassigned schedule

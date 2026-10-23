@@ -8,14 +8,20 @@ Paginasi persis 4 halaman sesuai master dokumen BNSP.
 import os
 import sys
 import json
+import io
+import base64
+from PIL import Image
 from reportlab.pdfgen import canvas
 from reportlab.lib.colors import black, HexColor
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.lib.utils import ImageReader
 
-ASSETS = os.path.join(os.path.dirname(__file__), "..", "tests", "Fixtures", "muk", "assets")
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+ASSETS = os.path.join(PROJECT_ROOT, "tests", "Fixtures", "muk", "assets")
+OUT_FILE = os.path.join(PROJECT_ROOT, "tests", "Fixtures", "muk", "FR_IA_03_generated.pdf")
 
-def find_font(filename):
+def find_font(filename, fallback="LiberationSans-Regular.ttf"):
     candidates = [
         "/usr/share/fonts/liberation",
         "/usr/share/fonts/carlito",
@@ -31,18 +37,20 @@ def find_font(filename):
     for root, _, files in os.walk("/usr/share/fonts"):
         if filename in files:
             return os.path.join(root, filename)
+    if fallback and fallback != filename:
+        return find_font(fallback, fallback="")
     return filename
 
 font_map = {
-    "Lib": "LiberationSans-Regular.ttf",
-    "Lib-B": "LiberationSans-Bold.ttf",
-    "Lib-I": "LiberationSans-Italic.ttf",
-    "Cal": "Carlito-Regular.ttf",
-    "Cal-B": "Carlito-Bold.ttf",
-    "DJ": "DejaVuSans.ttf",
+    "Lib": ("LiberationSans-Regular.ttf", "LiberationSans-Regular.ttf"),
+    "Lib-B": ("LiberationSans-Bold.ttf", "LiberationSans-Bold.ttf"),
+    "Lib-I": ("LiberationSans-Italic.ttf", "LiberationSans-Italic.ttf"),
+    "Cal": ("Carlito-Regular.ttf", "LiberationSans-Regular.ttf"),
+    "Cal-B": ("Carlito-Bold.ttf", "LiberationSans-Bold.ttf"),
+    "DJ": ("DejaVuSans.ttf", "DejaVuSans.ttf"),
 }
-for name, ffile in font_map.items():
-    pdfmetrics.registerFont(TTFont(name, find_font(ffile)))
+for name, (ffile, fallback) in font_map.items():
+    pdfmetrics.registerFont(TTFont(name, find_font(ffile, fallback)))
 
 PAGE_W, PAGE_H = 595.5, 842.5
 Y = lambda top: PAGE_H - top
@@ -57,6 +65,8 @@ DATA = {
     "asesi_nama": "Wahyu Andika Rahadi",
     "tanggal": "19 Oktober 2026",
     "tanggal_ttd": "19 Oktober 2026",
+    "signature_asesi": None,
+    "signature_asesor": None,
     "tanggapan_k1_1": "Menggunakan APD lengkap sesuai SOP, memastikan area kerja bersih dan bebas ceceran oli.",
     "tanggapan_k1_2": "Agar peralatan tidak cepat rusak, hasil pengukuran presisi, dan menjaga keselamatan kerja mekanik.",
     "tanggapan_k1_3": "Untuk kesiapsiagaan darurat jika terjadi percikan api atau korsleting saat perbaikan sistem injeksi.",
@@ -68,6 +78,80 @@ DATA = {
     "tanggapan_k3_3": "Karena sistem EFI dikontrol komputer (ECU) sehingga error code hanya bisa dibaca akurat via scanner.",
 }
 
+def clean_signature_image(raw_bytes_or_path):
+    try:
+        if isinstance(raw_bytes_or_path, (bytes, bytearray)):
+            im = Image.open(io.BytesIO(raw_bytes_or_path))
+        else:
+            im = Image.open(raw_bytes_or_path)
+        im = im.convert("RGBA")
+        w, h = im.size
+        if w == 0 or h == 0:
+            return None
+
+        corners = []
+        for pt in ((0, 0), (w - 1, 0), (0, h - 1), (w - 1, h - 1)):
+            px = im.getpixel(pt)
+            if isinstance(px, tuple) and len(px) >= 3:
+                corners.append((px[0], px[1], px[2]))
+            elif isinstance(px, (int, float)):
+                corners.append((int(px), int(px), int(px)))
+
+        if not corners:
+            corners = [(255, 255, 255)]
+
+        bg_r = sum(c[0] for c in corners) / len(corners)
+        bg_g = sum(c[1] for c in corners) / len(corners)
+        bg_b = sum(c[2] for c in corners) / len(corners)
+
+        pixels = im.load()
+        if pixels is None:
+            return None
+
+        for y in range(h):
+            for x in range(w):
+                px = pixels[x, y]
+                if not isinstance(px, tuple) or len(px) < 4:
+                    continue
+                r, g, b, a = int(px[0]), int(px[1]), int(px[2]), int(px[3])
+                if a == 0:
+                    continue
+                is_green = (g > 80 and g > r * 1.15 and g > b * 1.15)
+                dist_bg = ((r - bg_r)**2 + (g - bg_g)**2 + (b - bg_b)**2)**0.5
+                is_bg = dist_bg < 45
+                is_white = (r > 235 and g > 235 and b > 235)
+
+                if is_green or is_bg or is_white:
+                    pixels[x, y] = (0, 0, 0, 0)
+                elif dist_bg < 75 or (g > r and g > b and g > 70):
+                    factor = min(1.0, max(0.0, (dist_bg - 45) / 30.0))
+                    pixels[x, y] = (r, g, b, int(a * factor))
+
+        out_io = io.BytesIO()
+        im.save(out_io, format="PNG")
+        out_io.seek(0)
+        return out_io
+    except Exception:
+        return None
+
+def draw_signature(c, sig_data, x, y_bot, w=65.0, h=26.0):
+    if not sig_data:
+        return
+    try:
+        if isinstance(sig_data, str) and sig_data.startswith("data:image"):
+            sig_data = sig_data.split(",", 1)[1]
+            raw = base64.b64decode(sig_data)
+            cleaned = clean_signature_image(raw)
+            img = ImageReader(cleaned if cleaned else io.BytesIO(raw))
+        elif isinstance(sig_data, str) and os.path.isfile(sig_data):
+            cleaned = clean_signature_image(sig_data)
+            img = ImageReader(cleaned if cleaned else sig_data)
+        else:
+            return
+        c.drawImage(img, x, Y(y_bot), w, h, mask="auto")
+    except Exception:
+        pass
+
 def draw_header_box(c, x0, x1, top, bot):
     c.setLineWidth(0.7)
     c.setStrokeColor(black)
@@ -75,6 +159,8 @@ def draw_header_box(c, x0, x1, top, bot):
     x_div = 147.7
     c.line(x_div, Y(top), x_div, Y(bot))
     logo_file = os.path.join(ASSETS, "logo.png")
+    if not os.path.exists(logo_file):
+        logo_file = os.path.join(PROJECT_ROOT, "public", "images", "logo-lsp-proindo.png")
     if os.path.exists(logo_file):
         c.drawImage(logo_file, x0 + 16.0, Y(bot) + 4.0, 50.0, 36.0, mask="auto")
     c.setFont("Lib-B", 11.5)
@@ -93,6 +179,15 @@ def draw_cb(c, cx, cy, checked):
 
 def render(dest_path):
     c = canvas.Canvas(dest_path, pagesize=(PAGE_W, PAGE_H))
+    
+    skema_nama = DATA.get("skema_nama") or DATA.get("skema_judul") or "Maintenance Gasoline Engine Injection System"
+    skema_nomor = DATA.get("skema_nomor") or "02/LSP PrO Indo/I/2026"
+    tuk_tipe = DATA.get("tuk_tipe") or DATA.get("tuk_nama") or "Sewaktu/Tempat Kerja/Mandiri*"
+    asesor_nama = DATA.get("asesor_nama") or "Drs. Budi Santoso, M.T."
+    asesor_reg = DATA.get("asesor_no_reg") or DATA.get("asesor_reg") or "MET.000.001234 2022"
+    asesi_nama = DATA.get("asesi_nama") or "Wahyu Andika Rahadi"
+    tanggal = DATA.get("tanggal") or "19 Oktober 2026"
+    tanggal_ttd = DATA.get("tanggal_ttd") or tanggal
     
     # ================= PAGE 1 =================
     x0, x1 = 73.2, 551.4
@@ -119,29 +214,28 @@ def render(dest_path):
     c.drawString(c1 + 6.0, Y(111.0), "Judul")
     c.drawString(c2 + 4.0, Y(111.0), ":")
     c.setFont("Lib-B", 8.5)
-    c.drawString(c3 + 6.0, Y(111.0), DATA["skema_nama"])
+    c.drawString(c3 + 6.0, Y(111.0), skema_nama)
     
     c.setFont("Lib", 8.5)
     c.drawString(c1 + 6.0, Y(131.0), "Nomor")
     c.drawString(c2 + 4.0, Y(131.0), ":")
     c.setFont("Lib-B", 8.5)
-    c.drawString(c3 + 6.0, Y(131.0), DATA["skema_nomor"])
+    c.drawString(c3 + 6.0, Y(131.0), skema_nomor)
     
     c.setFont("Lib", 8.5)
     c.drawString(x0 + 6.0, Y(152.0), "TUK")
     c.drawString(c2 + 4.0, Y(152.0), ":")
-    c.drawString(c3 + 6.0, Y(152.0), DATA["tuk_tipe"])
+    c.drawString(c3 + 6.0, Y(152.0), tuk_tipe)
     
     c.drawString(x0 + 6.0, Y(173.0), "Nama Asesor")
     c.drawString(c2 + 4.0, Y(173.0), ":")
     c.setFont("Lib-B", 8.5)
-    c.drawString(c3 + 6.0, Y(173.0), DATA["asesor_nama"])
+    c.drawString(c3 + 6.0, Y(173.0), asesor_nama)
     
-    c.setFont("Lib", 8.5)
     c.drawString(x0 + 6.0, Y(194.0), "Nama Asesi")
     c.drawString(c2 + 4.0, Y(194.0), ":")
     c.setFont("Lib-B", 8.5)
-    c.drawString(c3 + 6.0, Y(194.0), DATA["asesi_nama"])
+    c.drawString(c3 + 6.0, Y(194.0), asesi_nama)
     
     # Table 3: Panduan Asesor (top=231.4 to 506.1)
     c.setFillColor(GRAY_FILL)
@@ -173,7 +267,6 @@ def render(dest_path):
         py += 21.0
         
     # Table 4: Kelompok Pekerjaan 1 (top=520.6 to 689.9)
-    # Rows: 520.6, 545.0, 575.0, 605.0, 635.0, 665.0, 689.9
     c_k_split = 220.0
     c_no_k = 245.0
     c_kd_k = 345.0
@@ -210,16 +303,11 @@ def render(dest_path):
     c.showPage()
     
     # ================= PAGE 2 =================
-    # Table 1: Questions Kelompok 1 (top=84.1 to 370.1)
     L2, R2 = 70.9, 554.2
     c_q_no = 92.0
     c_q_txt = 475.0
     c_mid_ya = (c_q_txt + R2) / 2
     
-    # Header: 84.1 to 110.0 (Ya/Tdk)
-    # Q1: 110.0 to 145.0 (Tanya), 145.0 to 195.0 (Tanggapan)
-    # Q2: 195.0 to 230.0 (Tanya), 230.0 to 280.0 (Tanggapan)
-    # Q3: 280.0 to 315.0 (Tanya), 315.0 to 370.1 (Tanggapan)
     r_q1 = [84.1, 98.0, 112.0, 145.0, 195.0, 230.0, 280.0, 315.0, 370.1]
     c.rect(L2, Y(r_q1[-1]), R2 - L2, r_q1[-1] - r_q1[0])
     for y in r_q1[1:-1]:
@@ -243,7 +331,7 @@ def render(dest_path):
     c.setFont("Lib-B", 8)
     c.drawString(c_q_no + 5.0, Y(158.0), "Tanggapan:")
     c.setFont("Lib-I", 8)
-    c.drawString(c_q_no + 5.0, Y(172.0), DATA["tanggapan_k1_1"])
+    c.drawString(c_q_no + 5.0, Y(172.0), DATA.get("tanggapan_k1_1") or "Menggunakan APD lengkap sesuai SOP, memastikan area kerja bersih dan bebas ceceran oli.")
     draw_cb(c, (c_q_txt + c_mid_ya) / 2, Y(170.0), True)
     draw_cb(c, (c_mid_ya + R2) / 2, Y(170.0), False)
     
@@ -254,7 +342,7 @@ def render(dest_path):
     c.setFont("Lib-B", 8)
     c.drawString(c_q_no + 5.0, Y(243.0), "Tanggapan:")
     c.setFont("Lib-I", 8)
-    c.drawString(c_q_no + 5.0, Y(257.0), DATA["tanggapan_k1_2"])
+    c.drawString(c_q_no + 5.0, Y(257.0), DATA.get("tanggapan_k1_2") or "Agar peralatan tidak cepat rusak, hasil pengukuran presisi, dan menjaga keselamatan kerja mekanik.")
     draw_cb(c, (c_q_txt + c_mid_ya) / 2, Y(255.0), True)
     draw_cb(c, (c_mid_ya + R2) / 2, Y(255.0), False)
     
@@ -265,7 +353,7 @@ def render(dest_path):
     c.setFont("Lib-B", 8)
     c.drawString(c_q_no + 5.0, Y(330.0), "Tanggapan:")
     c.setFont("Lib-I", 8)
-    c.drawString(c_q_no + 5.0, Y(344.0), DATA["tanggapan_k1_3"])
+    c.drawString(c_q_no + 5.0, Y(344.0), DATA.get("tanggapan_k1_3") or "Untuk kesiapsiagaan darurat jika terjadi percikan api atau korsleting saat perbaikan sistem injeksi.")
     draw_cb(c, (c_q_txt + c_mid_ya) / 2, Y(342.0), True)
     draw_cb(c, (c_mid_ya + R2) / 2, Y(342.0), False)
     
@@ -311,7 +399,7 @@ def render(dest_path):
     c.setFont("Lib-B", 8)
     c.drawString(c_q_no + 5.0, Y(545.0), "Tanggapan:")
     c.setFont("Lib-I", 8)
-    c.drawString(c_q_no + 5.0, Y(559.0), DATA["tanggapan_k2_1"])
+    c.drawString(c_q_no + 5.0, Y(559.0), DATA.get("tanggapan_k2_1") or "Untuk mencegah keausan dini komponen mesin dan mempertahankan performa optimal kendaraan.")
     draw_cb(c, (c_q_txt + c_mid_ya) / 2, Y(555.0), True)
     draw_cb(c, (c_mid_ya + R2) / 2, Y(555.0), False)
     
@@ -322,7 +410,7 @@ def render(dest_path):
     c.setFont("Lib-B", 8)
     c.drawString(c_q_no + 5.0, Y(637.0), "Tanggapan:")
     c.setFont("Lib-I", 8)
-    c.drawString(c_q_no + 5.0, Y(651.0), DATA["tanggapan_k2_2"])
+    c.drawString(c_q_no + 5.0, Y(651.0), DATA.get("tanggapan_k2_2") or "Melakukan pemeriksaan visual, pengecekan celah katup, dan pengecekan kebocoran kompresi.")
     draw_cb(c, (c_q_txt + c_mid_ya) / 2, Y(647.0), True)
     draw_cb(c, (c_mid_ya + R2) / 2, Y(647.0), False)
     
@@ -333,7 +421,7 @@ def render(dest_path):
     c.setFont("Lib-B", 8)
     c.drawString(c_q_no + 5.0, Y(730.0), "Tanggapan:")
     c.setFont("Lib-I", 8)
-    c.drawString(c_q_no + 5.0, Y(744.0), DATA["tanggapan_k2_3"])
+    c.drawString(c_q_no + 5.0, Y(744.0), DATA.get("tanggapan_k2_3") or "Mencatat semua hasil pengukuran ke report sheet dan menyerahkan ke asesor/supervisor bengkel.")
     draw_cb(c, (c_q_txt + c_mid_ya) / 2, Y(740.0), True)
     draw_cb(c, (c_mid_ya + R2) / 2, Y(740.0), False)
     
@@ -394,7 +482,7 @@ def render(dest_path):
     c.setFont("Lib-B", 8)
     c.drawString(c_q_no + 5.0, Y(295.0), "Tanggapan:")
     c.setFont("Lib-I", 8)
-    c.drawString(c_q_no + 5.0, Y(310.0), DATA["tanggapan_k3_1"])
+    c.drawString(c_q_no + 5.0, Y(310.0), DATA.get("tanggapan_k3_1") or "Melakukan pemeriksaan berat jenis air aki dan melakukan charging ulang jika kapasitas drop.")
     draw_cb(c, (c_q_txt + c_mid_ya) / 2, Y(315.0), True)
     draw_cb(c, (c_mid_ya + R3) / 2, Y(315.0), False)
     
@@ -405,7 +493,7 @@ def render(dest_path):
     c.setFont("Lib-B", 8)
     c.drawString(c_q_no + 5.0, Y(415.0), "Tanggapan:")
     c.setFont("Lib-I", 8)
-    c.drawString(c_q_no + 5.0, Y(430.0), DATA["tanggapan_k3_2"])
+    c.drawString(c_q_no + 5.0, Y(430.0), DATA.get("tanggapan_k3_2") or "Dapat menyebabkan korsleting listrik dan membakar komponen ECU/sensor elektronik mobil.")
     draw_cb(c, (c_q_txt + c_mid_ya) / 2, Y(432.0), True)
     draw_cb(c, (c_mid_ya + R3) / 2, Y(432.0), False)
     
@@ -416,7 +504,7 @@ def render(dest_path):
     c.setFont("Lib-B", 8)
     c.drawString(c_q_no + 5.0, Y(540.0), "Tanggapan:")
     c.setFont("Lib-I", 8)
-    c.drawString(c_q_no + 5.0, Y(555.0), DATA["tanggapan_k3_3"])
+    c.drawString(c_q_no + 5.0, Y(555.0), DATA.get("tanggapan_k3_3") or "Karena sistem EFI dikontrol komputer (ECU) sehingga error code hanya bisa dibaca akurat via scanner.")
     draw_cb(c, (c_q_txt + c_mid_ya) / 2, Y(560.0), True)
     draw_cb(c, (c_mid_ya + R3) / 2, Y(560.0), False)
     
@@ -446,12 +534,17 @@ def render(dest_path):
     c.drawString(L4 + 6.0, Y(116.0), "Nama")
     c.drawString(c_split_sig + 4.0, Y(116.0), ":")
     c.setFont("Lib-B", 8.5)
-    c.drawString(c_colon_sig + 6.0, Y(116.0), DATA["asesi_nama"])
+    c.drawString(c_colon_sig + 6.0, Y(116.0), asesi_nama)
     
     c.setFont("Lib", 8.5)
     c.drawString(L4 + 6.0, Y(145.0), "Tanda tangan/ Tanggal")
     c.drawString(c_split_sig + 4.0, Y(145.0), ":")
-    c.drawString(c_colon_sig + 6.0, Y(145.0), f"[Tanda Tangan Digital]   -   {DATA['tanggal_ttd']}")
+    sig_asesi = DATA.get("signature_asesi") or DATA.get("asesi_signature")
+    if sig_asesi:
+        draw_signature(c, sig_asesi, c_colon_sig + 6.0, 160.0, w=65.0, h=26.0)
+        c.drawString(c_colon_sig + 80.0, Y(145.0), tanggal_ttd)
+    else:
+        c.drawString(c_colon_sig + 6.0, Y(145.0), f"[Tanda Tangan Digital]   -   {tanggal_ttd}")
     
     # Asesor
     c.setFont("Lib-B", 8.5)
@@ -460,24 +553,42 @@ def render(dest_path):
     c.drawString(L4 + 6.0, Y(200.0), "Nama")
     c.drawString(c_split_sig + 4.0, Y(200.0), ":")
     c.setFont("Lib-B", 8.5)
-    c.drawString(c_colon_sig + 6.0, Y(200.0), DATA["asesor_nama"])
+    c.drawString(c_colon_sig + 6.0, Y(200.0), asesor_nama)
     
     c.setFont("Lib", 8.5)
     c.drawString(L4 + 6.0, Y(222.0), "No. Reg")
     c.drawString(c_split_sig + 4.0, Y(222.0), ":")
-    c.drawString(c_colon_sig + 6.0, Y(222.0), DATA["asesor_no_reg"])
+    c.drawString(c_colon_sig + 6.0, Y(222.0), asesor_reg)
     
     c.setFont("Lib", 8.5)
     c.drawString(L4 + 6.0, Y(245.0), "Tanda tangan / Tanggal")
     c.drawString(c_split_sig + 4.0, Y(245.0), ":")
-    c.drawString(c_colon_sig + 6.0, Y(245.0), f"[Tanda Tangan Digital]   -   {DATA['tanggal_ttd']}")
+    sig_asesor = DATA.get("signature_asesor") or DATA.get("assessor_signature")
+    if sig_asesor:
+        draw_signature(c, sig_asesor, c_colon_sig + 6.0, 255.0, w=65.0, h=26.0)
+        c.drawString(c_colon_sig + 80.0, Y(245.0), tanggal_ttd)
+    else:
+        c.drawString(c_colon_sig + 6.0, Y(245.0), f"[Tanda Tangan Digital]   -   {tanggal_ttd}")
     
     c.showPage()
     c.save()
     print(f"OK -> Sukses generate FR.IA.03: {dest_path}")
 
 if __name__ == "__main__":
-    out_dir = os.path.join(os.path.dirname(__file__), "..", "tests", "Fixtures", "muk")
+    out_dir = os.path.join(PROJECT_ROOT, "tests", "Fixtures", "muk")
     os.makedirs(out_dir, exist_ok=True)
-    out_file = os.path.join(out_dir, "FR_IA_03_generated.pdf")
+    out_file = OUT_FILE
+    if len(sys.argv) > 1:
+        arg1 = sys.argv[1]
+        if arg1.endswith(".json") and os.path.isfile(arg1):
+            with open(arg1, "r", encoding="utf-8") as f:
+                DATA.update(json.load(f))
+            if len(sys.argv) > 2:
+                out_file = sys.argv[2]
+        elif len(sys.argv) > 2 and sys.argv[2].endswith(".json") and os.path.isfile(sys.argv[2]):
+            out_file = arg1
+            with open(sys.argv[2], "r", encoding="utf-8") as f:
+                DATA.update(json.load(f))
+        else:
+            out_file = arg1
     render(out_file)

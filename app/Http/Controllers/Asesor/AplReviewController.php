@@ -86,7 +86,7 @@ class AplReviewController extends Controller
             ]);
 
             if ($status === 'APPROVED') {
-                // 1. Auto-generate standard FR.AK.07
+                // Auto-generate standard FR.AK.07
                 AssessmentAk07Item::firstOrCreate([
                     'assessment_id' => $assessment->id,
                 ], [
@@ -95,20 +95,13 @@ class AplReviewController extends Controller
                     'assessor_id' => $assessorId,
                 ]);
 
-                // 2. Auto-agree FR.AK.01 with signatures
-                $asesiSig = $assessment->asesi_signature ?? $assessment->asesi?->profile?->signature_data;
-                $assessorSig = $assessment->assessor_signature ?? auth()->user()->profile?->signature_data;
-
                 $assessment->update([
-                    'ak01_agreed_at' => $assessment->ak01_agreed_at ?? $now,
-                    'asesi_signature' => $asesiSig,
-                    'asesi_signed_at' => $assessment->asesi_signed_at ?? $now,
                     'last_active_step' => 'ruang-uji',
                 ]);
             }
         });
 
-        return redirect()->route('asesor.jadwal.asesi', $assessment->schedule_id)
-            ->with('success', $status === 'APPROVED' ? 'APL asesi berhasil disetujui. Asesi telah siap memasuki Ruang Uji.' : 'Keputusan review APL berhasil disimpan.');
+        return redirect()->route('asesor.schedule.instrument', ['schedule' => $assessment->schedule_id, 'code' => 'apl'])
+            ->with('success', $status === 'APPROVED' ? 'APL asesi berhasil disetujui.' : 'Keputusan review APL berhasil disimpan.');
     }
 }

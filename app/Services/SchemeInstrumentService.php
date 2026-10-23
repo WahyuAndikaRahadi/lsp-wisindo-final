@@ -212,6 +212,13 @@ class SchemeInstrumentService
             }
         }
 
+        // Check in official fixed document store
+        $fixedService = app(MukFixedDocumentService::class);
+        $fixedPath = $fixedService->getFixedFilePath($scheme, $instrumentCode);
+        if ($fixedPath && file_exists($fixedPath)) {
+            return $fixedPath;
+        }
+
         return null;
     }
 }

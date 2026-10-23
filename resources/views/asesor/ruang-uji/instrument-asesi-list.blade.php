@@ -6,7 +6,11 @@
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
             <div class="flex items-center space-x-2 text-xs font-semibold mb-1">
-                <a href="{{ route('asesor.schedule.ruang-uji', $schedule->id) }}" class="text-brand-600 hover:text-brand-700 font-bold">&larr; Kembali ke Ruang Uji Jadwal</a>
+                @if($meta['route_code'] === 'apl')
+                    <a href="{{ route('asesor.jadwal.index') }}" class="text-brand-600 hover:text-brand-700 font-bold">&larr; Jadwal Penugasan</a>
+                @else
+                    <a href="{{ route('asesor.schedule.ruang-uji', $schedule->id) }}" class="text-brand-600 hover:text-brand-700 font-bold">&larr; Kembali ke Ruang Uji Jadwal</a>
+                @endif
                 <span class="text-slate-300">/</span>
                 <span class="text-slate-700">{{ $meta['code'] }}</span>
             </div>
@@ -20,9 +24,18 @@
         </div>
 
         <div class="flex items-center space-x-2">
-            <a href="{{ route('asesor.schedule.ruang-uji', $schedule->id) }}" class="px-4 py-2 text-xs font-semibold bg-white text-slate-800 border border-slate-300 rounded-lg shadow-sm hover:bg-slate-50 transition">
-                Ganti Instrumen
-            </a>
+            @if($meta['route_code'] === 'apl')
+                <a href="{{ route('asesor.schedule.ak01', $schedule->id) }}" class="inline-flex items-center space-x-1.5 px-4 py-2 text-xs font-bold bg-brand-600 text-white rounded-lg shadow-sm hover:bg-brand-700 transition">
+                    <span>Selanjutnya: FR.AK.01</span>
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                    </svg>
+                </a>
+            @else
+                <a href="{{ route('asesor.schedule.ruang-uji', $schedule->id) }}" class="px-4 py-2 text-xs font-semibold bg-white text-slate-800 border border-slate-300 rounded-lg shadow-sm hover:bg-slate-50 transition">
+                    Ganti Instrumen
+                </a>
+            @endif
         </div>
     </div>
 
@@ -65,9 +78,11 @@
                         <tr>
                             <th class="px-6 py-3 w-16 text-center">No</th>
                             <th class="px-6 py-3">Data Peserta Asesi</th>
-                            <th class="px-6 py-3 text-center">Status APL</th>
-                            <th class="px-6 py-3 text-center">Status Penilaian {{ $meta['code'] }}</th>
-                            <th class="px-6 py-3 text-right">Aksi Penilaian</th>
+                            @if($meta['route_code'] !== 'apl')
+                                <th class="px-6 py-3 text-center">Status APL</th>
+                            @endif
+                            <th class="px-6 py-3 text-center">{{ $meta['route_code'] === 'apl' ? 'Status Verifikasi APL' : 'Status Penilaian ' . $meta['code'] }}</th>
+                            <th class="px-6 py-3 text-right">{{ $meta['route_code'] === 'apl' ? 'Aksi Verifikasi' : 'Aksi Penilaian' }}</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y-2 divide-slate-200">
@@ -101,11 +116,13 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 text-center">
-                                    <span class="px-2.5 py-1 rounded text-xs font-bold border border-slate-300 {{ $item->assessment->apl_status === 'APPROVED' ? 'bg-emerald-50 text-emerald-700 border-emerald-300' : 'bg-slate-100 text-slate-600' }}">
-                                        {{ str_replace('_', ' ', $item->assessment->apl_status) }}
-                                    </span>
-                                </td>
+                                @if($meta['route_code'] !== 'apl')
+                                    <td class="px-6 py-4 text-center">
+                                        <span class="px-2.5 py-1 rounded text-xs font-bold border border-slate-300 {{ $item->assessment->apl_status === 'APPROVED' ? 'bg-emerald-50 text-emerald-700 border-emerald-300' : 'bg-slate-100 text-slate-600' }}">
+                                            {{ str_replace('_', ' ', $item->assessment->apl_status) }}
+                                        </span>
+                                    </td>
+                                @endif
                                 <td class="px-6 py-4 text-center">
                                     <div class="inline-flex flex-col items-center space-y-1">
                                         <span class="px-3 py-1 rounded-full text-xs font-bold border {{ $item->status_class }}">
@@ -133,7 +150,13 @@
                                     @if($item->is_my_candidate)
                                         <a href="{{ $item->inspect_url }}"
                                            class="inline-flex items-center space-x-1.5 px-4 py-2 text-xs font-bold {{ $item->is_completed ? 'bg-slate-900 hover:bg-slate-800 text-white' : 'bg-brand-600 hover:bg-brand-700 text-white' }} rounded-lg shadow-sm transition">
-                                            <span>{{ $item->is_completed ? 'Tinjau / Ubah Penilaian' : 'Periksa Hasil Asesi' }}</span>
+                                            <span>
+                                                @if($meta['route_code'] === 'apl')
+                                                    {{ $item->is_completed ? 'Tinjau Verifikasi APL' : 'Verifikasi APL' }}
+                                                @else
+                                                    {{ $item->is_completed ? 'Tinjau / Ubah Penilaian' : 'Periksa Hasil Asesi' }}
+                                                @endif
+                                            </span>
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                                             </svg>
@@ -154,5 +177,17 @@
             </div>
         @endif
     </div>
+
+    @if($meta['route_code'] === 'apl')
+        <div class="flex justify-end pt-2">
+            <a href="{{ route('asesor.schedule.ak01', $schedule->id) }}"
+               class="inline-flex items-center space-x-2 px-6 py-3 text-sm font-bold bg-brand-600 hover:bg-brand-700 text-white rounded-lg shadow-sm transition">
+                <span>Selanjutnya: FR.AK.01 Persetujuan Asesmen</span>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                </svg>
+            </a>
+        </div>
+    @endif
 </div>
 @endsection

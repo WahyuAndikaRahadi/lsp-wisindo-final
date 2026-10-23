@@ -200,7 +200,7 @@ class MvpEndToEndWorkflowTest extends TestCase
             'final_notes' => 'Asesi menunjukkan kompetensi kerja optimal pada seluruh unit.',
             'follow_up_action' => 'Diusulkan penerbitan sertifikat kompetensi BNSP.',
         ]);
-        $ak02Update->assertRedirect(route('asesor.jadwal.asesi', $schedule->id));
+        $ak02Update->assertRedirect(route('asesor.schedule.ak02', $schedule->id));
         $ak02Update->assertSessionHas('success');
         $assessment->refresh();
         $this->assertEquals('KOMPETEN', $assessment->final_result);
@@ -312,7 +312,7 @@ class MvpEndToEndWorkflowTest extends TestCase
             'decision' => 'REVISION',
             'notes' => $revisionNote,
         ]);
-        $decideRes->assertRedirect(route('asesor.jadwal.asesi', $schedule->id));
+        $decideRes->assertRedirect(route('asesor.schedule.instrument', ['schedule' => $schedule->id, 'code' => 'apl']));
         $decideRes->assertSessionHas('success');
 
         $assessment->refresh();

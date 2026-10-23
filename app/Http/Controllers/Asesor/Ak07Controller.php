@@ -23,7 +23,7 @@ class Ak07Controller extends Controller
 
         $unapprovedCount = $schedule->assessments()->where('apl_status', '!=', 'APPROVED')->count();
         if ($unapprovedCount > 0) {
-            return redirect()->route('asesor.jadwal.asesi', $schedule->id)
+            return redirect()->route('asesor.schedule.ruang-uji', $schedule->id)
                 ->with('error', "Formulir FR.AK07 belum dapat dibuka. Masih ada {$unapprovedCount} asesi yang belum disetujui APL-nya.");
         }
 
@@ -44,7 +44,7 @@ class Ak07Controller extends Controller
 
         $unapprovedCount = $schedule->assessments()->where('apl_status', '!=', 'APPROVED')->count();
         if ($unapprovedCount > 0) {
-            return redirect()->route('asesor.jadwal.asesi', $schedule->id)
+            return redirect()->route('asesor.schedule.ruang-uji', $schedule->id)
                 ->with('error', 'Penyesuaian tidak dapat disimpan karena belum seluruh asesi disetujui APL-nya.');
         }
 
@@ -62,8 +62,8 @@ class Ak07Controller extends Controller
                 ]);
             }
 
-            return redirect()->route('asesor.schedule.ak01', $schedule->id)
-                ->with('info', 'FR.AK07 ditetapkan tanpa penyesuaian khusus. Melanjutkan ke FR.AK01 (Persetujuan Asesmen & Kerahasiaan).');
+            return redirect()->route('asesor.schedule.ruang-uji', $schedule->id)
+                ->with('info', 'FR.AK07 ditetapkan tanpa penyesuaian khusus. Masuk ke Ruang Uji.');
         }
 
         $items = $request->input('items', []);
@@ -166,9 +166,9 @@ class Ak07Controller extends Controller
         });
 
         $msg = $savedAny
-            ? 'Penyesuaian yang wajar (FR.AK07) berhasil disimpan. Melanjutkan ke FR.AK01 (Persetujuan Asesmen & Kerahasiaan).'
-            : 'FR.AK07 disimpan tanpa penyesuaian khusus. Melanjutkan ke FR.AK01 (Persetujuan Asesmen & Kerahasiaan).';
+            ? 'Penyesuaian yang wajar (FR.AK07) berhasil disimpan. Masuk ke Ruang Uji.'
+            : 'FR.AK07 disimpan tanpa penyesuaian khusus. Masuk ke Ruang Uji.';
 
-        return redirect()->route('asesor.schedule.ak01', $schedule->id)->with('success', $msg);
+        return redirect()->route('asesor.schedule.ruang-uji', $schedule->id)->with('success', $msg);
     }
 }

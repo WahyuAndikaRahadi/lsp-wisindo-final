@@ -36,73 +36,6 @@
         </div>
     @endif
 
-    {{-- Perhatian Asesor: Tugas Yang Perlu Dikerjakan --}}
-    @if((isset($pendingAplAssessments) && $pendingAplAssessments->count() > 0) || (isset($pendingScoringAssessments) && $pendingScoringAssessments->count() > 0))
-        <div class="bg-amber-50/70 border border-amber-200 rounded-xl p-5 shadow-xs space-y-4">
-            <div class="flex items-center justify-between border-b border-amber-200/80 pb-3">
-                <div class="flex items-center space-x-2">
-                    <span class="w-3 h-3 rounded-full bg-amber-500 animate-pulse"></span>
-                    <h2 class="text-sm font-bold uppercase tracking-wider text-amber-950">Perhatian Asesor: Tugas Yang Perlu Diselesaikan</h2>
-                </div>
-                <span class="text-xs font-semibold text-amber-800">
-                    {{ ($pendingAplAssessments->count() ?? 0) + ($pendingScoringAssessments->count() ?? 0) }} Asesi Memerlukan Tindakan
-                </span>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {{-- 1. Asesi Menunggu Review APL --}}
-                @if(isset($pendingAplAssessments) && $pendingAplAssessments->count() > 0)
-                    <div class="bg-white rounded-lg border border-amber-200 p-4 space-y-3">
-                        <div class="flex items-center justify-between">
-                            <span class="text-xs font-bold text-slate-800">Menunggu Review APL (01/02)</span>
-                            <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-amber-100 text-amber-800">
-                                {{ $pendingAplAssessments->count() }} Asesi
-                            </span>
-                        </div>
-                        <div class="space-y-2">
-                            @foreach($pendingAplAssessments->take(3) as $aplItem)
-                                <div class="flex items-center justify-between p-2 rounded bg-slate-50 border border-slate-100 text-xs">
-                                    <div>
-                                        <span class="font-bold text-slate-900 block">{{ $aplItem->asesi->full_name }}</span>
-                                        <span class="text-[11px] text-slate-500 font-mono">{{ $aplItem->schedule->code }} &bull; {{ $aplItem->schedule->scheme->name }}</span>
-                                    </div>
-                                    <a href="{{ route('asesor.review-apl', $aplItem->id) }}" class="px-2.5 py-1 text-[11px] font-bold bg-amber-500 hover:bg-amber-600 text-white rounded transition shrink-0">
-                                        Review APL &rarr;
-                                    </a>
-                                </div>
-                            @endforeach
-                        </div>
-                    </div>
-                @endif
-
-                {{-- 2. Asesi Menunggu Penilaian Instrumen --}}
-                @if(isset($pendingScoringAssessments) && $pendingScoringAssessments->count() > 0)
-                    <div class="bg-white rounded-lg border border-blue-200 p-4 space-y-3">
-                        <div class="flex items-center justify-between">
-                            <span class="text-xs font-bold text-slate-800">Siap Diuji & Dinilai (Instrumen Praktik/CBT)</span>
-                            <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-blue-100 text-blue-800">
-                                {{ $pendingScoringAssessments->count() }} Asesi
-                            </span>
-                        </div>
-                        <div class="space-y-2">
-                            @foreach($pendingScoringAssessments->take(3) as $scItem)
-                                <div class="flex items-center justify-between p-2 rounded bg-slate-50 border border-slate-100 text-xs">
-                                    <div>
-                                        <span class="font-bold text-slate-900 block">{{ $scItem->asesi->full_name }}</span>
-                                        <span class="text-[11px] text-slate-500 font-mono">{{ $scItem->schedule->code }}</span>
-                                    </div>
-                                    <a href="{{ route('asesor.assessment.ruang-uji', $scItem->id) }}" class="px-2.5 py-1 text-[11px] font-bold bg-brand-600 hover:bg-brand-700 text-white rounded transition shrink-0">
-                                        Ruang Uji &rarr;
-                                    </a>
-                                </div>
-                            @endforeach
-                        </div>
-                    </div>
-                @endif
-            </div>
-        </div>
-    @endif
-
     @if($jadwals->isEmpty())
         <div class="bg-white rounded-xl border border-slate-200 p-8 text-center shadow-sm">
             <div class="w-12 h-12 rounded-full bg-slate-100 text-slate-400 mx-auto flex items-center justify-center mb-3">
@@ -172,7 +105,7 @@
                     </div>
 
                     <div class="mt-5 pt-4 border-t border-slate-100">
-                        <a href="{{ route('asesor.jadwal.asesi', $jadwal->id) }}" class="w-full inline-flex items-center justify-center px-4 py-2.5 text-xs font-bold uppercase tracking-wider bg-brand-600 hover:bg-brand-700 text-white rounded-lg shadow-sm transition">
+                        <a href="{{ route('asesor.schedule.instrument', ['schedule' => $jadwal->id, 'code' => 'apl']) }}" class="w-full inline-flex items-center justify-center px-4 py-2.5 text-xs font-bold uppercase tracking-wider bg-brand-600 hover:bg-brand-700 text-white rounded-lg shadow-sm transition">
                             Masuk Asesmen &rarr;
                         </a>
                     </div>

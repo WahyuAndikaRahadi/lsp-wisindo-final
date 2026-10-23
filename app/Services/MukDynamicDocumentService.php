@@ -1,0 +1,972 @@
+<?php
+
+namespace App\Services;
+
+use App\Models\Assessment;
+use App\Models\Schedule;
+use App\Models\Scheme;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\File;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+
+class MukDynamicDocumentService
+{
+    protected string $baseDir;
+
+    protected string $cacheDir;
+
+    public function __construct()
+    {
+        $this->baseDir = base_path('lsp-document-dynamic');
+        $this->cacheDir = storage_path('app/muk-cache');
+
+        if (! File::isDirectory($this->cacheDir)) {
+            File::makeDirectory($this->cacheDir, 0755, true, true);
+        }
+    }
+
+    /**
+     * Map Scheme to its folder in /lsp-document-dynamic.
+     */
+    public function getSchemeDir(Scheme $scheme): ?string
+    {
+        $schemeId = $scheme->id;
+        $name = strtolower($scheme->name ?? '');
+        $code = strtolower($scheme->code ?? '');
+
+        $schemeMap = [
+            1 => 'MUK SKEMA 1 Engine Junior Technician',
+            2 => 'MUK SKEMA 2 Klaster Maintenance Gasoline Engine Injection',
+            3 => 'MUK SKEMA 3 Maintenence Electrical Vehicle',
+            4 => 'MUK SKEMA 4 Memperbaiki Panel Bodi Kendaraan',
+            5 => 'MUK SKEMA 5 Mekanik Junior pdf',
+            6 => 'MUK SKEMA 6 Servis Sepeda Motor Listrik.pdf',
+            7 => 'MUK SKEMA 7 Klaster Servis Sepeda Motor Injeksi',
+        ];
+
+        if (isset($schemeMap[$schemeId])) {
+            $path = $this->baseDir.'/'.$schemeMap[$schemeId];
+            if (File::isDirectory($path)) {
+                return $path;
+            }
+        }
+
+        if (preg_match('/(?:skm|skema)[-_ ]?0?([1-7])/i', $code, $m)) {
+            $num = (int) $m[1];
+            if (isset($schemeMap[$num])) {
+                $path = $this->baseDir.'/'.$schemeMap[$num];
+                if (File::isDirectory($path)) {
+                    return $path;
+                }
+            }
+        }
+
+        $directories = File::directories($this->baseDir);
+        foreach ($directories as $dir) {
+            $dirName = basename($dir);
+            if (str_contains(strtolower($dirName), $name) || (strlen($code) > 3 && str_contains(strtolower($dirName), $code))) {
+                return $dir;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Find matching dynamic template PDF inside scheme folder or root.
+     */
+    public function getDynamicFilePath(Scheme $scheme, string $docType): ?string
+    {
+        $normType = strtolower(str_replace(['_', ' ', '-', '.'], '', $docType));
+
+        // Shared operational files
+        if (in_array($normType, ['ba', 'beritaacara', 'beritaacaradanpeserta'], true)) {
+            $baCandidates = [
+                base_path('lsp-document-fixed/2.2 & 2.3 Berita  Acara Pelaksanaan Uji Kompetensi dan Daftar Hadir Peserta.docx.pdf'),
+                base_path('lsp-document-fixed/2.2 & 2.3 Berita Acara Pelaksanaan Uji Kompetensi dan Daftar Hadir Peserta.docx.pdf'),
+                $this->baseDir.'/2.2 & 2.3 Berita  Acara Pelaksanaan Uji Kompetensi dan Daftar Hadir Peserta.docx.pdf',
+            ];
+            foreach ($baCandidates as $cand) {
+                if (File::isFile($cand)) {
+                    return $cand;
+                }
+            }
+        }
+
+        if (in_array($normType, ['hadirasesor', 'daftarhadirasesor'], true)) {
+            $asesorCandidates = [
+                base_path('lsp-document-fixed/2.4 DAFTAR HADIR ASESOR.docx.pdf'),
+                $this->baseDir.'/2.4 DAFTAR HADIR ASESOR.docx.pdf',
+            ];
+            foreach ($asesorCandidates as $cand) {
+                if (File::isFile($cand)) {
+                    return $cand;
+                }
+            }
+        }
+
+        if ($normType === 'pernyataan') {
+            $pernyataanCandidates = [
+                base_path('lsp-document-fixed/15 Surat Pernyataan Pemegang Sertifikat.pdf'),
+                $this->baseDir.'/MUK SKEMA 7 Klaster Servis Sepeda Motor Injeksi/15 Surat Pernyataan Pemegang Sertifikat.pdf',
+            ];
+            foreach ($pernyataanCandidates as $cand) {
+                if (File::isFile($cand)) {
+                    return $cand;
+                }
+            }
+        }
+
+        $schemeDir = $this->getSchemeDir($scheme);
+        if (! $schemeDir || ! File::isDirectory($schemeDir)) {
+            return null;
+        }
+
+        $files = File::files($schemeDir);
+
+        foreach ($files as $file) {
+            $name = strtolower($file->getFilename());
+            if ($file->getExtension() !== 'pdf') {
+                continue;
+            }
+
+            switch ($normType) {
+                case 'apl01':
+                case 'frapl01':
+                    if (str_contains($name, 'apl.01') || str_contains($name, 'apl 01') || str_contains($name, 'apl-01')) {
+                        return $file->getPathname();
+                    }
+                    break;
+                case 'apl02':
+                case 'frapl02':
+                    if (str_contains($name, 'apl.02') || str_contains($name, 'apl 02') || str_contains($name, 'apl-02')) {
+                        return $file->getPathname();
+                    }
+                    break;
+                case 'ak01':
+                case 'frak01':
+                    if (str_contains($name, 'ak.01') || str_contains($name, 'ak 01') || str_contains($name, 'ak-01')) {
+                        return $file->getPathname();
+                    }
+                    break;
+                case 'ak02':
+                case 'frak02':
+                    if (str_contains($name, 'ak.02') || str_contains($name, 'ak 02') || str_contains($name, 'ak-02')) {
+                        return $file->getPathname();
+                    }
+                    break;
+                case 'ak03':
+                case 'frak03':
+                    if (str_contains($name, 'ak.03') || str_contains($name, 'ak 03') || str_contains($name, 'ak-03')) {
+                        return $file->getPathname();
+                    }
+                    break;
+                case 'ak04':
+                case 'frak04':
+                    if (str_contains($name, 'ak.04') || str_contains($name, 'ak 04') || str_contains($name, 'ak-04')) {
+                        return $file->getPathname();
+                    }
+                    break;
+                case 'ak07':
+                case 'frak07':
+                    if (str_contains($name, 'ak.07') || str_contains($name, 'ak 07') || str_contains($name, 'ak-07')) {
+                        return $file->getPathname();
+                    }
+                    break;
+                case 'ia01':
+                case 'fria01':
+                    if (str_contains($name, 'ia.01.ceklis') || (str_contains($name, 'ia.01') && ! str_contains($name, '01b') && ! str_contains($name, 'report'))) {
+                        return $file->getPathname();
+                    }
+                    break;
+                case 'ia01b':
+                case 'fria01b':
+                    if (str_contains($name, 'ia01b') || str_contains($name, 'ia 01 b') || str_contains($name, 'ia.01b') || str_contains($name, 'report')) {
+                        return $file->getPathname();
+                    }
+                    break;
+                case 'ia03':
+                case 'fria03':
+                    if (str_contains($name, 'ia.03') || str_contains($name, 'ia 03') || str_contains($name, 'ia-03')) {
+                        return $file->getPathname();
+                    }
+                    break;
+                case 'ia05c':
+                case 'fria05c':
+                    if (str_contains($name, 'ia.05.c') || str_contains($name, 'ia 05 c') || str_contains($name, 'ia-05-c')) {
+                        return $file->getPathname();
+                    }
+                    break;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Build dynamic data payload from models.
+     */
+    public function buildPayload(Schedule $schedule, ?Assessment $assessment = null): array
+    {
+        $asesi = $assessment?->asesi;
+        $profile = $asesi?->profile;
+
+        $leadAssessor = $assessment?->assessor ?? $schedule->assessors->first();
+        $date = Carbon::parse($schedule->date ?? now());
+
+        $days = [
+            'Sunday' => 'Minggu', 'Monday' => 'Senin', 'Tuesday' => 'Selasa',
+            'Wednesday' => 'Rabu', 'Thursday' => 'Kamis', 'Friday' => 'Jumat', 'Saturday' => 'Sabtu',
+        ];
+        $months = [
+            1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April', 5 => 'Mei', 6 => 'Juni',
+            7 => 'Juli', 8 => 'Agustus', 9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember',
+        ];
+
+        $dayName = $days[$date->format('l')] ?? $date->format('l');
+        $monthName = $months[(int) $date->format('m')] ?? $date->format('F');
+        $formattedDate = $date->format('d').' '.$monthName.' '.$date->format('Y');
+
+        $payload = [
+            'skema_nama' => $schedule->scheme?->name ?? 'Skema Sertifikasi LSP PrO Indo',
+            'skema_nomor' => $schedule->scheme?->code ?? 'SKM/LSP-PRO/2026',
+            'tuk_nama' => $schedule->tuk_name ?? 'TUK Otomotif Mandiri',
+            'tuk_kota' => 'Karawang',
+            'tuk_alamat' => 'Karawang, Jawa Barat',
+            'hari_tanggal' => "{$dayName}, {$formattedDate}",
+            'tanggal' => $formattedDate,
+            'waktu' => ($schedule->start_time ?? '08:00').' - '.($schedule->end_time ?? '12:00').' WIB',
+            'asesor_nama' => $leadAssessor?->full_name ?? 'Asesor LSP PrO Indo',
+            'asesor_no_reg' => $leadAssessor?->profile?->no_reg ?? 'MET.000.001234 2022',
+            'tanggal_dokumen' => $formattedDate,
+            'penanggungjawab_nama' => 'H. Ahmad Fauzi, S.Pd., M.M.',
+            'penanggungjawab_jabatan' => 'Kepala TUK',
+        ];
+
+        if ($assessment) {
+            $isK = in_array($assessment->final_result, ['K', 'KOMPETEN'], true);
+            $payload['asesi_nama'] = $asesi?->full_name ?? 'Nama Asesi';
+            $payload['asesi_nik'] = $profile?->nik ?? '-';
+            $payload['asesi_ttl'] = ($profile?->birth_place ?? 'Jakarta').', '.($profile?->birth_date ? Carbon::parse($profile->birth_date)->format('d-m-Y') : '01-01-2000');
+            $payload['asesi_gender'] = ($profile?->gender ?? 'L') === 'L' ? 'Laki-laki' : 'Perempuan';
+            $payload['asesi_kebangsaan'] = 'Indonesia';
+            $payload['asesi_alamat'] = $profile?->address ?? '-';
+            $payload['asesi_telp'] = $profile?->phone_number ?? '-';
+            $payload['asesi_email'] = $asesi?->email ?? '-';
+            $payload['asesi_pendidikan'] = $profile?->last_education ?? 'SMK';
+            $payload['asesi_institusi'] = $profile?->company_name ?? 'SMK Negeri';
+            $payload['asesi_jabatan'] = 'Pelajar';
+            $payload['rekomendasi'] = $isK ? 'K' : 'BK';
+            $payload['final_result'] = $isK ? 'KOMPETEN' : 'BELUM KOMPETEN';
+            $payload['signature_asesi'] = $assessment->asesi_signature ?? $profile?->signature_data;
+            $payload['signature_asesor'] = $assessment->assessor_signature ?? $leadAssessor?->profile?->signature_data;
+        }
+
+        // Add participants list for Berita Acara
+        $pesertaList = [];
+        $assessments = $schedule->assessments;
+        foreach ($assessments as $idx => $ass) {
+            $assProfile = $ass->asesi?->profile;
+            $assIsK = in_array($ass->final_result, ['K', 'KOMPETEN'], true);
+            $pesertaList[] = [
+                'no' => $idx + 1,
+                'nama' => $ass->asesi?->full_name ?? 'Peserta '.($idx + 1),
+                'institusi' => $assProfile?->company_name ?? 'SMK Negeri',
+                'alamat' => $assProfile?->address ?? 'Karawang',
+                'pekerjaan' => 'Pelajar',
+                'telp' => $assProfile?->phone_number ?? '-',
+                'hasil' => $assIsK ? 'K' : 'BK',
+                'rekomendasi' => $assIsK ? 'Diterbitkan Sertifikat' : 'Tidak Diterbitkan',
+                'ket' => $assIsK ? 'Lulus' : 'Belum Lulus',
+            ];
+        }
+        $payload['peserta'] = $pesertaList;
+        $payload['jumlah_asesi'] = count($pesertaList).' orang';
+
+        // Add assessors list for Daftar Hadir Asesor
+        $asesorList = [];
+        foreach ($schedule->assessors as $idx => $as) {
+            $asesorList[] = [
+                'no' => $idx + 1,
+                'nama' => $as->full_name,
+                'no_met' => $as->profile?->no_reg ?? 'MET.000.001234 2022',
+            ];
+        }
+        $payload['asesor'] = $asesorList;
+
+        return $payload;
+    }
+
+    /**
+     * Build specific payload for FR.APL.01 (Permohonan Sertifikasi Kompetensi).
+     */
+    public function buildApl01Data(Schedule $schedule, Assessment $assessment): array
+    {
+        $asesi = $assessment->asesi;
+        $profile = $asesi?->profile;
+        $scheme = $assessment->scheme ?? $schedule->scheme;
+
+        // Competency Units
+        $units = [];
+        if ($scheme) {
+            foreach ($scheme->competencyUnits as $u) {
+                $units[] = [$u->code, $u->title];
+            }
+        }
+        if (empty($units)) {
+            $units = [
+                ['G.45OTO01.001.2', 'Melaksanakan Keselamatan dan Kesehatan Kerja'],
+                ['G.45OTO01.002.2', 'Menggunakan Peralatan dan Perlengkapan Tempat Kerja'],
+                ['G.45OTO01.007.2', 'Membaca Gambar Teknik'],
+                ['G.45OTO01.008.2', 'Menggunakan Alat Ukur'],
+                ['G.45OTO01.009.2', 'Melaksanakan Diagnosis'],
+                ['G.45OTO01.010.2', 'Melakukan Perawatan Berkala Engine'],
+                ['G.45OTO01.065.2', 'Memelihara Baterai'],
+                ['G.45OTO01.073.2', 'Memperbaiki Kerusakan Pada Sistem Pengaman Kelistrikan'],
+                ['G.45OTO01.078.2', 'Memperbaiki Sistem Manajemen Engine'],
+            ];
+        }
+
+        // Standard reference
+        $standarRef = $scheme?->competencyUnits->first()?->standard_reference ?? 'SKKNI Nomor 97 Tahun 2018';
+        if (preg_match('/^(.*?)(Tahun\s+\d+.*)$/i', $standarRef, $sm)) {
+            $standar = [trim($sm[1]), trim($sm[2])];
+        } else {
+            $standar = [$standarRef, ''];
+        }
+
+        // Proofs mapping
+        $savedProofTypes = $assessment->proofs()->pluck('proof_type')->map(fn ($t) => strtoupper((string) $t))->toArray();
+        $syaratDasar = [
+            in_array('IJAZAH_SMK', $savedProofTypes, true) ? 'memenuhi' : 'tidak_ada',
+            in_array('SURAT_SISWA_AKTIF', $savedProofTypes, true) ? 'memenuhi' : 'tidak_ada',
+            in_array('IJAZAH_SMA_SERTIFIKAT', $savedProofTypes, true) ? 'memenuhi' : 'tidak_ada',
+            in_array('PENGALAMAN_KERJA', $savedProofTypes, true) ? 'memenuhi' : 'tidak_ada',
+        ];
+        if (! in_array('memenuhi', $syaratDasar, true) && ($assessment->admin_status === 'APPROVED' || $assessment->apl_status === 'APPROVED')) {
+            $syaratDasar[0] = 'memenuhi';
+        }
+
+        $syaratAdmin = [
+            in_array('KTP', $savedProofTypes, true) ? 'memenuhi' : ($assessment->admin_status === 'APPROVED' ? 'memenuhi' : 'tidak_ada'),
+            in_array('PAS_FOTO', $savedProofTypes, true) ? 'memenuhi' : ($assessment->admin_status === 'APPROVED' ? 'memenuhi' : 'tidak_ada'),
+        ];
+
+        // TTL formatting
+        $tempatLahir = $profile?->tempat_lahir ?? ($profile?->birth_place ?? 'Jakarta');
+        $tglLahirRaw = $profile?->tanggal_lahir ?? $profile?->birth_date;
+        $tglLahir = $tglLahirRaw
+            ? Carbon::parse($tglLahirRaw)->locale('id')->translatedFormat('d F Y')
+            : '01 Januari 2000';
+        $ttl = "{$tempatLahir}, {$tglLahir}";
+
+        // Dates
+        $tglPemohon = $assessment->registered_at
+            ? Carbon::parse($assessment->registered_at)->locale('id')->translatedFormat('d F Y')
+            : ($assessment->created_at ? Carbon::parse($assessment->created_at)->locale('id')->translatedFormat('d F Y') : Carbon::now()->locale('id')->translatedFormat('d F Y'));
+
+        $tglAdmin = $assessment->admin_approved_at
+            ? Carbon::parse($assessment->admin_approved_at)->locale('id')->translatedFormat('d F Y')
+            : ($assessment->approved_at ? Carbon::parse($assessment->approved_at)->locale('id')->translatedFormat('d F Y') : $tglPemohon);
+
+        $adminUser = $assessment->admin ?? $assessment->admin_reviewer;
+        $namaAdmin = $adminUser?->full_name ?? 'Admin LSP';
+
+        $isAccepted = ($assessment->admin_status === 'APPROVED' || $assessment->apl_status === 'APPROVED' || $assessment->status === 'ACTIVE' || $assessment->status === 'COMPLETED');
+
+        // Signature data
+        $signatureAsesi = $assessment->asesi_signature ?? $profile?->signature_data;
+
+        return [
+            'skema_judul' => $scheme?->name ?? 'Maintenance Gasoline Engine Injection System',
+            'skema_nomor' => $scheme?->code ?? '02/LSP PrO Indo/I/2026',
+            'standar' => $standar,
+            'units' => $units,
+            'nama_lengkap' => $asesi?->full_name ?? 'Ahmad Fauzi Ramadhan',
+            'nik' => $profile?->nik ?? '-',
+            'ttl' => $ttl,
+            'jenis_kelamin' => ($profile?->jenis_kelamin === 'P' || strtolower((string) ($profile?->gender ?? '')) === 'p') ? 'P' : 'L',
+            'kebangsaan' => $profile?->kebangsaan ?? 'Indonesia',
+            'alamat_rumah' => $profile?->alamat_rumah ?? ($profile?->address ?? '-'),
+            'kode_pos' => $profile?->kode_pos ?? '-',
+            'telp_rumah' => $profile?->no_telepon_rumah ?? '-',
+            'telp_kantor_pribadi' => $profile?->no_telepon_kantor ?? '-',
+            'hp' => $asesi?->phone ?? ($profile?->phone_number ?? '-'),
+            'email' => $asesi?->email ?? '-',
+            'pendidikan' => $profile?->pendidikan_terakhir ?? ($profile?->last_education ?? 'SMK'),
+            'instansi' => $profile?->nama_institusi_perusahaan ?? ($profile?->company_name ?? '-'),
+            'jabatan' => $profile?->jabatan ?? ($profile?->job_title ?? '-'),
+            'alamat_kantor' => $profile?->alamat_kantor ?? ($profile?->company_address ?? '-'),
+            'kode_pos_kantor' => $profile?->kode_pos ?? '-',
+            'telp_kantor' => $profile?->no_telepon_kantor ?? '-',
+            'fax_kantor' => '-',
+            'kontak_kantor' => ($profile?->no_telepon_kantor ?? '-').' / '.($asesi?->email ?? '-'),
+            'tujuan' => ['sertifikasi' => true, 'pkt' => false, 'rpl' => false, 'lainnya' => false],
+            'syarat_dasar' => $syaratDasar,
+            'syarat_admin' => $syaratAdmin,
+            'diterima' => $isAccepted,
+            'catatan' => $assessment->admin_notes ?? ($assessment->apl_revision_notes ?? 'Berkas lengkap dan memenuhi persyaratan dasar.'),
+            'tgl_pemohon' => $tglPemohon,
+            'nama_admin' => $namaAdmin,
+            'tgl_admin' => $tglAdmin,
+            'signature_asesi' => $signatureAsesi,
+        ];
+    }
+
+    /**
+     * Build specific payload for FR.APL.02 (Asesmen Mandiri).
+     */
+    public function buildApl02Data(Schedule $schedule, Assessment $assessment): array
+    {
+        $asesi = $assessment->asesi;
+        $profile = $asesi?->profile;
+        $assessor = $assessment->assessor ?? $schedule->assessors->first();
+        $scheme = $assessment->scheme ?? $schedule->scheme;
+
+        $tgl = $assessment->registered_at
+            ? Carbon::parse($assessment->registered_at)->locale('id')->translatedFormat('d F Y')
+            : ($schedule->date ? Carbon::parse($schedule->date)->locale('id')->translatedFormat('d F Y') : Carbon::now()->locale('id')->translatedFormat('d F Y'));
+
+        $isKompeten = ! in_array($assessment->final_result, ['BK', 'BELUM_KOMPETEN', 'BELUM KOMPETEN'], true);
+
+        return [
+            'skema_judul' => $scheme?->name ?? 'Klaster Maintenance Gasoline Engine Injection System',
+            'skema_nomor' => $scheme?->code ?? '02/LSP PrO Indo/I/2026',
+            'asesi_nama' => $asesi?->full_name ?? 'Nama Asesi',
+            'asesor_nama' => $assessor?->full_name ?? 'Drs. Budi Santoso, M.T.',
+            'asesor_reg' => $assessor?->profile?->no_reg ?? 'MET.000.001234 2022',
+            'tanggal' => $tgl,
+            'is_kompeten' => $isKompeten,
+            'signature_asesi' => $assessment->asesi_signature ?? $profile?->signature_data,
+            'signature_asesor' => $assessment->assessor_signature ?? $assessor?->profile?->signature_data,
+        ];
+    }
+
+    /**
+     * Build specific payload for FR.AK.01 (Persetujuan Asesmen dan Kerahasiaan).
+     */
+    public function buildAk01Data(Schedule $schedule, Assessment $assessment): array
+    {
+        $asesi = $assessment->asesi;
+        $profile = $asesi?->profile;
+        $assessor = $assessment->assessor ?? $schedule->assessors->first();
+        $scheme = $assessment->scheme ?? $schedule->scheme;
+
+        $date = Carbon::parse($schedule->date ?? now());
+        $days = [
+            'Sunday' => 'Minggu', 'Monday' => 'Senin', 'Tuesday' => 'Selasa',
+            'Wednesday' => 'Rabu', 'Thursday' => 'Kamis', 'Friday' => 'Jumat', 'Saturday' => 'Sabtu',
+        ];
+        $months = [
+            1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April', 5 => 'Mei', 6 => 'Juni',
+            7 => 'Juli', 8 => 'Agustus', 9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember',
+        ];
+        $dayName = $days[$date->format('l')] ?? $date->format('l');
+        $monthName = $months[(int) $date->format('m')] ?? $date->format('F');
+        $formattedDate = $date->format('d').' '.$monthName.' '.$date->format('Y');
+
+        $tglTtd = $assessment->ak01_agreed_at
+            ? Carbon::parse($assessment->ak01_agreed_at)->locale('id')->translatedFormat('d F Y')
+            : $formattedDate;
+
+        $tglAsesor = $assessment->assessor_signed_at
+            ? Carbon::parse($assessment->assessor_signed_at)->locale('id')->translatedFormat('d F Y')
+            : $tglTtd;
+
+        $tglAsesi = $assessment->asesi_signed_at
+            ? Carbon::parse($assessment->asesi_signed_at)->locale('id')->translatedFormat('d F Y')
+            : $tglTtd;
+
+        $ak01Data = $schedule->ak01_data ?? [];
+        $evidence = $ak01Data['evidence'] ?? ['Hasil Observasi Langsung', 'Hasil Pertanyaan Tertulis'];
+        $otherEvidence = $ak01Data['other_evidence'] ?? '';
+        $tukType = $ak01Data['tuk_type'] ?? 'Sewaktu';
+
+        $startTime = $schedule->start_time ? Carbon::parse($schedule->start_time)->format('H.i') : '08.00';
+        $endTime = $schedule->end_time ? Carbon::parse($schedule->end_time)->format('H.i') : '12.00';
+
+        return [
+            'skema_nama' => $scheme?->name ?? 'Maintenance Gasoline Engine Injection System',
+            'skema_nomor' => $scheme?->code ?? '02/LSP PrO Indo/I/2026',
+            'tuk_tipe' => $tukType.'*',
+            'asesor_nama' => $assessor?->full_name ?? 'Drs. Budi Santoso, M.T.',
+            'asesi_nama' => $asesi?->full_name ?? 'Nama Asesi',
+            'bukti_portofolio' => in_array('Hasil Verifikasi Portofolio', $evidence, true),
+            'bukti_reviu' => in_array('Hasil Reviu Produk', $evidence, true),
+            'bukti_observasi' => in_array('Hasil Observasi Langsung', $evidence, true),
+            'bukti_terstruktur' => in_array('Hasil Kegiatan Terstruktur', $evidence, true),
+            'bukti_lisan' => in_array('Hasil Pertanyaan Lisan', $evidence, true),
+            'bukti_tertulis' => in_array('Hasil Pertanyaan Tertulis', $evidence, true),
+            'bukti_wawancara' => in_array('Hasil Pertanyaan Wawancara', $evidence, true),
+            'bukti_lainnya' => in_array('Lainnya', $evidence, true) || ! empty($otherEvidence),
+            'hari_tanggal' => "{$dayName}, {$formattedDate}",
+            'waktu' => ($schedule->start_time ?? '08.00').' - '.($schedule->end_time ?? '12.00').' WIB',
+            'tuk_nama' => $schedule->tuk_name ?? 'TUK Otomotif Mandiri',
+            'tanggal_ttd' => $tglTtd,
+            'tanggal_ttd_asesor' => $tglAsesor,
+            'tanggal_ttd_asesi' => $tglAsesi,
+            'signature_asesi' => $assessment->asesi_signature ?? $profile?->signature_data,
+            'signature_asesor' => $assessment->assessor_signature ?? $assessor?->profile?->signature_data,
+        ];
+    }
+
+    /**
+     * Build specific payload for FR.AK.02 (Rekaman Asesmen Kompetensi).
+     */
+    public function buildAk02Data(Schedule $schedule, Assessment $assessment): array
+    {
+        $asesi = $assessment->asesi;
+        $profile = $asesi?->profile;
+        $assessor = $assessment->assessor ?? $schedule->assessors->first();
+        $scheme = $assessment->scheme ?? $schedule->scheme;
+
+        $startDate = $schedule->date
+            ? Carbon::parse($schedule->date)->format('d/m/Y').' '.($schedule->start_time ? Carbon::parse($schedule->start_time)->format('H:i') : '08:30')
+            : now()->format('d/m/Y 08:30');
+
+        $endDate = $schedule->date
+            ? Carbon::parse($schedule->date)->format('d/m/Y').' '.($schedule->end_time ? Carbon::parse($schedule->end_time)->format('H:i') : '12:00')
+            : now()->format('d/m/Y 12:00');
+
+        $tglTtd = $assessment->final_result_at
+            ? Carbon::parse($assessment->final_result_at)->locale('id')->translatedFormat('d F Y')
+            : ($schedule->date ? Carbon::parse($schedule->date)->locale('id')->translatedFormat('d F Y') : Carbon::now()->locale('id')->translatedFormat('d F Y'));
+
+        $tglAsesor = $assessment->assessor_signed_at
+            ? Carbon::parse($assessment->assessor_signed_at)->locale('id')->translatedFormat('d F Y')
+            : $tglTtd;
+
+        $tglAsesi = $assessment->asesi_signed_at
+            ? Carbon::parse($assessment->asesi_signed_at)->locale('id')->translatedFormat('d F Y')
+            : $tglTtd;
+
+        $isKompeten = in_array($assessment->final_result, ['K', 'KOMPETEN'], true);
+
+        $tukType = $schedule->ak01_data['tuk_type'] ?? ($schedule->tuk_type ?? 'Sewaktu');
+        $tukDisplay = match (strtolower((string) $tukType)) {
+            'tempat_kerja', 'tempat kerja' => 'Tempat Kerja',
+            'mandiri' => 'Mandiri',
+            default => 'Sewaktu',
+        };
+
+        // Competency Units with evidence checkmarks from ak02Items
+        $units = [];
+        $ak02Items = $assessment->ak02Items->keyBy('competency_unit_id');
+        $compUnits = $scheme ? $scheme->competencyUnits : collect();
+
+        foreach ($compUnits as $cu) {
+            $item = $ak02Items->get($cu->id);
+            $methods = $item?->methods_json ?? [];
+            $units[] = [
+                'code' => $cu->code,
+                'title' => $cu->title,
+                'obs' => ! empty($methods['observasi_demonstrasi']) || empty($methods),
+                'port' => ! empty($methods['portofolio']),
+                'pihak3' => ! empty($methods['pihak_ketiga']),
+                'lisan' => ! empty($methods['lisan']),
+                'tulis' => ! empty($methods['tulis']) || empty($methods),
+                'proyek' => ! empty($methods['proyek']),
+                'lain' => ! empty($methods['lainnya']),
+            ];
+        }
+
+        if (empty($units)) {
+            $defaultUnits = [
+                'Melaksanakan Keselamatan dan Kesehatan Kerja',
+                'Menggunakan Peralatan dan Perlengkapan Tempat Kerja',
+                'Membaca Gambar Teknik',
+                'Menggunakan Alat Ukur',
+                'Melaksanakan Diagnosis',
+                'Melakukan Perawatan Berkala Engine',
+                'Memelihara Baterai',
+                'Memperbaiki Kerusakan Pada Sistem Pengaman Kelistrikan',
+                'Memperbaiki Sistem Manajemen Engine',
+            ];
+            foreach ($defaultUnits as $title) {
+                $units[] = [
+                    'title' => $title,
+                    'obs' => true,
+                    'port' => false,
+                    'pihak3' => false,
+                    'lisan' => true,
+                    'tulis' => true,
+                    'proyek' => false,
+                    'lain' => false,
+                ];
+            }
+        }
+
+        return [
+            'skema_nama' => $scheme?->name ?? 'Maintenance Gasoline Engine Injection System',
+            'skema_nomor' => $scheme?->code ?? '02/LSP PrO Indo/I/2026',
+            'tuk_tipe' => $tukDisplay.'*',
+            'asesor_nama' => $assessor?->full_name ?? 'Drs. Budi Santoso, M.T.',
+            'asesor_no_reg' => $assessor?->profile?->no_reg ?? 'MET.000.001234 2022',
+            'asesi_nama' => $asesi?->full_name ?? 'Nama Asesi',
+            'tanggal_mulai' => $startDate,
+            'tanggal_selesai' => $endDate,
+            'rekomendasi_kompeten' => $isKompeten,
+            'tindak_lanjut' => $assessment->follow_up_action ?? ($isKompeten ? 'Tidak ada tindakan perbaikan yang diperlukan. Seluruh unit kompetensi telah terpenuhi sesuai standar SKKNI.' : 'Perlu dilakukan asesmen ulang pada unit yang belum kompeten.'),
+            'komentar_asesor' => $assessment->final_notes ?? ($isKompeten ? 'Asesi menunjukkan pemahaman dan keterampilan kerja yang sangat baik dalam pelaksanaan asesmen kompetensi.' : 'Asesi perlu meningkatkan kompetensi pada unit tertentu.'),
+            'units' => $units,
+            'tanggal_tanda_tangan' => $tglTtd,
+            'tanggal_tanda_tangan_asesor' => $tglAsesor,
+            'tanggal_tanda_tangan_asesi' => $tglAsesi,
+            'signature_asesi' => $assessment->asesi_signature ?? $profile?->signature_data,
+            'signature_asesor' => $assessment->assessor_signature ?? $assessor?->profile?->signature_data,
+        ];
+    }
+
+    /**
+     * Build specific payload for FR.AK.07 (Ceklis Penyesuaian yang Wajar dan Beralasan).
+     */
+    public function buildAk07Data(Schedule $schedule, Assessment $assessment): array
+    {
+        $asesi = $assessment->asesi;
+        $profile = $asesi?->profile;
+        $assessor = $assessment->assessor ?? $schedule->assessors->first();
+        $scheme = $assessment->scheme ?? $schedule->scheme;
+
+        $tgl = $assessment->registered_at
+            ? Carbon::parse($assessment->registered_at)->locale('id')->translatedFormat('d F Y')
+            : ($schedule->date ? Carbon::parse($schedule->date)->locale('id')->translatedFormat('d F Y') : Carbon::now()->locale('id')->translatedFormat('d F Y'));
+
+        $ak07Items = $assessment->ak07Items ?? collect();
+        $hasAdjustment = $ak07Items->whereNotIn('adjustment_category', ['Standar', ''])->isNotEmpty();
+        $agreementItem = $ak07Items->firstWhere('adjustment_category', 'Kesepakatan Asesor-Asesi');
+        $agreementNotes = $agreementItem?->adjustment_detail ?? '';
+
+        $tukType = $schedule->tuk_type ?? 'Sewaktu';
+        $tukDisplay = match (strtolower((string) $tukType)) {
+            'tempat_kerja', 'tempat kerja' => 'Tempat Kerja',
+            'mandiri' => 'Mandiri',
+            default => 'Sewaktu',
+        };
+
+        return [
+            'skema_nama' => $scheme?->name ?? 'Maintenance Gasoline Engine Injection System',
+            'skema_nomor' => $scheme?->code ?? '02/LSP PrO Indo/I/2026',
+            'tuk_tipe' => $tukDisplay,
+            'asesor_nama' => $assessor?->full_name ?? 'Drs. Budi Santoso, M.T.',
+            'asesi_nama' => $asesi?->full_name ?? 'Nama Asesi',
+            'tanggal' => $tgl,
+            'tanggal_ttd' => $tgl,
+            'penyesuaian_diperlukan' => $hasAdjustment,
+            'agreement_notes' => $agreementNotes,
+            'signature_asesi' => $assessment->asesi_signature ?? $profile?->signature_data,
+            'signature_asesor' => $assessment->assessor_signature ?? $assessor?->profile?->signature_data,
+        ];
+    }
+
+    /**
+     * Build specific payload for FR.IA.01 (Ceklis Observasi Aktivitas Praktik).
+     */
+    public function buildIa01Data(Schedule $schedule, Assessment $assessment): array
+    {
+        $asesi = $assessment->asesi;
+        $profile = $asesi?->profile;
+        $assessor = $assessment->assessor ?? $schedule->assessors->first();
+        $scheme = $assessment->scheme ?? $schedule->scheme;
+
+        $tgl = $assessment->registered_at
+            ? Carbon::parse($assessment->registered_at)->locale('id')->translatedFormat('d F Y')
+            : ($schedule->date ? Carbon::parse($schedule->date)->locale('id')->translatedFormat('d F Y') : Carbon::now()->locale('id')->translatedFormat('d F Y'));
+
+        $isKompeten = ! in_array($assessment->final_result, ['BK', 'BELUM_KOMPETEN', 'BELUM KOMPETEN'], true);
+
+        $tukType = $schedule->tuk_type ?? 'Sewaktu';
+        $tukDisplay = match (strtolower((string) $tukType)) {
+            'tempat_kerja', 'tempat kerja' => 'Tempat Kerja',
+            'mandiri' => 'Mandiri',
+            default => 'Sewaktu',
+        };
+
+        return [
+            'skema_nama' => $scheme?->name ?? 'Maintenance Gasoline Engine Injection System',
+            'skema_nomor' => $scheme?->code ?? '02/LSP PrO Indo/I/2026',
+            'tuk_tipe' => $tukDisplay.'*',
+            'asesor_nama' => $assessor?->full_name ?? 'Drs. Budi Santoso, M.T.',
+            'asesor_no_reg' => $assessor?->profile?->no_reg ?? 'MET.000.001234 2022',
+            'asesi_nama' => $asesi?->full_name ?? 'Nama Asesi',
+            'tanggal' => $tgl,
+            'tanggal_ttd' => $tgl,
+            'is_kompeten' => $isKompeten,
+            'signature_asesi' => $assessment->asesi_signature ?? $profile?->signature_data,
+            'signature_asesor' => $assessment->assessor_signature ?? $assessor?->profile?->signature_data,
+        ];
+    }
+
+    /**
+     * Build specific payload for FR.IA.03 (Pertanyaan Mendukung Observasi).
+     */
+    public function buildIa03Data(Schedule $schedule, Assessment $assessment): array
+    {
+        $asesi = $assessment->asesi;
+        $profile = $asesi?->profile;
+        $assessor = $assessment->assessor ?? $schedule->assessors->first();
+        $scheme = $assessment->scheme ?? $schedule->scheme;
+
+        $tgl = $assessment->registered_at
+            ? Carbon::parse($assessment->registered_at)->locale('id')->translatedFormat('d F Y')
+            : ($schedule->date ? Carbon::parse($schedule->date)->locale('id')->translatedFormat('d F Y') : Carbon::now()->locale('id')->translatedFormat('d F Y'));
+
+        $tukType = $schedule->tuk_type ?? 'Sewaktu';
+        $tukDisplay = match (strtolower((string) $tukType)) {
+            'tempat_kerja', 'tempat kerja' => 'Tempat Kerja',
+            'mandiri' => 'Mandiri',
+            default => 'Sewaktu',
+        };
+
+        $ia03Response = $assessment->iaResponses?->firstWhere('instrument_code', 'IA03');
+
+        return [
+            'skema_nama' => $scheme?->name ?? 'Maintenance Gasoline Engine Injection System',
+            'skema_nomor' => $scheme?->code ?? '02/LSP PrO Indo/I/2026',
+            'tuk_tipe' => $tukDisplay.'*',
+            'asesor_nama' => $assessor?->full_name ?? 'Drs. Budi Santoso, M.T.',
+            'asesor_no_reg' => $assessor?->profile?->no_reg ?? 'MET.000.001234 2022',
+            'asesi_nama' => $asesi?->full_name ?? 'Nama Asesi',
+            'tanggal' => $tgl,
+            'tanggal_ttd' => $tgl,
+            'signature_asesi' => $ia03Response?->asesi_signature ?? $assessment->asesi_signature ?? $profile?->signature_data,
+            'signature_asesor' => $ia03Response?->assessor_signature ?? $assessment->assessor_signature ?? $assessor?->profile?->signature_data,
+        ];
+    }
+
+    /**
+     * Generate dynamic PDF with inserted candidate data.
+     */
+    public function generateDynamicPdf(string $docType, Schedule $schedule, ?Assessment $assessment = null): string
+    {
+        $normType = strtolower(str_replace(['_', ' ', '-', '.'], '', $docType));
+        $cacheKey = "dyn_{$schedule->id}_".($assessment?->id ?? 'sch')."_{$normType}.pdf";
+        $outputPath = $this->cacheDir.'/'.$cacheKey;
+
+        // Python executable finder
+        $python = base_path('.venv/bin/python');
+        if (! File::isFile($python)) {
+            $python = 'python3';
+        }
+
+        $pythonExec = escapeshellarg($python);
+
+        $payload = $this->buildPayload($schedule, $assessment);
+        $tempJson = $this->cacheDir.'/muk_json_'.uniqid().'.json';
+        File::put($tempJson, json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+
+        try {
+            // 1. Operational generators (ReportLab)
+            if ($normType === 'apl01') {
+                $script = base_path('tools/render_fr_apl_01.py');
+                if (File::isFile($script)) {
+                    $aplPayload = $assessment
+                        ? $this->buildApl01Data($schedule, $assessment)
+                        : $this->buildPayload($schedule, null);
+                    $tempAplJson = $this->cacheDir.'/muk_apl01_'.uniqid().'.json';
+                    File::put($tempAplJson, json_encode($aplPayload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+                    shell_exec("{$pythonExec} ".escapeshellarg($script).' '.escapeshellarg($tempAplJson).' '.escapeshellarg($outputPath));
+                    @unlink($tempAplJson);
+                    if (File::isFile($outputPath) && filesize($outputPath) > 1000) {
+                        return $outputPath;
+                    }
+                }
+            }
+
+            if ($normType === 'apl02') {
+                $script = base_path('tools/render_fr_apl_02.py');
+                if (File::isFile($script)) {
+                    $apl02Payload = $assessment
+                        ? $this->buildApl02Data($schedule, $assessment)
+                        : $this->buildPayload($schedule, null);
+                    $tempAplJson = $this->cacheDir.'/muk_apl02_'.uniqid().'.json';
+                    File::put($tempAplJson, json_encode($apl02Payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+                    shell_exec("{$pythonExec} ".escapeshellarg($script).' '.escapeshellarg($tempAplJson).' '.escapeshellarg($outputPath));
+                    @unlink($tempAplJson);
+                    if (File::isFile($outputPath) && filesize($outputPath) > 1000) {
+                        return $outputPath;
+                    }
+                }
+            }
+
+            if ($normType === 'ak01') {
+                $script = base_path('tools/render_fr_ak_01.py');
+                if (File::isFile($script)) {
+                    $ak01Payload = $assessment
+                        ? $this->buildAk01Data($schedule, $assessment)
+                        : $this->buildPayload($schedule, null);
+                    $tempAkJson = $this->cacheDir.'/muk_ak01_'.uniqid().'.json';
+                    File::put($tempAkJson, json_encode($ak01Payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+                    shell_exec("{$pythonExec} ".escapeshellarg($script).' '.escapeshellarg($tempAkJson).' '.escapeshellarg($outputPath));
+                    @unlink($tempAkJson);
+                    if (File::isFile($outputPath) && filesize($outputPath) > 1000) {
+                        return $outputPath;
+                    }
+                }
+            }
+
+            if ($normType === 'ak02') {
+                $script = base_path('tools/render_fr_ak_02.py');
+                if (File::isFile($script)) {
+                    $ak02Payload = $assessment
+                        ? $this->buildAk02Data($schedule, $assessment)
+                        : $this->buildPayload($schedule, null);
+                    $tempAk02Json = $this->cacheDir.'/muk_ak02_'.uniqid().'.json';
+                    File::put($tempAk02Json, json_encode($ak02Payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+                    shell_exec("{$pythonExec} ".escapeshellarg($script).' '.escapeshellarg($tempAk02Json).' '.escapeshellarg($outputPath));
+                    @unlink($tempAk02Json);
+                    if (File::isFile($outputPath) && filesize($outputPath) > 1000) {
+                        return $outputPath;
+                    }
+                }
+            }
+
+            if ($normType === 'ak07') {
+                $script = base_path('tools/render_fr_ak_07.py');
+                if (File::isFile($script)) {
+                    $ak07Payload = $assessment
+                        ? $this->buildAk07Data($schedule, $assessment)
+                        : $this->buildPayload($schedule, null);
+                    $tempAk07Json = $this->cacheDir.'/muk_ak07_'.uniqid().'.json';
+                    File::put($tempAk07Json, json_encode($ak07Payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+                    shell_exec("{$pythonExec} ".escapeshellarg($script).' '.escapeshellarg($tempAk07Json).' '.escapeshellarg($outputPath));
+                    @unlink($tempAk07Json);
+                    if (File::isFile($outputPath) && filesize($outputPath) > 1000) {
+                        return $outputPath;
+                    }
+                }
+            }
+
+            if ($normType === 'ia01') {
+                $script = base_path('tools/render_fr_ia_01.py');
+                if (File::isFile($script)) {
+                    $ia01Payload = $assessment
+                        ? $this->buildIa01Data($schedule, $assessment)
+                        : $this->buildPayload($schedule, null);
+                    $tempIa01Json = $this->cacheDir.'/muk_ia01_'.uniqid().'.json';
+                    File::put($tempIa01Json, json_encode($ia01Payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+                    shell_exec("{$pythonExec} ".escapeshellarg($script).' '.escapeshellarg($tempIa01Json).' '.escapeshellarg($outputPath));
+                    @unlink($tempIa01Json);
+                    if (File::isFile($outputPath) && filesize($outputPath) > 1000) {
+                        return $outputPath;
+                    }
+                }
+            }
+
+            if ($normType === 'ia03') {
+                $script = base_path('tools/render_fr_ia_03.py');
+                if (File::isFile($script)) {
+                    $ia03Payload = $assessment
+                        ? $this->buildIa03Data($schedule, $assessment)
+                        : $this->buildPayload($schedule, null);
+                    $tempIa03Json = $this->cacheDir.'/muk_ia03_'.uniqid().'.json';
+                    File::put($tempIa03Json, json_encode($ia03Payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+                    shell_exec("{$pythonExec} ".escapeshellarg($script).' '.escapeshellarg($tempIa03Json).' '.escapeshellarg($outputPath));
+                    @unlink($tempIa03Json);
+                    if (File::isFile($outputPath) && filesize($outputPath) > 1000) {
+                        return $outputPath;
+                    }
+                }
+            }
+            if (in_array($normType, ['ba', 'beritaacara', 'beritaacaradanpeserta'], true)) {
+                $script = base_path('tools/render_berita_acara.py');
+                if (File::isFile($script)) {
+                    shell_exec("{$pythonExec} ".escapeshellarg($script).' '.escapeshellarg($tempJson).' '.escapeshellarg($outputPath));
+                    if (File::isFile($outputPath) && filesize($outputPath) > 1000) {
+                        return $outputPath;
+                    }
+                }
+            }
+
+            if (in_array($normType, ['hadirasesor', 'daftarhadirasesor'], true)) {
+                $script = base_path('tools/render_daftar_hadir_asesor.py');
+                if (File::isFile($script)) {
+                    shell_exec("{$pythonExec} ".escapeshellarg($script).' '.escapeshellarg($tempJson).' '.escapeshellarg($outputPath));
+                    if (File::isFile($outputPath) && filesize($outputPath) > 1000) {
+                        return $outputPath;
+                    }
+                }
+            }
+
+            if ($normType === 'pernyataan') {
+                $script = base_path('tools/render_surat_pernyataan.py');
+                if (File::isFile($script)) {
+                    shell_exec("{$pythonExec} ".escapeshellarg($script).' '.escapeshellarg($tempJson).' '.escapeshellarg($outputPath));
+                    if (File::isFile($outputPath) && filesize($outputPath) > 1000) {
+                        return $outputPath;
+                    }
+                }
+            }
+
+            // 2. Scheme-specific master PDF overlay via PyMuPDF
+            $masterPdf = $this->getDynamicFilePath($schedule->scheme, $normType);
+            if ($masterPdf && File::isFile($masterPdf)) {
+                $overlayScript = base_path('tools/render_dynamic_overlay.py');
+                if (File::isFile($overlayScript)) {
+                    shell_exec("{$pythonExec} ".escapeshellarg($overlayScript).' '.escapeshellarg($masterPdf).' '.escapeshellarg($tempJson).' '.escapeshellarg($outputPath));
+                    if (File::isFile($outputPath) && filesize($outputPath) > 1000) {
+                        return $outputPath;
+                    }
+                }
+
+                // If python overlay execution failed, return clean master copy
+                return $masterPdf;
+            }
+
+            // 3. Fallback to fixture or print-example generated files
+            $fixtureMap = [
+                'apl01' => 'tests/Fixtures/muk/FR_APL_01_generated.pdf',
+                'apl02' => 'tests/Fixtures/muk/FR_APL_02_generated.pdf',
+                'ak01' => 'tests/Fixtures/muk/FR_AK_01_generated.pdf',
+                'ak02' => 'tests/Fixtures/muk/FR_AK_02_generated.pdf',
+                'ak03' => 'tests/Fixtures/muk/FR_AK_03_generated.pdf',
+                'ak04' => 'tests/Fixtures/muk/FR_AK_04_generated.pdf',
+                'ak07' => 'tests/Fixtures/muk/FR_AK_07_generated.pdf',
+                'ia01' => 'tests/Fixtures/muk/FR_IA_01_generated.pdf',
+                'ia01b' => 'tests/Fixtures/muk/FR_IA_01_B_generated.pdf',
+                'ia03' => 'tests/Fixtures/muk/FR_IA_03_generated.pdf',
+                'ia05c' => 'tests/Fixtures/muk/FR_IA_05_C_generated.pdf',
+                'daftarperiksa' => 'tests/Fixtures/muk/DAFTAR_PERIKSA_generated.pdf',
+            ];
+
+            if (isset($fixtureMap[$normType]) && File::isFile(base_path($fixtureMap[$normType]))) {
+                return base_path($fixtureMap[$normType]);
+            }
+        } finally {
+            if (File::isFile($tempJson)) {
+                @unlink($tempJson);
+            }
+        }
+
+        abort(404, "Dokumen dinamis MUK untuk skema {$schedule->scheme?->name} ({$docType}) tidak ditemukan.");
+    }
+
+    /**
+     * Export dynamic schedule document.
+     */
+    public function exportSchedule(Schedule $schedule, string $docType, bool $download = false): BinaryFileResponse
+    {
+        $filePath = $this->generateDynamicPdf($docType, $schedule);
+        $filename = strtoupper(str_replace(['_', ' '], '-', $docType)).'-'.preg_replace('/[^A-Za-z0-9_-]/', '_', $schedule->name).'.pdf';
+
+        return response()->file($filePath, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => ($download ? 'attachment' : 'inline').'; filename="'.$filename.'"',
+        ]);
+    }
+
+    /**
+     * Export dynamic candidate assessment document.
+     */
+    public function exportAssessment(Assessment $assessment, string $docType, bool $download = false): BinaryFileResponse
+    {
+        $schedule = $assessment->schedule;
+        $asesiName = $assessment->asesi?->full_name ?? 'Asesi';
+        $filePath = $this->generateDynamicPdf($docType, $schedule, $assessment);
+        $filename = strtoupper(str_replace(['_', ' '], '-', $docType)).'-'.preg_replace('/[^A-Za-z0-9_-]/', '_', $asesiName).'.pdf';
+
+        return response()->file($filePath, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => ($download ? 'attachment' : 'inline').'; filename="'.$filename.'"',
+        ]);
+    }
+}

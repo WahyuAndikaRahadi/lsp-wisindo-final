@@ -34,8 +34,8 @@
     {{-- Header & Navigation --}}
     <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-            <a href="{{ route('asesor.jadwal.asesi', $assessment->schedule_id) }}" class="inline-flex items-center text-xs text-brand-600 hover:text-brand-700 font-semibold mb-2">
-                &larr; Kembali ke Daftar Asesi
+            <a href="{{ route('asesor.schedule.instrument', ['schedule' => $assessment->schedule_id, 'code' => 'apl']) }}" class="inline-flex items-center text-xs text-brand-600 hover:text-brand-700 font-semibold mb-2">
+                &larr; Kembali ke Daftar Asesi (APL)
             </a>
             <div class="flex items-center gap-2 flex-wrap">
                 <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-indigo-100 text-indigo-800">
@@ -562,8 +562,8 @@
             </div>
 
             <div class="pt-4 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
-                <a href="{{ route('asesor.jadwal.asesi', $assessment->schedule_id) }}" class="text-xs font-semibold text-slate-600 hover:text-slate-800">
-                    &larr; Batalkan & Kembali
+                <a href="{{ route('asesor.schedule.instrument', ['schedule' => $assessment->schedule_id, 'code' => 'apl']) }}" class="text-xs font-semibold text-slate-600 hover:text-slate-800">
+                    &larr; Batalkan & Kembali ke Daftar Asesi
                 </a>
 
                 <button type="submit" class="w-full sm:w-auto px-8 py-3 bg-lsp-navy hover:bg-lsp-navy-dark text-white rounded-xl font-bold text-sm shadow-md transition transform active:scale-95 flex items-center justify-center gap-2"

@@ -124,11 +124,11 @@ class IdempotencyAndStatusGuardTest extends TestCase
             'notes' => 'Catatan verifikasi',
         ]);
 
-        $res->assertRedirect(route('asesor.jadwal.asesi', $assessment->schedule_id));
+        $res->assertRedirect(route('asesor.schedule.instrument', ['schedule' => $assessment->schedule_id, 'code' => 'apl']));
         $res->assertSessionHas('success');
         $assessment->refresh();
         $this->assertEquals('APPROVED', $assessment->apl_status);
-        $this->assertNotNull($assessment->ak01_agreed_at);
+        $this->assertNull($assessment->ak01_agreed_at);
     }
 
     public function test_asesi_cannot_resubmit_ia05_cbt_once_submitted(): void

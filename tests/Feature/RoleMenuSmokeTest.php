@@ -92,13 +92,12 @@ class RoleMenuSmokeTest extends TestCase
 
         $routes = [
             route('asesor.jadwal.index'),
-            route('asesor.jadwal.asesi', $sch),
+            route('asesor.schedule.ruang-uji', $sch),
             route('asesor.apl.review', $asm),
             route('asesor.schedule.ak01', $sch),
             route('asesor.schedule.ak07', $sch),
-            route('asesor.schedule.ruang-uji', $sch),
             route('asesor.schedule.instrument', [$sch, 'IA01']),
-            route('asesor.assessment.ruang-uji', $asm),
+            route('asesor.schedule.ak02', $sch),
             route('asesor.assessment.instrument', [$asm, 'ia01']),
             route('asesor.assessment.ak02', $asm),
             route('asesor.schedule.reports', $sch),

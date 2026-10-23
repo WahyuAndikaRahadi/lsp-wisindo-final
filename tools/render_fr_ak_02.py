@@ -7,49 +7,65 @@ Paginasi 3 halaman utuh sesuai master document dengan data dummy lengkap.
 
 import os
 import sys
+import io
+import base64
+from PIL import Image
 from reportlab.pdfgen import canvas
 from reportlab.lib.colors import black
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.lib.utils import ImageReader
 
 ASSETS = os.path.join(os.path.dirname(__file__), "..", "tests", "Fixtures", "muk", "assets")
 
 def register_fonts():
     font_candidates = {
         "Cal": [
+            "/usr/share/fonts/liberation/LiberationSans-Regular.ttf",
+            "/usr/share/fonts/TTF/DejaVuSans.ttf",
             "C:/Windows/Fonts/calibri.ttf",
             "/usr/share/fonts/truetype/carlito/Carlito-Regular.ttf",
             "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
             "LiberationSans-Regular.ttf"
         ],
         "Cal-B": [
+            "/usr/share/fonts/liberation/LiberationSans-Bold.ttf",
+            "/usr/share/fonts/TTF/DejaVuSans-Bold.ttf",
             "C:/Windows/Fonts/calibrib.ttf",
             "/usr/share/fonts/truetype/carlito/Carlito-Bold.ttf",
             "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf",
             "LiberationSans-Bold.ttf"
         ],
         "Cal-I": [
+            "/usr/share/fonts/liberation/LiberationSans-Italic.ttf",
+            "/usr/share/fonts/TTF/DejaVuSans-Oblique.ttf",
             "C:/Windows/Fonts/calibrii.ttf",
             "/usr/share/fonts/truetype/carlito/Carlito-Italic.ttf",
             "/usr/share/fonts/truetype/liberation/LiberationSans-Italic.ttf",
             "LiberationSans-Italic.ttf"
         ],
         "Tah": [
+            "/usr/share/fonts/liberation/LiberationSans-Regular.ttf",
+            "/usr/share/fonts/TTF/DejaVuSans.ttf",
             "C:/Windows/Fonts/tahoma.ttf",
             "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
             "DejaVuSans.ttf"
         ],
         "Tah-B": [
+            "/usr/share/fonts/liberation/LiberationSans-Bold.ttf",
+            "/usr/share/fonts/TTF/DejaVuSans-Bold.ttf",
             "C:/Windows/Fonts/tahomabd.ttf",
             "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
             "DejaVuSans-Bold.ttf"
         ],
         "Arial": [
+            "/usr/share/fonts/liberation/LiberationSans-Regular.ttf",
             "C:/Windows/Fonts/arial.ttf",
             "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
             "LiberationSans-Regular.ttf"
         ],
         "Arial-B": [
+            "/usr/share/fonts/liberation/LiberationSans-Bold.ttf",
             "C:/Windows/Fonts/arialbd.ttf",
             "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf",
             "LiberationSans-Bold.ttf"
@@ -65,6 +81,118 @@ register_fonts()
 
 PAGE_W, PAGE_H = 595.5, 842.5
 Y = lambda top: PAGE_H - top
+
+def clean_signature_image(raw_bytes_or_path):
+    try:
+        if isinstance(raw_bytes_or_path, (bytes, bytearray)):
+            im = Image.open(io.BytesIO(raw_bytes_or_path))
+        else:
+            im = Image.open(raw_bytes_or_path)
+        im = im.convert("RGBA")
+        w, h = im.size
+        if w == 0 or h == 0:
+            return None
+
+        # Sample corner colors to detect background
+        corners = []
+        for pt in ((0, 0), (w - 1, 0), (0, h - 1), (w - 1, h - 1)):
+            px = im.getpixel(pt)
+            if isinstance(px, tuple) and len(px) >= 3:
+                corners.append((px[0], px[1], px[2]))
+            elif isinstance(px, (int, float)):
+                corners.append((int(px), int(px), int(px)))
+
+        if not corners:
+            corners = [(255, 255, 255)]
+
+        bg_r = sum(c[0] for c in corners) / len(corners)
+        bg_g = sum(c[1] for c in corners) / len(corners)
+        bg_b = sum(c[2] for c in corners) / len(corners)
+
+        pixels = im.load()
+        if pixels is None:
+            return None
+
+        for y in range(h):
+            for x in range(w):
+                px = pixels[x, y]
+                if not isinstance(px, tuple) or len(px) < 4:
+                    continue
+                r, g, b, a = int(px[0]), int(px[1]), int(px[2]), int(px[3])
+                if a == 0:
+                    continue
+                is_green = (g > 80 and g > r * 1.15 and g > b * 1.15)
+                dist_bg = ((r - bg_r)**2 + (g - bg_g)**2 + (b - bg_b)**2)**0.5
+                is_bg = dist_bg < 45
+                is_white = (r > 235 and g > 235 and b > 235)
+
+                if is_green or is_bg or is_white:
+                    pixels[x, y] = (0, 0, 0, 0)
+                elif dist_bg < 75 or (g > r and g > b and g > 70):
+                    factor = min(1.0, max(0.0, (dist_bg - 45) / 30.0))
+                    pixels[x, y] = (r, g, b, int(a * factor))
+
+        # Auto-crop to bounding box of actual non-zero strokes
+        bbox = im.getbbox()
+        if bbox:
+            pad = 2
+            crop_box = (
+                max(0, bbox[0] - pad),
+                max(0, bbox[1] - pad),
+                min(w, bbox[2] + pad),
+                min(h, bbox[3] + pad)
+            )
+            im = im.crop(crop_box)
+
+        out_io = io.BytesIO()
+        im.save(out_io, format="PNG")
+        out_io.seek(0)
+        return out_io
+    except Exception:
+        return None
+
+def draw_signature(c, sig_data, x, y_bot_native, max_w=85.0, max_h=30.0):
+    if not sig_data:
+        return False
+    try:
+        if isinstance(sig_data, str) and sig_data.startswith("data:image"):
+            sig_data = sig_data.split(",", 1)[1]
+            raw = base64.b64decode(sig_data)
+        elif isinstance(sig_data, str) and os.path.isfile(sig_data):
+            with open(sig_data, "rb") as f:
+                raw = f.read()
+        else:
+            return False
+
+        cleaned_io = clean_signature_image(raw)
+        if not cleaned_io:
+            return False
+
+        im = Image.open(cleaned_io)
+        im_w, im_h = im.size
+        if im_w == 0 or im_h == 0:
+            return False
+
+        aspect = float(im_w) / float(im_h)
+        if aspect > (max_w / max_h):
+            w = max_w
+            h = max_w / aspect
+        else:
+            h = max_h
+            w = max_h * aspect
+
+        cleaned_io.seek(0)
+        img = ImageReader(cleaned_io)
+        c.drawImage(img, x, y_bot_native, w, h, mask="auto")
+        return True
+    except Exception:
+        return False
+
+def draw_vector_check(c, cx, cy, sz=3.0):
+    c.setLineWidth(1.4)
+    c.setStrokeColor(black)
+    c.line(cx - sz, cy - 0.2, cx - sz * 0.25, cy - sz * 0.9)
+    c.line(cx - sz * 0.25, cy - sz * 0.9, cx + sz * 1.1, cy + sz * 1.1)
 
 DATA = {
     "skema_nama": "Maintenance Gasoline Engine Injection System",
@@ -339,8 +467,9 @@ def render(dest_path):
     c.drawString(0, 0, "Lainnya")
     c.restoreState()
     
-    # Draw 9 Unit Rows
-    for idx, u in enumerate(DATA["units"]):
+    # Draw Unit Rows (up to 9 units fit in Page 1 table layout)
+    units_to_draw = DATA.get("units", [])[:9]
+    for idx, u in enumerate(units_to_draw):
         y_top = unit_tops[idx]
         y_bot = unit_tops[idx + 1]
         y_mid = (y_top + y_bot) / 2
@@ -355,37 +484,35 @@ def render(dest_path):
             c.drawString(cols_x[0] + 5.0, Y(y_top + 22.0), lines[1])
             
         # Draw checkmarks
-        c.setFont("Cal-B", 12.0)
-        checks = [u["obs"], u["port"], (u.get("pihak3", False) or u.get("wawancara", False)), u["lisan"], u["tulis"], u["proyek"], u["lain"]]
+        checks = [u.get("obs", False), u.get("port", False), (u.get("pihak3", False) or u.get("wawancara", False)), u.get("lisan", False), u.get("tulis", False), u.get("proyek", False), u.get("lain", False)]
         for ci, chk in enumerate(checks):
             if chk:
                 cx = (cols_x[1 + ci] + cols_x[2 + ci]) / 2
-                c.drawCentredString(cx, Y(y_mid + 4.0), "✓")
+                draw_vector_check(c, cx, Y(y_mid))
                 
     # Rekomendasi Row (601.9 -> 627.4)
     c.setFont("Cal", 11.0)
     c.drawString(cols_x[0] + 6.0, Y(617.0), "Rekomendasi hasil asesmen")
     
-    # Checkbox Kompeten / Belum Kompeten (Calibri-Bold 15pt)
-    c.setFont("Cal-B", 15.0)
+    # Checkbox Kompeten / Belum Kompeten
     cb_sz = 11.0
     bx1 = cols_x[1] + 10.0
     by1 = 612.0
-    c.rect(bx1, Y(by1 + cb_sz), cb_sz, cb_sz)
-    if DATA["rekomendasi_kompeten"]:
-        c.setFont("Cal-B", 11.0)
-        c.drawCentredString(bx1 + cb_sz / 2, Y(by1 + cb_sz) + 1.5, "✓")
+    c.setLineWidth(0.6)
+    c.setStrokeColor(black)
+    c.rect(bx1, Y(by1 + cb_sz), cb_sz, cb_sz, fill=0, stroke=1)
+    if DATA.get("rekomendasi_kompeten", True):
+        draw_vector_check(c, bx1 + cb_sz / 2, Y(by1 + cb_sz / 2), sz=3.5)
         
-    c.setFont("Cal-B", 15.0)
+    c.setFont("Cal-B", 13.0)
     c.drawString(bx1 + 16.0, Y(622.0), "Kompeten /")
     
     bx2 = bx1 + 105.0
-    c.rect(bx2, Y(by1 + cb_sz), cb_sz, cb_sz)
-    if not DATA["rekomendasi_kompeten"]:
-        c.setFont("Cal-B", 11.0)
-        c.drawCentredString(bx2 + cb_sz / 2, Y(by1 + cb_sz) + 1.5, "✓")
+    c.rect(bx2, Y(by1 + cb_sz), cb_sz, cb_sz, fill=0, stroke=1)
+    if not DATA.get("rekomendasi_kompeten", True):
+        draw_vector_check(c, bx2 + cb_sz / 2, Y(by1 + cb_sz / 2), sz=3.5)
         
-    c.setFont("Cal-B", 15.0)
+    c.setFont("Cal-B", 13.0)
     c.drawString(bx2 + 16.0, Y(622.0), "Belum kompeten")
     
     # Tindak Lanjut Row (627.4 -> 691.1)
@@ -463,8 +590,13 @@ def render(dest_path):
     c.drawString(63.3, Y(202.0), "Tanda tangan")
     c.drawString(63.3, Y(218.0), "dan Tanggal")
     c.drawString(227.5, Y(210.0), ":")
-    c.setFont("Cal-I", 10.0)
-    c.drawString(236.0, Y(210.0), f"[Tanda Tangan Digital]   -   {DATA['tanggal_tanda_tangan']}")
+    tgl_asesi = DATA.get("tanggal_tanda_tangan_asesi") or DATA.get("tanggal_tanda_tangan") or DATA.get("tanggal", "")
+    sig_asesi_drawn = draw_signature(c, DATA.get("signature_asesi") or DATA.get("asesi_signature"), 236.0, 222.0, max_w=85.0, max_h=30.0)
+    c.setFont("Cal", 10.0)
+    c.drawString(335.0, Y(210.0), f"Tanggal : {tgl_asesi}")
+    if not sig_asesi_drawn:
+        c.setFont("Cal-I", 10.0)
+        c.drawString(236.0, Y(210.0), "[Tanda Tangan Digital]")
     
     # Row 3: Asesor :
     c.setFont("Cal-B", 11.0)
@@ -475,20 +607,25 @@ def render(dest_path):
     c.drawString(63.3, Y(257.0), "Nama")
     c.drawString(227.5, Y(257.0), ":")
     c.setFont("Cal-B", 11.0)
-    c.drawString(236.0, Y(257.0), DATA["asesor_nama"])
+    c.drawString(236.0, Y(257.0), str(DATA.get("asesor_nama", "")))
     
     # Row 5: No. Reg
     c.setFont("Cal", 11.0)
     c.drawString(63.3, Y(275.0), "No. Reg")
     c.drawString(227.5, Y(275.0), ":")
-    c.drawString(236.0, Y(275.0), DATA["asesor_no_reg"])
+    c.drawString(236.0, Y(275.0), str(DATA.get("asesor_no_reg", "")))
     
     # Row 6: Tanda tangan dan Tanggal
     c.drawString(63.3, Y(296.0), "Tanda tangan")
     c.drawString(63.3, Y(312.0), "dan Tanggal")
     c.drawString(227.5, Y(304.0), ":")
-    c.setFont("Cal-I", 10.0)
-    c.drawString(236.0, Y(304.0), f"[Tanda Tangan Digital]   -   {DATA['tanggal_tanda_tangan']}")
+    tgl_asesor = DATA.get("tanggal_tanda_tangan_asesor") or DATA.get("tanggal_tanda_tangan") or DATA.get("tanggal", "")
+    sig_asesor_drawn = draw_signature(c, DATA.get("signature_asesor") or DATA.get("assessor_signature"), 236.0, 314.0, max_w=85.0, max_h=30.0)
+    c.setFont("Cal", 10.0)
+    c.drawString(335.0, Y(304.0), f"Tanggal : {tgl_asesor}")
+    if not sig_asesor_drawn:
+        c.setFont("Cal-I", 10.0)
+        c.drawString(236.0, Y(304.0), "[Tanda Tangan Digital]")
     
     c.showPage()
     
@@ -516,7 +653,16 @@ def render(dest_path):
     print(f"OK -> Sukses generate FR.AK.02: {dest_path}")
 
 if __name__ == "__main__":
+    import json
     out_dir = os.path.join(os.path.dirname(__file__), "..", "tests", "Fixtures", "muk")
     os.makedirs(out_dir, exist_ok=True)
     out_file = os.path.join(out_dir, "FR_AK_02_generated.pdf")
+    if len(sys.argv) > 1:
+        if sys.argv[1].endswith(".json") and os.path.isfile(sys.argv[1]):
+            with open(sys.argv[1], "r", encoding="utf-8") as f:
+                DATA.update(json.load(f))
+            if len(sys.argv) > 2:
+                out_file = sys.argv[2]
+        else:
+            out_file = sys.argv[1]
     render(out_file)

@@ -157,15 +157,15 @@ class LspWorkflowIntegrationTest extends TestCase
         $assessment->refresh();
         $this->assertEquals('SUBMITTED', $assessment->apl_status);
 
-        // 4. Asesor reviews APL directly and APPROVES (redirects to asesi list with auto-generated AK07 & AK01)
+        // 4. Asesor reviews APL directly and APPROVES
         $reviewResponse = $this->actingAs($asesor)->post(route('asesor.apl.decide', $assessment), [
             'decision' => 'APPROVED',
         ]);
-        $reviewResponse->assertRedirect(route('asesor.jadwal.asesi', $schedule->id));
+        $reviewResponse->assertRedirect(route('asesor.schedule.instrument', ['schedule' => $schedule->id, 'code' => 'apl']));
 
         $assessment->refresh();
         $this->assertEquals('APPROVED', $assessment->apl_status);
-        $this->assertNotNull($assessment->ak01_agreed_at);
+        $this->assertNull($assessment->ak01_agreed_at);
 
         // 5. Asesi can now directly enter Ruang Uji
         $ruangUjiResponse = $this->actingAs($asesi)->get(route('asesi.assessment.ruang-uji', $assessment));
@@ -301,8 +301,8 @@ class LspWorkflowIntegrationTest extends TestCase
         $resWithSchedule->assertOk();
         $resWithSchedule->assertSee($schedule->code);
 
-        // Check asesi list view
-        $resAsesi = $this->actingAs($asesor)->get(route('asesor.jadwal.asesi', $schedule));
+        // Check ruang-uji view
+        $resAsesi = $this->actingAs($asesor)->get(route('asesor.schedule.ruang-uji', $schedule));
         $resAsesi->assertOk();
     }
 
@@ -352,9 +352,9 @@ class LspWorkflowIntegrationTest extends TestCase
             'apl_status' => 'APPROVED',
             'notes' => 'Berkas dan asesmen mandiri lengkap memenuhi syarat.',
         ]);
-        $postRes->assertRedirect(route('asesor.jadwal.asesi', $schedule->id));
+        $postRes->assertRedirect(route('asesor.schedule.instrument', ['schedule' => $schedule->id, 'code' => 'apl']));
         $this->assertEquals('APPROVED', $assessment->fresh()->apl_status);
-        $this->assertNotNull($assessment->fresh()->ak01_agreed_at);
+        $this->assertNull($assessment->fresh()->ak01_agreed_at);
     }
 
     public function test_assessor_can_view_and_submit_ak07(): void
@@ -386,8 +386,8 @@ class LspWorkflowIntegrationTest extends TestCase
             'apl_status' => 'APPROVED',
         ]);
 
-        // Assessor visits asesi list
-        $asesiListRes = $this->actingAs($asesor)->get(route('asesor.jadwal.asesi', $schedule));
+        // Assessor visits ruang-uji
+        $asesiListRes = $this->actingAs($asesor)->get(route('asesor.schedule.ruang-uji', $schedule));
         $asesiListRes->assertOk();
         $asesiListRes->assertSee(route('asesor.ak07.create', $schedule->id));
 
@@ -396,13 +396,13 @@ class LspWorkflowIntegrationTest extends TestCase
         $ak07Res->assertOk();
         $ak07Res->assertSee('AK07');
 
-        // Assessor submits AK07 and continues to AK01 pra-asesmen (urutan diperbaiki: AK07 -> AK01)
+        // Assessor submits AK07 and continues to ruang uji (urutan baru: APL -> AK01 -> AK07 -> Ruang Uji)
         $postAk07 = $this->actingAs($asesor)->post(route('asesor.ak07.store', $schedule), [
             'assessment_ids' => [$assessment->id],
             'category' => 'waktu',
             'notes' => 'Penambahan waktu 15 menit untuk asesi.',
         ]);
-        $postAk07->assertRedirect(route('asesor.schedule.ak01', $schedule->id));
+        $postAk07->assertRedirect(route('asesor.schedule.ruang-uji', $schedule->id));
         $this->assertDatabaseHas('t_assessment_ak07_items', [
             'assessment_id' => $assessment->id,
             'adjustment_category' => 'waktu',

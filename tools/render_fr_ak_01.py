@@ -7,10 +7,14 @@ Tunggal tabel utuh sesuai master dokumen BNSP dengan data dummy lengkap.
 
 import os
 import sys
+import io
+import base64
+from PIL import Image
 from reportlab.pdfgen import canvas
 from reportlab.lib.colors import black
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.lib.utils import ImageReader
 
 ASSETS = os.path.join(os.path.dirname(__file__), "..", "tests", "Fixtures", "muk", "assets")
 
@@ -18,29 +22,39 @@ def register_fonts():
     # Register Windows fonts with cross-platform fallbacks
     font_candidates = {
         "Cal": [
+            "/usr/share/fonts/liberation/LiberationSans-Regular.ttf",
+            "/usr/share/fonts/TTF/DejaVuSans.ttf",
             "C:/Windows/Fonts/calibri.ttf",
             "/usr/share/fonts/truetype/carlito/Carlito-Regular.ttf",
             "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
             "LiberationSans-Regular.ttf"
         ],
         "Cal-B": [
+            "/usr/share/fonts/liberation/LiberationSans-Bold.ttf",
+            "/usr/share/fonts/TTF/DejaVuSans-Bold.ttf",
             "C:/Windows/Fonts/calibrib.ttf",
             "/usr/share/fonts/truetype/carlito/Carlito-Bold.ttf",
             "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf",
             "LiberationSans-Bold.ttf"
         ],
         "Cal-I": [
+            "/usr/share/fonts/liberation/LiberationSans-Italic.ttf",
+            "/usr/share/fonts/TTF/DejaVuSans-Oblique.ttf",
             "C:/Windows/Fonts/calibrii.ttf",
             "/usr/share/fonts/truetype/carlito/Carlito-Italic.ttf",
             "/usr/share/fonts/truetype/liberation/LiberationSans-Italic.ttf",
             "LiberationSans-Italic.ttf"
         ],
         "Tah": [
+            "/usr/share/fonts/liberation/LiberationSans-Regular.ttf",
+            "/usr/share/fonts/TTF/DejaVuSans.ttf",
             "C:/Windows/Fonts/tahoma.ttf",
             "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
             "DejaVuSans.ttf"
         ],
         "Tah-B": [
+            "/usr/share/fonts/liberation/LiberationSans-Bold.ttf",
+            "/usr/share/fonts/TTF/DejaVuSans-Bold.ttf",
             "C:/Windows/Fonts/tahomabd.ttf",
             "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
             "DejaVuSans-Bold.ttf"
@@ -61,6 +75,123 @@ register_fonts()
 
 PAGE_W, PAGE_H = 595.56, 842.52
 Y = lambda top: PAGE_H - top
+
+def clean_signature_image(raw_bytes_or_path):
+    try:
+        if isinstance(raw_bytes_or_path, (bytes, bytearray)):
+            im = Image.open(io.BytesIO(raw_bytes_or_path))
+        else:
+            im = Image.open(raw_bytes_or_path)
+        im = im.convert("RGBA")
+        w, h = im.size
+        if w == 0 or h == 0:
+            return None
+
+        # Sample corner colors to detect background
+        corners = []
+        for pt in ((0, 0), (w - 1, 0), (0, h - 1), (w - 1, h - 1)):
+            px = im.getpixel(pt)
+            if isinstance(px, tuple) and len(px) >= 3:
+                corners.append((px[0], px[1], px[2]))
+            elif isinstance(px, (int, float)):
+                corners.append((int(px), int(px), int(px)))
+
+        if not corners:
+            corners = [(255, 255, 255)]
+
+        bg_r = sum(c[0] for c in corners) / len(corners)
+        bg_g = sum(c[1] for c in corners) / len(corners)
+        bg_b = sum(c[2] for c in corners) / len(corners)
+
+        pixels = im.load()
+        if pixels is None:
+            return None
+
+        for y in range(h):
+            for x in range(w):
+                px = pixels[x, y]
+                if not isinstance(px, tuple) or len(px) < 4:
+                    continue
+                r, g, b, a = int(px[0]), int(px[1]), int(px[2]), int(px[3])
+                if a == 0:
+                    continue
+                is_green = (g > 80 and g > r * 1.15 and g > b * 1.15)
+                dist_bg = ((r - bg_r)**2 + (g - bg_g)**2 + (b - bg_b)**2)**0.5
+                is_bg = dist_bg < 45
+                is_white = (r > 235 and g > 235 and b > 235)
+
+                if is_green or is_bg or is_white:
+                    pixels[x, y] = (0, 0, 0, 0)
+                elif dist_bg < 75 or (g > r and g > b and g > 70):
+                    factor = min(1.0, max(0.0, (dist_bg - 45) / 30.0))
+                    pixels[x, y] = (r, g, b, int(a * factor))
+
+        # Auto-crop to bounding box of actual non-zero strokes
+        bbox = im.getbbox()
+        if bbox:
+            pad = 2
+            crop_box = (
+                max(0, bbox[0] - pad),
+                max(0, bbox[1] - pad),
+                min(w, bbox[2] + pad),
+                min(h, bbox[3] + pad)
+            )
+            im = im.crop(crop_box)
+
+        out_io = io.BytesIO()
+        im.save(out_io, format="PNG")
+        out_io.seek(0)
+        return out_io
+    except Exception:
+        return None
+
+def draw_signature(c, sig_data, x_center=236.5, y_baseline=688.0, max_w=85.0, max_h=26.0):
+    if not sig_data:
+        return
+    try:
+        if isinstance(sig_data, str) and sig_data.startswith("data:image"):
+            sig_data = sig_data.split(",", 1)[1]
+            raw = base64.b64decode(sig_data)
+        elif isinstance(sig_data, str) and os.path.isfile(sig_data):
+            with open(sig_data, "rb") as f:
+                raw = f.read()
+        else:
+            return
+
+        cleaned_io = clean_signature_image(raw)
+        if not cleaned_io:
+            return
+
+        im = Image.open(cleaned_io)
+        im_w, im_h = im.size
+        if im_w == 0 or im_h == 0:
+            return
+
+        aspect = float(im_w) / float(im_h)
+        if aspect > (max_w / max_h):
+            w = max_w
+            h = max_w / aspect
+        else:
+            h = max_h
+            w = max_h * aspect
+
+        x = x_center - (w / 2.0)
+        # Position bottom of signature slightly above the baseline of dotted line
+        y_bot_native = Y(y_baseline) - 3.0
+        cleaned_io.seek(0)
+        img = ImageReader(cleaned_io)
+        c.drawImage(img, x, y_bot_native, w, h, mask="auto")
+    except Exception:
+        pass
+
+def draw_fitted_line(c, x, y, text_str, font="Cal", max_sz=10.5, max_w=474.0):
+    sz = max_sz
+    w = pdfmetrics.stringWidth(text_str, font, sz)
+    if w > max_w:
+        sz = sz * (max_w / w)
+    c.setFont(font, sz)
+    c.drawString(x, y, text_str)
+    return sz
 
 DATA = {
     "skema_nama": "Maintenance Gasoline Engine Injection System",
@@ -101,11 +232,12 @@ def draw_cb(c, cx, cy_top, checked):
     y_center = Y(cy_top)
     c.setLineWidth(0.6)
     c.setStrokeColor(black)
-    c.rect(cx - sz / 2, y_center - sz / 2, sz, sz)
+    c.rect(cx - sz / 2, y_center - sz / 2, sz, sz, fill=0, stroke=1)
     if checked:
-        c.setFont("Cal-B", 9.5)
-        c.setFillColor(black)
-        c.drawCentredString(cx, y_center - sz / 2 + 1.2, "✓")
+        c.setLineWidth(1.4)
+        c.setStrokeColor(black)
+        c.line(cx - 2.8, y_center - 0.2, cx - 0.7, y_center - 2.8)
+        c.line(cx - 0.7, y_center - 2.8, cx + 3.2, y_center + 3.2)
 
 def render(dest_path):
     c = canvas.Canvas(dest_path, pagesize=(PAGE_W, PAGE_H))
@@ -186,8 +318,8 @@ def render(dest_path):
     
     # === TEXT CONTENT ===
     # Row 0: Persetujuan statement
-    c.setFont("Cal", 11.0)
-    c.drawString(76.7, Y(149.0), "Persetujuan Asesmen ini untuk menjamin bahwa Asesi telah diberi arahan secara rinci tentang perencanaan")
+    draw_fitted_line(c, 76.7, Y(149.0), "Persetujuan Asesmen ini untuk menjamin bahwa Asesi telah diberi arahan secara rinci tentang perencanaan", "Cal", 10.5, 474.0)
+    c.setFont("Cal", 10.0)
     c.drawString(76.7, Y(164.0), "dan proses asesmen")
     
     # Row 1 & 2: Skema
@@ -234,7 +366,7 @@ def render(dest_path):
     
     # Row 6
     draw_cb(c, 266.6, 304.0, DATA["bukti_portofolio"])
-    c.setFont("Cal", 11.0)
+    c.setFont("Cal", 10.0)
     c.drawString(282.9, Y(309.0), "Hasil Verifikasi Portofolio")
     draw_cb(c, 415.7, 304.0, DATA["bukti_reviu"])
     c.drawString(431.0, Y(309.0), "Hasil Reviu Produk")
@@ -280,46 +412,49 @@ def render(dest_path):
     c.drawString(338.0, Y(489.0), DATA["tuk_nama"])
     
     # Row 13: Pernyataan Asesi 1
-    c.setFont("Cal-B", 11.0)
+    c.setFont("Cal-B", 10.5)
     c.drawString(76.7, Y(512.0), "Asesi :")
-    c.setFont("Cal", 11.0)
-    c.drawString(76.7, Y(528.0), "Bahwa saya telah mendapatkan penjelasan terkait hak dan prosedur banding asesmen dari asesor.")
+    draw_fitted_line(c, 76.7, Y(528.0), "Bahwa saya telah mendapatkan penjelasan terkait hak dan prosedur banding asesmen dari asesor.", "Cal", 10.5, 474.0)
     
     # Row 14: Pernyataan Asesor
-    c.setFont("Cal-B", 11.0)
+    c.setFont("Cal-B", 10.5)
     c.drawString(76.7, Y(550.0), "Asesor :")
-    c.setFont("Cal", 11.0)
-    c.drawString(76.7, Y(568.0), "Menyatakan tidak akan membuka hasil pekerjaan yang saya peroleh karena penugasan saya sebagai Asesor")
+    draw_fitted_line(c, 76.7, Y(568.0), "Menyatakan tidak akan membuka hasil pekerjaan yang saya peroleh karena penugasan saya sebagai Asesor", "Cal", 10.5, 474.0)
+    sz_r14_2 = 9.8
+    c.setFont("Cal", sz_r14_2)
     c.drawString(76.7, Y(582.0), "dalam pekerjaan ")
-    w_dp = c.stringWidth("dalam pekerjaan ", "Cal", 11.0)
-    c.setFont("Cal-I", 11.0)
+    w_dp = c.stringWidth("dalam pekerjaan ", "Cal", sz_r14_2)
+    c.setFont("Cal-I", sz_r14_2)
     c.drawString(76.7 + w_dp, Y(582.0), "Asesmen ")
-    w_as = c.stringWidth("Asesmen ", "Cal-I", 11.0)
-    c.setFont("Cal", 11.0)
+    w_as = c.stringWidth("Asesmen ", "Cal-I", sz_r14_2)
+    c.setFont("Cal", sz_r14_2)
     c.drawString(76.7 + w_dp + w_as, Y(582.0), "kepada siapapun atau organisasi apapun selain kepada pihak yang berwenang")
     c.drawString(76.7, Y(596.0), "sehubungan dengan kewajiban saya sebagai Asesor yang ditugaskan oleh LSP.")
     
     # Row 15: Pernyataan Asesi 2
-    c.setFont("Cal-B", 11.0)
+    c.setFont("Cal-B", 10.5)
     c.drawString(76.7, Y(624.0), "Asesi :")
-    c.setFont("Cal", 11.0)
-    c.drawString(76.7, Y(642.0), "Saya setuju mengikuti asesmen dengan pemahaman bahwa informasi yang dikumpulkan hanya digunakan")
+    draw_fitted_line(c, 76.7, Y(642.0), "Saya setuju mengikuti asesmen dengan pemahaman bahwa informasi yang dikumpulkan hanya digunakan", "Cal", 10.5, 474.0)
+    c.setFont("Cal", 10.0)
     c.drawString(76.7, Y(656.0), "untuk pengembangan profesional dan hanya dapat diakses oleh orang tertentu saja.")
     
     # Row 16: Tanda Tangan Section (stacked vertically, exact master layout)
+    tgl_asesor = DATA.get("tanggal_ttd_asesor") or DATA.get("tanggal_ttd", "")
+    tgl_asesi = DATA.get("tanggal_ttd_asesi") or DATA.get("tanggal_ttd", "")
+
     c.setFont("Cal", 11.0)
     c.drawString(76.7, Y(688.0), "Tanda tangan Asesor : ……………………………")
-    c.drawString(292.9, Y(688.0), f"Tanggal : {DATA['tanggal_ttd']}")
-    # Dummy name under signature
+    c.drawString(292.9, Y(688.0), f"Tanggal : {tgl_asesor}")
+    draw_signature(c, DATA.get("signature_asesor") or DATA.get("assessor_signature"), x_center=236.5, y_baseline=688.0, max_w=85.0, max_h=26.0)
     c.setFont("Cal-B", 10.0)
-    c.drawString(176.0, Y(702.0), f"( {DATA['asesor_nama']} )")
+    c.drawString(176.0, Y(702.0), f"( {DATA.get('asesor_nama', '')} )")
     
     c.setFont("Cal", 11.0)
     c.drawString(76.7, Y(726.0), "Tanda tangan Asesi : ……………………………")
-    c.drawString(292.9, Y(726.0), f"Tanggal : {DATA['tanggal_ttd']}")
-    # Dummy name under signature
+    c.drawString(292.9, Y(726.0), f"Tanggal : {tgl_asesi}")
+    draw_signature(c, DATA.get("signature_asesi") or DATA.get("asesi_signature"), x_center=236.5, y_baseline=726.0, max_w=85.0, max_h=26.0)
     c.setFont("Cal-B", 10.0)
-    c.drawString(176.0, Y(740.0), f"( {DATA['asesi_nama']} )")
+    c.drawString(176.0, Y(740.0), f"( {DATA.get('asesi_nama', '')} )")
     
     # Below Table: Note
     c.setFont("Cal-I", 11.0)
@@ -330,7 +465,16 @@ def render(dest_path):
     print(f"OK -> Sukses generate FR.AK.01: {dest_path}")
 
 if __name__ == "__main__":
+    import json
     out_dir = os.path.join(os.path.dirname(__file__), "..", "tests", "Fixtures", "muk")
     os.makedirs(out_dir, exist_ok=True)
     out_file = os.path.join(out_dir, "FR_AK_01_generated.pdf")
+    if len(sys.argv) > 1:
+        if sys.argv[1].endswith(".json") and os.path.isfile(sys.argv[1]):
+            with open(sys.argv[1], "r", encoding="utf-8") as f:
+                DATA.update(json.load(f))
+            if len(sys.argv) > 2:
+                out_file = sys.argv[2]
+        else:
+            out_file = sys.argv[1]
     render(out_file)

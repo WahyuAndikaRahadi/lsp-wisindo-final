@@ -88,7 +88,7 @@
     {{-- Header Navigation --}}
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-            <a href="{{ route('asesor.jadwal.asesi', $jadwal->id) }}" class="text-xs text-brand-600 hover:text-brand-700 font-bold">&larr; Kembali ke Daftar Asesi</a>
+            <a href="{{ route('asesor.schedule.ak01', $jadwal->id) }}" class="text-xs text-brand-600 hover:text-brand-700 font-bold">&larr; Kembali ke FR.AK.01</a>
             <h1 class="text-2xl font-black text-slate-900 tracking-tight mt-1">FR.AK.07. CEKLIS PENYESUAIAN YANG WAJAR DAN BERALASAN</h1>
             <p class="text-xs text-slate-500 font-medium">Lembaga Sertifikasi Profesi Praktisi Otomotif (LSP-PrO Indo)</p>
         </div>
@@ -296,7 +296,7 @@
                 &larr; Lewati (Tanpa Penyesuaian) ke Ruang Uji
             </a>
             <div class="flex items-center space-x-3 w-full sm:w-auto justify-end">
-                <a href="{{ route('asesor.jadwal.asesi', $jadwal->id) }}" class="px-5 py-2.5 text-xs font-bold text-slate-700 bg-white border-2 border-slate-300 rounded-lg hover:bg-slate-50 transition">Kembali ke Daftar Asesi</a>
+                <a href="{{ route('asesor.schedule.ak01', $jadwal->id) }}" class="px-5 py-2.5 text-xs font-bold text-slate-700 bg-white border-2 border-slate-300 rounded-lg hover:bg-slate-50 transition">Kembali ke FR.AK.01</a>
                 <button type="submit" class="px-6 py-2.5 text-xs font-black uppercase tracking-wider bg-brand-600 hover:bg-brand-700 text-white rounded-lg border-2 border-black shadow-[2px_2px_0_0_rgba(0,0,0,0.9)] transition">
                     Simpan FR.AK07 & Lanjut ke Ruang Uji &rarr;
                 </button>

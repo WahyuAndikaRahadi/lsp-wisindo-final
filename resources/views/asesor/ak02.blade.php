@@ -4,7 +4,7 @@
 <div class="max-w-5xl mx-auto space-y-6">
     <div class="flex items-center justify-between">
         <div>
-            <a href="{{ route('asesor.jadwal.asesi', $assessment->schedule_id) }}" class="text-xs text-brand-600 hover:text-brand-700 font-semibold">&larr; Kembali ke Daftar Asesi</a>
+            <a href="{{ route('asesor.schedule.ruang-uji', $assessment->schedule_id) }}" class="text-xs text-brand-600 hover:text-brand-700 font-semibold">&larr; Kembali ke Ruang Uji</a>
             <h1 class="text-2xl font-black text-slate-900 tracking-tight mt-1">FR.AK.02 Rekaman Asesmen Kompetensi</h1>
             <p class="text-xs text-slate-500">Rekapitulasi bukti dan penetapan rekomendasi hasil asesmen kompetensi</p>
         </div>
@@ -173,7 +173,7 @@
             </div>
 
             <div class="flex items-center justify-between pt-4 border-t border-slate-200">
-                <a href="{{ route('asesor.jadwal.asesi', $assessment->schedule_id) }}" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-900">
+                <a href="{{ route('asesor.schedule.ak02', $assessment->schedule_id) }}" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-900">
                     Batal
                 </a>
                 <button type="submit" class="px-6 py-2.5 text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 rounded-lg shadow-sm transition">

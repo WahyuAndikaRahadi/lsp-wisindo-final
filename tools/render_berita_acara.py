@@ -15,7 +15,7 @@ from reportlab.pdfbase.ttfonts import TTFont
 
 ASSETS = os.path.join(os.path.dirname(__file__), "..", "tests", "Fixtures", "muk", "assets")
 
-def find_font(filename):
+def find_font(filename, fallback="LiberationSans-Regular.ttf"):
     candidates = [
         "/usr/share/fonts/liberation",
         "/usr/share/fonts/carlito",
@@ -31,17 +31,19 @@ def find_font(filename):
     for root, _, files in os.walk("/usr/share/fonts"):
         if filename in files:
             return os.path.join(root, filename)
+    if fallback and fallback != filename:
+        return find_font(fallback, fallback=None)
     return filename
 
 font_map = {
-    "Lib": "LiberationSans-Regular.ttf",
-    "Lib-B": "LiberationSans-Bold.ttf",
-    "Lib-I": "LiberationSans-Italic.ttf",
-    "Cal": "Carlito-Regular.ttf",
-    "Cal-B": "Carlito-Bold.ttf",
+    "Lib": ("LiberationSans-Regular.ttf", "LiberationSans-Regular.ttf"),
+    "Lib-B": ("LiberationSans-Bold.ttf", "LiberationSans-Bold.ttf"),
+    "Lib-I": ("LiberationSans-Italic.ttf", "LiberationSans-Italic.ttf"),
+    "Cal": ("Carlito-Regular.ttf", "LiberationSans-Regular.ttf"),
+    "Cal-B": ("Carlito-Bold.ttf", "LiberationSans-Bold.ttf"),
 }
-for name, ffile in font_map.items():
-    pdfmetrics.registerFont(TTFont(name, find_font(ffile)))
+for name, (ffile, fallback) in font_map.items():
+    pdfmetrics.registerFont(TTFont(name, find_font(ffile, fallback)))
 
 DATA = {
     "hari_tanggal": "Senin / 19 Oktober 2026",
@@ -279,7 +281,16 @@ def render(dest_path):
     print(f"OK -> Sukses generate Berita Acara & Daftar Hadir Peserta: {dest_path}")
 
 if __name__ == "__main__":
+    import json
     out_dir = os.path.join(os.path.dirname(__file__), "..", "tests", "Fixtures", "muk")
     os.makedirs(out_dir, exist_ok=True)
     out_file = os.path.join(out_dir, "Berita_Acara_Peserta_generated.pdf")
+    if len(sys.argv) > 1:
+        if sys.argv[1].endswith(".json") and os.path.isfile(sys.argv[1]):
+            with open(sys.argv[1], "r", encoding="utf-8") as f:
+                DATA.update(json.load(f))
+            if len(sys.argv) > 2:
+                out_file = sys.argv[2]
+        else:
+            out_file = sys.argv[1]
     render(out_file)

@@ -23,6 +23,62 @@ class FinalizationController extends Controller
     ) {}
 
     /**
+     * Schedule-level FR.AK.02 asesi list.
+     */
+    public function scheduleAk02(Schedule $schedule): View
+    {
+        $this->authorizeAssessorSchedule($schedule);
+
+        $schedule->load([
+            'scheme.competencyUnits',
+            'assessments.asesi.profile',
+            'assessments.ak02Items',
+            'assessors',
+        ]);
+
+        $user = auth()->user();
+        $isSingleAssessor = $schedule->assessors->count() === 1 && $schedule->assessors->first()?->id === $user->id;
+
+        $asesiList = $schedule->assessments->map(function ($assessment) use ($user, $isSingleAssessor) {
+            $isMyCandidate = (int) $assessment->assessor_id === (int) $user->id || (empty($assessment->assessor_id) && $isSingleAssessor);
+
+            return (object) [
+                'assessment' => $assessment,
+                'asesi' => $assessment->asesi,
+                'is_completed' => ! empty($assessment->final_result),
+                'status_label' => $assessment->final_result ?? 'Belum Direkam',
+                'status_class' => match ($assessment->final_result) {
+                    'KOMPETEN' => 'bg-emerald-50 text-emerald-700 border-emerald-300',
+                    'BELUM_KOMPETEN' => 'bg-rose-50 text-rose-700 border-rose-300',
+                    default => 'bg-slate-100 text-slate-700 border-slate-300',
+                },
+                'inspect_url' => route('asesor.assessment.ak02', $assessment->id),
+                'is_my_candidate' => $isMyCandidate,
+            ];
+        });
+
+        $meta = [
+            'code' => 'FR.AK.02',
+            'title' => 'Rekaman Asesmen Kompetensi',
+            'desc' => 'Rekapitulasi bukti dan penetapan rekomendasi hasil asesmen kompetensi untuk setiap asesi.',
+            'badge' => 'Rekaman',
+            'badge_color' => 'bg-teal-50 text-teal-700 border-teal-200',
+            'route_code' => 'ak02',
+        ];
+
+        $codeUpper = 'AK02';
+        $codeLower = 'ak02';
+
+        return view('asesor.ruang-uji.schedule-ak02', compact(
+            'schedule',
+            'asesiList',
+            'meta',
+            'codeUpper',
+            'codeLower'
+        ));
+    }
+
+    /**
      * Complete individual candidate assessment & auto-generate AK.02.
      */
     public function completeAssessment(Assessment $assessment): RedirectResponse
@@ -149,7 +205,7 @@ class FinalizationController extends Controller
             ]);
         });
 
-        return redirect()->route('asesor.jadwal.asesi', $assessment->schedule_id)
+        return redirect()->route('asesor.schedule.ak02', $assessment->schedule_id)
             ->with('success', 'FR.AK.02 Rekaman Asesmen berhasil diperbarui.');
     }
 
@@ -224,7 +280,7 @@ class FinalizationController extends Controller
         });
 
         if (! $readiness['is_ready']) {
-            return redirect()->route('asesor.jadwal.asesi', $schedule->id)
+            return redirect()->route('asesor.schedule.ruang-uji', $schedule->id)
                 ->with('warning', "Laporan tersimpan. Jadwal belum dapat ditutup: {$readiness['uncompleted_count']} asesi belum selesai.");
         }
 
@@ -264,7 +320,7 @@ class FinalizationController extends Controller
         $readiness = $this->workflowService->isScheduleReadyForClosure($schedule);
 
         if (! $readiness['is_ready']) {
-            return redirect()->route('asesor.jadwal.asesi', $schedule->id)
+            return redirect()->route('asesor.schedule.ruang-uji', $schedule->id)
                 ->with('error', "Jadwal belum dapat ditutup. Masih ada {$readiness['uncompleted_count']} asesi yang belum diselesaikan asesmennya.");
         }
 

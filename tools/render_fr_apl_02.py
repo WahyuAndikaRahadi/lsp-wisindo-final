@@ -8,10 +8,14 @@ Paginasi persis 6 halaman sesuai master document BNSP.
 import os
 import sys
 import json
+import io
+import base64
+from PIL import Image
 from reportlab.pdfgen import canvas
 from reportlab.lib.colors import black, HexColor, Color
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.lib.utils import ImageReader
 
 BASE = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.abspath(os.path.join(BASE, ".."))
@@ -109,14 +113,121 @@ def draw_cb(c, cx, cy, checked=False):
     c.setStrokeColor(black)
     c.rect(cx - sz / 2, cy - sz / 2, sz, sz, fill=0, stroke=1)
     if checked:
-        c.setFont("DJ", 8.5)
-        c.setFillColor(black)
-        c.drawCentredString(cx, cy - sz / 2 + 1.0, "✓")
+        c.setLineWidth(1.3)
+        c.setStrokeColor(black)
+        c.line(cx - 2.5, cy - 0.2, cx - 0.6, cy - 2.5)
+        c.line(cx - 0.6, cy - 2.5, cx + 2.8, cy + 2.8)
 
 def draw_page_num(c, pnum):
     c.setFont("Times", 12.0)
     c.setFillColor(BLUE_NUM)
     c.drawCentredString(PAGE_W / 2, 42.0, str(pnum))
+
+def clean_signature_image(raw_bytes_or_path):
+    try:
+        if isinstance(raw_bytes_or_path, (bytes, bytearray)):
+            im = Image.open(io.BytesIO(raw_bytes_or_path))
+        else:
+            im = Image.open(raw_bytes_or_path)
+        im = im.convert("RGBA")
+        w, h = im.size
+        if w == 0 or h == 0:
+            return None
+
+        # Sample corner colors to detect background
+        corners = []
+        for pt in ((0, 0), (w - 1, 0), (0, h - 1), (w - 1, h - 1)):
+            px = im.getpixel(pt)
+            if isinstance(px, tuple) and len(px) >= 3:
+                corners.append((px[0], px[1], px[2]))
+            elif isinstance(px, (int, float)):
+                corners.append((int(px), int(px), int(px)))
+
+        if not corners:
+            corners = [(255, 255, 255)]
+
+        bg_r = sum(c[0] for c in corners) / len(corners)
+        bg_g = sum(c[1] for c in corners) / len(corners)
+        bg_b = sum(c[2] for c in corners) / len(corners)
+
+        pixels = im.load()
+        if pixels is None:
+            return None
+
+        for y in range(h):
+            for x in range(w):
+                px = pixels[x, y]
+                if not isinstance(px, tuple) or len(px) < 4:
+                    continue
+                r, g, b, a = int(px[0]), int(px[1]), int(px[2]), int(px[3])
+                if a == 0:
+                    continue
+                is_green = (g > 80 and g > r * 1.15 and g > b * 1.15)
+                dist_bg = ((r - bg_r)**2 + (g - bg_g)**2 + (b - bg_b)**2)**0.5
+                is_bg = dist_bg < 45
+                is_white = (r > 235 and g > 235 and b > 235)
+
+                if is_green or is_bg or is_white:
+                    pixels[x, y] = (0, 0, 0, 0)
+                elif dist_bg < 75 or (g > r and g > b and g > 70):
+                    factor = min(1.0, max(0.0, (dist_bg - 45) / 30.0))
+                    pixels[x, y] = (r, g, b, int(a * factor))
+
+        # Auto-crop to bounding box of actual non-zero strokes
+        bbox = im.getbbox()
+        if bbox:
+            pad = 2
+            crop_box = (
+                max(0, bbox[0] - pad),
+                max(0, bbox[1] - pad),
+                min(w, bbox[2] + pad),
+                min(h, bbox[3] + pad)
+            )
+            im = im.crop(crop_box)
+
+        out_io = io.BytesIO()
+        im.save(out_io, format="PNG")
+        out_io.seek(0)
+        return out_io
+    except Exception:
+        return None
+
+def draw_signature(c, sig_data, x, y_bot, w=75.0, h=26.0):
+    if not sig_data:
+        return
+    try:
+        if isinstance(sig_data, str) and sig_data.startswith("data:image"):
+            sig_data = sig_data.split(",", 1)[1]
+            raw = base64.b64decode(sig_data)
+        elif isinstance(sig_data, str) and os.path.isfile(sig_data):
+            with open(sig_data, "rb") as f:
+                raw = f.read()
+        else:
+            return
+
+        cleaned_io = clean_signature_image(raw)
+        if not cleaned_io:
+            return
+
+        im = Image.open(cleaned_io)
+        im_w, im_h = im.size
+        if im_w == 0 or im_h == 0:
+            return
+
+        aspect = float(im_w) / float(im_h)
+        if aspect > (w / h):
+            draw_w = w
+            draw_h = w / aspect
+        else:
+            draw_h = h
+            draw_w = h * aspect
+
+        y_bot_native = Y(y_bot)
+        cleaned_io.seek(0)
+        img = ImageReader(cleaned_io)
+        c.drawImage(img, x, y_bot_native, draw_w, draw_h, mask="auto")
+    except Exception:
+        pass
 
 def draw_unit_header(c, num, code, title, y_top, y_bot, L=53.4, R=541.2):
     c1, c2, c3 = 160.2, 227.5, 242.9
@@ -284,12 +395,20 @@ def render_page_1(c, p_data):
     c.setFont("Lib-B", 9.5)
     c.drawString(c1 + 5.5, Y(149.5), "Judul")
     c.drawString(c2 + 5.0, Y(149.5), ":")
-    c.drawString(c3 + 5.5, Y(146.0), "Skema Sertifikasi Klaster Maintenance Gasoline Engine")
-    c.drawString(c3 + 5.5, Y(159.0), "Injection System")
+    skema_judul = str(DATA.get("skema_judul") or "Skema Sertifikasi Klaster Maintenance Gasoline Engine Injection System")
+    if len(skema_judul) > 50 and " " in skema_judul:
+        words = skema_judul.split()
+        mid = len(words) // 2
+        line1 = " ".join(words[:mid])
+        line2 = " ".join(words[mid:])
+        c.drawString(c3 + 5.5, Y(146.0), line1)
+        c.drawString(c3 + 5.5, Y(159.0), line2)
+    else:
+        c.drawString(c3 + 5.5, Y(149.5), skema_judul)
     
     c.drawString(c1 + 5.5, Y(174.5), "Nomor")
     c.drawString(c2 + 5.0, Y(174.5), ":")
-    c.drawString(c3 + 5.5, Y(174.5), "Skema 02/LSP PrO Indo/XI/2025")
+    c.drawString(c3 + 5.5, Y(174.5), str(DATA.get("skema_nomor") or "Skema 02/LSP PrO Indo/XI/2025"))
     
     # Table 2: Panduan Asesmen Mandiri (top=193.0 to 294.2)
     p_top, p_hdr_bot, p_bot = 193.0, 207.6, 294.2
@@ -462,16 +581,31 @@ def render_page_6(c, p_data):
     # Left Section: Rekomendasi
     c.setFont("Lib", 10.0)
     c.setFillColor(black)
-    c.drawString(L + 7.0, Y(534.0), "Asesmen dapat / tidak dapat dilanjutkan")
+    ok = bool(DATA.get("is_kompeten", True))
+    w1 = pdfmetrics.stringWidth("Asesmen ", "Lib", 10.0)
+    w2 = pdfmetrics.stringWidth("dapat", "Lib", 10.0)
+    w3 = pdfmetrics.stringWidth(" / ", "Lib", 10.0)
+    w4 = pdfmetrics.stringWidth("tidak dapat", "Lib", 10.0)
+    c.drawString(L + 7.0, Y(534.0), "Asesmen ")
+    c.drawString(L + 7.0 + w1, Y(534.0), "dapat")
+    c.drawString(L + 7.0 + w1 + w2, Y(534.0), " / ")
+    c.drawString(L + 7.0 + w1 + w2 + w3, Y(534.0), "tidak dapat")
+    c.drawString(L + 7.0 + w1 + w2 + w3 + w4, Y(534.0), " dilanjutkan")
+    c.setLineWidth(0.6)
+    if ok:
+        c.line(L + 7.0 + w1 + w2 + w3, Y(534.0 - 3.0), L + 7.0 + w1 + w2 + w3 + w4, Y(534.0 - 3.0))
+    else:
+        c.line(L + 7.0 + w1, Y(534.0 - 3.0), L + 7.0 + w1 + w2, Y(534.0 - 3.0))
     
     # Right Section: Asesi
     c.setFont("Lib", 10.0)
     c.drawString(c_mid + 6.0, Y(531.0), "Nama")
-    c.drawString(c_lbl + 6.0, Y(531.0), f": {DATA['asesi_nama']}")
+    c.drawString(c_lbl + 6.0, Y(531.0), str(DATA.get('asesi_nama', '')))
     
     c.drawString(c_mid + 6.0, Y(548.0), "Tanda tangan/")
     c.drawString(c_mid + 6.0, Y(560.0), "Tanggal")
-    c.drawString(c_lbl + 6.0, Y(554.0), f": [Tanda Tangan Digital] - {DATA['tanggal']}")
+    c.drawString(c_lbl + 6.0, Y(554.0), str(DATA.get('tanggal', '')))
+    draw_signature(c, DATA.get("signature_asesi") or DATA.get("asesi_signature"), c_lbl + 68.0, 565.0, w=75.0, h=26.0)
     
     # Right Section: Asesor Header
     c.setFont("Lib-B", 10.0)
@@ -480,16 +614,31 @@ def render_page_6(c, p_data):
     # Right Section: Asesor Details
     c.setFont("Lib", 10.0)
     c.drawString(c_mid + 6.0, Y(592.0), "Nama :")
-    c.drawString(c_lbl + 6.0, Y(592.0), f": {DATA['asesor_nama']}")
+    c.drawString(c_lbl + 6.0, Y(592.0), str(DATA.get('asesor_nama', '')))
     
     c.drawString(c_mid + 6.0, Y(610.0), "No. Reg:")
-    c.drawString(c_lbl + 6.0, Y(610.0), f": {DATA['asesor_reg']}")
+    c.drawString(c_lbl + 6.0, Y(610.0), str(DATA.get('asesor_reg', '')))
     
     c.drawString(c_mid + 6.0, Y(628.0), "Tanda tangan/")
     c.drawString(c_mid + 6.0, Y(640.0), "Tanggal")
-    c.drawString(c_lbl + 6.0, Y(634.0), f": [Tanda Tangan Digital] - {DATA['tanggal']}")
+    c.drawString(c_lbl + 6.0, Y(634.0), str(DATA.get('tanggal', '')))
+    draw_signature(c, DATA.get("signature_asesor") or DATA.get("assessor_signature"), c_lbl + 68.0, 645.0, w=75.0, h=26.0)
 
 if __name__ == "__main__":
     out_dir = os.path.join(PROJECT_ROOT, "tests", "Fixtures", "muk")
     os.makedirs(out_dir, exist_ok=True)
-    render(OUT)
+    out_file = OUT
+    if len(sys.argv) > 1:
+        arg1 = sys.argv[1]
+        if arg1.endswith(".json") and os.path.isfile(arg1):
+            with open(arg1, "r", encoding="utf-8") as f:
+                DATA.update(json.load(f))
+            if len(sys.argv) > 2:
+                out_file = sys.argv[2]
+        elif len(sys.argv) > 2 and sys.argv[2].endswith(".json") and os.path.isfile(sys.argv[2]):
+            out_file = arg1
+            with open(sys.argv[2], "r", encoding="utf-8") as f:
+                DATA.update(json.load(f))
+        else:
+            out_file = arg1
+    render(out_file)

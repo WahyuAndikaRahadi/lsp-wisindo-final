@@ -137,7 +137,16 @@ def render(dest_path):
     print(f"OK -> Sukses generate Surat Pernyataan: {dest_path}")
 
 if __name__ == "__main__":
+    import json
     out_dir = os.path.join(os.path.dirname(__file__), "..", "tests", "Fixtures", "muk")
     os.makedirs(out_dir, exist_ok=True)
     out_file = os.path.join(out_dir, "Surat_Pernyataan_generated.pdf")
+    if len(sys.argv) > 1:
+        if sys.argv[1].endswith(".json") and os.path.isfile(sys.argv[1]):
+            with open(sys.argv[1], "r", encoding="utf-8") as f:
+                DATA.update(json.load(f))
+            if len(sys.argv) > 2:
+                out_file = sys.argv[2]
+        else:
+            out_file = sys.argv[1]
     render(out_file)

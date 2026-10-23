@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Assessment;
 use App\Models\Schedule;
+use App\Services\MukDynamicDocumentService;
 use App\Services\MukExportService;
+use App\Services\MukFixedDocumentService;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -13,6 +15,8 @@ class DokumenMukController extends Controller
 {
     public function __construct(
         private MukExportService $exporter,
+        private MukFixedDocumentService $fixedService,
+        private MukDynamicDocumentService $dynamicService,
     ) {}
 
     public function index(): View
@@ -24,8 +28,13 @@ class DokumenMukController extends Controller
         return view('admin.dokumen-muk.index', compact('schedules'));
     }
 
-    public function exportSchedule(Schedule $schedule, string $type)
+    public function exportSchedule(Schedule $schedule, string $type, ?Request $request = null)
     {
+        $request = $request ?? request();
+        if ($request->query('format') === 'pdf' && $request->query('source') === 'fixed' || $request->boolean('fixed')) {
+            return $this->exportFixed($schedule, $type, $request);
+        }
+
         $normalizedType = strtolower(str_replace(['_', ' '], '-', $type));
         $aliasMap = [
             'mapa01' => 'mapa',
@@ -39,6 +48,14 @@ class DokumenMukController extends Controller
             'daftar-periksa' => 'daftar-periksa',
         ];
         $targetType = $aliasMap[$normalizedType] ?? $normalizedType;
+
+        if ($request->query('source') === 'dynamic' || ($request->query('format') === 'pdf' && in_array($targetType, ['ba', 'hadir-asesor', 'hadir-asesi'], true))) {
+            return $this->dynamicService->exportSchedule($schedule, $targetType, $request->boolean('download'));
+        }
+
+        if ($request->query('format') === 'pdf' || $request->query('source') === 'fixed') {
+            return $this->exportFixed($schedule, $type, $request);
+        }
 
         $data = $this->exporter->getExportData($schedule);
         $data['exportType'] = $targetType;
@@ -62,8 +79,13 @@ class DokumenMukController extends Controller
         return view('admin.dokumen-muk.preview-schedule', $data);
     }
 
-    public function exportAsesi(Assessment $assessment, string $type = 'all')
+    public function exportAsesi(Assessment $assessment, string $type = 'all', ?Request $request = null)
     {
+        $request = $request ?? request();
+        if ($request->query('format') === 'pdf' && $request->query('source') === 'fixed' || $request->boolean('fixed')) {
+            return $this->exportAsesiFixed($assessment, $type, $request);
+        }
+
         $normalizedType = strtolower(str_replace(['_', ' '], '-', $type));
         $aliasMap = [
             'mapa' => 'mapa01',
@@ -97,6 +119,15 @@ class DokumenMukController extends Controller
             'fr-apl-02' => 'apl02',
         ];
         $targetType = $aliasMap[$normalizedType] ?? $normalizedType;
+
+        $dynamicTypes = ['apl01', 'apl02', 'ak01', 'ak02', 'ak03', 'ak04', 'ak07', 'ia01', 'ia01b', 'ia03', 'ia05c', 'pernyataan'];
+        if ($request->query('source') === 'dynamic' || ($request->query('format') === 'pdf' && in_array($targetType, $dynamicTypes, true))) {
+            return $this->dynamicService->exportAssessment($assessment, $targetType, $request->boolean('download'));
+        }
+
+        if ($request->query('format') === 'pdf' || $request->query('source') === 'fixed') {
+            return $this->exportAsesiFixed($assessment, $type, $request);
+        }
 
         $data = $this->exporter->getAsesiExportData($assessment);
         $data['exportType'] = $targetType;
@@ -144,6 +175,46 @@ class DokumenMukController extends Controller
 
     public function exportIndividual(Assessment $assessment, Request $request)
     {
-        return $this->exportAsesi($assessment, $request->query('type', 'all'));
+        return $this->exportAsesi($assessment, $request->query('type', 'all'), $request);
+    }
+
+    /**
+     * Export dynamic PDF with candidate and schedule data.
+     */
+    public function exportDynamic(Schedule $schedule, string $type, Request $request)
+    {
+        $download = $request->boolean('download', false);
+
+        return $this->dynamicService->exportSchedule($schedule, $type, $download);
+    }
+
+    /**
+     * Export dynamic PDF with candidate assessment data.
+     */
+    public function exportAsesiDynamic(Assessment $assessment, string $type, Request $request)
+    {
+        $download = $request->boolean('download', false);
+
+        return $this->dynamicService->exportAssessment($assessment, $type, $download);
+    }
+
+    /**
+     * Export fixed static original PDF directly from /lsp-document-fixed based on schedule's scheme.
+     */
+    public function exportFixed(Schedule $schedule, string $type, Request $request)
+    {
+        $download = $request->boolean('download', false);
+
+        return $this->fixedService->exportSchedule($schedule, $type, $download);
+    }
+
+    /**
+     * Export fixed static original PDF directly from /lsp-document-fixed for individual candidate's scheme.
+     */
+    public function exportAsesiFixed(Assessment $assessment, string $type, Request $request)
+    {
+        $download = $request->boolean('download', false);
+
+        return $this->fixedService->exportAssessment($assessment, $type, $download);
     }
 }
