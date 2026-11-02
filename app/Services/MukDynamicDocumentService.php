@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Assessment;
 use App\Models\Schedule;
 use App\Models\Scheme;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\File;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -245,17 +246,22 @@ class MukDynamicDocumentService
 
         if ($assessment) {
             $isK = in_array($assessment->final_result, ['K', 'KOMPETEN'], true);
+            $tempatLahir = $profile?->tempat_lahir ?? ($profile?->birth_place ?? 'Jakarta');
+            $tglLahirRaw = $profile?->tanggal_lahir ?? $profile?->birth_date;
+            $tglLahir = $tglLahirRaw ? Carbon::parse($tglLahirRaw)->format('d-m-Y') : '01-01-2000';
+            $jk = strtoupper(substr((string) ($profile?->jenis_kelamin ?? $profile?->gender ?? 'L'), 0, 1));
+
             $payload['asesi_nama'] = $asesi?->full_name ?? 'Nama Asesi';
             $payload['asesi_nik'] = $profile?->nik ?? '-';
-            $payload['asesi_ttl'] = ($profile?->birth_place ?? 'Jakarta').', '.($profile?->birth_date ? Carbon::parse($profile->birth_date)->format('d-m-Y') : '01-01-2000');
-            $payload['asesi_gender'] = ($profile?->gender ?? 'L') === 'L' ? 'Laki-laki' : 'Perempuan';
-            $payload['asesi_kebangsaan'] = 'Indonesia';
-            $payload['asesi_alamat'] = $profile?->address ?? '-';
-            $payload['asesi_telp'] = $profile?->phone_number ?? '-';
+            $payload['asesi_ttl'] = "{$tempatLahir}, {$tglLahir}";
+            $payload['asesi_gender'] = in_array($jk, ['P', 'W'], true) ? 'Perempuan' : 'Laki-laki';
+            $payload['asesi_kebangsaan'] = $profile?->kebangsaan ?? ($profile?->nationality ?? 'Indonesia');
+            $payload['asesi_alamat'] = $profile?->alamat_rumah ?? ($profile?->address ?? '-');
+            $payload['asesi_telp'] = $asesi?->phone ?? ($profile?->no_telepon_rumah ?? ($profile?->phone_number ?? '-'));
             $payload['asesi_email'] = $asesi?->email ?? '-';
-            $payload['asesi_pendidikan'] = $profile?->last_education ?? 'SMK';
-            $payload['asesi_institusi'] = $profile?->company_name ?? 'SMK Negeri';
-            $payload['asesi_jabatan'] = 'Pelajar';
+            $payload['asesi_pendidikan'] = $profile?->pendidikan_terakhir ?? ($profile?->last_education ?? 'SMK');
+            $payload['asesi_institusi'] = $profile?->nama_institusi_perusahaan ?? ($profile?->company_name ?? 'SMK Negeri');
+            $payload['asesi_jabatan'] = $profile?->jabatan ?? ($profile?->job_title ?? 'Pelajar');
             $payload['rekomendasi'] = $isK ? 'K' : 'BK';
             $payload['final_result'] = $isK ? 'KOMPETEN' : 'BELUM KOMPETEN';
             $payload['signature_asesi'] = $assessment->asesi_signature ?? $profile?->signature_data;
@@ -271,10 +277,10 @@ class MukDynamicDocumentService
             $pesertaList[] = [
                 'no' => $idx + 1,
                 'nama' => $ass->asesi?->full_name ?? 'Peserta '.($idx + 1),
-                'institusi' => $assProfile?->company_name ?? 'SMK Negeri',
-                'alamat' => $assProfile?->address ?? 'Karawang',
-                'pekerjaan' => 'Pelajar',
-                'telp' => $assProfile?->phone_number ?? '-',
+                'institusi' => $assProfile?->nama_institusi_perusahaan ?? ($assProfile?->company_name ?? 'SMK Negeri'),
+                'alamat' => $assProfile?->alamat_rumah ?? ($assProfile?->address ?? 'Karawang'),
+                'pekerjaan' => $assProfile?->jabatan ?? ($assProfile?->job_title ?? 'Pelajar'),
+                'telp' => $ass->asesi?->phone ?? ($assProfile?->no_telepon_rumah ?? ($assProfile?->phone_number ?? '-')),
                 'hasil' => $assIsK ? 'K' : 'BK',
                 'rekomendasi' => $assIsK ? 'Diterbitkan Sertifikat' : 'Tidak Diterbitkan',
                 'ket' => $assIsK ? 'Lulus' : 'Belum Lulus',
@@ -363,14 +369,15 @@ class MukDynamicDocumentService
         // Dates
         $tglPemohon = $assessment->registered_at
             ? Carbon::parse($assessment->registered_at)->locale('id')->translatedFormat('d F Y')
-            : ($assessment->created_at ? Carbon::parse($assessment->created_at)->locale('id')->translatedFormat('d F Y') : Carbon::now()->locale('id')->translatedFormat('d F Y'));
+            : ($schedule->date ? Carbon::parse($schedule->date)->locale('id')->translatedFormat('d F Y') : ($assessment->created_at ? Carbon::parse($assessment->created_at)->locale('id')->translatedFormat('d F Y') : Carbon::now()->locale('id')->translatedFormat('d F Y')));
 
         $tglAdmin = $assessment->admin_approved_at
             ? Carbon::parse($assessment->admin_approved_at)->locale('id')->translatedFormat('d F Y')
-            : ($assessment->approved_at ? Carbon::parse($assessment->approved_at)->locale('id')->translatedFormat('d F Y') : $tglPemohon);
+            : ($schedule->date ? Carbon::parse($schedule->date)->locale('id')->translatedFormat('d F Y') : ($assessment->approved_at ? Carbon::parse($assessment->approved_at)->locale('id')->translatedFormat('d F Y') : $tglPemohon));
 
-        $adminUser = $assessment->admin ?? $assessment->admin_reviewer;
+        $adminUser = $assessment->admin ?? $assessment->admin_reviewer ?? User::where('role', 'ADMIN_LSP')->first();
         $namaAdmin = $adminUser?->full_name ?? 'Admin LSP';
+        $signatureAdmin = $adminUser?->profile?->signature_data;
 
         $isAccepted = ($assessment->admin_status === 'APPROVED' || $assessment->apl_status === 'APPROVED' || $assessment->status === 'ACTIVE' || $assessment->status === 'COMPLETED');
 
@@ -410,6 +417,7 @@ class MukDynamicDocumentService
             'nama_admin' => $namaAdmin,
             'tgl_admin' => $tglAdmin,
             'signature_asesi' => $signatureAsesi,
+            'signature_admin' => $signatureAdmin,
         ];
     }
 
@@ -734,6 +742,31 @@ class MukDynamicDocumentService
     }
 
     /**
+     * Get working python executable for current platform.
+     */
+    public function getPythonExecutable(): string
+    {
+        $venvPython = PHP_OS_FAMILY === 'Windows'
+            ? base_path('.venv/Scripts/python.exe')
+            : base_path('.venv/bin/python');
+
+        if (File::isFile($venvPython)) {
+            return $venvPython;
+        }
+
+        if (PHP_OS_FAMILY === 'Windows') {
+            $laragonPython = 'C:\\laragon\\bin\\python\\python-3.10\\python.exe';
+            if (File::isFile($laragonPython)) {
+                return $laragonPython;
+            }
+
+            return 'python';
+        }
+
+        return 'python3';
+    }
+
+    /**
      * Generate dynamic PDF with inserted candidate data.
      */
     public function generateDynamicPdf(string $docType, Schedule $schedule, ?Assessment $assessment = null): string
@@ -743,11 +776,7 @@ class MukDynamicDocumentService
         $outputPath = $this->cacheDir.'/'.$cacheKey;
 
         // Python executable finder
-        $python = base_path('.venv/bin/python');
-        if (! File::isFile($python)) {
-            $python = 'python3';
-        }
-
+        $python = $this->getPythonExecutable();
         $pythonExec = escapeshellarg($python);
 
         $payload = $this->buildPayload($schedule, $assessment);
@@ -764,7 +793,10 @@ class MukDynamicDocumentService
                         : $this->buildPayload($schedule, null);
                     $tempAplJson = $this->cacheDir.'/muk_apl01_'.uniqid().'.json';
                     File::put($tempAplJson, json_encode($aplPayload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
-                    shell_exec("{$pythonExec} ".escapeshellarg($script).' '.escapeshellarg($tempAplJson).' '.escapeshellarg($outputPath));
+                    if (File::isFile($outputPath)) {
+                        @unlink($outputPath);
+                    }
+                    shell_exec("{$pythonExec} ".escapeshellarg($script).' '.escapeshellarg($tempAplJson).' '.escapeshellarg($outputPath).' 2>&1');
                     @unlink($tempAplJson);
                     if (File::isFile($outputPath) && filesize($outputPath) > 1000) {
                         return $outputPath;
@@ -902,7 +934,16 @@ class MukDynamicDocumentService
             if ($masterPdf && File::isFile($masterPdf)) {
                 $overlayScript = base_path('tools/render_dynamic_overlay.py');
                 if (File::isFile($overlayScript)) {
-                    shell_exec("{$pythonExec} ".escapeshellarg($overlayScript).' '.escapeshellarg($masterPdf).' '.escapeshellarg($tempJson).' '.escapeshellarg($outputPath));
+                    $overlayPayload = ($normType === 'apl01' && $assessment)
+                        ? $this->buildApl01Data($schedule, $assessment)
+                        : $payload;
+                    $tempOverlayJson = $this->cacheDir.'/muk_ov_'.uniqid().'.json';
+                    File::put($tempOverlayJson, json_encode($overlayPayload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+                    if (File::isFile($outputPath)) {
+                        @unlink($outputPath);
+                    }
+                    shell_exec("{$pythonExec} ".escapeshellarg($overlayScript).' '.escapeshellarg($masterPdf).' '.escapeshellarg($tempOverlayJson).' '.escapeshellarg($outputPath).' 2>&1');
+                    @unlink($tempOverlayJson);
                     if (File::isFile($outputPath) && filesize($outputPath) > 1000) {
                         return $outputPath;
                     }

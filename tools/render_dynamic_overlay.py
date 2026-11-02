@@ -72,16 +72,37 @@ def get_clean_sig_bytes(sig_data):
 def clean_watermark(doc):
     cleaned = 0
     for page in doc:
+        # 1. Clean vector watermark stream
         for xref in page.get_contents():
-            stream = doc.xref_stream(xref).decode('latin1', errors='ignore')
-            wm_start = stream.find('0.722 0.8 0.894 rg')
-            if wm_start != -1:
-                wm_end = stream.find('h\r\nf*\r\n', wm_start)
-                if wm_end != -1:
-                    wm_end += len('h\r\nf*\r\n')
-                    clean_stream = stream[:wm_start] + stream[wm_end:]
-                    doc.update_stream(xref, clean_stream.encode('latin1'))
-                    cleaned += 1
+            try:
+                stream = doc.xref_stream(xref).decode('latin1', errors='ignore')
+                wm_start = stream.find('0.722 0.8 0.894 rg')
+                if wm_start != -1:
+                    wm_end = stream.find('h\r\nf*\r\n', wm_start)
+                    if wm_end != -1:
+                        wm_end += len('h\r\nf*\r\n')
+                        clean_stream = stream[:wm_start] + stream[wm_end:]
+                        doc.update_stream(xref, clean_stream.encode('latin1'))
+                        cleaned += 1
+            except Exception:
+                pass
+
+        # 2. Clean background watermark images
+        for img in page.get_image_info(xrefs=True):
+            w = img.get('width', 0)
+            h = img.get('height', 0)
+            bbox = img.get('bbox', (0, 0, 0, 0))
+            img_w = bbox[2] - bbox[0]
+            img_h = bbox[3] - bbox[1]
+            # Watermark images in BNSP master PDFs are typically 1228x1202 or large (> 400x400) and centered
+            if (w > 400 and h > 400) or (img_w > 250 and img_h > 250 and bbox[1] > 100):
+                xref = img.get('xref')
+                if xref:
+                    try:
+                        page.delete_image(xref)
+                        cleaned += 1
+                    except Exception:
+                        pass
     return cleaned
 
 def find_colon_after(page, rect, max_x_dist=260, y_tolerance=6):

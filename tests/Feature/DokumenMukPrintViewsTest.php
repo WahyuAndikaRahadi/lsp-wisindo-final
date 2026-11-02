@@ -403,4 +403,26 @@ class DokumenMukPrintViewsTest extends TestCase
         $res03->assertSee('FR.IA.03');
         $res03->assertSee('PERTANYAAN MENDUKUNG OBSERVASI');
     }
+
+    public function test_can_render_fr_apl01_with_candidate_personal_and_employment_data(): void
+    {
+        $response = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.export-asesi', [
+            'assessment' => $this->assessment->id,
+            'type' => 'apl01',
+        ]));
+
+        $response->assertOk();
+        $response->assertSee('FR.APL.01. PERMOHONAN SERTIFIKASI KOMPETENSI');
+        $response->assertSee('Rian Kurniawan');
+        $response->assertSee('3215012345670001');
+        $response->assertSee('SMK Negeri 3 Karawang');
+        $response->assertSee('Teknisi Junior Otomotif');
+        $response->assertSee('Perum Griya Kondang Asri Blok B No 12 Karawang');
+        $response->assertSee('Engine Junior Technician');
+        $response->assertSee('01/LSP PrO Indo/I/2026');
+        $response->assertSee('check-box checked');
+        $response->assertSee('Tujuan Asesmen');
+        $response->assertSee('Bukti Persyaratan Dasar');
+        $response->assertSee('Bukti Administratif');
+    }
 }

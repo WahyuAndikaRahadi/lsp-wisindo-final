@@ -42,7 +42,7 @@ class DynamicMukExportTest extends TestCase
         // Scheme 1: Engine Junior Technician
         $scheme = Scheme::firstOrCreate(
             ['code' => 'SKM-01-2026'],
-            ['name' => 'Engine Junior Technician', 'is_active' => true]
+            ['name' => 'Engine Junior Technician', 'scheme_type' => 'KLASTER', 'is_active' => true]
         );
 
         $this->schedule = Schedule::create([
@@ -168,11 +168,20 @@ class DynamicMukExportTest extends TestCase
         $filePath = $response->baseResponse->getFile()->getPathname();
         $this->assertFileExists($filePath);
 
-        // Verify text extraction contains dynamic candidate info
-        $pdfText = shell_exec('pdftotext '.escapeshellarg($filePath).' - 2>/dev/null') ?? '';
+        // Verify text extraction contains dynamic candidate info, employment, and scheme
+        $nullDev = PHP_OS_FAMILY === 'Windows' ? '2>nul' : '2>/dev/null';
+        $pdfText = shell_exec('pdftotext '.escapeshellarg($filePath)." - {$nullDev}") ?? '';
         $this->assertStringContainsString('Bambang Sudarmono', $pdfText);
         $this->assertStringContainsString('3275010203050099', $pdfText);
+        $this->assertStringContainsString('Karawang', $pdfText);
+        $this->assertStringContainsString('Jl. Otomotif No. 45 Karawang', $pdfText);
         $this->assertStringContainsString('PT Astra Otomotif Test', $pdfText);
+        $this->assertStringContainsString('Mekanik Junior', $pdfText);
+        $this->assertStringContainsString('Engine Junior Technician', $pdfText);
+        $this->assertStringContainsString('SKM-01-2026', $pdfText);
+
+        // Verify watermark is absent
+        $this->assertStringNotContainsString('WATERMARK', strtoupper($pdfText));
     }
 
     public function test_admin_can_export_dynamic_candidate_apl02_pdf(): void
@@ -189,7 +198,8 @@ class DynamicMukExportTest extends TestCase
         $this->assertFileExists($filePath);
 
         // Verify text extraction contains dynamic candidate & assessor info
-        $pdfText = shell_exec('pdftotext '.escapeshellarg($filePath).' - 2>/dev/null') ?? '';
+        $nullDev = PHP_OS_FAMILY === 'Windows' ? '2>nul' : '2>/dev/null';
+        $pdfText = shell_exec('pdftotext '.escapeshellarg($filePath)." - {$nullDev}") ?? '';
         $this->assertStringContainsString('FR.APL.02. ASESMEN MANDIRI', $pdfText);
         $this->assertStringContainsString('Bambang Sudarmono', $pdfText);
         $this->assertStringContainsString('Ir. Hendra Gunawan, S.T.', $pdfText);
@@ -209,7 +219,8 @@ class DynamicMukExportTest extends TestCase
         $this->assertFileExists($filePath);
 
         // Verify text extraction contains dynamic candidate & assessor info
-        $pdfText = shell_exec('pdftotext '.escapeshellarg($filePath).' - 2>/dev/null') ?? '';
+        $nullDev = PHP_OS_FAMILY === 'Windows' ? '2>nul' : '2>/dev/null';
+        $pdfText = shell_exec('pdftotext '.escapeshellarg($filePath)." - {$nullDev}") ?? '';
         $this->assertStringContainsString('FR.AK.01', $pdfText);
         $this->assertStringContainsString('Bambang Sudarmono', $pdfText);
         $this->assertStringContainsString('Ir. Hendra Gunawan, S.T.', $pdfText);
@@ -229,7 +240,8 @@ class DynamicMukExportTest extends TestCase
         $this->assertFileExists($filePath);
 
         // Verify text extraction contains dynamic candidate & assessor info
-        $pdfText = shell_exec('pdftotext '.escapeshellarg($filePath).' - 2>/dev/null') ?? '';
+        $nullDev = PHP_OS_FAMILY === 'Windows' ? '2>nul' : '2>/dev/null';
+        $pdfText = shell_exec('pdftotext '.escapeshellarg($filePath)." - {$nullDev}") ?? '';
         $this->assertStringContainsString('FR.AK.07', $pdfText);
         $this->assertStringContainsString('CEKLIS PENYESUAIAN YANG WAJAR', $pdfText);
         $this->assertStringContainsString('Bambang Sudarmono', $pdfText);
@@ -250,7 +262,8 @@ class DynamicMukExportTest extends TestCase
         $this->assertFileExists($filePath);
 
         // Verify text extraction contains dynamic candidate & assessor info
-        $pdfText = shell_exec('pdftotext '.escapeshellarg($filePath).' - 2>/dev/null') ?? '';
+        $nullDev = PHP_OS_FAMILY === 'Windows' ? '2>nul' : '2>/dev/null';
+        $pdfText = shell_exec('pdftotext '.escapeshellarg($filePath)." - {$nullDev}") ?? '';
         $this->assertStringContainsString('FR.IA.01', $pdfText);
         $this->assertStringContainsString('CEKLIS OBSERVASI AKTIVITAS', $pdfText);
         $this->assertStringContainsString('Bambang Sudarmono', $pdfText);
@@ -271,7 +284,8 @@ class DynamicMukExportTest extends TestCase
         $this->assertFileExists($filePath);
 
         // Verify text extraction contains dynamic candidate & assessor info
-        $pdfText = shell_exec('pdftotext '.escapeshellarg($filePath).' - 2>/dev/null') ?? '';
+        $nullDev = PHP_OS_FAMILY === 'Windows' ? '2>nul' : '2>/dev/null';
+        $pdfText = shell_exec('pdftotext '.escapeshellarg($filePath)." - {$nullDev}") ?? '';
         $this->assertStringContainsString('FR.IA.03', $pdfText);
         $this->assertStringContainsString('PERTANYAAN MENDUKUNG OBSERVASI', $pdfText);
         $this->assertStringContainsString('Bambang Sudarmono', $pdfText);
@@ -293,7 +307,8 @@ class DynamicMukExportTest extends TestCase
         $this->assertFileExists($filePath);
 
         // Verify text extraction contains dynamic candidate & assessor info
-        $pdfText = shell_exec('pdftotext '.escapeshellarg($filePath).' - 2>/dev/null') ?? '';
+        $nullDev = PHP_OS_FAMILY === 'Windows' ? '2>nul' : '2>/dev/null';
+        $pdfText = shell_exec('pdftotext '.escapeshellarg($filePath)." - {$nullDev}") ?? '';
         $this->assertStringContainsString('FR.AK.02', $pdfText);
         $this->assertStringContainsString('REKAMAN ASESMEN KOMPETENSI', $pdfText);
         $this->assertStringContainsString('Bambang Sudarmono', $pdfText);

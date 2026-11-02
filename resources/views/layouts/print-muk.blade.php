@@ -191,15 +191,24 @@
 
         /* Checkbox Box */
         .check-box {
-            display: inline-block;
-            width: 13px;
-            height: 13px;
-            border: 1px solid #000;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 14px;
+            height: 14px;
+            border: 1.5px solid #000;
             text-align: center;
-            line-height: 12px;
-            font-size: 10px;
+            line-height: 1;
+            font-size: 11px;
             font-weight: bold;
-            margin-right: 3px;
+            margin-right: 4px;
+            vertical-align: middle;
+            background: #fff;
+            color: #000;
+        }
+        .check-box.checked {
+            font-weight: 900;
+            color: #000;
         }
 
         /* Signature block */
@@ -219,14 +228,15 @@
             padding: 0 10px;
         }
         .sig-box {
-            min-height: 65px;
+            min-height: 70px;
             margin-top: 5px;
             margin-bottom: 5px;
         }
         .sig-img {
-            max-height: 60px;
-            max-width: 180px;
+            max-height: 68px;
+            max-width: 200px;
             object-fit: contain;
+            filter: contrast(1.5) brightness(0.85);
         }
     </style>
     @stack('styles')
