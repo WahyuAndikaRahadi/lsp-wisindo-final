@@ -346,6 +346,7 @@ Route::middleware(['auth', 'role:SUPER_ADMIN,ADMIN_LSP,KOMITE_TEKNIS,TUK_ADMIN']
     Route::middleware(['role:SUPER_ADMIN,ADMIN_LSP'])->group(function () {
         // Candidate Registration Review
         Route::post('/assessment/{assessment}/review-registration', [Admin\JadwalController::class, 'reviewRegistration'])->name('assessment.review-registration');
+        Route::post('/assessment/{assessment}/assign-assessor', [Admin\JadwalController::class, 'assignAssessor'])->name('assessment.assign-assessor');
         Route::post('/jadwal/{jadwal}/batch-review-registration', [Admin\JadwalController::class, 'batchReviewRegistration'])->name('jadwal.batch-review-registration');
         Route::post('/assessment/{assessment}/mark-absent', [Admin\JadwalController::class, 'markAbsent'])->name('assessment.mark-absent');
 

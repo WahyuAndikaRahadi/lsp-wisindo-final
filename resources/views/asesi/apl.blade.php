@@ -3,7 +3,10 @@
 @section('title', 'FR.APL.01 & FR.APL.02 - Pendaftaran & Asesmen Mandiri')
 
 @section('content')
-<div class="max-w-5xl mx-auto space-y-8 py-6">
+<div class="max-w-5xl mx-auto space-y-6 py-6">
+    {{-- Stepper Component --}}
+    <x-progress-stepper currentStep="apl" :assessment="$assessment" />
+
     {{-- Header --}}
     <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
@@ -78,6 +81,7 @@
             <div class="p-6">
                 @php
                     $isProfileComplete = $profile && !empty($profile->nik) && !empty($profile->tempat_lahir) && !empty($profile->tanggal_lahir) && !empty($profile->jenis_kelamin) && !empty($profile->alamat_rumah) && !empty($profile->kode_pos) && !empty($profile->pendidikan_terakhir) && !empty($profile->jabatan) && !empty(auth()->user()->phone);
+                    $isAplLocked = $assessment->apl_status === 'SUBMITTED';
                 @endphp
 
                 @if(! $isProfileComplete)
@@ -96,42 +100,271 @@
                     </div>
                 @endif
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm bg-slate-50 p-4 rounded-lg border border-slate-200 mb-6">
-                    <div>
-                        <span class="text-xs text-slate-500 block">Nama Lengkap</span>
-                        <span class="font-semibold text-slate-800">{{ auth()->user()->full_name }}</span>
-                    </div>
-                    <div>
-                        <span class="text-xs text-slate-500 block">NIK / No. KTP</span>
-                        <span class="font-semibold text-slate-800">{{ $profile?->nik ?? '-' }}</span>
-                    </div>
-                    <div>
-                        <span class="text-xs text-slate-500 block">Tempat, Tanggal Lahir</span>
-                        <span class="font-semibold text-slate-800">
-                            {{ $profile?->tempat_lahir ?? '-' }}, {{ $profile?->tanggal_lahir ? \Carbon\Carbon::parse($profile->tanggal_lahir)->translatedFormat('d F Y') : '-' }}
+                {{-- a. Data Pribadi --}}
+                <div class="mb-6 bg-slate-50 p-5 rounded-xl border border-slate-200 space-y-4">
+                    <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+                        <div>
+                            <h3 class="text-xs font-bold text-slate-800 uppercase tracking-wider">a. Data Pribadi</h3>
+                            <p class="text-xs text-slate-500">Nilai data otomatis diambil dari profil akun Anda dan dapat diperbarui langsung.</p>
+                        </div>
+                        <span class="text-[11px] font-semibold text-brand-700 bg-brand-50 px-2.5 py-1 rounded-full border border-brand-200">
+                            Auto-fetch Profil
                         </span>
                     </div>
-                    <div>
-                        <span class="text-xs text-slate-500 block">Jenis Kelamin / Kebangsaan</span>
-                        <span class="font-semibold text-slate-800">
-                            {{ $profile?->jenis_kelamin === 'L' ? 'Laki-laki' : ($profile?->jenis_kelamin === 'P' ? 'Perempuan' : '-') }} / {{ $profile?->kebangsaan ?? 'Indonesia' }}
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                                Nama Lengkap (Sesuai KTP) <span class="text-rose-500">*</span>
+                            </label>
+                            <input type="text" name="full_name" required value="{{ old('full_name', auth()->user()->full_name) }}"
+                                class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 bg-white text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none"
+                                @disabled($isAplLocked)>
+                            @error('full_name') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                                Nomor Induk Kependudukan (NIK) <span class="text-rose-500">*</span>
+                            </label>
+                            <input type="text" name="nik" maxlength="16" inputmode="numeric" required value="{{ old('nik', $profile?->nik) }}"
+                                placeholder="16 digit NIK KTP (angka)"
+                                class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 bg-white text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none"
+                                @disabled($isAplLocked)>
+                            @error('nik') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                                Jenis Kelamin <span class="text-rose-500">*</span>
+                            </label>
+                            <div class="flex items-center space-x-6 h-[42px] px-3 bg-white border border-slate-300 rounded-lg text-sm">
+                                <label class="inline-flex items-center cursor-pointer">
+                                    <input type="radio" name="jenis_kelamin" value="L" {{ old('jenis_kelamin', $profile?->jenis_kelamin) === 'L' ? 'checked' : '' }} required
+                                        class="text-brand-600 focus:ring-brand-500" @disabled($isAplLocked)>
+                                    <span class="ml-2 text-slate-700 font-medium">Laki-laki</span>
+                                </label>
+                                <label class="inline-flex items-center cursor-pointer">
+                                    <input type="radio" name="jenis_kelamin" value="P" {{ old('jenis_kelamin', $profile?->jenis_kelamin) === 'P' ? 'checked' : '' }} required
+                                        class="text-brand-600 focus:ring-brand-500" @disabled($isAplLocked)>
+                                    <span class="ml-2 text-slate-700 font-medium">Perempuan</span>
+                                </label>
+                            </div>
+                            @error('jenis_kelamin') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                                Tempat Lahir <span class="text-rose-500">*</span>
+                            </label>
+                            <input type="text" name="tempat_lahir" required value="{{ old('tempat_lahir', $profile?->tempat_lahir) }}"
+                                placeholder="Kota / Kabupaten Lahir"
+                                class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 bg-white text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none"
+                                @disabled($isAplLocked)>
+                            @error('tempat_lahir') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                                Tanggal Lahir <span class="text-rose-500">*</span>
+                            </label>
+                            <input type="date" name="tanggal_lahir" required
+                                value="{{ old('tanggal_lahir', $profile?->tanggal_lahir ? \Carbon\Carbon::parse($profile->tanggal_lahir)->format('Y-m-d') : '') }}"
+                                class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 bg-white text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none"
+                                @disabled($isAplLocked)>
+                            @error('tanggal_lahir') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                                Kebangsaan <span class="text-rose-500">*</span>
+                            </label>
+                            <input type="text" name="kebangsaan" required value="{{ old('kebangsaan', $profile?->kebangsaan ?? 'Indonesia') }}"
+                                class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 bg-white text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none"
+                                @disabled($isAplLocked)>
+                            @error('kebangsaan') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                                Pendidikan Terakhir <span class="text-rose-500">*</span>
+                            </label>
+                            <select name="pendidikan_terakhir" required class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 bg-white text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none" @disabled($isAplLocked)>
+                                <option value="">-- Pilih Pendidikan --</option>
+                                @foreach(['SD', 'SMP', 'SMA/Sederajat', 'D1', 'D2', 'D3', 'D4', 'S1', 'S2', 'S3'] as $opt)
+                                    <option value="{{ $opt }}" {{ old('pendidikan_terakhir', $profile?->pendidikan_terakhir) === $opt ? 'selected' : '' }}>{{ $opt }}</option>
+                                @endforeach
+                            </select>
+                            @error('pendidikan_terakhir') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                                Alamat Rumah Tinggal <span class="text-rose-500">*</span>
+                            </label>
+                            <textarea name="alamat_rumah" rows="2" required
+                                class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 bg-white text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none"
+                                @disabled($isAplLocked)>{{ old('alamat_rumah', $profile?->alamat_rumah) }}</textarea>
+                            @error('alamat_rumah') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                                Kode Pos <span class="text-rose-500">*</span>
+                            </label>
+                            <input type="text" name="kode_pos" maxlength="10" inputmode="numeric" required value="{{ old('kode_pos', $profile?->kode_pos) }}"
+                                placeholder="Contoh: 17530"
+                                class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 bg-white text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none"
+                                @disabled($isAplLocked)>
+                            @error('kode_pos') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                                Nomor HP / WhatsApp <span class="text-rose-500">*</span>
+                            </label>
+                            <input type="text" name="phone" required inputmode="numeric" maxlength="15" value="{{ old('phone', auth()->user()->phone) }}"
+                                placeholder="Contoh: 081234567890"
+                                class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 bg-white text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none"
+                                @disabled($isAplLocked)>
+                            @error('phone') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                                Telepon Rumah (Opsional)
+                            </label>
+                            <input type="text" name="no_telepon_rumah" inputmode="numeric" maxlength="15" value="{{ old('no_telepon_rumah', $profile?->no_telepon_rumah) }}"
+                                placeholder="Contoh: 0218901234"
+                                class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 bg-white text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none"
+                                @disabled($isAplLocked)>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                                Email Asesi
+                            </label>
+                            <input type="email" disabled value="{{ auth()->user()->email }}"
+                                class="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 bg-slate-100 text-slate-500 text-sm">
+                        </div>
+                    </div>
+                </div>
+
+                {{-- b. Data Pekerjaan / Sekolah / Institusi --}}
+                <div class="mb-6 bg-slate-50 p-5 rounded-xl border border-slate-200 space-y-4">
+                    <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+                        <div>
+                            <h3 class="text-xs font-bold text-slate-800 uppercase tracking-wider">b. Data Pekerjaan / Sekolah / Institusi</h3>
+                            <p class="text-xs text-slate-500">Nilai data otomatis diambil dari profil akun Anda dan dapat diperbarui langsung.</p>
+                        </div>
+                        <span class="text-[11px] font-semibold text-brand-700 bg-brand-50 px-2.5 py-1 rounded-full border border-brand-200">
+                            Auto-fetch Profil
                         </span>
                     </div>
-                    <div class="md:col-span-2">
-                        <span class="text-xs text-slate-500 block">Alamat Rumah</span>
-                        <span class="font-semibold text-slate-800">{{ $profile?->alamat_rumah ?? '-' }} (Kode Pos: {{ $profile?->kode_pos ?? '-' }})</span>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                                Nama Institusi / Sekolah / Perusahaan (Opsional)
+                            </label>
+                            <input type="text" name="nama_institusi_perusahaan" value="{{ old('nama_institusi_perusahaan', $profile?->nama_institusi_perusahaan) }}"
+                                placeholder="Contoh: SMK Negeri 1 Cikarang Barat / Bengkel Auto"
+                                class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 bg-white text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none"
+                                @disabled($isAplLocked)>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                                Jabatan / Posisi / Status <span class="text-rose-500">*</span>
+                            </label>
+                            @php
+                                $jobOptions = [
+                                    'Pelajar / Siswa',
+                                    'Mahasiswa',
+                                    'Karyawan Swasta / Teknisi / Mekanik',
+                                    'Pegawai Negeri / BUMN',
+                                    'Wirausaha / Pemilik Usaha',
+                                    'Belum Bekerja / Fresh Graduate',
+                                    'Lainnya',
+                                ];
+                                $currentJabatan = old('jabatan', $profile?->jabatan);
+                            @endphp
+                            <select name="jabatan" required class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 bg-white text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none" @disabled($isAplLocked)>
+                                <option value="">-- Pilih Jabatan / Posisi / Status --</option>
+                                @foreach($jobOptions as $opt)
+                                    <option value="{{ $opt }}" {{ $currentJabatan === $opt ? 'selected' : '' }}>{{ $opt }}</option>
+                                @endforeach
+                                @if($currentJabatan && !in_array($currentJabatan, $jobOptions))
+                                    <option value="{{ $currentJabatan }}" selected>{{ $currentJabatan }}</option>
+                                @endif
+                            </select>
+                            @error('jabatan') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                                Alamat Kantor / Sekolah (Opsional)
+                            </label>
+                            <textarea name="alamat_kantor" rows="2"
+                                class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 bg-white text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none"
+                                @disabled($isAplLocked)>{{ old('alamat_kantor', $profile?->alamat_kantor) }}</textarea>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                                No. Telepon Kantor / Sekolah (Opsional)
+                            </label>
+                            <input type="text" name="no_telepon_kantor" inputmode="numeric" maxlength="15" value="{{ old('no_telepon_kantor', $profile?->no_telepon_kantor) }}"
+                                placeholder="Contoh: 0218905678"
+                                class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 bg-white text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none"
+                                @disabled($isAplLocked)>
+                        </div>
                     </div>
-                    <div>
-                        <span class="text-xs text-slate-500 block">Kontak Telepon / Email</span>
-                        <span class="font-semibold text-slate-800">{{ auth()->user()->phone ?? '-' }} / {{ auth()->user()->email }}</span>
+                </div>
+
+                {{-- Bagian 2 : Data Sertifikasi & Tujuan Asesmen --}}
+                <div class="mb-6">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Bagian 2: Data Sertifikasi</h3>
+                        <span class="text-[11px] text-slate-400">Skema & Tujuan Asesmen</span>
                     </div>
-                    <div>
-                        <span class="text-xs text-slate-500 block">Pendidikan Terakhir</span>
-                        <span class="font-semibold text-slate-800">{{ $profile?->pendidikan_terakhir ?? '-' }}</span>
-                    </div>
-                    <div class="md:col-span-2">
-                        <span class="text-xs text-slate-500 block">Institusi / Perusahaan & Jabatan</span>
-                        <span class="font-semibold text-slate-800">{{ $profile?->nama_institusi_perusahaan ?? '-' }} ({{ $profile?->jabatan ?? '-' }})</span>
+                    <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                            <div>
+                                <span class="text-xs text-slate-500 block">Judul Skema Sertifikasi</span>
+                                <span class="font-semibold text-slate-800">{{ $assessment->schedule->scheme->name }}</span>
+                            </div>
+                            <div>
+                                <span class="text-xs text-slate-500 block">Nomor Skema Sertifikasi</span>
+                                <span class="font-semibold text-slate-800 font-mono">{{ $assessment->schedule->scheme->code }}</span>
+                            </div>
+                        </div>
+
+                        <div class="border-t border-slate-200/80 pt-3">
+                            <label for="tujuan_asesmen" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+                                <span>Tujuan Asesmen <span class="text-rose-500">*</span></span>
+                                <span class="text-[11px] text-slate-500 font-normal lowercase">Pilih tujuan asesmen sesuai permohonan</span>
+                            </label>
+                            @php
+                                $tujuanOptions = [
+                                    'Sertifikasi',
+                                    'Pengakuan Kompetensi Terkini (PKT)',
+                                    'Rekognisi Pembelajaran Lampau (RPL)',
+                                    'Lainnya',
+                                ];
+                                $selectedTujuan = old('tujuan_asesmen', $assessment->tujuan_asesmen ?? 'Sertifikasi');
+                                $isAplLocked = $assessment->apl_status === 'SUBMITTED';
+                            @endphp
+                            <select name="tujuan_asesmen" id="tujuan_asesmen" required class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 bg-white text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none" @disabled($isAplLocked)>
+                                @foreach($tujuanOptions as $opt)
+                                    <option value="{{ $opt }}" @selected($selectedTujuan === $opt)>{{ $opt }}</option>
+                                @endforeach
+                            </select>
+                            @if($isAplLocked)
+                                <input type="hidden" name="tujuan_asesmen" value="{{ $selectedTujuan }}">
+                            @endif
+                            @error('tujuan_asesmen') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
+                        </div>
                     </div>
                 </div>
 
@@ -145,7 +378,7 @@
                             <span>Pilih Asesor Penguji <span class="text-rose-500">*</span></span>
                             <span class="text-[11px] text-slate-500 font-normal lowercase">Asesor yang akan memverifikasi berkas & menguji Anda</span>
                         </label>
-                        <select name="assessor_id" required class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 bg-white text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none" @disabled($assessment->apl_status === 'APPROVED' || $assessment->apl_status === 'SUBMITTED')>
+                        <select name="assessor_id" required class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 bg-white text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none" @disabled($assessment->apl_status === 'SUBMITTED')>
                             <option value="">-- Pilih Salah Satu Asesor Penguji --</option>
                             @foreach($scheduleAssessors as $asesor)
                                 <option value="{{ $asesor->id }}" {{ old('assessor_id', $assessment->assessor_id) == $asesor->id || $scheduleAssessors->count() === 1 ? 'selected' : '' }}>
@@ -182,7 +415,7 @@
                             {{-- Opsi A --}}
                             <div class="bg-white p-3 rounded-lg border border-slate-200">
                                 <label class="block text-xs font-bold text-slate-700 mb-1">A. Ijazah SMK Otomotif</label>
-                                <input type="file" name="proofs[IJAZAH_SMK]" accept=".jpg,.jpeg,.png,.pdf" class="block w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" @disabled($assessment->apl_status === 'APPROVED' || $assessment->apl_status === 'SUBMITTED')>
+                                <input type="file" name="proofs[IJAZAH_SMK]" accept=".jpg,.jpeg,.png,.pdf" class="block w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" @disabled($assessment->apl_status === 'SUBMITTED')>
                                 @if(isset($existingProofs['IJAZAH_SMK']))
                                     <span class="text-xs text-emerald-600 font-medium mt-1 inline-block">✓ Terunggah: {{ $existingProofs['IJAZAH_SMK']->original_filename }}</span>
                                 @endif
@@ -191,7 +424,7 @@
                             {{-- Opsi B --}}
                             <div class="bg-white p-3 rounded-lg border border-slate-200">
                                 <label class="block text-xs font-bold text-slate-700 mb-1">B. Surat Keterangan Siswa Aktif SMK</label>
-                                <input type="file" name="proofs[SURAT_SISWA_AKTIF]" accept=".jpg,.jpeg,.png,.pdf" class="block w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" @disabled($assessment->apl_status === 'APPROVED' || $assessment->apl_status === 'SUBMITTED')>
+                                <input type="file" name="proofs[SURAT_SISWA_AKTIF]" accept=".jpg,.jpeg,.png,.pdf" class="block w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" @disabled($assessment->apl_status === 'SUBMITTED')>
                                 @if(isset($existingProofs['SURAT_SISWA_AKTIF']))
                                     <span class="text-xs text-emerald-600 font-medium mt-1 inline-block">✓ Terunggah: {{ $existingProofs['SURAT_SISWA_AKTIF']->original_filename }}</span>
                                 @endif
@@ -200,7 +433,7 @@
                             {{-- Opsi C --}}
                             <div class="bg-white p-3 rounded-lg border border-slate-200">
                                 <label class="block text-xs font-bold text-slate-700 mb-1">C. Ijazah SMA + Sertifikat Pelatihan Otomotif</label>
-                                <input type="file" name="proofs[IJAZAH_SMA_SERTIFIKAT]" accept=".jpg,.jpeg,.png,.pdf" class="block w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" @disabled($assessment->apl_status === 'APPROVED' || $assessment->apl_status === 'SUBMITTED')>
+                                <input type="file" name="proofs[IJAZAH_SMA_SERTIFIKAT]" accept=".jpg,.jpeg,.png,.pdf" class="block w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" @disabled($assessment->apl_status === 'SUBMITTED')>
                                 @if(isset($existingProofs['IJAZAH_SMA_SERTIFIKAT']))
                                     <span class="text-xs text-emerald-600 font-medium mt-1 inline-block">✓ Terunggah: {{ $existingProofs['IJAZAH_SMA_SERTIFIKAT']->original_filename }}</span>
                                 @endif
@@ -209,7 +442,7 @@
                             {{-- Opsi D --}}
                             <div class="bg-white p-3 rounded-lg border border-slate-200">
                                 <label class="block text-xs font-bold text-slate-700 mb-1">D. Surat Pengalaman Kerja Bengkel Otomotif</label>
-                                <input type="file" name="proofs[PENGALAMAN_KERJA]" accept=".jpg,.jpeg,.png,.pdf" class="block w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" @disabled($assessment->apl_status === 'APPROVED' || $assessment->apl_status === 'SUBMITTED')>
+                                <input type="file" name="proofs[PENGALAMAN_KERJA]" accept=".jpg,.jpeg,.png,.pdf" class="block w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" @disabled($assessment->apl_status === 'SUBMITTED')>
                                 @if(isset($existingProofs['PENGALAMAN_KERJA']))
                                     <span class="text-xs text-emerald-600 font-medium mt-1 inline-block">✓ Terunggah: {{ $existingProofs['PENGALAMAN_KERJA']->original_filename }}</span>
                                 @endif
@@ -232,7 +465,7 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div class="bg-white p-3 rounded-lg border border-slate-200">
                                 <label class="block text-xs font-bold text-slate-700 mb-1">Fotokopi KTP / Identitas Diri <span class="text-rose-500">*</span></label>
-                                <input type="file" name="proofs[KTP]" accept=".jpg,.jpeg,.png,.pdf" class="block w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100" @disabled($assessment->apl_status === 'APPROVED' || $assessment->apl_status === 'SUBMITTED')>
+                                <input type="file" name="proofs[KTP]" accept=".jpg,.jpeg,.png,.pdf" class="block w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100" @disabled($assessment->apl_status === 'SUBMITTED')>
                                 @if(isset($existingProofs['KTP']))
                                     <span class="text-xs text-emerald-600 font-medium mt-1 inline-block">✓ Terunggah: {{ $existingProofs['KTP']->original_filename }}</span>
                                 @endif
@@ -240,7 +473,7 @@
 
                             <div class="bg-white p-3 rounded-lg border border-slate-200">
                                 <label class="block text-xs font-bold text-slate-700 mb-1">Pas Foto 3x4 (Latar Belakang Merah) <span class="text-rose-500">*</span></label>
-                                <input type="file" name="proofs[PAS_FOTO]" accept=".jpg,.jpeg,.png,.pdf" class="block w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100" @disabled($assessment->apl_status === 'APPROVED' || $assessment->apl_status === 'SUBMITTED')>
+                                <input type="file" name="proofs[PAS_FOTO]" accept=".jpg,.jpeg,.png,.pdf" class="block w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100" @disabled($assessment->apl_status === 'SUBMITTED')>
                                 @if(isset($existingProofs['PAS_FOTO']))
                                     <span class="text-xs text-emerald-600 font-medium mt-1 inline-block">✓ Terunggah: {{ $existingProofs['PAS_FOTO']->original_filename }}</span>
                                 @endif
@@ -267,7 +500,7 @@
                     <p class="text-xs text-indigo-200">Panduan Asesmen Mandiri: Nilai kesiapan Anda pada setiap Kriteria Unjuk Kerja (KUK)</p>
                 </div>
 
-                @if($assessment->apl_status !== 'APPROVED' && $assessment->apl_status !== 'SUBMITTED')
+                @if($assessment->apl_status !== 'SUBMITTED')
                     {{-- Fast Actions --}}
                     <div class="flex items-center gap-2 flex-wrap">
                         <button type="button" @click="setAll('K')" class="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded text-xs font-bold shadow-sm transition">
@@ -288,7 +521,7 @@
                     <div class="flex items-center gap-2">
                         <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-white/20 text-white rounded text-xs font-semibold">
                             <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-                            Formulir Terkunci &amp; Terkirim
+                            Formulir Terkunci &amp; Sedang Diverifikasi Asesor
                         </span>
                     </div>
                 @endif
@@ -337,13 +570,13 @@
                                             <span class="text-slate-600">{{ $kuk->statement }}</span>
                                         </td>
                                         <td class="p-3 text-center bg-emerald-50/50">
-                                            <input type="radio" name="kuks[{{ $kuk->id }}][value]" value="K" class="radio-kuk-K text-emerald-600 focus:ring-emerald-500 w-4 h-4 cursor-pointer" @checked($val === 'K') @disabled($assessment->apl_status === 'APPROVED' || $assessment->apl_status === 'SUBMITTED')>
+                                            <input type="radio" name="kuks[{{ $kuk->id }}][value]" value="K" class="radio-kuk-K text-emerald-600 focus:ring-emerald-500 w-4 h-4 cursor-pointer" @checked($val === 'K') @disabled($assessment->apl_status === 'SUBMITTED')>
                                         </td>
                                         <td class="p-3 text-center bg-rose-50/50">
-                                            <input type="radio" name="kuks[{{ $kuk->id }}][value]" value="BK" class="radio-kuk-BK text-rose-600 focus:ring-rose-500 w-4 h-4 cursor-pointer" @checked($val === 'BK') @disabled($assessment->apl_status === 'APPROVED' || $assessment->apl_status === 'SUBMITTED')>
+                                            <input type="radio" name="kuks[{{ $kuk->id }}][value]" value="BK" class="radio-kuk-BK text-rose-600 focus:ring-rose-500 w-4 h-4 cursor-pointer" @checked($val === 'BK') @disabled($assessment->apl_status === 'SUBMITTED')>
                                         </td>
                                         <td class="p-3">
-                                            <select name="kuks[{{ $kuk->id }}][proof_type]" class="select-proof w-full text-xs border border-slate-200 rounded px-2 py-1 bg-white focus:ring-1 focus:ring-indigo-500" @disabled($assessment->apl_status === 'APPROVED' || $assessment->apl_status === 'SUBMITTED')>
+                                            <select name="kuks[{{ $kuk->id }}][proof_type]" class="select-proof w-full text-xs border border-slate-200 rounded px-2 py-1 bg-white focus:ring-1 focus:ring-indigo-500" @disabled($assessment->apl_status === 'SUBMITTED')>
                                                 <option value="IJAZAH_SMK" @selected($proof === 'IJAZAH_SMK')>Ijazah SMK Otomotif</option>
                                                 <option value="SURAT_SISWA_AKTIF" @selected($proof === 'SURAT_SISWA_AKTIF')>Surat Keterangan Siswa Aktif</option>
                                                 <option value="IJAZAH_SMA_SERTIFIKAT" @selected($proof === 'IJAZAH_SMA_SERTIFIKAT')>Ijazah SMA + Sertifikat Pelatihan</option>
@@ -368,16 +601,29 @@
                         label="Tanda Tangan Pemohon (Asesi)" 
                         :required="true"
                         height="140" 
-                        :disabled="$assessment->apl_status === 'SUBMITTED' || $assessment->apl_status === 'APPROVED'"
+                        :disabled="$assessment->apl_status === 'SUBMITTED'"
                     />
                 </div>
 
                 <div class="w-full md:w-auto flex flex-col items-end gap-2">
                     @if($assessment->apl_status === 'APPROVED')
-                        <a href="{{ route('asesi.assessment.ruang-uji', $assessment) }}" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-md transition flex items-center gap-2">
-                            <span>Lanjut ke Ruang Uji</span>
-                            <span>→</span>
-                        </a>
+                        <div class="mb-2 p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-left w-full md:max-w-md">
+                            <label class="flex items-start gap-2.5 cursor-pointer">
+                                <input type="checkbox" name="statement_integrity" value="1" checked required class="mt-0.5 rounded border-emerald-300 text-emerald-600 focus:ring-emerald-500">
+                                <span class="text-xs text-emerald-950 leading-relaxed">
+                                    <strong>Pernyataan Pemohon (Asesi):</strong> Data permohonan APL telah diverifikasi asesor. Anda dapat memperbarui data berkas ini dan menyimpannya tanpa membatalkan status verifikasi.
+                                </span>
+                            </label>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <a href="{{ route('asesi.assessment.ruang-uji', $assessment) }}" class="px-5 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs uppercase tracking-wider rounded-xl border border-slate-300 transition">
+                                Kembali ke Ruang Uji →
+                            </a>
+                            <button type="submit" class="px-7 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-md transition flex items-center gap-2">
+                                <span>Simpan Perubahan APL</span>
+                                <span>✓</span>
+                            </button>
+                        </div>
                     @elseif($assessment->apl_status === 'SUBMITTED')
                         <button type="button" disabled class="px-6 py-3 bg-slate-400 text-white font-bold rounded-xl shadow-md cursor-not-allowed">
                             Menunggu Verifikasi Asesor

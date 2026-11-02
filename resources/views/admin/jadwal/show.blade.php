@@ -65,8 +65,25 @@
                                 <span class="text-slate-500 font-mono text-[11px]">{{ $assessment->asesi->email }} | NIK: {{ $assessment->asesi->profile?->nik ?? '-' }}</span>
                             </td>
                             <td class="px-3 py-3">
-                                <span class="font-semibold text-slate-800 block">{{ $assessment->assessor?->full_name ?? '-' }}</span>
-                                <span class="text-[10px] text-slate-400 font-mono">{{ $assessment->assessor?->assessor_registration_number ?? '' }}</span>
+                                @if($jadwal->assessors->isNotEmpty())
+                                    <form action="{{ route('admin.assessment.assign-assessor', $assessment) }}" method="POST" class="space-y-1">
+                                        @csrf
+                                        <select name="assessor_id" onchange="this.form.submit()" class="text-xs py-1 px-2 border border-slate-300 rounded bg-white text-slate-800 font-medium focus:ring-1 focus:ring-brand-500 w-full max-w-[180px]">
+                                            <option value="">-- Pilih Asesor --</option>
+                                            @foreach($jadwal->assessors as $asesor)
+                                                <option value="{{ $asesor->id }}" @selected($assessment->assessor_id == $asesor->id)>
+                                                    {{ $asesor->full_name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        @if($assessment->assessor)
+                                            <span class="text-[10px] text-slate-400 font-mono block">{{ $assessment->assessor->assessor_registration_number ?? '' }}</span>
+                                        @endif
+                                    </form>
+                                @else
+                                    <span class="font-semibold text-slate-800 block">{{ $assessment->assessor?->full_name ?? '-' }}</span>
+                                    <span class="text-[10px] text-slate-400 font-mono">{{ $assessment->assessor?->assessor_registration_number ?? '' }}</span>
+                                @endif
                             </td>
                             <td class="px-3 py-3 text-center">
                                 <span class="px-2 py-0.5 rounded text-[11px] font-bold border {{ $asesorBadge }}">

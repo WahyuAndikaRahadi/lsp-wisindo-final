@@ -38,11 +38,6 @@ class AplController extends Controller
             return back()->with('error', 'Jadwal asesmen sudah resmi ditutup.');
         }
 
-        if ($assessment->apl_status === 'APPROVED') {
-            return redirect()->route('asesi.assessment.ruang-uji', $assessment)
-                ->with('info', 'Permohonan APL Anda sudah disetujui oleh Asesor.');
-        }
-
         if ($assessment->apl_status === 'SUBMITTED') {
             return back()->with('info', 'Permohonan APL Anda sudah diajukan dan sedang menunggu verifikasi asesor.');
         }
@@ -61,6 +56,7 @@ class AplController extends Controller
         }
 
         $request->validate([
+            'tujuan_asesmen' => ['nullable', 'string', 'in:Sertifikasi,Pengakuan Kompetensi Terkini (PKT),Rekognisi Pembelajaran Lampau (RPL),Lainnya'],
             'proofs' => 'nullable|array',
             'proofs.*' => 'nullable|file|mimes:pdf,jpg,jpeg,png,webp|max:5120',
             'ktp' => 'nullable|file|mimes:pdf,jpg,jpeg,png,webp|max:5120',
@@ -127,7 +123,51 @@ class AplController extends Controller
         ]);
 
         $user = auth()->user();
-        $profile = $user->profile ?? $user->profile()->first();
+        $profile = $user->profile ?? $user->profile()->firstOrCreate(['user_id' => $user->id]);
+
+        // Simpan pembaruan data pribadi dan pekerjaan ke profil asesi jika diinputkan
+        if ($request->hasAny(['full_name', 'phone', 'nik', 'tempat_lahir', 'tanggal_lahir', 'jenis_kelamin', 'kebangsaan', 'pendidikan_terakhir', 'alamat_rumah', 'kode_pos', 'jabatan'])) {
+            $userUpdate = [];
+            if ($request->filled('full_name')) {
+                $userUpdate['full_name'] = $request->input('full_name');
+            }
+            if ($request->filled('phone')) {
+                $userUpdate['phone'] = $request->input('phone');
+            }
+            if (! empty($userUpdate)) {
+                $user->update($userUpdate);
+            }
+
+            $profileFields = [
+                'nik',
+                'tempat_lahir',
+                'tanggal_lahir',
+                'jenis_kelamin',
+                'kebangsaan',
+                'pendidikan_terakhir',
+                'alamat_rumah',
+                'kode_pos',
+                'no_telepon_rumah',
+                'nama_institusi_perusahaan',
+                'jabatan',
+                'alamat_kantor',
+                'no_telepon_kantor',
+            ];
+
+            $profileUpdate = [];
+            foreach ($profileFields as $field) {
+                if ($request->has($field)) {
+                    $profileUpdate[$field] = $request->input($field);
+                }
+            }
+
+            if (! empty($profileUpdate)) {
+                $profile->update($profileUpdate);
+            }
+
+            $user->refresh();
+            $profile->refresh();
+        }
 
         // Validasi kelengkapan data diri pemohon FR.APL.01
         if ($profile && $request->has('signature_data')) {
@@ -188,7 +228,9 @@ class AplController extends Controller
 
         $kukInputs = $request->input('kuks', $request->input('apl02', []));
 
-        DB::transaction(function () use ($assessment, $kukInputs, $request, $signature, $profile) {
+        $isAlreadyApproved = ($assessment->apl_status === 'APPROVED');
+
+        DB::transaction(function () use ($assessment, $kukInputs, $request, $signature, $profile, $isAlreadyApproved) {
             foreach ($kukInputs as $kukId => $data) {
                 $val = is_array($data) ? ($data['assessment_value'] ?? $data['value'] ?? 'K') : $data;
                 $proofType = is_array($data)
@@ -207,11 +249,17 @@ class AplController extends Controller
             }
 
             $updateData = [
-                'apl_status' => 'SUBMITTED',
-                'last_active_step' => 'apl',
+                'apl_status' => $isAlreadyApproved ? 'APPROVED' : 'SUBMITTED',
+                'last_active_step' => $isAlreadyApproved ? ($assessment->last_active_step ?: 'ruang-uji') : 'apl',
                 'asesi_signature' => $signature,
-                'asesi_signed_at' => now(),
+                'asesi_signed_at' => $assessment->asesi_signed_at ?? now(),
             ];
+
+            if ($request->filled('tujuan_asesmen')) {
+                $updateData['tujuan_asesmen'] = $request->input('tujuan_asesmen');
+            } elseif (empty($assessment->tujuan_asesmen)) {
+                $updateData['tujuan_asesmen'] = 'Sertifikasi';
+            }
 
             if ($request->filled('assessor_id')) {
                 $updateData['assessor_id'] = $request->assessor_id;
@@ -223,6 +271,11 @@ class AplController extends Controller
                 $profile->update(['signature_data' => $signature]);
             }
         });
+
+        if ($isAlreadyApproved) {
+            return redirect()->route('asesi.assessment.ruang-uji', $assessment)
+                ->with('success', 'Perubahan formulir APL berhasil disimpan. Status verifikasi asesor tetap aktif.');
+        }
 
         return redirect()->route('asesi.assessment.apl', $assessment)->with('success', 'Menunggu verifikasi asesor');
     }

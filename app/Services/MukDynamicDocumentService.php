@@ -408,7 +408,12 @@ class MukDynamicDocumentService
             'telp_kantor' => $profile?->no_telepon_kantor ?? '-',
             'fax_kantor' => '-',
             'kontak_kantor' => ($profile?->no_telepon_kantor ?? '-').' / '.($asesi?->email ?? '-'),
-            'tujuan' => ['sertifikasi' => true, 'pkt' => false, 'rpl' => false, 'lainnya' => false],
+            'tujuan' => [
+                'sertifikasi' => ($assessment->tujuan_asesmen ?? 'Sertifikasi') === 'Sertifikasi',
+                'pkt' => ($assessment->tujuan_asesmen ?? '') === 'Pengakuan Kompetensi Terkini (PKT)',
+                'rpl' => ($assessment->tujuan_asesmen ?? '') === 'Rekognisi Pembelajaran Lampau (RPL)',
+                'lainnya' => ($assessment->tujuan_asesmen ?? '') === 'Lainnya',
+            ],
             'syarat_dasar' => $syaratDasar,
             'syarat_admin' => $syaratAdmin,
             'diterima' => $isAccepted,

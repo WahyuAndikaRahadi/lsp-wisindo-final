@@ -166,6 +166,26 @@ class JadwalController extends Controller
         return back()->with('success', "Status pendaftaran asesi {$assessment->asesi->full_name} berhasil diperbarui menjadi {$status}.");
     }
 
+    public function assignAssessor(Assessment $assessment, Request $request): RedirectResponse
+    {
+        $request->validate([
+            'assessor_id' => ['required', 'exists:users,id'],
+        ]);
+
+        $schedule = $assessment->schedule;
+        if (! $schedule || ! $schedule->assessors()->where('users.id', $request->assessor_id)->exists()) {
+            return back()->with('error', 'Asesor yang dipilih tidak ditugaskan pada jadwal ini.');
+        }
+
+        $assessment->update([
+            'assessor_id' => $request->assessor_id,
+        ]);
+
+        $assessorName = User::find($request->assessor_id)?->full_name ?? 'Asesor';
+
+        return back()->with('success', "Asesi {$assessment->asesi->full_name} berhasil ditugaskan kepada {$assessorName}.");
+    }
+
     public function batchReviewRegistration(Schedule $jadwal, Request $request): RedirectResponse
     {
         $status = strtoupper((string) ($request->input('admin_status') ?? 'APPROVED'));

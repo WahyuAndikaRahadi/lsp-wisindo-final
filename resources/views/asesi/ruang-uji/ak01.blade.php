@@ -5,17 +5,37 @@
 @section('content')
 <div class="max-w-4xl mx-auto py-6 space-y-6">
     {{-- Stepper Component --}}
-    <x-progress-stepper currentStep="AK01" :assessment="$assessment" />
+    <x-progress-stepper currentStep="ruang-uji" :assessment="$assessment" />
 
     {{-- Form AK01 Card --}}
     <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-        <div class="bg-gradient-to-r from-slate-800 to-indigo-900 px-6 py-4 text-white">
-            <h1 class="text-xl font-bold">FR.AK.01. PERSETUJUAN ASESMEN DAN KERAHASIAAN</h1>
-            <p class="text-xs text-slate-300 mt-1">Kesepakatan pelaksanaan asesmen dan perlindungan kerahasiaan materi uji</p>
+        <div class="bg-gradient-to-r from-slate-800 to-indigo-900 px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between text-white gap-3">
+            <div>
+                <h1 class="text-xl font-bold">FR.AK.01. PERSETUJUAN ASESMEN DAN KERAHASIAAN</h1>
+                <p class="text-xs text-slate-300 mt-1">Kesepakatan pelaksanaan asesmen dan perlindungan kerahasiaan materi uji</p>
+            </div>
+            <a href="{{ route('asesi.assessment.ruang-uji', $assessment) }}" class="shrink-0 px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white text-xs font-bold rounded border border-white/20 transition">
+                ← Ruang Uji
+            </a>
         </div>
 
         <form action="{{ route('asesi.assessment.ak01.sign', $assessment) }}" method="POST" class="p-6 space-y-6">
             @csrf
+
+            @if($assessment->ak01_agreed_at)
+                <div class="p-4 bg-emerald-50 border border-emerald-300 text-emerald-800 rounded-lg text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div class="flex items-center gap-2">
+                        <span class="w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs font-bold shrink-0">✓</span>
+                        <div>
+                            <span class="font-bold">FR.AK.01 Telah Disetujui:</span>
+                            <span class="text-emerald-700">Persetujuan asesmen dan kerahasiaan telah Anda tandatangani pada {{ \Carbon\Carbon::parse($assessment->ak01_agreed_at)->translatedFormat('d F Y, H:i') }} WIB.</span>
+                        </div>
+                    </div>
+                    <a href="{{ route('asesi.assessment.ruang-uji', $assessment) }}" class="shrink-0 px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-xs transition shadow-xs">
+                        Ke Ruang Uji &rarr;
+                    </a>
+                </div>
+            @endif
 
             <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 text-sm grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
@@ -66,7 +86,7 @@
 
                 <div class="pt-2">
                     <label class="flex items-start gap-2 cursor-pointer font-medium text-slate-800">
-                        <input type="checkbox" required class="mt-0.5 rounded text-indigo-600 focus:ring-indigo-500">
+                        <input type="checkbox" required class="mt-0.5 rounded text-indigo-600 focus:ring-indigo-500" @checked((bool)$assessment->ak01_agreed_at) @disabled((bool)$assessment->ak01_agreed_at)>
                         <span>Saya telah membaca, memahami, dan menyetujui seluruh klausul di atas.</span>
                     </label>
                 </div>
@@ -77,18 +97,24 @@
                 <div class="w-full md:w-80">
                     <x-signature-pad 
                         name="signature_data" 
-                        :value="old('signature_data')" 
+                        :value="$assessment->asesi_signature ?? old('signature_data')" 
                         :profileSignature="auth()->user()->profile?->signature_data"
                         label="Tanda Tangan Persetujuan Asesi" 
                         height="140" 
+                        :disabled="(bool)$assessment->ak01_agreed_at"
                     />
                 </div>
 
-                <div class="w-full md:w-auto">
-                    <button type="submit" class="w-full md:w-auto px-8 py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-md transition flex items-center justify-center gap-2">
-                        <span>Setujui & Masuk Ruang Uji</span>
-                        <span>→</span>
-                    </button>
+                <div class="w-full md:w-auto flex items-center gap-3">
+                    <a href="{{ route('asesi.assessment.ruang-uji', $assessment) }}" class="px-5 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs uppercase tracking-wider rounded-xl border border-slate-300 transition">
+                        ← Kembali ke Ruang Uji
+                    </a>
+                    @if(!$assessment->ak01_agreed_at)
+                        <button type="submit" class="w-full md:w-auto px-8 py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-md transition flex items-center justify-center gap-2">
+                            <span>Setujui & Masuk Ruang Uji</span>
+                            <span>→</span>
+                        </button>
+                    @endif
                 </div>
             </div>
         </form>

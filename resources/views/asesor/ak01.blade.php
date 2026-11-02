@@ -144,29 +144,35 @@
                     <div class="flex items-center justify-between pb-1.5 border-b border-slate-200">
                         <label class="inline-flex items-center gap-2 cursor-pointer text-xs font-bold text-slate-800">
                             <input type="checkbox" id="check-all-asesi" checked class="rounded border-slate-400 text-brand-600 focus:ring-brand-500 w-4 h-4">
-                            <span>Pilih Semua Asesi Terdaftar ({{ $assessments->count() }} Orang)</span>
+                            <span>Pilih Semua Asesi Binaan Anda ({{ $assessments->count() }} Orang)</span>
                         </label>
                         <span class="text-[10px] text-slate-500 italic">* Centang asesi yang akan disetujui persetujuannya</span>
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-56 overflow-y-auto p-1">
-                        @foreach($assessments as $assessment)
-                            <label class="flex items-start space-x-2 p-2 rounded border border-slate-200 hover:bg-slate-50 cursor-pointer transition">
-                                <input type="checkbox" name="assessment_ids[]" value="{{ $assessment->id }}"
-                                    class="asesi-item-checkbox rounded border-slate-400 text-brand-600 focus:ring-brand-500 w-4 h-4 mt-0.5 shrink-0"
-                                    {{ (empty(old('assessment_ids')) || in_array($assessment->id, old('assessment_ids', [])) || (string)$selectedAssessmentId === (string)$assessment->id) ? 'checked' : '' }}>
-                                <div class="truncate text-xs">
-                                    <div class="font-bold text-slate-900 truncate">{{ $assessment->asesi->full_name }}</div>
-                                    <div class="text-[10px] text-slate-500 truncate">
-                                        {{ $assessment->asesi->email }}
-                                        @if(!empty($assessment->asesi->profile?->nik))
-                                            &bull; NIK: {{ $assessment->asesi->profile->nik }}
-                                        @endif
+                    @if($assessments->isEmpty())
+                        <div class="p-4 bg-amber-50 border border-amber-200 rounded-lg text-amber-800 text-xs">
+                            Belum ada asesi yang ditugaskan kepada Anda pada jadwal ini.
+                        </div>
+                    @else
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-56 overflow-y-auto p-1">
+                            @foreach($assessments as $assessment)
+                                <label class="flex items-start space-x-2 p-2 rounded border border-slate-200 hover:bg-slate-50 cursor-pointer transition">
+                                    <input type="checkbox" name="assessment_ids[]" value="{{ $assessment->id }}"
+                                        class="asesi-item-checkbox rounded border-slate-400 text-brand-600 focus:ring-brand-500 w-4 h-4 mt-0.5 shrink-0"
+                                        {{ (empty(old('assessment_ids')) || in_array($assessment->id, old('assessment_ids', [])) || (string)$selectedAssessmentId === (string)$assessment->id) ? 'checked' : '' }}>
+                                    <div class="truncate text-xs">
+                                        <div class="font-bold text-slate-900 truncate">{{ $assessment->asesi->full_name }}</div>
+                                        <div class="text-[10px] text-slate-500 truncate">
+                                            {{ $assessment->asesi->email }}
+                                            @if(!empty($assessment->asesi->profile?->nik))
+                                                &bull; NIK: {{ $assessment->asesi->profile->nik }}
+                                            @endif
+                                        </div>
                                     </div>
-                                </div>
-                            </label>
-                        @endforeach
-                    </div>
+                                </label>
+                            @endforeach
+                        </div>
+                    @endif
                 </div>
             </div>
 

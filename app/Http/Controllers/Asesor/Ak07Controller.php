@@ -19,16 +19,29 @@ class Ak07Controller extends Controller
     {
         $this->authorizeAssessorSchedule($schedule);
 
-        $schedule->load('scheme', 'assessments.asesi', 'assessments.ak07Items');
+        $schedule->load('scheme', 'assessments.asesi', 'assessments.ak07Items', 'assessors');
 
-        $unapprovedCount = $schedule->assessments()->where('apl_status', '!=', 'APPROVED')->count();
+        $user = auth()->user();
+        $isSingleAssessor = $schedule->assessors->count() === 1 && $schedule->assessors->first()?->id === $user?->id;
+
+        $myAssessments = $schedule->assessments
+            ->filter(function ($assessment) use ($user, $isSingleAssessor) {
+                if (! $user || $user->role !== 'ASESOR') {
+                    return true;
+                }
+
+                return (int) $assessment->assessor_id === (int) $user->id || (empty($assessment->assessor_id) && $isSingleAssessor);
+            })
+            ->values();
+
+        $unapprovedCount = $myAssessments->where('apl_status', '!=', 'APPROVED')->count();
         if ($unapprovedCount > 0) {
             return redirect()->route('asesor.schedule.ruang-uji', $schedule->id)
-                ->with('error', "Formulir FR.AK07 belum dapat dibuka. Masih ada {$unapprovedCount} asesi yang belum disetujui APL-nya.");
+                ->with('error', "Formulir FR.AK07 belum dapat dibuka. Masih ada {$unapprovedCount} asesi binaan Anda yang belum disetujui APL-nya.");
         }
 
         $jadwal = $schedule;
-        $assessments = $schedule->assessments;
+        $assessments = $myAssessments;
         $selectedAssessmentId = $request->query('assessment');
 
         return view('asesor.ak07', compact('schedule', 'jadwal', 'assessments', 'selectedAssessmentId'));
@@ -42,17 +55,34 @@ class Ak07Controller extends Controller
             return back()->with('error', 'Jadwal asesmen sudah resmi ditutup.');
         }
 
-        $unapprovedCount = $schedule->assessments()->where('apl_status', '!=', 'APPROVED')->count();
+        $schedule->load('assessments', 'assessors');
+
+        $user = auth()->user();
+        $isSingleAssessor = $schedule->assessors->count() === 1 && $schedule->assessors->first()?->id === $user?->id;
+
+        $myAssessments = $schedule->assessments
+            ->filter(function ($assessment) use ($user, $isSingleAssessor) {
+                if (! $user || $user->role !== 'ASESOR') {
+                    return true;
+                }
+
+                return (int) $assessment->assessor_id === (int) $user->id || (empty($assessment->assessor_id) && $isSingleAssessor);
+            })
+            ->values();
+
+        $unapprovedCount = $myAssessments->where('apl_status', '!=', 'APPROVED')->count();
         if ($unapprovedCount > 0) {
             return redirect()->route('asesor.schedule.ruang-uji', $schedule->id)
-                ->with('error', 'Penyesuaian tidak dapat disimpan karena belum seluruh asesi disetujui APL-nya.');
+                ->with('error', 'Penyesuaian tidak dapat disimpan karena belum seluruh asesi binaan Anda disetujui APL-nya.');
         }
 
-        $ids = $request->input('assessment_ids', $request->input('asesi_ids', []));
+        $rawIds = array_map('intval', (array) $request->input('assessment_ids', $request->input('asesi_ids', [])));
+        $myAssessmentIds = $myAssessments->pluck('id')->toArray();
+        $ids = ! empty($rawIds) ? array_values(array_intersect($rawIds, $myAssessmentIds)) : [];
 
         // If asesor submits without selecting any asesi or adjustments (unfilled/optional)
         if (empty($ids)) {
-            foreach ($schedule->assessments as $assessment) {
+            foreach ($myAssessments as $assessment) {
                 AssessmentAk07Item::firstOrCreate([
                     'assessment_id' => $assessment->id,
                 ], [

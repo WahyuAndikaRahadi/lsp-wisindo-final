@@ -30,11 +30,20 @@
                 </p>
             </div>
 
-            @if($assessment->status === 'COMPLETED')
-                <div class="px-4 py-2 bg-emerald-50 border border-emerald-300 rounded-lg text-emerald-800 text-xs font-bold uppercase tracking-wider flex items-center gap-2 shadow-xs shrink-0">
-                    <span>✓ Asesmen Telah Selesai</span>
-                </div>
-            @endif
+            <div class="flex items-center gap-3 shrink-0 flex-wrap">
+                @if($assessment->apl_status === 'APPROVED')
+                    <a href="{{ route('asesi.assessment.apl', $assessment) }}" class="inline-flex items-center gap-1.5 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-lg border border-slate-300 transition shadow-xs" title="Kembali ke formulir APL">
+                        <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                        <span>Sebelumnya</span>
+                    </a>
+                @endif
+
+                @if($assessment->status === 'COMPLETED')
+                    <div class="px-4 py-2 bg-emerald-50 border border-emerald-300 rounded-lg text-emerald-800 text-xs font-bold uppercase tracking-wider flex items-center gap-2 shadow-xs shrink-0">
+                        <span>✓ Asesmen Telah Selesai</span>
+                    </div>
+                @endif
+            </div>
         </div>
     </div>
 

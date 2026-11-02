@@ -23,6 +23,7 @@ class Assessment extends Model
         'asesi_signature',
         'asesi_signed_at',
         'apl_status',
+        'tujuan_asesmen',
         'apl_revision_notes',
         'last_active_step',
         'status',

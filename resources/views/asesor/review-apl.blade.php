@@ -104,43 +104,95 @@
         </div>
 
         <div class="p-6 space-y-6">
-            {{-- Data Pribadi Grid --}}
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm bg-slate-50 p-4 rounded-xl border border-slate-200">
-                <div>
-                    <span class="text-xs text-slate-500 block">Nama Lengkap Asesi</span>
-                    <span class="font-bold text-slate-900">{{ $assessment->asesi->full_name }}</span>
+            {{-- a. Data Pribadi --}}
+            <div>
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider">a. Data Pribadi</h3>
+                    <span class="text-[11px] text-slate-400">Data bersumber dari profil akun asesi</span>
                 </div>
-                <div>
-                    <span class="text-xs text-slate-500 block">NIK / No. KTP</span>
-                    <span class="font-bold text-slate-900 font-mono">{{ $profile?->nik ?? '-' }}</span>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm bg-slate-50 p-4 rounded-xl border border-slate-200">
+                    <div>
+                        <span class="text-xs text-slate-500 block">Nama Lengkap Asesi</span>
+                        <span class="font-bold text-slate-900">{{ $assessment->asesi->full_name }}</span>
+                    </div>
+                    <div>
+                        <span class="text-xs text-slate-500 block">NIK / No. KTP</span>
+                        <span class="font-bold text-slate-900 font-mono">{{ $profile?->nik ?? '-' }}</span>
+                    </div>
+                    <div>
+                        <span class="text-xs text-slate-500 block">Tempat, Tanggal Lahir</span>
+                        <span class="font-semibold text-slate-800">
+                            {{ $profile?->tempat_lahir ?? '-' }}, {{ $profile?->tanggal_lahir ? \Carbon\Carbon::parse($profile->tanggal_lahir)->translatedFormat('d F Y') : '-' }}
+                        </span>
+                    </div>
+                    <div>
+                        <span class="text-xs text-slate-500 block">Jenis Kelamin / Kebangsaan</span>
+                        <span class="font-semibold text-slate-800">
+                            {{ $profile?->jenis_kelamin === 'L' ? 'Laki-laki' : ($profile?->jenis_kelamin === 'P' ? 'Perempuan' : '-') }} / {{ $profile?->kebangsaan ?? 'Indonesia' }}
+                        </span>
+                    </div>
+                    <div class="md:col-span-2">
+                        <span class="text-xs text-slate-500 block">Alamat Rumah</span>
+                        <span class="font-semibold text-slate-800">{{ $profile?->alamat_rumah ?? '-' }} (Kode Pos: {{ $profile?->kode_pos ?? '-' }})</span>
+                    </div>
+                    <div>
+                        <span class="text-xs text-slate-500 block">Kontak Telepon / Email</span>
+                        <span class="font-semibold text-slate-800">{{ $assessment->asesi->phone ?? '-' }} / {{ $assessment->asesi->email }}</span>
+                    </div>
+                    <div>
+                        <span class="text-xs text-slate-500 block">Pendidikan Terakhir</span>
+                        <span class="font-semibold text-slate-800">{{ $profile?->pendidikan_terakhir ?? '-' }}</span>
+                    </div>
                 </div>
-                <div>
-                    <span class="text-xs text-slate-500 block">Tempat, Tanggal Lahir</span>
-                    <span class="font-semibold text-slate-800">
-                        {{ $profile?->tempat_lahir ?? '-' }}, {{ $profile?->tanggal_lahir ? \Carbon\Carbon::parse($profile->tanggal_lahir)->translatedFormat('d F Y') : '-' }}
-                    </span>
+            </div>
+
+            {{-- b. Data Pekerjaan / Sekolah / Institusi --}}
+            <div>
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider">b. Data Pekerjaan / Sekolah / Institusi</h3>
+                    <span class="text-[11px] text-slate-400">Data bersumber dari profil akun asesi</span>
                 </div>
-                <div>
-                    <span class="text-xs text-slate-500 block">Jenis Kelamin / Kebangsaan</span>
-                    <span class="font-semibold text-slate-800">
-                        {{ $profile?->jenis_kelamin === 'L' ? 'Laki-laki' : ($profile?->jenis_kelamin === 'P' ? 'Perempuan' : '-') }} / {{ $profile?->kebangsaan ?? 'Indonesia' }}
-                    </span>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm bg-slate-50 p-4 rounded-xl border border-slate-200">
+                    <div>
+                        <span class="text-xs text-slate-500 block">Nama Institusi / Sekolah / Perusahaan</span>
+                        <span class="font-semibold text-slate-800">{{ $profile?->nama_institusi_perusahaan ?: '-' }}</span>
+                    </div>
+                    <div>
+                        <span class="text-xs text-slate-500 block">Jabatan / Posisi / Status</span>
+                        <span class="font-semibold text-slate-800">{{ $profile?->jabatan ?: '-' }}</span>
+                    </div>
+                    <div class="md:col-span-2">
+                        <span class="text-xs text-slate-500 block">Alamat Kantor / Sekolah</span>
+                        <span class="font-semibold text-slate-800">{{ $profile?->alamat_kantor ?: '-' }}</span>
+                    </div>
+                    <div>
+                        <span class="text-xs text-slate-500 block">No. Telepon Kantor / Sekolah</span>
+                        <span class="font-semibold text-slate-800">{{ $profile?->no_telepon_kantor ?: '-' }}</span>
+                    </div>
                 </div>
-                <div class="md:col-span-2">
-                    <span class="text-xs text-slate-500 block">Alamat Rumah</span>
-                    <span class="font-semibold text-slate-800">{{ $profile?->alamat_rumah ?? '-' }} (Kode Pos: {{ $profile?->kode_pos ?? '-' }})</span>
+            </div>
+
+            {{-- Data Sertifikasi & Tujuan Asesmen --}}
+            <div>
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Bagian 2: Data Sertifikasi & Tujuan Asesmen</h3>
+                    <span class="text-[11px] text-slate-400">Skema & Pilihan Pemohon</span>
                 </div>
-                <div>
-                    <span class="text-xs text-slate-500 block">Kontak Telepon / Email</span>
-                    <span class="font-semibold text-slate-800">{{ $assessment->asesi->phone ?? '-' }} / {{ $assessment->asesi->email }}</span>
-                </div>
-                <div>
-                    <span class="text-xs text-slate-500 block">Pendidikan Terakhir</span>
-                    <span class="font-semibold text-slate-800">{{ $profile?->pendidikan_terakhir ?? '-' }}</span>
-                </div>
-                <div class="md:col-span-2">
-                    <span class="text-xs text-slate-500 block">Institusi / Perusahaan & Jabatan</span>
-                    <span class="font-semibold text-slate-800">{{ $profile?->nama_institusi_perusahaan ?? '-' }} ({{ $profile?->jabatan ?? '-' }})</span>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm bg-slate-50 p-4 rounded-xl border border-slate-200">
+                    <div>
+                        <span class="text-xs text-slate-500 block">Judul Skema Sertifikasi</span>
+                        <span class="font-semibold text-slate-800">{{ $scheme->name }}</span>
+                    </div>
+                    <div>
+                        <span class="text-xs text-slate-500 block">Nomor Skema Sertifikasi</span>
+                        <span class="font-semibold text-slate-800 font-mono">{{ $scheme->code }}</span>
+                    </div>
+                    <div>
+                        <span class="text-xs text-slate-500 block">Tujuan Asesmen</span>
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold bg-indigo-100 text-indigo-800">
+                            {{ $assessment->tujuan_asesmen ?? 'Sertifikasi' }}
+                        </span>
+                    </div>
                 </div>
             </div>
 

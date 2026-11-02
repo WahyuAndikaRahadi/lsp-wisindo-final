@@ -21,7 +21,19 @@ class Ak01Controller extends Controller
 
         $schedule->load(['scheme', 'assessments.asesi.profile', 'assessors']);
 
-        $assessments = $schedule->assessments;
+        $user = auth()->user();
+        $isSingleAssessor = $schedule->assessors->count() === 1 && $schedule->assessors->first()?->id === $user?->id;
+
+        $assessments = $schedule->assessments
+            ->filter(function ($assessment) use ($user, $isSingleAssessor) {
+                if (! $user || $user->role !== 'ASESOR') {
+                    return true;
+                }
+
+                return (int) $assessment->assessor_id === (int) $user->id || (empty($assessment->assessor_id) && $isSingleAssessor);
+            })
+            ->values();
+
         $selectedAssessmentId = $request->query('assessment');
 
         // Defaults for Bukti yang akan dikumpulkan
@@ -72,22 +84,37 @@ class Ak01Controller extends Controller
             'agreed_time' => substr($schedule->start_time, 0, 5).' - '.substr($schedule->end_time, 0, 5).' WIB',
         ];
 
-        DB::transaction(function () use ($schedule, $request, $ak01Data, $assessorSignature) {
+        $schedule->load(['assessments', 'assessors']);
+
+        $user = auth()->user();
+        $isSingleAssessor = $schedule->assessors->count() === 1 && $schedule->assessors->first()?->id === $user?->id;
+
+        $myAssessments = $schedule->assessments
+            ->filter(function ($assessment) use ($user, $isSingleAssessor) {
+                if (! $user || $user->role !== 'ASESOR') {
+                    return true;
+                }
+
+                return (int) $assessment->assessor_id === (int) $user->id || (empty($assessment->assessor_id) && $isSingleAssessor);
+            })
+            ->values();
+
+        $selectedIds = array_map('intval', (array) $request->input('assessment_ids', []));
+        $targetAssessments = ! empty($selectedIds)
+            ? $myAssessments->whereIn('id', $selectedIds)
+            : $myAssessments;
+
+        DB::transaction(function () use ($schedule, $targetAssessments, $ak01Data, $assessorSignature) {
             $schedule->update([
                 'ak01_data' => $ak01Data,
             ]);
-
-            $selectedIds = $request->input('assessment_ids', []);
-            $targetAssessments = ! empty($selectedIds)
-                ? $schedule->assessments()->whereIn('id', $selectedIds)->get()
-                : $schedule->assessments;
 
             foreach ($targetAssessments as $assessment) {
                 $assessment->update([
                     'ak01_data' => $ak01Data,
                     'assessor_signature' => $assessorSignature ?? $assessment->assessor_signature,
                     'assessor_signed_at' => $assessorSignature ? now() : $assessment->assessor_signed_at,
-                    'assessor_id' => auth()->id(),
+                    'assessor_id' => $assessment->assessor_id ?? auth()->id(),
                 ]);
             }
         });

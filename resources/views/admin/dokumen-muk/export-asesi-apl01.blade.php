@@ -152,10 +152,13 @@
         <tr style="border-top: 1px solid #000;">
             <td style="font-weight: bold;">Tujuan Asesmen</td>
             <td colspan="3" style="padding-left: 8px; vertical-align: middle;">
-                <span class="check-box checked">&#10003;</span> Sertifikasi &nbsp;&nbsp;&nbsp;&nbsp;
-                <span class="check-box">&nbsp;</span> Pengakuan Kompetensi Terkini (PKT) &nbsp;&nbsp;&nbsp;&nbsp;
-                <span class="check-box">&nbsp;</span> Rekognisi Pembelajaran Lampau (RPL) &nbsp;&nbsp;&nbsp;&nbsp;
-                <span class="check-box">&nbsp;</span> Lainnya
+                @php
+                    $tujuanVal = $assessment->tujuan_asesmen ?? 'Sertifikasi';
+                @endphp
+                <span class="check-box {{ $tujuanVal === 'Sertifikasi' ? 'checked' : '' }}">{!! $tujuanVal === 'Sertifikasi' ? '&#10003;' : '&nbsp;' !!}</span> Sertifikasi &nbsp;&nbsp;&nbsp;&nbsp;
+                <span class="check-box {{ $tujuanVal === 'Pengakuan Kompetensi Terkini (PKT)' ? 'checked' : '' }}">{!! $tujuanVal === 'Pengakuan Kompetensi Terkini (PKT)' ? '&#10003;' : '&nbsp;' !!}</span> Pengakuan Kompetensi Terkini (PKT) &nbsp;&nbsp;&nbsp;&nbsp;
+                <span class="check-box {{ $tujuanVal === 'Rekognisi Pembelajaran Lampau (RPL)' ? 'checked' : '' }}">{!! $tujuanVal === 'Rekognisi Pembelajaran Lampau (RPL)' ? '&#10003;' : '&nbsp;' !!}</span> Rekognisi Pembelajaran Lampau (RPL) &nbsp;&nbsp;&nbsp;&nbsp;
+                <span class="check-box {{ $tujuanVal === 'Lainnya' ? 'checked' : '' }}">{!! $tujuanVal === 'Lainnya' ? '&#10003;' : '&nbsp;' !!}</span> Lainnya
             </td>
         </tr>
     </table>

@@ -132,22 +132,34 @@
 
                 {{-- Pilih Asesi Sasaran (Batch) --}}
                 <div class="mt-4 pt-4 border-t border-slate-200">
-                    <label class="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-2">
-                        Asesi yang Diberikan Penyesuaian (Pilih Asesi):
-                    </label>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
-                        @foreach($assessments as $assessment)
-                            <label class="flex items-center space-x-2.5 p-2.5 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer transition">
-                                <input type="checkbox" name="assessment_ids[]" value="{{ $assessment->id }}"
-                                    class="rounded border-slate-400 text-brand-600 focus:ring-brand-500 w-4 h-4"
-                                    {{ (empty(old('assessment_ids')) || in_array($assessment->id, old('assessment_ids', [])) || (string)$selectedAssessmentId === (string)$assessment->id) ? 'checked' : '' }}>
-                                <div class="truncate">
-                                    <div class="font-bold text-slate-900 text-xs truncate">{{ $assessment->asesi->full_name }}</div>
-                                    <div class="text-[10px] text-slate-500 truncate">{{ $assessment->asesi->email }}</div>
-                                </div>
-                            </label>
-                        @endforeach
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="block text-xs font-bold text-slate-800 uppercase tracking-wider">
+                            Asesi yang Diberikan Penyesuaian (Pilih Asesi):
+                        </label>
+                        <span class="text-[11px] font-semibold text-slate-500">
+                            {{ $assessments->count() }} Asesi Binaan Anda
+                        </span>
                     </div>
+
+                    @if($assessments->isEmpty())
+                        <div class="p-4 bg-amber-50 border border-amber-200 rounded-lg text-amber-800 text-xs">
+                            Belum ada asesi yang ditugaskan kepada Anda pada jadwal ini.
+                        </div>
+                    @else
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
+                            @foreach($assessments as $assessment)
+                                <label class="flex items-center space-x-2.5 p-2.5 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer transition">
+                                    <input type="checkbox" name="assessment_ids[]" value="{{ $assessment->id }}"
+                                        class="rounded border-slate-400 text-brand-600 focus:ring-brand-500 w-4 h-4"
+                                        {{ (empty(old('assessment_ids')) || in_array($assessment->id, old('assessment_ids', [])) || (string)$selectedAssessmentId === (string)$assessment->id) ? 'checked' : '' }}>
+                                    <div class="truncate">
+                                        <div class="font-bold text-slate-900 text-xs truncate">{{ $assessment->asesi->full_name }}</div>
+                                        <div class="text-[10px] text-slate-500 truncate">{{ $assessment->asesi->email }}</div>
+                                    </div>
+                                </label>
+                            @endforeach
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>

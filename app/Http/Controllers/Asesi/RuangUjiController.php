@@ -24,10 +24,6 @@ class RuangUjiController extends Controller
     {
         abort_if($assessment->asesi_id !== auth()->id(), 403);
 
-        if ($assessment->ak01_agreed_at) {
-            return redirect()->route('asesi.assessment.ruang-uji', $assessment);
-        }
-
         if ($assessment->apl_status !== 'APPROVED') {
             return redirect()->route('asesi.assessment.apl', $assessment)
                 ->with('error', 'FR.AK.01 hanya dapat diakses setelah permohonan APL Anda disetujui asesor.');
