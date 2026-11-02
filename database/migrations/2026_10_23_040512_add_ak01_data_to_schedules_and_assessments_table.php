@@ -12,11 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('t_schedules', function (Blueprint $table) {
-            $table->json('ak01_data')->nullable()->after('selected_instruments');
+            if (! Schema::hasColumn('t_schedules', 'ak01_data')) {
+                $table->json('ak01_data')->nullable()->after('selected_instruments');
+            }
         });
 
         Schema::table('t_assessments', function (Blueprint $table) {
-            $table->json('ak01_data')->nullable()->after('ak01_agreed_at');
+            if (! Schema::hasColumn('t_assessments', 'ak01_data')) {
+                $table->json('ak01_data')->nullable()->after('ak01_agreed_at');
+            }
         });
     }
 
@@ -26,11 +30,15 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('t_schedules', function (Blueprint $table) {
-            $table->dropColumn('ak01_data');
+            if (Schema::hasColumn('t_schedules', 'ak01_data')) {
+                $table->dropColumn('ak01_data');
+            }
         });
 
         Schema::table('t_assessments', function (Blueprint $table) {
-            $table->dropColumn('ak01_data');
+            if (Schema::hasColumn('t_assessments', 'ak01_data')) {
+                $table->dropColumn('ak01_data');
+            }
         });
     }
 };

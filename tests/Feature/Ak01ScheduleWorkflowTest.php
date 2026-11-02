@@ -6,12 +6,12 @@ use App\Models\Assessment;
 use App\Models\Schedule;
 use App\Models\Scheme;
 use App\Models\User;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class Ak01ScheduleWorkflowTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     private function createFixture(): array
     {

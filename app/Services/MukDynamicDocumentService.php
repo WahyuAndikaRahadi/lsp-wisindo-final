@@ -511,7 +511,7 @@ class MukDynamicDocumentService
         $asesi = $assessment->asesi;
         $profile = $asesi?->profile;
         $assessor = $assessment->assessor ?? $schedule->assessors->first();
-        $scheme = $assessment->scheme ?? $schedule->scheme;
+        $scheme = $schedule->scheme ?? $assessment->schedule?->scheme;
 
         $date = Carbon::parse($schedule->date ?? now());
         $days = [
@@ -528,7 +528,7 @@ class MukDynamicDocumentService
 
         $tglTtd = $assessment->ak01_agreed_at
             ? Carbon::parse($assessment->ak01_agreed_at)->locale('id')->translatedFormat('d F Y')
-            : $formattedDate;
+            : ($schedule->date ? Carbon::parse($schedule->date)->locale('id')->translatedFormat('d F Y') : $formattedDate);
 
         $tglAsesor = $assessment->assessor_signed_at
             ? Carbon::parse($assessment->assessor_signed_at)->locale('id')->translatedFormat('d F Y')
@@ -538,10 +538,15 @@ class MukDynamicDocumentService
             ? Carbon::parse($assessment->asesi_signed_at)->locale('id')->translatedFormat('d F Y')
             : $tglTtd;
 
-        $ak01Data = $schedule->ak01_data ?? [];
-        $evidence = $ak01Data['evidence'] ?? ['Hasil Observasi Langsung', 'Hasil Pertanyaan Tertulis'];
+        $ak01Data = $assessment->ak01_data ?? $schedule->ak01_data ?? [];
+        $evidence = $ak01Data['evidence'] ?? [
+            'Hasil Verifikasi Portofolio',
+            'Hasil Observasi Langsung',
+            'Hasil Pertanyaan Lisan',
+            'Hasil Pertanyaan Tertulis',
+        ];
         $otherEvidence = $ak01Data['other_evidence'] ?? '';
-        $tukType = $ak01Data['tuk_type'] ?? 'Sewaktu';
+        $tukType = $ak01Data['tuk_type'] ?? ($schedule->tuk_type ?? 'Sewaktu');
 
         $startTime = $schedule->start_time ? Carbon::parse($schedule->start_time)->format('H.i') : '08.00';
         $endTime = $schedule->end_time ? Carbon::parse($schedule->end_time)->format('H.i') : '12.00';
@@ -550,8 +555,8 @@ class MukDynamicDocumentService
             'skema_nama' => $scheme?->name ?? 'Maintenance Gasoline Engine Injection System',
             'skema_nomor' => $scheme?->code ?? '02/LSP PrO Indo/I/2026',
             'tuk_tipe' => $tukType.'*',
-            'asesor_nama' => $assessor?->full_name ?? 'Drs. Budi Santoso, M.T.',
-            'asesi_nama' => $asesi?->full_name ?? 'Nama Asesi',
+            'asesor_nama' => $assessor?->full_name ?? $assessor?->name ?? 'Drs. Budi Santoso, M.T.',
+            'asesi_nama' => $asesi?->full_name ?? $asesi?->name ?? 'Nama Asesi',
             'bukti_portofolio' => in_array('Hasil Verifikasi Portofolio', $evidence, true),
             'bukti_reviu' => in_array('Hasil Reviu Produk', $evidence, true),
             'bukti_observasi' => in_array('Hasil Observasi Langsung', $evidence, true),
@@ -561,7 +566,7 @@ class MukDynamicDocumentService
             'bukti_wawancara' => in_array('Hasil Pertanyaan Wawancara', $evidence, true),
             'bukti_lainnya' => in_array('Lainnya', $evidence, true) || ! empty($otherEvidence),
             'hari_tanggal' => "{$dayName}, {$formattedDate}",
-            'waktu' => ($schedule->start_time ?? '08.00').' - '.($schedule->end_time ?? '12.00').' WIB',
+            'waktu' => "{$startTime} - {$endTime} WIB",
             'tuk_nama' => $schedule->tuk_name ?? 'TUK Otomotif Mandiri',
             'tanggal_ttd' => $tglTtd,
             'tanggal_ttd_asesor' => $tglAsesor,
@@ -884,7 +889,10 @@ class MukDynamicDocumentService
                         : $this->buildPayload($schedule, null);
                     $tempAkJson = $this->cacheDir.'/muk_ak01_'.uniqid().'.json';
                     File::put($tempAkJson, json_encode($ak01Payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
-                    shell_exec("{$pythonExec} ".escapeshellarg($script).' '.escapeshellarg($tempAkJson).' '.escapeshellarg($outputPath));
+                    if (File::isFile($outputPath)) {
+                        @unlink($outputPath);
+                    }
+                    shell_exec("{$pythonExec} ".escapeshellarg($script).' '.escapeshellarg($tempAkJson).' '.escapeshellarg($outputPath).' 2>&1');
                     @unlink($tempAkJson);
                     if (File::isFile($outputPath) && filesize($outputPath) > 1000) {
                         return $outputPath;

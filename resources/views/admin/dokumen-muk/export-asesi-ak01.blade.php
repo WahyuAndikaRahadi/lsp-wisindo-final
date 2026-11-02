@@ -89,17 +89,48 @@
 
 @section('content')
 @php
-    $dummySkemaJudul = $scheme->name ?? 'Maintenance Gasoline Engine Injection System';
-    $dummySkemaNomor = $scheme->code ?? '02/LSP PrO Indo/I/2026';
-    $dummyTukTipe = 'Sewaktu/Tempat Kerja/Mandiri*';
-    $dummyTukNama = $schedule->tuk_name ?? 'TUK Otomotif PrO Indo';
-    $dummyAsesorNama = $assessor?->full_name ?? $assessor?->name ?? 'Drs. Budi Santoso, M.T.';
-    $dummyAsesiNama = $asesi->full_name ?? $asesi->name ?? 'Wahyu Andika Rahadi';
-    $dummyHariTgl = !empty($schedule?->date) ? \Carbon\Carbon::parse($schedule->date)->translatedFormat('l, d F Y') : 'Senin, 19 Oktober 2026';
-    $dummyWaktu = (!empty($schedule?->start_time) && !empty($schedule?->end_time))
-        ? \Carbon\Carbon::parse($schedule->start_time)->format('H.i') . ' - ' . \Carbon\Carbon::parse($schedule->end_time)->format('H.i') . ' WIB'
-        : '08.00 - 12.00 WIB';
-    $dummyTglTtd = !empty($schedule?->date) ? \Carbon\Carbon::parse($schedule->date)->translatedFormat('d F Y') : '19 Oktober 2026';
+    $scheme = $schedule->scheme ?? $assessment->schedule?->scheme;
+    $skemaJudul = $scheme->name ?? 'Maintenance Gasoline Engine Injection System';
+    $skemaNomor = $scheme->code ?? '02/LSP PrO Indo/I/2026';
+    $ak01Data = $assessment->ak01_data ?? $schedule->ak01_data ?? [];
+    $tukTipe = ($ak01Data['tuk_type'] ?? ($schedule->tuk_type ?? 'Sewaktu')) . '*';
+    $tukNama = $schedule->tuk_name ?? 'TUK Otomotif Mandiri';
+    $asesorNama = $assessor?->full_name ?? $assessor?->name ?? 'Drs. Budi Santoso, M.T.';
+    $asesiNama = $asesi->full_name ?? $asesi->name ?? 'Nama Asesi';
+
+    $date = !empty($schedule?->date) ? \Carbon\Carbon::parse($schedule->date) : now();
+    $hariTgl = $date->locale('id')->translatedFormat('l, d F Y');
+    $startTime = !empty($schedule?->start_time) ? \Carbon\Carbon::parse($schedule->start_time)->format('H.i') : '08.00';
+    $endTime = !empty($schedule?->end_time) ? \Carbon\Carbon::parse($schedule->end_time)->format('H.i') : '12.00';
+    $waktu = "{$startTime} - {$endTime} WIB";
+
+    $tglTtd = $assessment->ak01_agreed_at
+        ? \Carbon\Carbon::parse($assessment->ak01_agreed_at)->locale('id')->translatedFormat('d F Y')
+        : $date->locale('id')->translatedFormat('d F Y');
+    $tglAsesor = $assessment->assessor_signed_at
+        ? \Carbon\Carbon::parse($assessment->assessor_signed_at)->locale('id')->translatedFormat('d F Y')
+        : $tglTtd;
+    $tglAsesi = $assessment->asesi_signed_at
+        ? \Carbon\Carbon::parse($assessment->asesi_signed_at)->locale('id')->translatedFormat('d F Y')
+        : $tglTtd;
+
+    $evidence = $ak01Data['evidence'] ?? [
+        'Hasil Verifikasi Portofolio',
+        'Hasil Observasi Langsung',
+        'Hasil Pertanyaan Lisan',
+        'Hasil Pertanyaan Tertulis',
+    ];
+    $hasPorto = in_array('Hasil Verifikasi Portofolio', $evidence, true);
+    $hasReviu = in_array('Hasil Reviu Produk', $evidence, true);
+    $hasObs = in_array('Hasil Observasi Langsung', $evidence, true);
+    $hasTerk = in_array('Hasil Kegiatan Terstruktur', $evidence, true);
+    $hasLisan = in_array('Hasil Pertanyaan Lisan', $evidence, true);
+    $hasTulis = in_array('Hasil Pertanyaan Tertulis', $evidence, true);
+    $hasWwn = in_array('Hasil Pertanyaan Wawancara', $evidence, true);
+    $hasLain = in_array('Lainnya', $evidence, true) || !empty($ak01Data['other_evidence']);
+
+    $asesiSig = $assessment->asesi_signature ?? $asesi->profile?->signature_data;
+    $assessorSig = $assessment->assessor_signature ?? $assessor?->profile?->signature_data;
 @endphp
 
 <div class="ak01-container">
@@ -137,35 +168,35 @@
             </td>
             <td style="width: 10%;">Judul</td>
             <td style="width: 3%; text-align: center;">:</td>
-            <td style="font-style: italic;">{{ $dummySkemaJudul }}</td>
+            <td style="font-style: italic;">{{ $skemaJudul }}</td>
         </tr>
 
         {{-- Row 2: Skema Nomor --}}
         <tr>
             <td>Nomor</td>
             <td style="text-align: center;">:</td>
-            <td>{{ $dummySkemaNomor }}</td>
+            <td>{{ $skemaNomor }}</td>
         </tr>
 
         {{-- Row 3: TUK --}}
         <tr>
             <td colspan="2">TUK</td>
             <td style="text-align: center;">:</td>
-            <td>{{ $dummyTukTipe }}</td>
+            <td>{{ $tukTipe }}</td>
         </tr>
 
         {{-- Row 4: Nama Asesor --}}
         <tr>
             <td colspan="2">Nama Asesor</td>
             <td style="text-align: center;">:</td>
-            <td style="font-weight: bold;">{{ $dummyAsesorNama }}</td>
+            <td style="font-weight: bold;">{{ $asesorNama }}</td>
         </tr>
 
         {{-- Row 5: Nama Asesi --}}
         <tr>
             <td colspan="2">Nama Asesi</td>
             <td style="text-align: center;">:</td>
-            <td style="font-weight: bold;">{{ $dummyAsesiNama }}</td>
+            <td style="font-weight: bold;">{{ $asesiNama }}</td>
         </tr>
 
         {{-- Row 6 to 9: Bukti-bukti yang dikumpulkan --}}
@@ -180,34 +211,34 @@
                 <table class="sub-table-clean">
                     <tr>
                         <td style="width: 50%;">
-                            <span class="cb-box">&#10003;</span> Hasil Verifikasi Portofolio
+                            <span class="cb-box">{!! $hasPorto ? '&#10003;' : '&nbsp;' !!}</span> Hasil Verifikasi Portofolio
                         </td>
                         <td style="width: 50%;">
-                            <span class="cb-box">&nbsp;</span> Hasil Reviu Produk
+                            <span class="cb-box">{!! $hasReviu ? '&#10003;' : '&nbsp;' !!}</span> Hasil Reviu Produk
                         </td>
                     </tr>
                     <tr>
                         <td>
-                            <span class="cb-box">&#10003;</span> Hasil Observasi Langsung
+                            <span class="cb-box">{!! $hasObs ? '&#10003;' : '&nbsp;' !!}</span> Hasil Observasi Langsung
                         </td>
                         <td>
-                            <span class="cb-box">&nbsp;</span> Hasil Kegiatan Terstruktur
+                            <span class="cb-box">{!! $hasTerk ? '&#10003;' : '&nbsp;' !!}</span> Hasil Kegiatan Terstruktur
                         </td>
                     </tr>
                     <tr>
                         <td>
-                            <span class="cb-box">&#10003;</span> Hasil Pertanyaan Lisan
+                            <span class="cb-box">{!! $hasLisan ? '&#10003;' : '&nbsp;' !!}</span> Hasil Pertanyaan Lisan
                         </td>
                         <td>
-                            <span class="cb-box">&#10003;</span> Hasil Pertanyaan Tertulis
+                            <span class="cb-box">{!! $hasTulis ? '&#10003;' : '&nbsp;' !!}</span> Hasil Pertanyaan Tertulis
                         </td>
                     </tr>
                     <tr>
                         <td style="vertical-align: top;">
-                            <span class="cb-box">&nbsp;</span> Lainnya ……
+                            <span class="cb-box">{!! $hasLain ? '&#10003;' : '&nbsp;' !!}</span> Lainnya ……
                         </td>
                         <td style="vertical-align: top;">
-                            <span class="cb-box">&nbsp;</span> Hasil Pertanyaan Wawancara
+                            <span class="cb-box">{!! $hasWwn ? '&#10003;' : '&nbsp;' !!}</span> Hasil Pertanyaan Wawancara
                         </td>
                     </tr>
                 </table>
@@ -224,17 +255,17 @@
                     <tr>
                         <td style="width: 25%;">Hari/ Tanggal</td>
                         <td style="width: 3%; text-align: center;">:</td>
-                        <td style="font-weight: bold;">{{ $dummyHariTgl }}</td>
+                        <td style="font-weight: bold;">{{ $hariTgl }}</td>
                     </tr>
                     <tr>
                         <td>Waktu</td>
                         <td style="text-align: center;">:</td>
-                        <td style="font-weight: bold;">{{ $dummyWaktu }}</td>
+                        <td style="font-weight: bold;">{{ $waktu }}</td>
                     </tr>
                     <tr>
                         <td>TUK</td>
                         <td style="text-align: center;">:</td>
-                        <td style="font-weight: bold;">{{ $dummyTukNama }}</td>
+                        <td style="font-weight: bold;">{{ $tukNama }}</td>
                     </tr>
                 </table>
             </td>
@@ -264,36 +295,49 @@
             </td>
         </tr>
 
-        {{-- Row 16: Tanda Tangan Section (Stacked vertically exactly like Master) --}}
+        {{-- Row 16: Tanda Tangan Section (2 Symmetrical Columns with Date Underneath) --}}
         <tr>
-            <td colspan="4" style="padding: 12px 10px 14px 10px;">
-                <div style="margin-bottom: 12px;">
-                    <div style="display: flex; justify-content: space-between; align-items: baseline;">
-                        <div>
-                            Tanda tangan Asesor : ……………………………
-                        </div>
-                        <div style="margin-right: 180px;">
-                            Tanggal : {{ $dummyTglTtd }}
-                        </div>
-                    </div>
-                    <div style="margin-top: 3px; padding-left: 140px; font-weight: bold; font-size: 10pt;">
-                        ( {{ $dummyAsesorNama }} )
-                    </div>
-                </div>
-
-                <div style="margin-top: 8px;">
-                    <div style="display: flex; justify-content: space-between; align-items: baseline;">
-                        <div>
-                            Tanda tangan Asesi &nbsp;: ……………………………
-                        </div>
-                        <div style="margin-right: 180px;">
-                            Tanggal : {{ $dummyTglTtd }}
-                        </div>
-                    </div>
-                    <div style="margin-top: 3px; padding-left: 140px; font-weight: bold; font-size: 10pt;">
-                        ( {{ $dummyAsesiNama }} )
-                    </div>
-                </div>
+            <td colspan="4" style="padding: 10px 8px;">
+                <table style="width: 100%; border-collapse: collapse; border: none;">
+                    <tr>
+                        <td style="width: 50%; border: none; vertical-align: top; text-align: center; padding: 0 10px;">
+                            <div style="font-size: 10.5pt; font-weight: bold; margin-bottom: 2px; text-align: left;">
+                                Tanda tangan Asesor :
+                            </div>
+                            <div style="height: 48px; display: flex; align-items: center; justify-content: center; margin: 2px 0;">
+                                @if(!empty($assessorSig))
+                                    <img src="{{ $assessorSig }}" style="max-height: 48px; max-width: 140px; object-fit: contain; filter: contrast(1.8) brightness(0.8);">
+                                @else
+                                    <div style="color: #94a3b8; font-style: italic; font-size: 8.5pt;">(Belum ditandatangani)</div>
+                                @endif
+                            </div>
+                            <div style="font-weight: bold; font-size: 10pt;">
+                                ( {{ $asesorNama }} )
+                            </div>
+                            <div style="font-size: 9pt; color: #1e293b; margin-top: 3px;">
+                                Tanggal : {{ $tglAsesor }}
+                            </div>
+                        </td>
+                        <td style="width: 50%; border: none; vertical-align: top; text-align: center; padding: 0 10px; border-left: 1px solid #000;">
+                            <div style="font-size: 10.5pt; font-weight: bold; margin-bottom: 2px; text-align: left;">
+                                Tanda tangan Asesi :
+                            </div>
+                            <div style="height: 48px; display: flex; align-items: center; justify-content: center; margin: 2px 0;">
+                                @if(!empty($asesiSig))
+                                    <img src="{{ $asesiSig }}" style="max-height: 48px; max-width: 140px; object-fit: contain; filter: contrast(1.8) brightness(0.8);">
+                                @else
+                                    <div style="color: #94a3b8; font-style: italic; font-size: 8.5pt;">(Belum ditandatangani)</div>
+                                @endif
+                            </div>
+                            <div style="font-weight: bold; font-size: 10pt;">
+                                ( {{ $asesiNama }} )
+                            </div>
+                            <div style="font-size: 9pt; color: #1e293b; margin-top: 3px;">
+                                Tanggal : {{ $tglAsesi }}
+                            </div>
+                        </td>
+                    </tr>
+                </table>
             </td>
         </tr>
     </table>
