@@ -697,10 +697,27 @@ class MukDynamicDocumentService
             ? Carbon::parse($assessment->registered_at)->locale('id')->translatedFormat('d F Y')
             : ($schedule->date ? Carbon::parse($schedule->date)->locale('id')->translatedFormat('d F Y') : Carbon::now()->locale('id')->translatedFormat('d F Y'));
 
+        $tglAsesor = $assessment->assessor_signed_at
+            ? Carbon::parse($assessment->assessor_signed_at)->locale('id')->translatedFormat('d F Y')
+            : $tgl;
+
+        $tglAsesi = $assessment->asesi_signed_at
+            ? Carbon::parse($assessment->asesi_signed_at)->locale('id')->translatedFormat('d F Y')
+            : $tgl;
+
         $ak07Items = $assessment->ak07Items ?? collect();
         $hasAdjustment = $ak07Items->whereNotIn('adjustment_category', ['Standar', ''])->isNotEmpty();
         $agreementItem = $ak07Items->firstWhere('adjustment_category', 'Kesepakatan Asesor-Asesi');
         $agreementNotes = $agreementItem?->adjustment_detail ?? '';
+
+        $item1Ya = $ak07Items->contains(fn ($i) => str_contains(strtolower($i->adjustment_category ?? ''), 'bahasa') || str_contains(strtolower($i->adjustment_category ?? ''), 'literasi') || str_contains(strtolower($i->adjustment_category ?? ''), '#1'));
+        $item2Ya = $ak07Items->contains(fn ($i) => str_contains(strtolower($i->adjustment_category ?? ''), 'dukungan') || str_contains(strtolower($i->adjustment_category ?? ''), 'penerjemah') || str_contains(strtolower($i->adjustment_category ?? ''), '#2'));
+        $item3Ya = $ak07Items->contains(fn ($i) => str_contains(strtolower($i->adjustment_category ?? ''), 'adaptif') || str_contains(strtolower($i->adjustment_category ?? ''), '#3'));
+        $item4Ya = $ak07Items->contains(fn ($i) => str_contains(strtolower($i->adjustment_category ?? ''), 'fisik') || str_contains(strtolower($i->adjustment_category ?? ''), 'kelelahan') || str_contains(strtolower($i->adjustment_category ?? ''), '#4'));
+        $item5Ya = $ak07Items->contains(fn ($i) => str_contains(strtolower($i->adjustment_category ?? ''), 'braille') || str_contains(strtolower($i->adjustment_category ?? ''), '#5'));
+        $item6Ya = $ak07Items->contains(fn ($i) => str_contains(strtolower($i->adjustment_category ?? ''), 'tempat fisik') || str_contains(strtolower($i->adjustment_category ?? ''), 'lingkungan') || str_contains(strtolower($i->adjustment_category ?? ''), '#6'));
+        $item7Ya = $ak07Items->contains(fn ($i) => str_contains(strtolower($i->adjustment_category ?? ''), 'umur') || str_contains(strtolower($i->adjustment_category ?? ''), 'usia') || str_contains(strtolower($i->adjustment_category ?? ''), '#7'));
+        $item8Ya = $ak07Items->contains(fn ($i) => str_contains(strtolower($i->adjustment_category ?? ''), 'budaya') || str_contains(strtolower($i->adjustment_category ?? ''), 'agama') || str_contains(strtolower($i->adjustment_category ?? ''), '#8'));
 
         $tukType = $schedule->tuk_type ?? 'Sewaktu';
         $tukDisplay = match (strtolower((string) $tukType)) {
@@ -709,18 +726,47 @@ class MukDynamicDocumentService
             default => 'Sewaktu',
         };
 
+        $assessorSignature = $assessment->assessor_signature ?? $assessor?->profile?->signature_data;
+        if (! $assessorSignature && $assessor?->profile?->signature_path) {
+            $sigDiskPath = storage_path('app/public/'.$assessor->profile->signature_path);
+            if (File::isFile($sigDiskPath)) {
+                $assessorSignature = $sigDiskPath;
+            }
+        }
+
+        $asesiSignature = $assessment->asesi_signature ?? $profile?->signature_data;
+        if (! $asesiSignature && $profile?->signature_path) {
+            $sigDiskPath = storage_path('app/public/'.$profile->signature_path);
+            if (File::isFile($sigDiskPath)) {
+                $asesiSignature = $sigDiskPath;
+            }
+        }
+
         return [
             'skema_nama' => $scheme?->name ?? 'Maintenance Gasoline Engine Injection System',
             'skema_nomor' => $scheme?->code ?? '02/LSP PrO Indo/I/2026',
             'tuk_tipe' => $tukDisplay,
-            'asesor_nama' => $assessor?->full_name ?? 'Drs. Budi Santoso, M.T.',
-            'asesi_nama' => $asesi?->full_name ?? 'Nama Asesi',
+            'asesor_nama' => $assessor?->full_name ?? $assessor?->name ?? 'Drs. Budi Santoso, M.T.',
+            'asesi_nama' => $asesi?->full_name ?? $asesi?->name ?? 'Nama Asesi',
             'tanggal' => $tgl,
             'tanggal_ttd' => $tgl,
+            'tanggal_ttd_asesor' => $tglAsesor,
+            'tanggal_ttd_asesi' => $tglAsesi,
             'penyesuaian_diperlukan' => $hasAdjustment,
             'agreement_notes' => $agreementNotes,
-            'signature_asesi' => $assessment->asesi_signature ?? $profile?->signature_data,
-            'signature_asesor' => $assessment->assessor_signature ?? $assessor?->profile?->signature_data,
+            'agreement_acuan' => $ak07Items->firstWhere('adjustment_category', 'Acuan Pembanding')?->adjustment_detail ?? '',
+            'agreement_metode' => $ak07Items->firstWhere('adjustment_category', 'Metode Asesmen')?->adjustment_detail ?? '',
+            'agreement_instrumen' => $ak07Items->firstWhere('adjustment_category', 'Instrumen Asesmen')?->adjustment_detail ?? '',
+            'signature_asesi' => $asesiSignature,
+            'signature_asesor' => $assessorSignature,
+            'item1_ya' => $item1Ya,
+            'item2_ya' => $item2Ya,
+            'item3_ya' => $item3Ya,
+            'item4_ya' => $item4Ya,
+            'item5_ya' => $item5Ya,
+            'item6_ya' => $item6Ya,
+            'item7_ya' => $item7Ya,
+            'item8_ya' => $item8Ya,
         ];
     }
 
@@ -924,7 +970,10 @@ class MukDynamicDocumentService
                         : $this->buildPayload($schedule, null);
                     $tempAk07Json = $this->cacheDir.'/muk_ak07_'.uniqid().'.json';
                     File::put($tempAk07Json, json_encode($ak07Payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
-                    shell_exec("{$pythonExec} ".escapeshellarg($script).' '.escapeshellarg($tempAk07Json).' '.escapeshellarg($outputPath));
+                    if (File::isFile($outputPath)) {
+                        @unlink($outputPath);
+                    }
+                    shell_exec("{$pythonExec} ".escapeshellarg($script).' '.escapeshellarg($tempAk07Json).' '.escapeshellarg($outputPath).' 2>&1');
                     @unlink($tempAk07Json);
                     if (File::isFile($outputPath) && filesize($outputPath) > 1000) {
                         return $outputPath;

@@ -21,38 +21,79 @@ PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 ASSETS = os.path.join(PROJECT_ROOT, "tests", "Fixtures", "muk", "assets")
 OUT_FILE = os.path.join(PROJECT_ROOT, "tests", "Fixtures", "muk", "FR_AK_07_generated.pdf")
 
-def find_font(filename, fallback="LiberationSans-Regular.ttf"):
-    candidates = [
-        "/usr/share/fonts/liberation",
-        "/usr/share/fonts/carlito",
-        "/usr/share/fonts/TTF",
-        "/usr/share/fonts/truetype/liberation",
-        "/usr/share/fonts/truetype/crosextra",
-        "/usr/share/fonts/truetype/dejavu",
-    ]
-    for d in candidates:
-        p = os.path.join(d, filename)
-        if os.path.isfile(p):
-            return p
-    for root, _, files in os.walk("/usr/share/fonts"):
-        if filename in files:
-            return os.path.join(root, filename)
-    if fallback and fallback != filename:
-        return find_font(fallback, fallback=None)
-    return filename
+def register_fonts():
+    font_candidates = {
+        "Lib": [
+            "C:/Windows/Fonts/arial.ttf",
+            "C:/Windows/Fonts/calibri.ttf",
+            "/usr/share/fonts/liberation/LiberationSans-Regular.ttf",
+            "/usr/share/fonts/TTF/DejaVuSans.ttf",
+            "LiberationSans-Regular.ttf"
+        ],
+        "Lib-B": [
+            "C:/Windows/Fonts/arialbd.ttf",
+            "C:/Windows/Fonts/calibrib.ttf",
+            "/usr/share/fonts/liberation/LiberationSans-Bold.ttf",
+            "/usr/share/fonts/TTF/DejaVuSans-Bold.ttf",
+            "LiberationSans-Bold.ttf"
+        ],
+        "Lib-I": [
+            "C:/Windows/Fonts/ariali.ttf",
+            "C:/Windows/Fonts/calibrii.ttf",
+            "/usr/share/fonts/liberation/LiberationSans-Italic.ttf",
+            "/usr/share/fonts/TTF/DejaVuSans-Oblique.ttf",
+            "LiberationSans-Italic.ttf"
+        ],
+        "Cal": [
+            "C:/Windows/Fonts/calibri.ttf",
+            "C:/Windows/Fonts/arial.ttf",
+            "/usr/share/fonts/liberation/LiberationSans-Regular.ttf",
+            "Carlito-Regular.ttf"
+        ],
+        "Cal-B": [
+            "C:/Windows/Fonts/calibrib.ttf",
+            "C:/Windows/Fonts/arialbd.ttf",
+            "/usr/share/fonts/liberation/LiberationSans-Bold.ttf",
+            "Carlito-Bold.ttf"
+        ],
+        "Cal-I": [
+            "C:/Windows/Fonts/calibrii.ttf",
+            "C:/Windows/Fonts/ariali.ttf",
+            "/usr/share/fonts/liberation/LiberationSans-Italic.ttf",
+            "Carlito-Italic.ttf"
+        ],
+        "Tah": [
+            "C:/Windows/Fonts/tahoma.ttf",
+            "C:/Windows/Fonts/arial.ttf",
+            "/usr/share/fonts/liberation/LiberationSans-Regular.ttf",
+        ],
+        "Tah-B": [
+            "C:/Windows/Fonts/tahomabd.ttf",
+            "C:/Windows/Fonts/arialbd.ttf",
+            "/usr/share/fonts/liberation/LiberationSans-Bold.ttf",
+        ],
+        "DJ": [
+            "C:/Windows/Fonts/arial.ttf",
+            "/usr/share/fonts/TTF/DejaVuSans.ttf",
+            "DejaVuSans.ttf"
+        ],
+        "Times": [
+            "C:/Windows/Fonts/times.ttf",
+            "C:/Windows/Fonts/arial.ttf",
+            "/usr/share/fonts/liberation/LiberationSerif-Regular.ttf",
+            "LiberationSerif-Regular.ttf"
+        ]
+    }
+    for name, paths in font_candidates.items():
+        for p in paths:
+            if os.path.exists(p):
+                try:
+                    pdfmetrics.registerFont(TTFont(name, p))
+                    break
+                except Exception:
+                    pass
 
-font_map = {
-    "Lib": ("LiberationSans-Regular.ttf", "LiberationSans-Regular.ttf"),
-    "Lib-B": ("LiberationSans-Bold.ttf", "LiberationSans-Bold.ttf"),
-    "Lib-I": ("LiberationSans-Italic.ttf", "LiberationSans-Italic.ttf"),
-    "Cal": ("Carlito-Regular.ttf", "LiberationSans-Regular.ttf"),
-    "Cal-B": ("Carlito-Bold.ttf", "LiberationSans-Bold.ttf"),
-    "Cal-I": ("Carlito-Italic.ttf", "LiberationSans-Italic.ttf"),
-    "DJ": ("DejaVuSans.ttf", "DejaVuSans.ttf"),
-    "Times": ("LiberationSerif-Regular.ttf", "LiberationSerif-Regular.ttf"),
-}
-for name, (ffile, fallback) in font_map.items():
-    pdfmetrics.registerFont(TTFont(name, find_font(ffile, fallback)))
+register_fonts()
 
 PAGE_W, PAGE_H = 595.56, 842.52
 Y = lambda top: PAGE_H - top
@@ -79,6 +120,8 @@ DATA = {
 
 def clean_signature_image(raw_bytes_or_path):
     try:
+        from PIL import ImageFilter
+
         if isinstance(raw_bytes_or_path, (bytes, bytearray)):
             im = Image.open(io.BytesIO(raw_bytes_or_path))
         else:
@@ -88,66 +131,106 @@ def clean_signature_image(raw_bytes_or_path):
         if w == 0 or h == 0:
             return None
 
+        # Sample corner colors to detect background if opaque
         corners = []
         for pt in ((0, 0), (w - 1, 0), (0, h - 1), (w - 1, h - 1)):
             px = im.getpixel(pt)
-            if isinstance(px, tuple) and len(px) >= 3:
+            if isinstance(px, tuple) and len(px) >= 4 and px[3] > 200:
                 corners.append((px[0], px[1], px[2]))
-            elif isinstance(px, (int, float)):
-                corners.append((int(px), int(px), int(px)))
 
-        if not corners:
-            corners = [(255, 255, 255)]
+        has_solid_bg = len(corners) >= 3
+        bg_r = sum(c[0] for c in corners) / len(corners) if has_solid_bg else 255
+        bg_g = sum(c[1] for c in corners) / len(corners) if has_solid_bg else 255
+        bg_b = sum(c[2] for c in corners) / len(corners) if has_solid_bg else 255
 
-        bg_r = sum(c[0] for c in corners) / len(corners)
-        bg_g = sum(c[1] for c in corners) / len(corners)
-        bg_b = sum(c[2] for c in corners) / len(corners)
-
-        pixels = im.load()
-        if pixels is None:
-            return None
-
+        out = Image.new("RGBA", (w, h), (0, 0, 0, 0))
         for y in range(h):
             for x in range(w):
-                px = pixels[x, y]
+                px = im.getpixel((x, y))
                 if not isinstance(px, tuple) or len(px) < 4:
                     continue
                 r, g, b, a = int(px[0]), int(px[1]), int(px[2]), int(px[3])
-                if a == 0:
+                if a < 12:
                     continue
-                is_green = (g > 80 and g > r * 1.15 and g > b * 1.15)
-                dist_bg = ((r - bg_r)**2 + (g - bg_g)**2 + (b - bg_b)**2)**0.5
-                is_bg = dist_bg < 45
-                is_white = (r > 235 and g > 235 and b > 235)
 
-                if is_green or is_bg or is_white:
-                    pixels[x, y] = (0, 0, 0, 0)
-                elif dist_bg < 75 or (g > r and g > b and g > 70):
-                    factor = min(1.0, max(0.0, (dist_bg - 45) / 30.0))
-                    pixels[x, y] = (r, g, b, int(a * factor))
+                is_white = (r > 220 and g > 220 and b > 220)
+                is_green = (g > 80 and g > r * 1.15 and g > b * 1.15)
+                dist_bg = ((r - bg_r)**2 + (g - bg_g)**2 + (b - bg_b)**2)**0.5 if has_solid_bg else 999
+                is_bg = (has_solid_bg and dist_bg < 45)
+
+                if is_white or is_green or is_bg:
+                    continue
+
+                # Ink enhancement: boost opacity to solid deep black/slate
+                boosted_a = min(255, int(a * 2.8))
+                if boosted_a > 20:
+                    out.putpixel((x, y), (10, 15, 30, min(255, int(boosted_a * 1.25))))
+
+        # Auto-crop to bounding box of actual non-zero strokes
+        bbox = out.getbbox()
+        if bbox:
+            pad = 4
+            crop_box = (
+                max(0, bbox[0] - pad),
+                max(0, bbox[1] - pad),
+                min(w, bbox[2] + pad),
+                min(h, bbox[3] + pad)
+            )
+            out = out.crop(crop_box)
+        else:
+            return None
+
+        # Dilate alpha channel (3x3 MaxFilter) so thin canvas lines don't fade away when scaled
+        r_ch, g_ch, b_ch, a_ch = out.split()
+        a_dilated = a_ch.filter(ImageFilter.MaxFilter(3))
+        out_thick = Image.merge("RGBA", (r_ch, g_ch, b_ch, a_dilated))
 
         out_io = io.BytesIO()
-        im.save(out_io, format="PNG")
+        out_thick.save(out_io, format="PNG")
         out_io.seek(0)
         return out_io
     except Exception:
         return None
 
-def draw_signature(c, sig_data, x, y_bot, w=75.0, h=26.0):
+def draw_signature(c, sig_data, x_center=434.25, y_center=288.0, max_w=125.0, max_h=32.0, **kwargs):
+    if "w" in kwargs:
+        max_w = kwargs["w"]
+    if "h" in kwargs:
+        max_h = kwargs["h"]
     if not sig_data:
         return
     try:
         if isinstance(sig_data, str) and sig_data.startswith("data:image"):
             sig_data = sig_data.split(",", 1)[1]
             raw = base64.b64decode(sig_data)
-            cleaned = clean_signature_image(raw)
-            img = ImageReader(cleaned if cleaned else io.BytesIO(raw))
         elif isinstance(sig_data, str) and os.path.isfile(sig_data):
-            cleaned = clean_signature_image(sig_data)
-            img = ImageReader(cleaned if cleaned else sig_data)
+            with open(sig_data, "rb") as f:
+                raw = f.read()
         else:
             return
-        c.drawImage(img, x, Y(y_bot), w, h, mask="auto")
+
+        cleaned_io = clean_signature_image(raw)
+        if not cleaned_io:
+            return
+
+        im = Image.open(cleaned_io)
+        im_w, im_h = im.size
+        if im_w == 0 or im_h == 0:
+            return
+
+        aspect = float(im_w) / float(im_h)
+        if aspect > (max_w / max_h):
+            w = max_w
+            h = max_w / aspect
+        else:
+            h = max_h
+            w = max_h * aspect
+
+        x = x_center - (w / 2.0)
+        y_bot_native = Y(y_center) - (h / 2.0)
+        cleaned_io.seek(0)
+        img = ImageReader(cleaned_io)
+        c.drawImage(img, x, y_bot_native, w, h, mask="auto")
     except Exception:
         pass
 
@@ -196,13 +279,23 @@ def draw_page_num(c, pnum):
 
 def draw_cb(c, cx, cy, checked=False):
     sz = 8.6
+    c.saveState()
     c.setLineWidth(0.65)
     c.setStrokeColor(black)
-    c.rect(cx - sz / 2, cy - sz / 2, sz, sz, fill=0, stroke=1)
+    x0 = cx - sz / 2.0
+    y0 = cy - sz / 2.0
+    c.rect(x0, y0, sz, sz, fill=0, stroke=1)
     if checked:
-        c.setFont("DJ", 8.5)
-        c.setFillColor(black)
-        c.drawCentredString(cx, cy - sz / 2 + 1.0, "✓")
+        c.setStrokeColor(black)
+        c.setLineWidth(1.2)
+        c.setLineCap(1)
+        c.setLineJoin(1)
+        p = c.beginPath()
+        p.moveTo(x0 + 0.20 * sz, y0 + 0.48 * sz)
+        p.lineTo(x0 + 0.42 * sz, y0 + 0.22 * sz)
+        p.lineTo(x0 + 0.82 * sz, y0 + 0.80 * sz)
+        c.drawPath(p, stroke=1, fill=0)
+    c.restoreState()
 
 # ================= PAGE 1 =================
 def render_page_1(c):
@@ -391,6 +484,10 @@ def render_page_1(c):
     c.drawCentredString((c_tdk + R) / 2, Y(685.0), "Keterangan")
     
     # Item 1 row (starts on page 1)
+    item1_ya = bool(DATA.get("item1_ya", False))
+    draw_cb(c, (c_req + c_ya) / 2, Y((703.9 + 772.1) / 2), item1_ya)
+    draw_cb(c, (c_ya + c_tdk) / 2, Y((703.9 + 772.1) / 2), not item1_ya)
+
     c.setFont("Lib", 9.0)
     c.drawString(c_no + 5.0, Y(718.0), "Keterbatasan asesi terhadap")
     c.drawString(c_no + 5.0, Y(729.5), "persyaratan bahasa, literasi,")
@@ -472,6 +569,10 @@ def render_page_2(c):
     c.drawString(c_kcb + 5.0, Y(230.0), "………………………………….")
     
     # Item 2 (238.6 to 355.2)
+    item2_ya = bool(DATA.get("item2_ya", False))
+    draw_cb(c, (c_req + c_ya) / 2, Y((238.6 + 355.2) / 2), item2_ya)
+    draw_cb(c, (c_ya + c_tdk) / 2, Y((238.6 + 355.2) / 2), not item2_ya)
+
     c.drawString(c_no + 5.0, Y(254.0), "Penyediaan dukungan pemba")
     c.drawString(c_no + 5.0, Y(265.5), "ca,penerjemah, pelayan,")
     c.drawString(c_no + 5.0, Y(277.0), "penulis.")
@@ -491,6 +592,10 @@ def render_page_2(c):
     c.drawString(c_kcb + 5.0, Y(347.0), "……………………………………..")
     
     # Item 3 (355.2 to 540.4)
+    item3_ya = bool(DATA.get("item3_ya", False))
+    draw_cb(c, (c_req + c_ya) / 2, Y((355.2 + 540.4) / 2), item3_ya)
+    draw_cb(c, (c_ya + c_tdk) / 2, Y((355.2 + 540.4) / 2), not item3_ya)
+
     c.setFont("Lib-I", 9.5)
     c.drawCentredString((L + c_no) / 2, Y(367.0), "3")
     
@@ -521,6 +626,10 @@ def render_page_2(c):
             ys += 11.5
             
     # Item 4 (540.4 to 760.5)
+    item4_ya = bool(DATA.get("item4_ya", False))
+    draw_cb(c, (c_req + c_ya) / 2, Y((540.4 + 760.5) / 2), item4_ya)
+    draw_cb(c, (c_ya + c_tdk) / 2, Y((540.4 + 760.5) / 2), not item4_ya)
+
     c.drawString(c_no + 5.0, Y(554.0), "Pelaksanaan asesmen secara")
     c.drawString(c_no + 5.0, Y(565.5), "fleksibel karena alasan")
     c.drawString(c_no + 5.0, Y(577.0), "keletihan atau keperluan")
@@ -583,6 +692,10 @@ def render_page_3(c):
     c.line(c_kcb, Y(t_bot), c_kcb, Y(t_top))
     
     # Item 5 (112.9 to 183.7)
+    item5_ya = bool(DATA.get("item5_ya", False))
+    draw_cb(c, (c_req + c_ya) / 2, Y((112.9 + 183.7) / 2), item5_ya)
+    draw_cb(c, (c_ya + c_tdk) / 2, Y((112.9 + 183.7) / 2), not item5_ya)
+
     c.setFont("Lib", 9.0)
     c.drawString(c_no + 5.0, Y(125.0), "Penyediaan peralatan")
     c.drawString(c_no + 5.0, Y(136.5), "asesmen berupa braille,")
@@ -602,6 +715,10 @@ def render_page_3(c):
             ys += 11.5
             
     # Item 6 (183.7 to 336.2)
+    item6_ya = bool(DATA.get("item6_ya", False))
+    draw_cb(c, (c_req + c_ya) / 2, Y((183.7 + 336.2) / 2), item6_ya)
+    draw_cb(c, (c_ya + c_tdk) / 2, Y((183.7 + 336.2) / 2), not item6_ya)
+
     c.drawString(c_no + 5.0, Y(196.0), "Penyesuaian tempat")
     c.drawString(c_no + 5.0, Y(207.5), "fisik/lingkungan asesmen")
     
@@ -620,6 +737,10 @@ def render_page_3(c):
         c.drawString(c_kcb + 5.0, Y(y_t + 11.5), lines_txt[0])
         
     # Item 7 (336.2 to 548.0)
+    item7_ya = bool(DATA.get("item7_ya", False))
+    draw_cb(c, (c_req + c_ya) / 2, Y((336.2 + 548.0) / 2), item7_ya)
+    draw_cb(c, (c_ya + c_tdk) / 2, Y((336.2 + 548.0) / 2), not item7_ya)
+
     c.drawString(c_no + 5.0, Y(349.0), "Pertimbangan umur/usia")
     c.drawString(c_no + 5.0, Y(360.5), "lanjut/gender asesi.")
     c.drawString(c_no + 5.0, Y(372.0), "(Adanya perbedaan usia dengan")
@@ -649,6 +770,10 @@ def render_page_3(c):
             ys += 11.5
             
     # Item 8 (548.0 to 665.3)
+    item8_ya = bool(DATA.get("item8_ya", False))
+    draw_cb(c, (c_req + c_ya) / 2, Y((548.0 + 665.3) / 2), item8_ya)
+    draw_cb(c, (c_ya + c_tdk) / 2, Y((548.0 + 665.3) / 2), not item8_ya)
+
     c.setFont("Lib-B", 9.5)
     c.drawCentredString((L + c_no) / 2, Y(559.0), "8")
     
@@ -722,9 +847,9 @@ def render_page_4(c):
     if instrumen:
         c.drawString(105.0, Y(237.0), str(instrumen)[:75])
     
-    # 2x2 Signatures Table (255.0 to 353.2)
+    # 2x2 Signatures Table (252.0 to 378.0)
     t_x0, t_x1 = 66.7, 556.5
-    t_top, t_mid, t_bot = 255.0, 304.0, 353.2
+    t_top, t_mid, t_bot = 252.0, 315.0, 378.0
     c_mid = 312.0
     
     c.rect(t_x0, Y(t_bot), t_x1 - t_x0, t_bot - t_top)
@@ -733,32 +858,56 @@ def render_page_4(c):
     
     asesor_nama = DATA.get("asesor_nama") or ""
     asesi_nama = DATA.get("asesi_nama") or ""
-    tanggal_ttd = DATA.get("tanggal_ttd") or DATA.get("tanggal") or ""
+    tanggal_asesor = DATA.get("tanggal_ttd_asesor") or DATA.get("tanggal_ttd") or DATA.get("tanggal") or ""
+    tanggal_asesi = DATA.get("tanggal_ttd_asesi") or DATA.get("tanggal_ttd") or DATA.get("tanggal") or ""
     sig_asesor = DATA.get("signature_asesor") or DATA.get("assessor_signature")
     sig_asesi = DATA.get("signature_asesi") or DATA.get("asesi_signature")
 
     # Row 1: Asesor
+    # Left column: Nama Asesor
     c.setFont("Lib", 9.5)
-    c.drawString(73.6, Y(269.0), f"Nama Asesor : {asesor_nama}")
-    c.drawString(318.4, Y(269.0), "Tanggal dan Tanda Tangan Asesor:")
-    c.drawString(318.4, Y(286.0), f"Tanggal: {tanggal_ttd}")
+    c.drawString(75.0, Y(265.0), "Nama Asesor :")
+    f_sz = 9.5
+    while pdfmetrics.stringWidth(asesor_nama, "Lib-B", f_sz) > (c_mid - 85.0) and f_sz > 7.0:
+        f_sz -= 0.5
+    c.setFont("Lib-B", f_sz)
+    c.drawString(75.0, Y(286.0), asesor_nama)
+
+    # Right column: Tanggal dan Tanda Tangan Asesor
+    c.setFont("Lib", 9.5)
+    c.drawString(320.0, Y(265.0), "Tanggal dan Tanda Tangan Asesor :")
     if sig_asesor:
-        draw_signature(c, sig_asesor, 435.0, 300.0, w=85.0, h=28.0)
+        draw_signature(c, sig_asesor, x_center=434.25, y_center=286.0, max_w=125.0, max_h=28.0)
     else:
-        c.drawString(435.0, Y(286.0), "[Ttd Digital]")
-    
+        c.setFont("Lib-I", 8.5)
+        c.drawCentredString(434.25, Y(286.0), "[Tanda Tangan Digital]")
+    c.setFont("Lib", 8.5)
+    c.drawCentredString(434.25, Y(308.0), f"Tanggal: {tanggal_asesor}")
+
     # Row 2: Asesi
-    c.drawString(73.6, Y(318.0), f"Nama Asesi: {asesi_nama}")
-    c.drawString(318.4, Y(318.0), "Tanggal dan Tanda Tangan Asesi:")
-    c.drawString(318.4, Y(335.0), f"Tanggal: {tanggal_ttd}")
+    # Left column: Nama Asesi
+    c.setFont("Lib", 9.5)
+    c.drawString(75.0, Y(328.0), "Nama Asesi :")
+    f_sz = 9.5
+    while pdfmetrics.stringWidth(asesi_nama, "Lib-B", f_sz) > (c_mid - 85.0) and f_sz > 7.0:
+        f_sz -= 0.5
+    c.setFont("Lib-B", f_sz)
+    c.drawString(75.0, Y(349.0), asesi_nama)
+
+    # Right column: Tanggal dan Tanda Tangan Asesi
+    c.setFont("Lib", 9.5)
+    c.drawString(320.0, Y(328.0), "Tanggal dan Tanda Tangan Asesi :")
     if sig_asesi:
-        draw_signature(c, sig_asesi, 435.0, 349.0, w=85.0, h=28.0)
+        draw_signature(c, sig_asesi, x_center=434.25, y_center=349.0, max_w=125.0, max_h=28.0)
     else:
-        c.drawString(435.0, Y(335.0), "[Ttd Digital]")
-    
+        c.setFont("Lib-I", 8.5)
+        c.drawCentredString(434.25, Y(349.0), "[Tanda Tangan Digital]")
+    c.setFont("Lib", 8.5)
+    c.drawCentredString(434.25, Y(371.0), f"Tanggal: {tanggal_asesi}")
+
     # Footnote
     c.setFont("Lib-I", 8.5)
-    c.drawString(63.9, Y(363.0), "Modul Melaksanakan Asesmen hal 32-35")
+    c.drawString(66.7, Y(392.0), "Modul Melaksanakan Asesmen hal 32-35")
     
     draw_page_num(c, 4)
 

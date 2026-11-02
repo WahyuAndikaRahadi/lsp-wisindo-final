@@ -363,36 +363,42 @@
         <tr>
             <td style="width: 50%; border-right: 1px solid #000; border-bottom: 1px solid #000; padding: 8px; vertical-align: top;">
                 <div style="font-weight: bold;">Nama Asesor :</div>
-                <div style="margin-top: 3px;">{{ $assessor?->full_name ?? $assessor?->name ?? '-' }}</div>
+                <div style="margin-top: 6px; font-weight: bold;">{{ $assessor?->full_name ?? $assessor?->name ?? '-' }}</div>
             </td>
             <td style="width: 50%; border-bottom: 1px solid #000; padding: 8px; vertical-align: top;">
-                <div style="font-weight: bold; margin-bottom: 4px;">Tanggal dan Tanda Tangan Asesor:</div>
-                <div style="margin-top: 4px;">
+                <div style="font-weight: bold; margin-bottom: 4px;">Tanggal dan Tanda Tangan Asesor :</div>
+                <div style="text-align: center; margin: 4px 0; min-height: 40px; display: flex; align-items: center; justify-content: center;">
                     @if($assessor?->profile?->signature_path)
-                        <img src="{{ asset('storage/' . $assessor->profile->signature_path) }}" style="max-height: 35px; max-width: 110px; vertical-align: middle;" alt="TTD Asesor">
-                    @elseif($assessment->assessor_signature)
-                        <img src="{{ $assessment->assessor_signature }}" style="max-height: 35px; max-width: 110px; vertical-align: middle;" alt="TTD Asesor">
+                        <img src="{{ asset('storage/' . $assessor->profile->signature_path) }}" style="max-height: 40px; max-width: 130px; object-fit: contain; filter: contrast(1.8) brightness(0.8); mix-blend-mode: multiply;" alt="TTD Asesor">
+                    @elseif($assessment->assessor_signature ?? $assessor?->profile?->signature_data)
+                        <img src="{{ $assessment->assessor_signature ?? $assessor?->profile?->signature_data }}" style="max-height: 40px; max-width: 130px; object-fit: contain; filter: contrast(1.8) brightness(0.8); mix-blend-mode: multiply;" alt="TTD Asesor">
                     @else
-                        [Tanda Tangan Digital]
+                        <span style="font-style: italic; color: #64748b;">[Tanda Tangan Digital]</span>
                     @endif
-                    &nbsp;- {{ \Carbon\Carbon::parse($schedule->date ?? now())->translatedFormat('d/m/Y') }}
+                </div>
+                <div style="text-align: center; font-size: 8pt; color: #1e293b; margin-top: 4px;">
+                    Tanggal: {{ \Carbon\Carbon::parse($assessment->assessor_signed_at ?? $schedule->date ?? now())->locale('id')->translatedFormat('d F Y') }}
                 </div>
             </td>
         </tr>
         <tr>
             <td style="width: 50%; border-right: 1px solid #000; padding: 8px; vertical-align: top;">
-                <div style="font-weight: bold;">Nama Asesi:</div>
-                <div style="margin-top: 3px;">{{ $asesi->full_name }}</div>
+                <div style="font-weight: bold;">Nama Asesi :</div>
+                <div style="margin-top: 6px; font-weight: bold;">{{ $asesi->full_name }}</div>
             </td>
             <td style="width: 50%; padding: 8px; vertical-align: top;">
-                <div style="font-weight: bold; margin-bottom: 4px;">Tanggal dan Tanda Tangan Asesi:</div>
-                <div style="margin-top: 4px;">
-                    @if($assessment->asesi_signature)
-                        <img src="{{ $assessment->asesi_signature }}" style="max-height: 35px; max-width: 110px; vertical-align: middle;" alt="TTD Asesi">
+                <div style="font-weight: bold; margin-bottom: 4px;">Tanggal dan Tanda Tangan Asesi :</div>
+                <div style="text-align: center; margin: 4px 0; min-height: 40px; display: flex; align-items: center; justify-content: center;">
+                    @if($assessment->asesi_signature ?? $asesi?->profile?->signature_data)
+                        <img src="{{ $assessment->asesi_signature ?? $asesi?->profile?->signature_data }}" style="max-height: 40px; max-width: 130px; object-fit: contain; filter: contrast(1.8) brightness(0.8); mix-blend-mode: multiply;" alt="TTD Asesi">
+                    @elseif($asesi?->profile?->signature_path)
+                        <img src="{{ asset('storage/' . $asesi->profile->signature_path) }}" style="max-height: 40px; max-width: 130px; object-fit: contain; filter: contrast(1.8) brightness(0.8); mix-blend-mode: multiply;" alt="TTD Asesi">
                     @else
-                        [Tanda Tangan Digital]
+                        <span style="font-style: italic; color: #64748b;">[Tanda Tangan Digital]</span>
                     @endif
-                    &nbsp;- {{ \Carbon\Carbon::parse($schedule->date ?? now())->translatedFormat('d/m/Y') }}
+                </div>
+                <div style="text-align: center; font-size: 8pt; color: #1e293b; margin-top: 4px;">
+                    Tanggal: {{ \Carbon\Carbon::parse($assessment->asesi_signed_at ?? $schedule->date ?? now())->locale('id')->translatedFormat('d F Y') }}
                 </div>
             </td>
         </tr>
