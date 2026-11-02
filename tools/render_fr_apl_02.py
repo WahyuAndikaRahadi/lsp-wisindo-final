@@ -27,37 +27,69 @@ CELLS_FILE = os.path.join(PROJECT_ROOT, "tests/Fixtures/muk/apl02_master_cells_e
 PAGE_W, PAGE_H = 595.28, 841.89
 Y = lambda top: PAGE_H - top
 
-def find_font(filename, fallback="LiberationSans-Regular.ttf"):
+def find_font(filename):
+    win_fonts = os.path.join(os.environ.get('WINDIR', 'C:\\Windows'), 'Fonts')
+    win_map = {
+        'Carlito-Regular.ttf': ['calibri.ttf', 'arial.ttf'],
+        'Carlito-Bold.ttf': ['calibrib.ttf', 'arialbd.ttf'],
+        'Carlito-Italic.ttf': ['calibrii.ttf', 'ariali.ttf'],
+        'LiberationSans-Regular.ttf': ['arial.ttf', 'calibri.ttf'],
+        'LiberationSans-Bold.ttf': ['arialbd.ttf', 'calibrib.ttf'],
+        'LiberationSans-Italic.ttf': ['ariali.ttf', 'calibrii.ttf'],
+        'LiberationSerif-Regular.ttf': ['times.ttf', 'georgia.ttf', 'arial.ttf'],
+        'DejaVuSans.ttf': ['segoeui.ttf', 'arial.ttf'],
+    }
+    if os.path.isdir(win_fonts):
+        if filename in win_map:
+            for cand in win_map[filename]:
+                p = os.path.join(win_fonts, cand)
+                if os.path.isfile(p):
+                    return p
+        p = os.path.join(win_fonts, filename)
+        if os.path.isfile(p):
+            return p
+
     candidates = [
-        "/usr/share/fonts/liberation",
         "/usr/share/fonts/carlito",
+        "/usr/share/fonts/liberation",
         "/usr/share/fonts/TTF",
-        "/usr/share/fonts/truetype/liberation",
         "/usr/share/fonts/truetype/crosextra",
-        "/usr/share/fonts/truetype/dejavu"
+        "/usr/share/fonts/truetype/liberation",
+        "/usr/share/fonts/truetype/dejavu",
+        "/Library/Fonts",
+        "/System/Library/Fonts",
     ]
     for d in candidates:
         p = os.path.join(d, filename)
         if os.path.isfile(p):
             return p
-    for root, _, files in os.walk("/usr/share/fonts"):
-        if filename in files:
-            return os.path.join(root, filename)
-    if fallback and fallback != filename:
-        return find_font(fallback, fallback=None)
+    for d in candidates:
+        if os.path.isdir(d):
+            for root, _, files in os.walk(d):
+                if filename in files:
+                    return os.path.join(root, filename)
+
+    fallbacks = {
+        "Carlito-Regular.ttf": "LiberationSans-Regular.ttf",
+        "Carlito-Bold.ttf": "LiberationSans-Bold.ttf",
+        "Carlito-Italic.ttf": "LiberationSans-Italic.ttf",
+        "LiberationSerif-Regular.ttf": "LiberationSans-Regular.ttf",
+    }
+    if filename in fallbacks:
+        return find_font(fallbacks[filename])
     return filename
 
 font_map = {
-    "Lib": ("LiberationSans-Regular.ttf", "LiberationSans-Regular.ttf"),
-    "Lib-B": ("LiberationSans-Bold.ttf", "LiberationSans-Bold.ttf"),
-    "Lib-I": ("LiberationSans-Italic.ttf", "LiberationSans-Italic.ttf"),
-    "Cal": ("Carlito-Regular.ttf", "LiberationSans-Regular.ttf"),
-    "Cal-B": ("Carlito-Bold.ttf", "LiberationSans-Bold.ttf"),
-    "DJ": ("DejaVuSans.ttf", "DejaVuSans.ttf"),
-    "Times": ("LiberationSerif-Regular.ttf", "LiberationSerif-Regular.ttf"),
+    "Lib": "LiberationSans-Regular.ttf",
+    "Lib-B": "LiberationSans-Bold.ttf",
+    "Lib-I": "LiberationSans-Italic.ttf",
+    "Cal": "Carlito-Regular.ttf",
+    "Cal-B": "Carlito-Bold.ttf",
+    "DJ": "DejaVuSans.ttf",
+    "Times": "LiberationSerif-Regular.ttf",
 }
-for name, (ffile, fallback) in font_map.items():
-    pdfmetrics.registerFont(TTFont(name, find_font(ffile, fallback)))
+for name, ffile in font_map.items():
+    pdfmetrics.registerFont(TTFont(name, find_font(ffile)))
 
 BLUE_NUM = Color(0.267, 0.447, 0.769)
 
@@ -113,10 +145,13 @@ def draw_cb(c, cx, cy, checked=False):
     c.setStrokeColor(black)
     c.rect(cx - sz / 2, cy - sz / 2, sz, sz, fill=0, stroke=1)
     if checked:
-        c.setLineWidth(1.3)
+        c.setLineWidth(1.4)
         c.setStrokeColor(black)
-        c.line(cx - 2.5, cy - 0.2, cx - 0.6, cy - 2.5)
-        c.line(cx - 0.6, cy - 2.5, cx + 2.8, cy + 2.8)
+        p = c.beginPath()
+        p.moveTo(cx - 2.6, cy - 0.2)
+        p.lineTo(cx - 0.6, cy - 2.6)
+        p.lineTo(cx + 2.8, cy + 2.8)
+        c.drawPath(p, stroke=1, fill=0)
 
 def draw_page_num(c, pnum):
     c.setFont("Times", 12.0)
@@ -184,6 +219,13 @@ def clean_signature_image(raw_bytes_or_path):
                 min(h, bbox[3] + pad)
             )
             im = im.crop(crop_box)
+
+        # Boost ink opacity & contrast: make non-transparent strokes dark solid slate/black
+        for y in range(im.height):
+            for x in range(im.width):
+                px = im.getpixel((x, y))
+                if px[3] > 25:
+                    im.putpixel((x, y), (15, 23, 42, 255))
 
         out_io = io.BytesIO()
         im.save(out_io, format="PNG")
@@ -281,6 +323,27 @@ def parse_element_lines(cell_text):
                 result.append((line_s, 'kuk_cont', 59.8))
     return result
 
+def wrap_text_width(text, font_name, font_size, max_w):
+    words = text.split()
+    if not words:
+        return []
+    lines = []
+    cur_line = []
+    for w in words:
+        test_line = " ".join(cur_line + [w])
+        if pdfmetrics.stringWidth(test_line, font_name, font_size) <= max_w:
+            cur_line.append(w)
+        else:
+            if cur_line:
+                lines.append(" ".join(cur_line))
+                cur_line = [w]
+            else:
+                lines.append(w)
+                cur_line = []
+    if cur_line:
+        lines.append(" ".join(cur_line))
+    return lines
+
 def draw_elements_table_generic(c, L, R, y_hdr_top, y_hdr_bot, rows_data, is_first_page_of_table=True):
     c1, c2, c3 = 321.4, 348.2, 375.2
     
@@ -330,8 +393,42 @@ def draw_elements_table_generic(c, L, R, y_hdr_top, y_hdr_bot, rows_data, is_fir
         # Draw Checkboxes
         if r.get("has_checkbox", True):
             cb_y = (Y(yt) + Y(yb)) / 2
-            draw_cb(c, (c1 + c2) / 2, cb_y, r.get("k", True))
-            draw_cb(c, (c2 + c3) / 2, cb_y, not r.get("k", True))
+            is_k = r.get("k", True)
+            if "row_index" in r and "answers" in DATA and isinstance(DATA["answers"], list):
+                idx = r["row_index"]
+                if idx < len(DATA["answers"]):
+                    val = DATA["answers"][idx]
+                    if isinstance(val, bool):
+                        is_k = val
+                    elif isinstance(val, str):
+                        is_k = (val.upper() == "K")
+            draw_cb(c, (c1 + c2) / 2, cb_y, is_k)
+            draw_cb(c, (c2 + c3) / 2, cb_y, not is_k)
+
+        # Draw Bukti yang relevan in Col 3 (c3 to R)
+        proof_text = ""
+        idx = r.get("row_index")
+        if idx is not None and "proofs" in DATA and isinstance(DATA["proofs"], list):
+            if idx < len(DATA["proofs"]):
+                proof_text = str(DATA["proofs"][idx] or "")
+        if not proof_text:
+            proof_text = str(DATA.get("default_proof") or DATA.get("bukti_relevan") or "Ijazah SMK Otomotif")
+
+        if proof_text:
+            c.setFillColor(black)
+            font_name = "Lib"
+            font_size = 8.5
+            c.setFont(font_name, font_size)
+            max_text_w = (R - 6.0) - (c3 + 8.0)
+            wrapped_lines = wrap_text_width(proof_text, font_name, font_size, max_text_w)
+            
+            line_h = 10.5
+            total_h = len(wrapped_lines) * line_h
+            y_mid = (yt + yb) / 2
+            start_y = y_mid - (total_h / 2) + 8.0
+            
+            for line_idx, line_str in enumerate(wrapped_lines):
+                c.drawString(c3 + 8.0, Y(start_y + line_idx * line_h), line_str)
 
 def render(dest_path):
     c = canvas.Canvas(dest_path, pagesize=(PAGE_W, PAGE_H))
@@ -431,8 +528,8 @@ def render_page_1(c, p_data):
     # Table 4: Unit 1 Elements (356.6 to 532.0)
     t4_data = p_data["tables"][4]["data"]
     draw_elements_table_generic(c, L, R, 356.6, 368.6, [
-        {"y_top": 368.6, "y_bot": 438.8, "cell_text": t4_data[1][0], "has_checkbox": True, "k": True},
-        {"y_top": 438.8, "y_bot": 532.0, "cell_text": t4_data[2][0], "has_checkbox": True, "k": True},
+        {"y_top": 368.6, "y_bot": 438.8, "cell_text": t4_data[1][0], "has_checkbox": True, "k": True, "row_index": 0},
+        {"y_top": 438.8, "y_bot": 532.0, "cell_text": t4_data[2][0], "has_checkbox": True, "k": True, "row_index": 1},
     ])
     
     # Table 5: Unit 2 Header (541.7 to 582.3)
@@ -441,8 +538,8 @@ def render_page_1(c, p_data):
     # Table 6: Unit 2 Elements (594.4 to 769.8)
     t6_data = p_data["tables"][6]["data"]
     draw_elements_table_generic(c, L, R, 594.4, 606.4, [
-        {"y_top": 606.4, "y_bot": 688.0, "cell_text": t6_data[1][0], "has_checkbox": True, "k": True},
-        {"y_top": 688.0, "y_bot": 769.8, "cell_text": t6_data[2][0], "has_checkbox": True, "k": True},
+        {"y_top": 606.4, "y_bot": 688.0, "cell_text": t6_data[1][0], "has_checkbox": True, "k": True, "row_index": 2},
+        {"y_top": 688.0, "y_bot": 769.8, "cell_text": t6_data[2][0], "has_checkbox": True, "k": True, "row_index": 3},
     ])
 
 # ================= PAGE 2 =================
@@ -455,8 +552,8 @@ def render_page_2(c, p_data):
     # Unit 3 Elements (166.1 to 307.0)
     t2_data = p_data["tables"][2]["data"]
     draw_elements_table_generic(c, L, R, 166.1, 178.1, [
-        {"y_top": 178.1, "y_bot": 236.8, "cell_text": t2_data[1][0], "has_checkbox": True, "k": True},
-        {"y_top": 236.8, "y_bot": 307.0, "cell_text": t2_data[2][0], "has_checkbox": True, "k": True},
+        {"y_top": 178.1, "y_bot": 236.8, "cell_text": t2_data[1][0], "has_checkbox": True, "k": True, "row_index": 4},
+        {"y_top": 236.8, "y_bot": 307.0, "cell_text": t2_data[2][0], "has_checkbox": True, "k": True, "row_index": 5},
     ])
     
     # Unit 4 Header (319.0 to 359.6)
@@ -465,8 +562,8 @@ def render_page_2(c, p_data):
     # Unit 4 Elements (371.7 to 547.0)
     t4_data = p_data["tables"][4]["data"]
     draw_elements_table_generic(c, L, R, 371.7, 383.7, [
-        {"y_top": 383.7, "y_bot": 476.8, "cell_text": t4_data[1][0], "has_checkbox": True, "k": True},
-        {"y_top": 476.8, "y_bot": 547.0, "cell_text": t4_data[2][0], "has_checkbox": True, "k": True},
+        {"y_top": 383.7, "y_bot": 476.8, "cell_text": t4_data[1][0], "has_checkbox": True, "k": True, "row_index": 6},
+        {"y_top": 476.8, "y_bot": 547.0, "cell_text": t4_data[2][0], "has_checkbox": True, "k": True, "row_index": 7},
     ])
     
     # Unit 5 Header (559.0 to 599.7)
@@ -475,8 +572,8 @@ def render_page_2(c, p_data):
     # Unit 5 Elements Part 1 (611.7 to 775.5)
     t6_data = p_data["tables"][6]["data"]
     draw_elements_table_generic(c, L, R, 611.7, 623.7, [
-        {"y_top": 623.7, "y_bot": 693.9, "cell_text": t6_data[1][0], "has_checkbox": True, "k": True},
-        {"y_top": 693.9, "y_bot": 775.5, "cell_text": t6_data[2][0], "has_checkbox": True, "k": True},
+        {"y_top": 623.7, "y_bot": 693.9, "cell_text": t6_data[1][0], "has_checkbox": True, "k": True, "row_index": 8},
+        {"y_top": 693.9, "y_bot": 775.5, "cell_text": t6_data[2][0], "has_checkbox": True, "k": True, "row_index": 9},
     ])
 
 # ================= PAGE 3 =================
@@ -486,7 +583,7 @@ def render_page_3(c, p_data):
     # Table 1: Continuation of Unit 5 Elemen 2 (113.4 to 148.4)
     t1_data = p_data["tables"][1]["data"]
     draw_elements_table_generic(c, L, R, 113.4, 113.4, [
-        {"y_top": 113.4, "y_bot": 148.4, "cell_text": t1_data[0][0], "has_checkbox": True, "k": True},
+        {"y_top": 113.4, "y_bot": 148.4, "cell_text": t1_data[0][0], "has_checkbox": True, "k": True, "row_index": 10},
     ], is_first_page_of_table=False)
     
     # Table 2: Unit 6 Header (160.4 to 201.1)
@@ -495,8 +592,8 @@ def render_page_3(c, p_data):
     # Table 3: Unit 6 Elements (213.1 to 733.5)
     t3_data = p_data["tables"][3]["data"]
     draw_elements_table_generic(c, L, R, 213.1, 225.1, [
-        {"y_top": 225.1, "y_bot": 444.8, "cell_text": t3_data[1][0], "has_checkbox": True, "k": True},
-        {"y_top": 444.8, "y_bot": 733.5, "cell_text": t3_data[2][0], "has_checkbox": True, "k": True},
+        {"y_top": 225.1, "y_bot": 444.8, "cell_text": t3_data[1][0], "has_checkbox": True, "k": True, "row_index": 11},
+        {"y_top": 444.8, "y_bot": 733.5, "cell_text": t3_data[2][0], "has_checkbox": True, "k": True, "row_index": 12},
     ])
 
 # ================= PAGE 4 =================
@@ -509,9 +606,9 @@ def render_page_4(c, p_data):
     # Table 2: Unit 7 Elements (166.1 to 676.1)
     t2_data = p_data["tables"][2]["data"]
     draw_elements_table_generic(c, L, R, 166.1, 178.1, [
-        {"y_top": 178.1, "y_bot": 397.8, "cell_text": t2_data[1][0], "has_checkbox": True, "k": True},
-        {"y_top": 397.8, "y_bot": 594.5, "cell_text": t2_data[2][0], "has_checkbox": True, "k": True},
-        {"y_top": 594.5, "y_bot": 676.1, "cell_text": t2_data[3][0], "has_checkbox": True, "k": True},
+        {"y_top": 178.1, "y_bot": 397.8, "cell_text": t2_data[1][0], "has_checkbox": True, "k": True, "row_index": 13},
+        {"y_top": 397.8, "y_bot": 594.5, "cell_text": t2_data[2][0], "has_checkbox": True, "k": True, "row_index": 14},
+        {"y_top": 594.5, "y_bot": 676.1, "cell_text": t2_data[3][0], "has_checkbox": True, "k": True, "row_index": 15},
     ])
     
     # Table 3: Unit 8 Header (688.1 to 728.9)
@@ -520,7 +617,7 @@ def render_page_4(c, p_data):
     # Table 4: Unit 8 Elements Part 1 (740.9 to 776.4)
     t4_data = p_data["tables"][4]["data"]
     draw_elements_table_generic(c, L, R, 740.9, 752.9, [
-        {"y_top": 752.9, "y_bot": 776.4, "cell_text": t4_data[1][0], "has_checkbox": True, "k": True},
+        {"y_top": 752.9, "y_bot": 776.4, "cell_text": t4_data[1][0], "has_checkbox": True, "k": True, "row_index": 16},
     ])
 
 # ================= PAGE 5 =================
@@ -530,9 +627,9 @@ def render_page_5(c, p_data):
     # Table 1: Unit 8 Continuation Table (113.4 to 530.9)
     t1_data = p_data["tables"][1]["data"]
     draw_elements_table_generic(c, L, R, 113.4, 113.4, [
-        {"y_top": 113.4, "y_bot": 264.1, "cell_text": t1_data[0][0], "has_checkbox": True, "k": True},
-        {"y_top": 264.1, "y_bot": 391.8, "cell_text": t1_data[1][0], "has_checkbox": True, "k": True},
-        {"y_top": 391.8, "y_bot": 530.9, "cell_text": t1_data[2][0], "has_checkbox": True, "k": True},
+        {"y_top": 113.4, "y_bot": 264.1, "cell_text": t1_data[0][0], "has_checkbox": True, "k": True, "row_index": 17},
+        {"y_top": 264.1, "y_bot": 391.8, "cell_text": t1_data[1][0], "has_checkbox": True, "k": True, "row_index": 18},
+        {"y_top": 391.8, "y_bot": 530.9, "cell_text": t1_data[2][0], "has_checkbox": True, "k": True, "row_index": 19},
     ], is_first_page_of_table=False)
     
     # Table 2: Unit 9 Header (542.9 to 583.6)
@@ -541,7 +638,7 @@ def render_page_5(c, p_data):
     # Table 3: Unit 9 Elements Part 1 (595.6 to 781.4)
     t3_data = p_data["tables"][3]["data"]
     draw_elements_table_generic(c, L, R, 595.6, 607.6, [
-        {"y_top": 607.6, "y_bot": 781.4, "cell_text": t3_data[1][0], "has_checkbox": True, "k": True},
+        {"y_top": 607.6, "y_bot": 781.4, "cell_text": t3_data[1][0], "has_checkbox": True, "k": True, "row_index": 20},
     ])
 
 # ================= PAGE 6 =================
@@ -551,9 +648,9 @@ def render_page_6(c, p_data):
     # Table 0: Unit 9 Continuation Table (113.4 to 507.3)
     t0_data = p_data["tables"][0]["data"]
     draw_elements_table_generic(c, L, R, 113.4, 113.4, [
-        {"y_top": 113.4, "y_bot": 148.4, "cell_text": t0_data[0][0], "has_checkbox": True, "k": True},
-        {"y_top": 148.4, "y_bot": 333.6, "cell_text": t0_data[1][0], "has_checkbox": True, "k": True},
-        {"y_top": 333.6, "y_bot": 507.3, "cell_text": t0_data[2][0], "has_checkbox": True, "k": True},
+        {"y_top": 113.4, "y_bot": 148.4, "cell_text": t0_data[0][0], "has_checkbox": True, "k": True, "row_index": 21},
+        {"y_top": 148.4, "y_bot": 333.6, "cell_text": t0_data[1][0], "has_checkbox": True, "k": True, "row_index": 22},
+        {"y_top": 333.6, "y_bot": 507.3, "cell_text": t0_data[2][0], "has_checkbox": True, "k": True, "row_index": 23},
     ], is_first_page_of_table=False)
     
     # Table 1: Rekomendasi & Signature Box (519.9 to 648.8)
@@ -604,8 +701,10 @@ def render_page_6(c, p_data):
     
     c.drawString(c_mid + 6.0, Y(548.0), "Tanda tangan/")
     c.drawString(c_mid + 6.0, Y(560.0), "Tanggal")
-    c.drawString(c_lbl + 6.0, Y(554.0), str(DATA.get('tanggal', '')))
-    draw_signature(c, DATA.get("signature_asesi") or DATA.get("asesi_signature"), c_lbl + 68.0, 565.0, w=75.0, h=26.0)
+    x_cell_ctr = (c_lbl + R) / 2
+    draw_signature(c, DATA.get("signature_asesi") or DATA.get("asesi_signature"), x_cell_ctr - 35.0, 555.5, w=70.0, h=18.0)
+    c.setFont("Lib", 8.5)
+    c.drawCentredString(x_cell_ctr, Y(564.5), str(DATA.get('tanggal', '')))
     
     # Right Section: Asesor Header
     c.setFont("Lib-B", 10.0)
@@ -621,8 +720,9 @@ def render_page_6(c, p_data):
     
     c.drawString(c_mid + 6.0, Y(628.0), "Tanda tangan/")
     c.drawString(c_mid + 6.0, Y(640.0), "Tanggal")
-    c.drawString(c_lbl + 6.0, Y(634.0), str(DATA.get('tanggal', '')))
-    draw_signature(c, DATA.get("signature_asesor") or DATA.get("assessor_signature"), c_lbl + 68.0, 645.0, w=75.0, h=26.0)
+    draw_signature(c, DATA.get("signature_asesor") or DATA.get("assessor_signature"), x_cell_ctr - 35.0, 636.5, w=70.0, h=18.0)
+    c.setFont("Lib", 8.5)
+    c.drawCentredString(x_cell_ctr, Y(645.5), str(DATA.get('tanggal', '')))
 
 if __name__ == "__main__":
     out_dir = os.path.join(PROJECT_ROOT, "tests", "Fixtures", "muk")

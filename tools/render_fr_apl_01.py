@@ -662,13 +662,15 @@ def page3(c, d, pnum=3):
 
     text(c, "Pemohon/ Kandidat :", 484, top_rek + 11, "Cal-B")
     text(c, "Nama", 484, top_rek + 36); text(c, str(d.get("nama_lengkap") or "-"), 600, top_rek + 36, "Cal", BODY - 0.5)
-    text(c, "Tanda tangan/", 484, top_rek + 78); text(c, "Tanggal", 484, top_rek + 96); text(c, str(d.get("tgl_pemohon") or "-"), 600, top_rek + 96)
-    draw_signature(c, d.get("signature_asesi") or d.get("asesi_signature"), 600, top_rek + 93, 140, 38)
+    text(c, "Tanda tangan/", 484, top_rek + 78); text(c, "Tanggal", 484, top_rek + 96)
+    draw_signature(c, d.get("signature_asesi") or d.get("asesi_signature"), 600, top_rek + 95, 120, 32)
+    text(c, str(d.get("tgl_pemohon") or "-"), 600, top_rek + 116, "Cal", BODY - 0.5)
 
     text(c, "Admin LSP  :", 484, mid_rek + 10, "Cal-B")
     text(c, "Nama :", 484, mid_rek + 36); text(c, str(d.get("nama_admin") or "Admin LSP"), 600, mid_rek + 36)
-    text(c, "Tanda tangan/", 484, mid_rek + 74); text(c, "Tanggal", 484, mid_rek + 92); text(c, str(d.get("tgl_admin") or "-"), 600, mid_rek + 92)
-    draw_signature(c, d.get("signature_admin") or d.get("admin_signature"), 600, mid_rek + 89, 140, 38)
+    text(c, "Tanda tangan/", 484, mid_rek + 74); text(c, "Tanggal", 484, mid_rek + 92)
+    draw_signature(c, d.get("signature_admin") or d.get("admin_signature"), 600, mid_rek + 93, 120, 32)
+    text(c, str(d.get("tgl_admin") or "-"), 600, mid_rek + 114, "Cal", BODY - 0.5)
     pageno(c, pnum)
 
 # ================= HALAMAN 2 & 3 UNTUK SKEMA BESAR (> 9 UNIT) =================
@@ -864,13 +866,15 @@ def page3_large(c, d, pnum=3):
 
     text(c, "Pemohon/ Kandidat :", 484, top_rek + 11, "Cal-B")
     text(c, "Nama", 484, top_rek + 36); text(c, str(d.get("nama_lengkap") or "-"), 600, top_rek + 36, "Cal", BODY - 0.5)
-    text(c, "Tanda tangan/", 484, top_rek + 78); text(c, "Tanggal", 484, top_rek + 96); text(c, str(d.get("tgl_pemohon") or "-"), 600, top_rek + 96)
-    draw_signature(c, d.get("signature_asesi") or d.get("asesi_signature"), 600, top_rek + 93, 140, 38)
+    text(c, "Tanda tangan/", 484, top_rek + 78); text(c, "Tanggal", 484, top_rek + 96)
+    draw_signature(c, d.get("signature_asesi") or d.get("asesi_signature"), 600, top_rek + 95, 120, 32)
+    text(c, str(d.get("tgl_pemohon") or "-"), 600, top_rek + 116, "Cal", BODY - 0.5)
 
     text(c, "Admin LSP  :", 484, mid_rek + 10, "Cal-B")
     text(c, "Nama :", 484, mid_rek + 36); text(c, str(d.get("nama_admin") or "Admin LSP"), 600, mid_rek + 36)
-    text(c, "Tanda tangan/", 484, mid_rek + 74); text(c, "Tanggal", 484, mid_rek + 92); text(c, str(d.get("tgl_admin") or "-"), 600, mid_rek + 92)
-    draw_signature(c, d.get("signature_admin") or d.get("admin_signature"), 600, mid_rek + 89, 140, 38)
+    text(c, "Tanda tangan/", 484, mid_rek + 74); text(c, "Tanggal", 484, mid_rek + 92)
+    draw_signature(c, d.get("signature_admin") or d.get("admin_signature"), 600, mid_rek + 93, 120, 32)
+    text(c, str(d.get("tgl_admin") or "-"), 600, mid_rek + 114, "Cal", BODY - 0.5)
     pageno(c, pnum)
 
 # --- Generator Utama dengan Flow Kontrol ---

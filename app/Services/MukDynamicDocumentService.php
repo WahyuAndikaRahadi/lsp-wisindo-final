@@ -429,7 +429,7 @@ class MukDynamicDocumentService
         $asesi = $assessment->asesi;
         $profile = $asesi?->profile;
         $assessor = $assessment->assessor ?? $schedule->assessors->first();
-        $scheme = $assessment->scheme ?? $schedule->scheme;
+        $scheme = $schedule->scheme ?? $assessment->schedule?->scheme;
 
         $tgl = $assessment->registered_at
             ? Carbon::parse($assessment->registered_at)->locale('id')->translatedFormat('d F Y')
@@ -437,14 +437,67 @@ class MukDynamicDocumentService
 
         $isKompeten = ! in_array($assessment->final_result, ['BK', 'BELUM_KOMPETEN', 'BELUM KOMPETEN'], true);
 
+        // Map element-level answers and proofs
+        $savedApl02 = $assessment->apl02Items->keyBy('kuk_id');
+        $answers = [];
+        $proofs = [];
+
+        $proofLabels = [
+            'IJAZAH_SMK' => 'Ijazah SMK Otomotif',
+            'SURAT_SISWA_AKTIF' => 'Surat Keterangan Siswa Aktif',
+            'IJAZAH_SMA_SERTIFIKAT' => 'Ijazah SMA + Sertifikat Pelatihan',
+            'PENGALAMAN_KERJA' => 'Surat Pengalaman Kerja',
+            'KTP' => 'Fotokopi KTP',
+            'PAS_FOTO' => 'Pas Foto 3x4',
+        ];
+
+        // Primary proof uploaded by candidate in assessment_proofs
+        $candidateBasicProof = $assessment->proofs
+            ->whereIn('proof_type', ['IJAZAH_SMK', 'SURAT_SISWA_AKTIF', 'IJAZAH_SMA_SERTIFIKAT', 'PENGALAMAN_KERJA'])
+            ->first()?->proof_type;
+        $defaultProof = $candidateBasicProof ? ($proofLabels[$candidateBasicProof] ?? 'Ijazah SMK Otomotif') : 'Ijazah SMK Otomotif';
+
+        if ($scheme) {
+            foreach ($scheme->competencyUnits as $unitIdx => $unit) {
+                foreach ($unit->elements as $elemIdx => $elem) {
+                    $allK = true;
+                    $elemProof = null;
+                    if ($savedApl02->isNotEmpty()) {
+                        foreach ($elem->kuks as $kuk) {
+                            $item = $savedApl02->get($kuk->id);
+                            if ($item) {
+                                if ($item->assessment_value === 'BK' || ($item->is_competent ?? true) === false) {
+                                    $allK = false;
+                                }
+                                if (! empty($item->selected_proof_type) && ! $elemProof) {
+                                    $elemProof = $proofLabels[$item->selected_proof_type] ?? $item->selected_proof_type;
+                                }
+                            }
+                        }
+                    }
+                    $answers[] = $allK;
+                    $proofs[] = $elemProof ?? $defaultProof;
+
+                    // Unit 5 Elemen 2 (element index 1) is split across Page 2 and Page 3 in ReportLab template
+                    if (($unitIdx === 4 || str_contains($unit->code, '009')) && $elemIdx === 1) {
+                        $answers[] = $allK;
+                        $proofs[] = $elemProof ?? $defaultProof;
+                    }
+                }
+            }
+        }
+
         return [
             'skema_judul' => $scheme?->name ?? 'Klaster Maintenance Gasoline Engine Injection System',
             'skema_nomor' => $scheme?->code ?? '02/LSP PrO Indo/I/2026',
             'asesi_nama' => $asesi?->full_name ?? 'Nama Asesi',
             'asesor_nama' => $assessor?->full_name ?? 'Drs. Budi Santoso, M.T.',
-            'asesor_reg' => $assessor?->profile?->no_reg ?? 'MET.000.001234 2022',
+            'asesor_reg' => $assessor?->profile?->no_reg ?? ($assessor?->no_reg ?? 'MET.000.001234 2022'),
             'tanggal' => $tgl,
             'is_kompeten' => $isKompeten,
+            'answers' => $answers,
+            'proofs' => $proofs,
+            'default_proof' => $defaultProof,
             'signature_asesi' => $assessment->asesi_signature ?? $profile?->signature_data,
             'signature_asesor' => $assessment->assessor_signature ?? $assessor?->profile?->signature_data,
         ];
@@ -812,7 +865,10 @@ class MukDynamicDocumentService
                         : $this->buildPayload($schedule, null);
                     $tempAplJson = $this->cacheDir.'/muk_apl02_'.uniqid().'.json';
                     File::put($tempAplJson, json_encode($apl02Payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
-                    shell_exec("{$pythonExec} ".escapeshellarg($script).' '.escapeshellarg($tempAplJson).' '.escapeshellarg($outputPath));
+                    if (File::isFile($outputPath)) {
+                        @unlink($outputPath);
+                    }
+                    shell_exec("{$pythonExec} ".escapeshellarg($script).' '.escapeshellarg($tempAplJson).' '.escapeshellarg($outputPath).' 2>&1');
                     @unlink($tempAplJson);
                     if (File::isFile($outputPath) && filesize($outputPath) > 1000) {
                         return $outputPath;

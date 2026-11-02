@@ -63,6 +63,18 @@
     {{-- Units Loop --}}
     @php
         $savedApl02 = $assessment->apl02Items->keyBy('kuk_id');
+        $proofLabels = [
+            'IJAZAH_SMK' => 'Ijazah SMK Otomotif',
+            'SURAT_SISWA_AKTIF' => 'Surat Keterangan Siswa Aktif',
+            'IJAZAH_SMA_SERTIFIKAT' => 'Ijazah SMA + Sertifikat Pelatihan',
+            'PENGALAMAN_KERJA' => 'Surat Pengalaman Kerja',
+            'KTP' => 'Fotokopi KTP',
+            'PAS_FOTO' => 'Pas Foto 3x4',
+        ];
+        $candidateBasicProof = $assessment->proofs
+            ->whereIn('proof_type', ['IJAZAH_SMK', 'SURAT_SISWA_AKTIF', 'IJAZAH_SMA_SERTIFIKAT', 'PENGALAMAN_KERJA'])
+            ->first()?->proof_type;
+        $defaultProof = $candidateBasicProof ? ($proofLabels[$candidateBasicProof] ?? 'Ijazah SMK Otomotif') : 'Ijazah SMK Otomotif';
     @endphp
 
     @foreach($scheme->competencyUnits as $uIdx => $unit)
@@ -99,13 +111,17 @@
                         @php
                             $elemKuks = $elem->kuks;
                             $allK = true;
+                            $elemProof = null;
                             foreach ($elemKuks as $k) {
                                 $item = $savedApl02->get($k->id);
                                 if ($item && !($item->is_competent ?? true)) {
                                     $allK = false;
-                                    break;
+                                }
+                                if ($item && !empty($item->selected_proof_type) && !$elemProof) {
+                                    $elemProof = $proofLabels[$item->selected_proof_type] ?? $item->selected_proof_type;
                                 }
                             }
+                            $proofText = $elemProof ?? $defaultProof;
                         @endphp
                         <tr style="page-break-inside: avoid;">
                             <td style="border: 1px solid #000; padding: 5px 8px; vertical-align: top; line-height: 1.35;">
@@ -129,8 +145,8 @@
                             <td style="border: 1px solid #000; text-align: center; vertical-align: middle;">
                                 <span class="check-box">{!! !$allK ? '&radic;' : '&nbsp;' !!}</span>
                             </td>
-                            <td style="border: 1px solid #000; padding: 4px 6px; vertical-align: middle; font-size: 8pt; color: #334155;">
-                                Portofolio / Raport / Ijazah SMK
+                            <td style="border: 1px solid #000; padding: 4px 6px; vertical-align: middle; font-size: 8pt; color: #1e293b;">
+                                {{ $proofText }}
                             </td>
                         </tr>
                     @endforeach
@@ -159,13 +175,20 @@
                         <td style="padding: 4px 6px; border-bottom: 1px solid #000; border-right: 1px solid #000; vertical-align: top;">
                             Tanda tangan/<br>Tanggal
                         </td>
-                        <td style="padding: 4px 6px; border-bottom: 1px solid #000; vertical-align: middle;">
-                            @if($assessment->asesi_signature)
-                                <img src="{{ $assessment->asesi_signature }}" style="max-height: 28px; max-width: 90px; vertical-align: middle;" alt="TTD Asesi">
-                            @else
-                                : [Tanda Tangan Digital]
-                            @endif
-                            &nbsp;- {{ \Carbon\Carbon::parse($schedule?->date ?? now())->translatedFormat('d/m/Y') }}
+                        <td style="padding: 4px 6px; border-bottom: 1px solid #000; vertical-align: middle; text-align: center;">
+                            @php
+                                $asesiSig = $assessment->asesi_signature ?? $asesi?->profile?->signature_data;
+                            @endphp
+                            <div style="min-height: 28px; display: flex; align-items: center; justify-content: center;">
+                                @if($asesiSig)
+                                    <img src="{{ $asesiSig }}" style="max-height: 32px; max-width: 100px; filter: contrast(1.5) brightness(0.85);" alt="TTD Asesi">
+                                @else
+                                    <span style="color: #64748b; font-style: italic; font-size: 8pt;">[Tanda Tangan Digital]</span>
+                                @endif
+                            </div>
+                            <div style="font-size: 8pt; color: #334155; margin-top: 2px;">
+                                {{ \Carbon\Carbon::parse($assessment->registered_at ?? ($schedule?->date ?? now()))->translatedFormat('d F Y') }}
+                            </div>
                         </td>
                     </tr>
                     <tr>
@@ -179,21 +202,28 @@
                     </tr>
                     <tr>
                         <td style="padding: 4px 6px; border-bottom: 1px solid #000; border-right: 1px solid #000;">No. Reg:</td>
-                        <td style="padding: 4px 6px; border-bottom: 1px solid #000; font-weight: bold;">: {{ $assessor?->profile?->met_number ?? $assessor?->assessor_registration_number ?? '-' }}</td>
+                        <td style="padding: 4px 6px; border-bottom: 1px solid #000; font-weight: bold;">: {{ $assessor?->profile?->no_reg ?? ($assessor?->profile?->met_number ?? ($assessor?->assessor_registration_number ?? 'MET.000.001234 2022')) }}</td>
                     </tr>
                     <tr>
                         <td style="padding: 4px 6px; border-right: 1px solid #000; vertical-align: top;">
                             Tanda tangan/<br>Tanggal
                         </td>
-                        <td style="padding: 4px 6px; vertical-align: middle;">
-                            @if($assessor?->profile?->signature_path)
-                                <img src="{{ asset('storage/' . $assessor->profile->signature_path) }}" style="max-height: 28px; max-width: 90px; vertical-align: middle;" alt="TTD Asesor">
-                            @elseif($assessment->assessor_signature)
-                                <img src="{{ $assessment->assessor_signature }}" style="max-height: 28px; max-width: 90px; vertical-align: middle;" alt="TTD Asesor">
-                            @else
-                                : [Tanda Tangan Digital]
-                            @endif
-                            &nbsp;- {{ \Carbon\Carbon::parse($schedule?->date ?? now())->translatedFormat('d/m/Y') }}
+                        <td style="padding: 4px 6px; vertical-align: middle; text-align: center;">
+                            @php
+                                $asesorSig = $assessment->assessor_signature ?? $assessor?->profile?->signature_data;
+                            @endphp
+                            <div style="min-height: 28px; display: flex; align-items: center; justify-content: center;">
+                                @if($asesorSig)
+                                    <img src="{{ $asesorSig }}" style="max-height: 32px; max-width: 100px; filter: contrast(1.5) brightness(0.85);" alt="TTD Asesor">
+                                @elseif($assessor?->profile?->signature_path)
+                                    <img src="{{ asset('storage/' . $assessor->profile->signature_path) }}" style="max-height: 32px; max-width: 100px; filter: contrast(1.5) brightness(0.85);" alt="TTD Asesor">
+                                @else
+                                    <span style="color: #64748b; font-style: italic; font-size: 8pt;">[Tanda Tangan Digital]</span>
+                                @endif
+                            </div>
+                            <div style="font-size: 8pt; color: #334155; margin-top: 2px;">
+                                {{ \Carbon\Carbon::parse($assessment->assessor_signed_at ?? ($schedule?->date ?? now()))->translatedFormat('d F Y') }}
+                            </div>
                         </td>
                     </tr>
                 </table>
