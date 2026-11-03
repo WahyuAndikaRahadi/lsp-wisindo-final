@@ -155,17 +155,17 @@ class DokumenMukController extends Controller
 
     public function exportBa(Schedule $schedule)
     {
-        return $this->exportSchedule($schedule, 'ba');
+        return $this->dynamicService->exportSchedule($schedule, 'ba', request()->boolean('download'));
     }
 
     public function exportHadirAsesor(Schedule $schedule)
     {
-        return $this->exportSchedule($schedule, 'hadir-asesor');
+        return $this->dynamicService->exportSchedule($schedule, 'hadir-asesor', request()->boolean('download'));
     }
 
     public function exportHadirAsesi(Schedule $schedule)
     {
-        return $this->exportSchedule($schedule, 'hadir-asesi');
+        return $this->dynamicService->exportSchedule($schedule, 'ba', request()->boolean('download'));
     }
 
     public function exportExcelBiodata(Schedule $schedule)

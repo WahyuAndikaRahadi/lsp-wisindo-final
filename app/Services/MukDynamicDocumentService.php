@@ -231,17 +231,19 @@ class MukDynamicDocumentService
         $payload = [
             'skema_nama' => $schedule->scheme?->name ?? 'Skema Sertifikasi LSP PrO Indo',
             'skema_nomor' => $schedule->scheme?->code ?? 'SKM/LSP-PRO/2026',
-            'tuk_nama' => $schedule->tuk_name ?? 'TUK Otomotif Mandiri',
-            'tuk_kota' => 'Karawang',
-            'tuk_alamat' => 'Karawang, Jawa Barat',
+            'tuk_nama' => $schedule->tuk_name ?? $schedule->tuk?->name ?? 'TUK Otomotif Mandiri',
+            'tuk_kota' => $schedule->tuk?->address ? (explode(',', $schedule->tuk->address)[0] ?? 'Karawang') : 'Karawang',
+            'tuk_alamat' => $schedule->tuk?->address ?? 'Karawang, Jawa Barat',
             'hari_tanggal' => "{$dayName}, {$formattedDate}",
             'tanggal' => $formattedDate,
             'waktu' => ($schedule->start_time ?? '08:00').' - '.($schedule->end_time ?? '12:00').' WIB',
             'asesor_nama' => $leadAssessor?->full_name ?? 'Asesor LSP PrO Indo',
             'asesor_no_reg' => $leadAssessor?->profile?->no_reg ?? 'MET.000.001234 2022',
             'tanggal_dokumen' => $formattedDate,
-            'penanggungjawab_nama' => 'H. Ahmad Fauzi, S.Pd., M.M.',
-            'penanggungjawab_jabatan' => 'Kepala TUK',
+            'penanggungjawab_nama' => $schedule->pic_name ?? 'H. Ahmad Fauzi, S.Pd., M.M.',
+            'penanggungjawab_jabatan' => $schedule->pic_position ?? 'Kepala TUK',
+            'signature_penanggungjawab' => $schedule->pic_signature,
+            'signature_asesor' => $leadAssessor?->profile?->signature_data,
         ];
 
         if ($assessment) {
@@ -284,6 +286,7 @@ class MukDynamicDocumentService
                 'hasil' => $assIsK ? 'K' : 'BK',
                 'rekomendasi' => $assIsK ? 'Diterbitkan Sertifikat' : 'Tidak Diterbitkan',
                 'ket' => $assIsK ? 'Lulus' : 'Belum Lulus',
+                'signature' => $ass->asesi_signature ?? $assProfile?->signature_data,
             ];
         }
         $payload['peserta'] = $pesertaList;
@@ -1017,10 +1020,13 @@ class MukDynamicDocumentService
                     }
                 }
             }
-            if (in_array($normType, ['ba', 'beritaacara', 'beritaacaradanpeserta'], true)) {
+            if (in_array($normType, ['ba', 'beritaacara', 'beritaacaradanpeserta', 'hadirasesi', 'daftarhadirasesi'], true)) {
                 $script = base_path('tools/render_berita_acara.py');
                 if (File::isFile($script)) {
-                    shell_exec("{$pythonExec} ".escapeshellarg($script).' '.escapeshellarg($tempJson).' '.escapeshellarg($outputPath));
+                    if (File::isFile($outputPath)) {
+                        @unlink($outputPath);
+                    }
+                    shell_exec("{$pythonExec} ".escapeshellarg($script).' '.escapeshellarg($tempJson).' '.escapeshellarg($outputPath).' 2>&1');
                     if (File::isFile($outputPath) && filesize($outputPath) > 1000) {
                         return $outputPath;
                     }
