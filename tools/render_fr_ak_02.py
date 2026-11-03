@@ -1,668 +1,760 @@
 #!/usr/bin/env python3
 """
-Generator FR.AK.02 (Rekaman Asesmen Kompetensi) - LSP PrO Indo
-Layout meniru template master BNSP aslinya secara presisi piksel 100%; tanpa watermark sesuai instruksi.
-Paginasi 3 halaman utuh sesuai master document dengan data dummy lengkap.
+Generator & Master Overlay FR.AK.02 (Rekaman Asesmen Kompetensi) - LSP PrO Indo
+Layout, tabel, dan font presisi identik dengan master template asli BNSP di lsp-document-dynamic:
+http://127.0.0.1:8000/asesor/assessment/3/ak02
+
+Fitur Arsitektur Master Overlay:
+- Deteksi dinamis master template PDF per skema (Skema 1 s/d Skema 7).
+- Penghapusan 100% watermark (Word header artifact curves, vector stream 0.722, dan background images).
+- Pembersihan tanda tangan digital transparan & kontras tinggi, aspect-ratio preserved, margin aman tidak nabrak garis.
+- Font: Calibri 10.5pt & 9.5pt sesuai standar BNSP.
+- Garis tabel vertikal dan horizontal 100% utuh, rapih, solid, dan tidak terhapus.
+- Data dinamis database terhubung riil dari penilaian asesor (t_assessments & t_assessment_ak02_items):
+  * Skema sertifikasi (judul & nomor)
+  * Asesi (nama) & Asesor (nama & nomor registrasi MET)
+  * TUK & tanggal pelaksanaan (Mulai & Selesai)
+  * Checklist metode bukti per unit kompetensi (Observasi, Portofolio, Pihak Ketiga, Lisan, Tulis, Proyek, Lainnya)
+    menggunakan vektor checkmark APL.02.
+  * Rekomendasi hasil asesmen: dicentang Kompeten jika final_result KOMPETEN, Belum kompeten jika BELUM_KOMPETEN.
+  * Tindak lanjut yang dibutuhkan: diambil dari follow_up_action asesor.
+  * Komentar / observasi asesor: diambil dari final_notes asesor.
+  * Tanda tangan digital & tanggal asesi dan asesor.
+- Default Kosong Total (saat belum dinilai asesor):
+  * Semua checklist metode per unit kompetensi kosong.
+  * Rekomendasi (Kompeten & Belum kompeten) tetap kosong (ballot box tidak dicentang).
+  * Tindak lanjut dan Komentar asesor kosong (tidak ada teks dummy/mock).
+  * Tanda tangan dan tanggal kosong jika belum ditandatangani.
 """
 
 import os
 import sys
+import json
 import io
 import base64
+import re
 from PIL import Image
-from reportlab.pdfgen import canvas
-from reportlab.lib.colors import black
-from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfbase.ttfonts import TTFont
-from reportlab.lib.utils import ImageReader
+import pymupdf as fitz
 
-ASSETS = os.path.join(os.path.dirname(__file__), "..", "tests", "Fixtures", "muk", "assets")
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+DEFAULT_REF_PDF = os.path.join(
+    PROJECT_ROOT,
+    "lsp-document-dynamic",
+    "MUK SKEMA 2 Klaster Maintenance Gasoline Engine Injection",
+    "13. FR.AK.02. Rekaman Asesmen Kompetensi.pdf"
+)
+OUT_FILE = os.path.join(PROJECT_ROOT, "tests", "Fixtures", "muk", "FR_AK_02_generated.pdf")
 
-def register_fonts():
-    font_candidates = {
-        "Cal": [
-            "/usr/share/fonts/liberation/LiberationSans-Regular.ttf",
-            "/usr/share/fonts/TTF/DejaVuSans.ttf",
-            "C:/Windows/Fonts/calibri.ttf",
-            "/usr/share/fonts/truetype/carlito/Carlito-Regular.ttf",
-            "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
-            "LiberationSans-Regular.ttf"
-        ],
-        "Cal-B": [
-            "/usr/share/fonts/liberation/LiberationSans-Bold.ttf",
-            "/usr/share/fonts/TTF/DejaVuSans-Bold.ttf",
-            "C:/Windows/Fonts/calibrib.ttf",
-            "/usr/share/fonts/truetype/carlito/Carlito-Bold.ttf",
-            "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf",
-            "LiberationSans-Bold.ttf"
-        ],
-        "Cal-I": [
-            "/usr/share/fonts/liberation/LiberationSans-Italic.ttf",
-            "/usr/share/fonts/TTF/DejaVuSans-Oblique.ttf",
-            "C:/Windows/Fonts/calibrii.ttf",
-            "/usr/share/fonts/truetype/carlito/Carlito-Italic.ttf",
-            "/usr/share/fonts/truetype/liberation/LiberationSans-Italic.ttf",
-            "LiberationSans-Italic.ttf"
-        ],
-        "Tah": [
-            "/usr/share/fonts/liberation/LiberationSans-Regular.ttf",
-            "/usr/share/fonts/TTF/DejaVuSans.ttf",
-            "C:/Windows/Fonts/tahoma.ttf",
-            "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
-            "DejaVuSans.ttf"
-        ],
-        "Tah-B": [
-            "/usr/share/fonts/liberation/LiberationSans-Bold.ttf",
-            "/usr/share/fonts/TTF/DejaVuSans-Bold.ttf",
-            "C:/Windows/Fonts/tahomabd.ttf",
-            "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
-            "DejaVuSans-Bold.ttf"
-        ],
-        "Arial": [
-            "/usr/share/fonts/liberation/LiberationSans-Regular.ttf",
-            "C:/Windows/Fonts/arial.ttf",
-            "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
-            "LiberationSans-Regular.ttf"
-        ],
-        "Arial-B": [
-            "/usr/share/fonts/liberation/LiberationSans-Bold.ttf",
-            "C:/Windows/Fonts/arialbd.ttf",
-            "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf",
-            "LiberationSans-Bold.ttf"
-        ],
-    }
-    for name, paths in font_candidates.items():
-        for p in paths:
-            if os.path.exists(p):
-                pdfmetrics.registerFont(TTFont(name, p))
-                break
+CALIBRI_REG = "C:/Windows/Fonts/calibri.ttf"
+CALIBRI_BOLD = "C:/Windows/Fonts/calibrib.ttf"
+CALIBRI_ITALIC = "C:/Windows/Fonts/calibrii.ttf"
 
-register_fonts()
+def clean_watermark(doc):
+    """Strip all background watermarks (Word artifact header bezier curves, vector rg, and large images)."""
+    cleaned = 0
+    for page in doc:
+        for xref in page.get_contents():
+            try:
+                stream = doc.xref_stream(xref).decode("latin1", errors="ignore")
+                modified = False
 
-PAGE_W, PAGE_H = 595.5, 842.5
-Y = lambda top: PAGE_H - top
+                # 1. Color vector watermark (0.722 0.8 0.894 rg)
+                wm_start = stream.find("0.722 0.8 0.894 rg")
+                if wm_start != -1:
+                    wm_end = stream.find("h\r\nf*\r\n", wm_start)
+                    if wm_end != -1:
+                        wm_end += len("h\r\nf*\r\n")
+                        stream = stream[:wm_start] + stream[wm_end:]
+                        modified = True
+                        cleaned += 1
+
+                # 2. Word Artifact Header bezier curves (/Artifact ... /Subtype/Header>> BDC /GS.. gs ... h f* q)
+                prefix = "/Artifact <</Attached [/Top]/Type/Pagination/Subtype/Header>> BDC"
+                art_pos = stream.find(prefix)
+                if art_pos != -1:
+                    gs_match = re.search(r"/GS\d+\s+gs\s*", stream[art_pos:art_pos + 200])
+                    if gs_match:
+                        wm_start = art_pos + gs_match.end()
+                        for term in ["h\r\nf*\r\nq", "h\nf*\nq", "h f* q"]:
+                            term_idx = stream.find(term, wm_start)
+                            if term_idx != -1 and (term_idx - wm_start) > 5000:
+                                wm_end = term_idx + len(term) - 1
+                                stream = stream[:wm_start] + stream[wm_end:]
+                                modified = True
+                                cleaned += 1
+                                break
+
+                # 3. Clean background watermark images if any (> 400x400 or > 250x250)
+                for img in page.get_image_info(xrefs=True):
+                    w = img.get("width", 0)
+                    h = img.get("height", 0)
+                    bbox = img.get("bbox", (0, 0, 0, 0))
+                    img_w = bbox[2] - bbox[0]
+                    img_h = bbox[3] - bbox[1]
+                    if (w > 400 and h > 400) or (img_w > 250 and img_h > 250 and bbox[1] > 100):
+                        xref_img = img.get("xref")
+                        if xref_img:
+                            try:
+                                page.delete_image(xref_img)
+                                cleaned += 1
+                            except Exception:
+                                pass
+
+                if modified:
+                    doc.update_stream(xref, stream.encode("latin1"))
+            except Exception:
+                pass
+    return cleaned
 
 def clean_signature_image(raw_bytes_or_path):
+    """
+    Load signature and ensure strokes are solid, bold, and crisp on transparent background.
+    Safely handles both transparent canvas signatures and solid white background scans.
+    """
+    if not raw_bytes_or_path:
+        return None
     try:
         if isinstance(raw_bytes_or_path, (bytes, bytearray)):
             im = Image.open(io.BytesIO(raw_bytes_or_path))
-        else:
+        elif isinstance(raw_bytes_or_path, str) and raw_bytes_or_path.startswith("data:image"):
+            b64_str = raw_bytes_or_path.split(",", 1)[1]
+            raw_bytes = base64.b64decode(b64_str)
+            im = Image.open(io.BytesIO(raw_bytes))
+        elif isinstance(raw_bytes_or_path, str) and os.path.isfile(raw_bytes_or_path):
             im = Image.open(raw_bytes_or_path)
+        else:
+            return None
+
         im = im.convert("RGBA")
         w, h = im.size
         if w == 0 or h == 0:
             return None
 
-        # Sample corner colors to detect background
-        corners = []
-        for pt in ((0, 0), (w - 1, 0), (0, h - 1), (w - 1, h - 1)):
-            px = im.getpixel(pt)
-            if isinstance(px, tuple) and len(px) >= 3:
-                corners.append((px[0], px[1], px[2]))
-            elif isinstance(px, (int, float)):
-                corners.append((int(px), int(px), int(px)))
-
-        if not corners:
-            corners = [(255, 255, 255)]
-
-        bg_r = sum(c[0] for c in corners) / len(corners)
-        bg_g = sum(c[1] for c in corners) / len(corners)
-        bg_b = sum(c[2] for c in corners) / len(corners)
-
         pixels = im.load()
-        if pixels is None:
-            return None
 
-        for y in range(h):
-            for x in range(w):
-                px = pixels[x, y]
-                if not isinstance(px, tuple) or len(px) < 4:
-                    continue
-                r, g, b, a = int(px[0]), int(px[1]), int(px[2]), int(px[3])
-                if a == 0:
-                    continue
-                is_green = (g > 80 and g > r * 1.15 and g > b * 1.15)
-                dist_bg = ((r - bg_r)**2 + (g - bg_g)**2 + (b - bg_b)**2)**0.5
-                is_bg = dist_bg < 45
-                is_white = (r > 235 and g > 235 and b > 235)
+        corners_transparent = all(
+            pixels[pt][3] < 50 for pt in ((0, 0), (w - 1, 0), (0, h - 1), (w - 1, h - 1))
+        )
 
-                if is_green or is_bg or is_white:
-                    pixels[x, y] = (0, 0, 0, 0)
-                elif dist_bg < 75 or (g > r and g > b and g > 70):
-                    factor = min(1.0, max(0.0, (dist_bg - 45) / 30.0))
-                    pixels[x, y] = (r, g, b, int(a * factor))
+        if corners_transparent:
+            for y in range(h):
+                for x in range(w):
+                    r, g, b, a = pixels[x, y]
+                    if a > 20:
+                        pixels[x, y] = (10, 15, 30, min(255, int(a * 1.5)))
+                    else:
+                        pixels[x, y] = (0, 0, 0, 0)
+        else:
+            corners = [pixels[pt][:3] for pt in ((0, 0), (w - 1, 0), (0, h - 1), (w - 1, h - 1))]
+            bg_r = sum(c[0] for c in corners) / len(corners)
+            bg_g = sum(c[1] for c in corners) / len(corners)
+            bg_b = sum(c[2] for c in corners) / len(corners)
 
-        # Auto-crop to bounding box of actual non-zero strokes
+            for y in range(h):
+                for x in range(w):
+                    r, g, b, a = pixels[x, y]
+                    dist_bg = ((r - bg_r)**2 + (g - bg_g)**2 + (b - bg_b)**2)**0.5
+                    if dist_bg < 45 or (r > 215 and g > 215 and b > 215):
+                        pixels[x, y] = (0, 0, 0, 0)
+                    else:
+                        pixels[x, y] = (10, 15, 30, min(255, int(a * 1.5)))
+
         bbox = im.getbbox()
         if bbox:
             pad = 2
-            crop_box = (
-                max(0, bbox[0] - pad),
-                max(0, bbox[1] - pad),
-                min(w, bbox[2] + pad),
-                min(h, bbox[3] + pad)
-            )
-            im = im.crop(crop_box)
+            im = im.crop((max(0, bbox[0] - pad), max(0, bbox[1] - pad), min(w, bbox[2] + pad), min(h, bbox[3] + pad)))
 
-        out_io = io.BytesIO()
-        im.save(out_io, format="PNG")
-        out_io.seek(0)
-        return out_io
+        out = io.BytesIO()
+        im.save(out, format="PNG")
+        return out.getvalue()
     except Exception:
         return None
 
-def draw_signature(c, sig_data, x, y_bot_native, max_w=85.0, max_h=30.0):
-    if not sig_data:
-        return False
-    try:
-        if isinstance(sig_data, str) and sig_data.startswith("data:image"):
-            sig_data = sig_data.split(",", 1)[1]
-            raw = base64.b64decode(sig_data)
-        elif isinstance(sig_data, str) and os.path.isfile(sig_data):
-            with open(sig_data, "rb") as f:
-                raw = f.read()
-        else:
-            return False
+def draw_vector_checkmark(page, box_rect):
+    """Draw a sharp vector checkmark matching FR.APL.02 inside a checkbox bounding box."""
+    bx0, by0, bx1, by1 = box_rect
+    cx = (bx0 + bx1) / 2.0
+    cy = (by0 + by1) / 2.0 + 0.8
 
-        cleaned_io = clean_signature_image(raw)
-        if not cleaned_io:
-            return False
+    p1 = fitz.Point(cx - 2.5, cy - 0.2)
+    p2 = fitz.Point(cx - 0.6, cy + 2.4)
+    p3 = fitz.Point(cx + 3.0, cy - 3.0)
 
-        im = Image.open(cleaned_io)
-        im_w, im_h = im.size
-        if im_w == 0 or im_h == 0:
-            return False
+    shape = page.new_shape()
+    shape.draw_polyline([p1, p2, p3])
+    shape.finish(color=(0, 0, 0), width=1.4, lineCap=1, lineJoin=1)
+    shape.commit()
 
-        aspect = float(im_w) / float(im_h)
-        if aspect > (max_w / max_h):
-            w = max_w
-            h = max_w / aspect
-        else:
-            h = max_h
-            w = max_h * aspect
+def draw_checkmark_at_point(page, cx, cy):
+    """Draw a sharp vector checkmark matching FR.APL.02 centered at (cx, cy)."""
+    p1 = fitz.Point(cx - 2.5, cy - 0.2)
+    p2 = fitz.Point(cx - 0.6, cy + 2.4)
+    p3 = fitz.Point(cx + 3.0, cy - 3.0)
 
-        cleaned_io.seek(0)
-        img = ImageReader(cleaned_io)
-        c.drawImage(img, x, y_bot_native, w, h, mask="auto")
-        return True
-    except Exception:
-        return False
+    shape = page.new_shape()
+    shape.draw_polyline([p1, p2, p3])
+    shape.finish(color=(0, 0, 0), width=1.4, lineCap=1, lineJoin=1)
+    shape.commit()
 
-def draw_vector_check(c, cx, cy, sz=3.0):
-    c.setLineWidth(1.4)
-    c.setStrokeColor(black)
-    c.line(cx - sz, cy - 0.2, cx - sz * 0.25, cy - sz * 0.9)
-    c.line(cx - sz * 0.25, cy - sz * 0.9, cx + sz * 1.1, cy + sz * 1.1)
+def get_page_unit_rows(page):
+    """Detect horizontal row boundaries (y0, y1) for competency units on a given page."""
+    h_ys = []
+    for p in page.get_drawings():
+        r = p['rect']
+        if (r.y1 - r.y0) < 1.5 and abs(r.x0 - 56.6) < 4.0 and abs(r.x1 - 298.0) < 4.0:
+            h_ys.append(round(r.y0, 1))
+    h_ys = sorted(list(set(h_ys)))
 
-DATA = {
-    "skema_nama": "Maintenance Gasoline Engine Injection System",
-    "skema_nomor": "02/LSP PrO Indo/I/2026",
-    "tuk_tipe": "Sewaktu/Tempat Kerja/Mandiri*",
-    "asesor_nama": "Drs. Budi Santoso, M.T.",
-    "asesor_no_reg": "MET.000.001234 2022",
-    "asesi_nama": "Wahyu Andika Rahadi",
-    "tanggal_mulai": "19/10/2026 08:30",
-    "tanggal_selesai": "19/10/2026 12:00",
-    "rekomendasi_kompeten": True,
-    "tindak_lanjut": "Tidak ada tindakan perbaikan yang diperlukan. Seluruh unit kompetensi telah terpenuhi sesuai standar SKKNI.",
-    "komentar_asesor": "Asesi menunjukkan pemahaman dan keterampilan kerja yang sangat baik dalam perawatan sistem injeksi bensin.",
-    "units": [
-        {"title": "Melaksanakan Keselamatan dan Kesehatan Kerja", "obs": True, "port": True, "pihak3": False, "lisan": True, "tulis": True, "proyek": False, "lain": False},
-        {"title": "Menggunakan Peralatan dan Perlengkapan Tempat Kerja", "obs": True, "port": False, "pihak3": True, "lisan": True, "tulis": False, "proyek": False, "lain": False},
-        {"title": "Membaca Gambar Teknik", "obs": False, "port": True, "pihak3": False, "lisan": False, "tulis": True, "proyek": True, "lain": False},
-        {"title": "Menggunakan Alat Ukur", "obs": True, "port": True, "pihak3": False, "lisan": True, "tulis": False, "proyek": False, "lain": False},
-        {"title": "Melaksanakan Diagnosis", "obs": True, "port": False, "pihak3": True, "lisan": False, "tulis": True, "proyek": True, "lain": False},
-        {"title": "Melakukan Perawatan Berkala Engine", "obs": True, "port": True, "pihak3": False, "lisan": True, "tulis": True, "proyek": False, "lain": False},
-        {"title": "Memelihara Baterai", "obs": True, "port": False, "pihak3": False, "lisan": True, "tulis": True, "proyek": False, "lain": True},
-        {"title": "Memperbaiki Kerusakan Pada Sistem Pengaman Kelistrikan", "obs": True, "port": True, "pihak3": True, "lisan": False, "tulis": True, "proyek": False, "lain": False},
-        {"title": "Memperbaiki Sistem Manajemen Engine", "obs": True, "port": False, "pihak3": False, "lisan": True, "tulis": True, "proyek": True, "lain": False},
-    ],
-    "tanggal_tanda_tangan": "19/10/2026",
-}
+    rekom = page.search_for('Rekomendasi')
+    if rekom:
+        lines_above = [y for y in h_ys if y <= rekom[0].y0]
+        max_y = lines_above[-1] if lines_above else rekom[0].y0
+    else:
+        max_y = 9999
 
-def draw_header_box(c, x0=56.8, x1=542.9, top=21.8, bot=66.7):
-    c.setLineWidth(0.6)
-    c.setStrokeColor(black)
-    c.rect(x0, Y(bot), x1 - x0, bot - top)
-    x_div = 154.2
-    c.line(x_div, Y(top), x_div, Y(bot))
-    logo_file = os.path.join(ASSETS, "logo.png")
-    
-    # Calculate logo and text position relative to top and bot
-    logo_top = top + 2.25
-    logo_bot = logo_top + 38.9
-    if os.path.exists(logo_file):
-        c.drawImage(logo_file, 73.3, Y(logo_bot), 44.0, 38.9, mask="auto")
-        
-    c.setFont("Tah-B", 11.0)
-    c.setFillColor(black)
-    text_y = top + 26.2
-    c.drawString(194.8, Y(text_y), "Lembaga Sertifikasi Profesi Praktisi Otomotif  LSP-PrO Indo")
+    head = page.search_for('Tanggal Asesmen') or page.search_for('Nama Asesi')
+    min_y = head[0].y1 if head else 0
+    unit_hdr = page.search_for('Unit Kompetensi')
+    if unit_hdr:
+        lines_below = [y for y in h_ys if y >= unit_hdr[0].y1]
+        if lines_below:
+            min_y = max(min_y, lines_below[0])
 
-def wrap_text(c, text, font, size, max_width):
-    words = text.split()
-    lines = []
-    current = ""
-    for w in words:
-        test = (current + " " + w).strip()
-        if c.stringWidth(test, font, size) <= max_width:
-            current = test
-        else:
-            if current: lines.append(current)
-            current = w
-    if current: lines.append(current)
-    return lines
+    unit_rows = []
+    for i in range(len(h_ys) - 1):
+        y0, y1 = h_ys[i], h_ys[i + 1]
+        if y0 >= (min_y - 1.0) and y1 <= (max_y + 1.0) and 15 < (y1 - y0) < 60:
+            unit_rows.append((y0, y1))
+    return unit_rows
 
-def render(dest_path):
-    c = canvas.Canvas(dest_path, pagesize=(PAGE_W, PAGE_H))
-    
-    # ================= PAGE 1 =================
-    draw_header_box(c, 56.8, 542.9, 21.8, 66.7)
-    
-    # Document Title
-    c.setFont("Cal-B", 12.0)
-    c.setFillColor(black)
-    c.drawString(63.9, Y(94.0), "FR.AK.02. REKAMAN ASESMEN KOMPETENSI")
-    
-    # Single Unified Table on Page 1:
-    # Outer boundaries: left=55.1, right=574.8, top=112.5, bot=780.0
-    L = 55.1
-    R = 574.8
-    
-    unit_tops = [
-        367.0, 394.7, 420.6, 446.5, 472.4, 498.3, 524.2, 550.1, 576.0, 601.9
-    ]
-    
-    # Outer border of Table 2
-    c.setLineWidth(0.6)
-    c.setStrokeColor(black)
-    c.rect(L, Y(780.0), R - L, 780.0 - 112.5)
-    
-    # Horizontal grid lines
-    # r1: 130.6 (from 177.0 to R)
-    c.line(177.0, Y(130.6), R, Y(130.6))
-    # r2: 148.1 (full)
-    c.line(L, Y(148.1), R, Y(148.1))
-    # r3: 165.6 (full)
-    c.line(L, Y(165.6), R, Y(165.6))
-    # r4: 183.1 (full)
-    c.line(L, Y(183.1), R, Y(183.1))
-    # r5: 200.4 (full)
-    c.line(L, Y(200.4), R, Y(200.4))
-    # r6: 217.7 (from 177.0 to R)
-    c.line(177.0, Y(217.7), R, Y(217.7))
-    # r7: 235.9 (full)
-    c.line(L, Y(235.9), R, Y(235.9))
-    # r8: 289.0 (full)
-    c.line(L, Y(289.0), R, Y(289.0))
-    # r9: 367.0 (full)
-    c.line(L, Y(367.0), R, Y(367.0))
-    
-    # unit lines
-    for uy in unit_tops[1:]:
-        c.line(L, Y(uy), R, Y(uy))
-        
-    # Rekomendasi line
-    c.line(L, Y(627.4), R, Y(627.4))
-    # Tindak lanjut line
-    c.line(L, Y(691.1), R, Y(691.1))
-    
-    # Vertical grid lines on Page 1:
-    # Metadata vertical lines (112.5 to 235.9)
-    # x = 177.0 (r0 to r2, and r5 to r7)
-    c.line(177.0, Y(148.1), 177.0, Y(112.5))
-    c.line(177.0, Y(235.9), 177.0, Y(200.4))
-    # x = 230.3 (r0 to r7)
-    c.line(230.3, Y(235.9), 230.3, Y(112.5))
-    # x = 244.4 (r0 to r7)
-    c.line(244.4, Y(235.9), 244.4, Y(112.5))
-    
-    # Units & Evidences vertical columns (289.0 to 601.9):
-    cols_x = [55.1, 298.0, 333.5, 368.9, 432.9, 468.3, 503.7, 539.3, 574.8]
-    for cx in cols_x[1:-1]:
-        c.line(cx, Y(601.9), cx, Y(289.0))
-        
-    # Vertical line for Rekomendasi, Tindak Lanjut, Komentar (601.9 to 780.0):
-    c.line(cols_x[1], Y(780.0), cols_x[1], Y(601.9))
-    
-    # === TEXT ON PAGE 1 ===
-    # Metadata text
-    c.setFont("Cal", 11.0)
-    c.drawString(64.5, Y(127.0), "Skema Sertifikasi")
-    c.drawString(64.5, Y(140.0), "(KKNI/Okupasi/Klaster)")
-    
-    c.drawString(185.2, Y(124.0), "Judul")
-    c.drawString(236.6, Y(124.0), ":")
-    c.setFont("Cal-I", 11.0)
-    c.drawString(248.0, Y(124.0), DATA["skema_nama"])
-    
-    c.setFont("Cal", 11.0)
-    c.drawString(185.2, Y(142.0), "Nomor")
-    c.drawString(236.6, Y(142.0), ":")
-    c.drawString(248.0, Y(142.0), DATA["skema_nomor"])
-    
-    c.drawString(64.5, Y(160.0), "TUK")
-    c.drawString(236.6, Y(160.0), ":")
-    c.drawString(248.0, Y(160.0), DATA["tuk_tipe"])
-    
-    c.drawString(64.5, Y(177.0), "Nama Asesor")
-    c.drawString(236.6, Y(177.0), ":")
-    c.setFont("Cal-B", 11.0)
-    c.drawString(248.0, Y(177.0), DATA["asesor_nama"])
-    
-    c.setFont("Cal", 11.0)
-    c.drawString(64.5, Y(195.0), "Nama Asesi")
-    c.drawString(236.6, Y(195.0), ":")
-    c.setFont("Cal-B", 11.0)
-    c.drawString(248.0, Y(195.0), DATA["asesi_nama"])
-    
-    c.setFont("Cal", 11.0)
-    c.drawString(64.5, Y(221.0), "Tanggal Asesmen")
-    c.drawString(185.2, Y(212.0), "Mulai")
-    c.drawString(236.6, Y(212.0), ":")
-    c.drawString(248.0, Y(212.0), DATA["tanggal_mulai"])
-    
-    c.drawString(185.2, Y(230.0), "Selesai")
-    c.drawString(236.6, Y(230.0), ":")
-    c.drawString(248.0, Y(230.0), DATA["tanggal_selesai"])
-    
-    # Instruction Row (Row 7)
-    c.drawString(56.8, Y(262.0), "Beri tanda centang (√) di kolom yang sesuai untuk mencerminkan bukti yang diperoleh untuk menentukan")
-    c.drawString(56.8, Y(275.5), "Kompetensi Asesi untuk setiap Unit Kompetensi.")
-    
-    # Table Header (Row 8)
-    c.setFont("Cal-B", 11.0)
-    c.drawString(139.5, Y(331.0), "Unit Kompetensi")
-    
-    # Rotated Evidence Headers
-    # Col 1: Observasi Demonstrasi (mid = 316.0)
-    c.saveState()
-    c.setFont("Cal-B", 10.0)
-    c.translate(310.0, Y(354.0))
-    c.rotate(90)
-    c.drawString(0, 0, "Observasi")
-    c.restoreState()
-    c.saveState()
-    c.setFont("Cal-B", 10.0)
-    c.translate(324.0, Y(360.0))
-    c.rotate(90)
-    c.drawString(0, 0, "Demonstrasi")
-    c.restoreState()
-    
-    # Col 2: Portofolio (mid = 351.2)
-    c.saveState()
-    c.setFont("Cal-B", 10.0)
-    c.translate(352.0, Y(354.0))
-    c.rotate(90)
-    c.drawString(0, 0, "Portofolio")
-    c.restoreState()
-    
-    # Col 3: Pernyataan Pihak Ketiga / Pertanyaan Wawancara (368.9 -> 432.9)
-    c.saveState()
-    c.setFont("Cal-B", 9.5)
-    c.translate(382.0, Y(358.0))
-    c.rotate(90)
-    c.drawString(0, 0, "Pernyataan")
-    c.restoreState()
-    c.saveState()
-    c.setFont("Cal-B", 9.5)
-    c.translate(395.0, Y(360.0))
-    c.rotate(90)
-    c.drawString(0, 0, "Pihak Ketiga")
-    c.restoreState()
-    c.saveState()
-    c.setFont("Cal-B", 9.5)
-    c.translate(409.0, Y(360.0))
-    c.rotate(90)
-    c.drawString(0, 0, "Pertanyaan")
-    c.restoreState()
-    c.saveState()
-    c.setFont("Cal-B", 9.5)
-    c.translate(423.0, Y(360.0))
-    c.rotate(90)
-    c.drawString(0, 0, "Wawancara")
-    c.restoreState()
-    
-    # Col 4: Pertanyaan Lisan (432.9 -> 468.3)
-    c.saveState()
-    c.setFont("Cal-B", 10.0)
-    c.translate(445.0, Y(358.0))
-    c.rotate(90)
-    c.drawString(0, 0, "Pertanyaan")
-    c.restoreState()
-    c.saveState()
-    c.setFont("Cal-B", 10.0)
-    c.translate(459.0, Y(343.0))
-    c.rotate(90)
-    c.drawString(0, 0, "Lisan")
-    c.restoreState()
-    
-    # Col 5: Pertanyaan Tertulis (468.3 -> 503.7)
-    c.saveState()
-    c.setFont("Cal-B", 10.0)
-    c.translate(481.0, Y(358.0))
-    c.rotate(90)
-    c.drawString(0, 0, "Pertanyaan")
-    c.restoreState()
-    c.saveState()
-    c.setFont("Cal-B", 10.0)
-    c.translate(494.0, Y(349.0))
-    c.rotate(90)
-    c.drawString(0, 0, "Tertulis")
-    c.restoreState()
-    
-    # Col 6: Proyek Kerja (503.7 -> 539.3)
-    c.saveState()
-    c.setFont("Cal-B", 10.0)
-    c.translate(522.0, Y(360.0))
-    c.rotate(90)
-    c.drawString(0, 0, "Proyek Kerja")
-    c.restoreState()
-    
-    # Col 7: Lainnya (539.3 -> 574.8)
-    c.saveState()
-    c.setFont("Cal-B", 10.0)
-    c.translate(558.0, Y(349.0))
-    c.rotate(90)
-    c.drawString(0, 0, "Lainnya")
-    c.restoreState()
-    
-    # Draw Unit Rows (up to 9 units fit in Page 1 table layout)
-    units_to_draw = DATA.get("units", [])[:9]
-    for idx, u in enumerate(units_to_draw):
-        y_top = unit_tops[idx]
-        y_bot = unit_tops[idx + 1]
-        y_mid = (y_top + y_bot) / 2
-        
-        c.setFont("Arial", 10.5)
-        w_title = cols_x[1] - cols_x[0] - 12.0
-        lines = wrap_text(c, u["title"], "Arial", 10.5, w_title)
-        if len(lines) == 1:
-            c.drawString(cols_x[0] + 5.0, Y(y_mid + 3.5), lines[0])
-        else:
-            c.drawString(cols_x[0] + 5.0, Y(y_top + 10.5), lines[0])
-            c.drawString(cols_x[0] + 5.0, Y(y_top + 22.0), lines[1])
-            
-        # Draw checkmarks
-        checks = [u.get("obs", False), u.get("port", False), (u.get("pihak3", False) or u.get("wawancara", False)), u.get("lisan", False), u.get("tulis", False), u.get("proyek", False), u.get("lain", False)]
-        for ci, chk in enumerate(checks):
-            if chk:
-                cx = (cols_x[1 + ci] + cols_x[2 + ci]) / 2
-                draw_vector_check(c, cx, Y(y_mid))
-                
-    # Rekomendasi Row (601.9 -> 627.4)
-    c.setFont("Cal", 11.0)
-    c.drawString(cols_x[0] + 6.0, Y(617.0), "Rekomendasi hasil asesmen")
-    
-    # Checkbox Kompeten / Belum Kompeten
-    cb_sz = 11.0
-    bx1 = cols_x[1] + 10.0
-    by1 = 612.0
-    c.setLineWidth(0.6)
-    c.setStrokeColor(black)
-    c.rect(bx1, Y(by1 + cb_sz), cb_sz, cb_sz, fill=0, stroke=1)
-    if DATA.get("rekomendasi_kompeten", True):
-        draw_vector_check(c, bx1 + cb_sz / 2, Y(by1 + cb_sz / 2), sz=3.5)
-        
-    c.setFont("Cal-B", 13.0)
-    c.drawString(bx1 + 16.0, Y(622.0), "Kompeten /")
-    
-    bx2 = bx1 + 105.0
-    c.rect(bx2, Y(by1 + cb_sz), cb_sz, cb_sz, fill=0, stroke=1)
-    if not DATA.get("rekomendasi_kompeten", True):
-        draw_vector_check(c, bx2 + cb_sz / 2, Y(by1 + cb_sz / 2), sz=3.5)
-        
-    c.setFont("Cal-B", 13.0)
-    c.drawString(bx2 + 16.0, Y(622.0), "Belum kompeten")
-    
-    # Tindak Lanjut Row (627.4 -> 691.1)
-    c.setFont("Cal-B", 11.0)
-    c.drawString(cols_x[0] + 6.0, Y(639.0), "Tindak lanjut yang dibutuhkan")
-    c.setFont("Cal", 10.5)
-    c.drawString(cols_x[0] + 6.0, Y(652.0), "(Masukkan pekerjaan tambahan dan asesmen yang")
-    c.drawString(cols_x[0] + 6.0, Y(665.0), "diperlukan untuk mencapai kompetensi)")
-    
-    # Tindak lanjut text
-    c.setFont("Cal", 10.5)
-    tin_lines = wrap_text(c, DATA["tindak_lanjut"], "Cal", 10.5, cols_x[-1] - cols_x[1] - 16.0)
-    ty = 645.0
-    for l in tin_lines:
-        c.drawString(cols_x[1] + 8.0, Y(ty), l)
-        ty += 14.0
-        
-    # Komentar Row (691.1 -> 780.0)
-    c.setFont("Cal", 11.0)
-    c.drawString(cols_x[0] + 6.0, Y(722.5), "Komentar/ Observasi oleh asesor")
-    
-    # Komentar text
-    kom_lines = wrap_text(c, DATA["komentar_asesor"], "Cal", 10.5, cols_x[-1] - cols_x[1] - 16.0)
-    ky = 718.0
-    for l in kom_lines:
-        c.drawString(cols_x[1] + 8.0, Y(ky), l)
-        ky += 14.0
-        
-    c.showPage()
-    
-    # ================= PAGE 2 =================
-    draw_header_box(c, 56.8, 542.9, 21.8, 66.7)
-    
-    # Continuation box of Komentar (Table 2 top overflow on Page 2):
-    # From y = 80.6 to 135.7
-    c.setLineWidth(0.6)
-    c.setStrokeColor(black)
-    c.rect(55.1, Y(135.7), 574.8 - 55.1, 135.7 - 80.6)
-    c.line(298.0, Y(80.6), 298.0, Y(135.7))
-    
-    # Signature Box on Page 2:
-    # Outer boundaries: left=56.3, right=571.3, top=149.9, bot=319.4
-    sL = 56.3
-    sR = 571.3
-    sig_rows = [149.9, 164.8, 184.7, 227.1, 242.1, 260.9, 279.7, 319.4]
-    
-    c.rect(sL, Y(sig_rows[-1]), sR - sL, sig_rows[-1] - sig_rows[0])
-    for sy in sig_rows[1:-1]:
-        c.line(sL, Y(sy), sR, Y(sy))
-        
-    # Vertical dividers for Signature table
-    s_col1 = 225.2
-    s_col2 = 232.3
-    # For Asesi: rows 1 to 3 (164.8 to 227.1)
-    c.line(s_col1, Y(sig_rows[3]), s_col1, Y(sig_rows[1]))
-    c.line(s_col2, Y(sig_rows[3]), s_col2, Y(sig_rows[1]))
-    # For Asesor: rows 4 to 7 (242.1 to 319.4)
-    c.line(s_col1, Y(sig_rows[7]), s_col1, Y(sig_rows[4]))
-    c.line(s_col2, Y(sig_rows[7]), s_col2, Y(sig_rows[4]))
-    
-    # Signature Texts:
-    # Row 0: Asesi :
-    c.setFont("Cal-B", 11.0)
-    c.drawString(63.3, Y(161.5), "Asesi :")
-    
-    # Row 1: Nama
-    c.setFont("Cal", 11.0)
-    c.drawString(63.3, Y(180.5), "Nama")
-    c.drawString(227.5, Y(180.5), ":")
-    c.setFont("Cal-B", 11.0)
-    c.drawString(236.0, Y(180.5), DATA["asesi_nama"])
-    
-    # Row 2: Tanda tangan dan Tanggal
-    c.setFont("Cal", 11.0)
-    c.drawString(63.3, Y(202.0), "Tanda tangan")
-    c.drawString(63.3, Y(218.0), "dan Tanggal")
-    c.drawString(227.5, Y(210.0), ":")
-    tgl_asesi = DATA.get("tanggal_tanda_tangan_asesi") or DATA.get("tanggal_tanda_tangan") or DATA.get("tanggal", "")
-    sig_asesi_drawn = draw_signature(c, DATA.get("signature_asesi") or DATA.get("asesi_signature"), 236.0, 222.0, max_w=85.0, max_h=30.0)
-    c.setFont("Cal", 10.0)
-    c.drawString(335.0, Y(210.0), f"Tanggal : {tgl_asesi}")
-    if not sig_asesi_drawn:
-        c.setFont("Cal-I", 10.0)
-        c.drawString(236.0, Y(210.0), "[Tanda Tangan Digital]")
-    
-    # Row 3: Asesor :
-    c.setFont("Cal-B", 11.0)
-    c.drawString(63.3, Y(239.5), "Asesor :")
-    
-    # Row 4: Nama
-    c.setFont("Cal", 11.0)
-    c.drawString(63.3, Y(257.0), "Nama")
-    c.drawString(227.5, Y(257.0), ":")
-    c.setFont("Cal-B", 11.0)
-    c.drawString(236.0, Y(257.0), str(DATA.get("asesor_nama", "")))
-    
-    # Row 5: No. Reg
-    c.setFont("Cal", 11.0)
-    c.drawString(63.3, Y(275.0), "No. Reg")
-    c.drawString(227.5, Y(275.0), ":")
-    c.drawString(236.0, Y(275.0), str(DATA.get("asesor_no_reg", "")))
-    
-    # Row 6: Tanda tangan dan Tanggal
-    c.drawString(63.3, Y(296.0), "Tanda tangan")
-    c.drawString(63.3, Y(312.0), "dan Tanggal")
-    c.drawString(227.5, Y(304.0), ":")
-    tgl_asesor = DATA.get("tanggal_tanda_tangan_asesor") or DATA.get("tanggal_tanda_tangan") or DATA.get("tanggal", "")
-    sig_asesor_drawn = draw_signature(c, DATA.get("signature_asesor") or DATA.get("assessor_signature"), 236.0, 314.0, max_w=85.0, max_h=30.0)
-    c.setFont("Cal", 10.0)
-    c.drawString(335.0, Y(304.0), f"Tanggal : {tgl_asesor}")
-    if not sig_asesor_drawn:
-        c.setFont("Cal-I", 10.0)
-        c.drawString(236.0, Y(304.0), "[Tanda Tangan Digital]")
-    
-    c.showPage()
-    
-    # ================= PAGE 3 =================
-    draw_header_box(c, 56.8, 542.9, 36.5, 81.4)
-    
-    c.setFont("Cal-B", 11.0)
-    c.drawString(70.8, Y(108.0), "LAMPIRAN DOKUMEN:")
-    
-    lampiran = [
-        "1. Dokumen APL 01 peserta",
-        "2. Dokumen APL 02 peserta",
-        "3. Bukti-bukti berkualitas peserta",
-        "4. Tinjauan proses asesmen"
-    ]
-    
-    c.setFont("Cal", 11.0)
-    ly = 124.0
-    for item in lampiran:
-        c.drawString(70.8, Y(ly), item)
-        ly += 16.0
-        
-    c.showPage()
-    c.save()
-    print(f"OK -> Sukses generate FR.AK.02: {dest_path}")
+def render_master_overlay(master_pdf_path, data, dest_path):
+    """Render dynamic data on top of BNSP master AK.02 PDF with multi-scheme resilience."""
+    if not os.path.isfile(master_pdf_path):
+        raise FileNotFoundError(f"Master PDF not found: {master_pdf_path}")
+
+    doc = fitz.open(master_pdf_path)
+    total_pages = len(doc)
+
+    # 1. Strip all watermarks from all pages
+    clean_watermark(doc)
+
+    # Register fonts
+    has_calibri = os.path.isfile(CALIBRI_REG)
+    reg_font = CALIBRI_REG if has_calibri else None
+    bold_font = CALIBRI_BOLD if os.path.isfile(CALIBRI_BOLD) else None
+    italic_font = CALIBRI_ITALIC if os.path.isfile(CALIBRI_ITALIC) else None
+
+    is_filled = bool(data.get("is_filled", False))
+    units_data = data.get("units") or []
+    rekom_kompeten = data.get("rekomendasi_kompeten")  # True, False, or None
+    tindak_lanjut_text = str(data.get("tindak_lanjut") or "").strip()
+    komentar_asesor_text = str(data.get("komentar_asesor") or "").strip()
+
+    # Track unit index across pages
+    current_unit_idx = 0
+
+    for p_idx in range(total_pages):
+        page = doc[p_idx]
+
+        # ----------------------------------------------------
+        # Strip Australian VET footnote template text if present
+        # ----------------------------------------------------
+        for b in page.get_text("dict")["blocks"]:
+            if "lines" in b:
+                b_txt = "".join(s["text"] for l in b["lines"] for s in l["spans"])
+                if "Diadaptasi" in b_txt or "Departemen Pendidikan" in b_txt or "Australia" in b_txt:
+                    r = b["bbox"]
+                    clean_rect = fitz.Rect(50.0, r[1] - 3.0, 560.0, r[3] + 8.0)
+                    page.add_redact_annot(clean_rect, fill=(1, 1, 1))
+                    page.apply_redactions()
+
+        # ----------------------------------------------------
+        # 1. HEADER METADATA OVERLAY (PAGE 1)
+        # ----------------------------------------------------
+        if p_idx == 0:
+            skema_rect = page.search_for("Skema Sertifikasi")
+            if skema_rect:
+                sy = skema_rect[0].y0
+                raw_h = []
+                raw_v = []
+                for d in page.get_drawings():
+                    r = d['rect']
+                    if (r.y1 - r.y0) < 2.5 and r.x1 > 500 and (sy - 20) <= r.y0 <= (sy + 150):
+                        raw_h.append(round(r.y0, 1))
+                    if (r.x1 - r.x0) < 3.0 and (r.y1 - r.y0) > 10 and (sy - 20) <= r.y0 <= (sy + 150):
+                        raw_v.append(round(r.x0, 1))
+
+                dedup_h = []
+                for y in sorted(list(set(raw_h))):
+                    if not dedup_h or abs(y - dedup_h[-1]) > 1.0:
+                        dedup_h.append(y)
+
+                dedup_v = []
+                for x in sorted(list(set(raw_v))):
+                    if not dedup_v or abs(x - dedup_v[-1]) > 2.0:
+                        dedup_v.append(x)
+
+                if len(dedup_h) >= 8 and len(dedup_v) >= 5:
+                    v_left = dedup_v[0]
+                    v_sub = dedup_v[1]
+                    v_colon = dedup_v[2]
+                    v_mid = dedup_v[3]
+                    v_right = dedup_v[4]
+                else:
+                    v_left = 56.0
+                    v_sub = 177.0
+                    v_colon = 230.3
+                    v_mid = 244.5
+                    v_right = 574.0
+                    if not dedup_h:
+                        dedup_h = [111.8, 130.3, 147.8, 165.3, 182.8, 200.1, 217.1, 235.1]
+
+                # Safe cell interior redaction across all 7 rows
+                # Leaves colons and all border lines 100% untouched!
+                for idx in range(min(7, len(dedup_h) - 1)):
+                    y_top = dedup_h[idx]
+                    y_bot = dedup_h[idx + 1]
+                    safe_rect = fitz.Rect(v_mid + 1.2, y_top + 1.0, v_right - 1.2, y_bot - 1.0)
+                    page.add_redact_annot(safe_rect, fill=(1, 1, 1))
+                page.apply_redactions()
+
+                header_values = [
+                    str(data.get("skema_nama") or "").strip(),
+                    str(data.get("skema_nomor") or "").strip(),
+                    str(data.get("tuk_tipe") or "Sewaktu/Tempat Kerja/Mandiri*").strip(),
+                    str(data.get("asesor_nama") or "").strip(),
+                    str(data.get("asesi_nama") or "").strip(),
+                    str(data.get("tanggal_mulai") or "").strip(),
+                    str(data.get("tanggal_selesai") or "").strip(),
+                ]
+
+                for idx in range(min(7, len(dedup_h) - 1)):
+                    val_text = header_values[idx]
+                    y_top = dedup_h[idx]
+                    y_bot = dedup_h[idx + 1]
+                    y_base = y_bot - 4.5
+                    if val_text:
+                        f_size = 9.5 if len(val_text) > 42 else 10.0
+                        page.insert_text(
+                            fitz.Point(v_mid + 6.0, y_base),
+                            val_text,
+                            fontfile=reg_font,
+                            fontsize=f_size,
+                            color=(0, 0, 0)
+                        )
+
+                # Re-stroke table borders to guarantee 100% crisp visibility
+                shape_hdr = page.new_shape()
+                # 1. Outer box
+                shape_hdr.draw_rect(fitz.Rect(v_left, dedup_h[0], v_right, dedup_h[-1]))
+                shape_hdr.finish(color=(0, 0, 0), width=1.2)
+                # 2. Right vertical border
+                shape_hdr.draw_line(fitz.Point(v_right, dedup_h[0]), fitz.Point(v_right, dedup_h[-1]))
+                shape_hdr.finish(color=(0, 0, 0), width=1.2)
+                # 3. Vertical line to the right of colons (v_mid)
+                shape_hdr.draw_line(fitz.Point(v_mid, dedup_h[0]), fitz.Point(v_mid, dedup_h[-1]))
+                shape_hdr.finish(color=(0, 0, 0), width=0.6)
+                # 4. Vertical line to the left of colons (v_colon)
+                shape_hdr.draw_line(fitz.Point(v_colon, dedup_h[0]), fitz.Point(v_colon, dedup_h[-1]))
+                shape_hdr.finish(color=(0, 0, 0), width=0.6)
+                # 5. Vertical line dividing left labels and sub-labels (v_sub)
+                shape_hdr.draw_line(fitz.Point(v_sub, dedup_h[0]), fitz.Point(v_sub, dedup_h[2]))
+                shape_hdr.finish(color=(0, 0, 0), width=0.6)
+                shape_hdr.draw_line(fitz.Point(v_sub, dedup_h[5]), fitz.Point(v_sub, dedup_h[7]))
+                shape_hdr.finish(color=(0, 0, 0), width=0.6)
+                # 6. Horizontal lines matching the exact merged rows:
+                shape_hdr.draw_line(fitz.Point(v_sub, dedup_h[1]), fitz.Point(v_right, dedup_h[1]))
+                shape_hdr.finish(color=(0, 0, 0), width=0.6)
+                shape_hdr.draw_line(fitz.Point(v_left, dedup_h[2]), fitz.Point(v_right, dedup_h[2]))
+                shape_hdr.finish(color=(0, 0, 0), width=0.6)
+                shape_hdr.draw_line(fitz.Point(v_left, dedup_h[3]), fitz.Point(v_right, dedup_h[3]))
+                shape_hdr.finish(color=(0, 0, 0), width=0.6)
+                shape_hdr.draw_line(fitz.Point(v_left, dedup_h[4]), fitz.Point(v_right, dedup_h[4]))
+                shape_hdr.finish(color=(0, 0, 0), width=0.6)
+                shape_hdr.draw_line(fitz.Point(v_left, dedup_h[5]), fitz.Point(v_right, dedup_h[5]))
+                shape_hdr.finish(color=(0, 0, 0), width=0.6)
+                shape_hdr.draw_line(fitz.Point(v_sub, dedup_h[6]), fitz.Point(v_right, dedup_h[6]))
+                shape_hdr.finish(color=(0, 0, 0), width=0.6)
+                shape_hdr.commit()
+
+        # ----------------------------------------------------
+        # 2. COMPETENCY UNITS TABLE OVERLAY
+        # ----------------------------------------------------
+        page_unit_rows = get_page_unit_rows(page)
+
+        if page_unit_rows:
+            # Redact pre-printed checkmarks or characters in method columns (x: 298..574)
+            min_row_y = page_unit_rows[0][0]
+            max_row_y = page_unit_rows[-1][1]
+
+            for b in page.get_text("dict")["blocks"]:
+                if "lines" in b:
+                    for l in b["lines"]:
+                        for s in l["spans"]:
+                            s_bbox = s["bbox"]
+                            if 298.0 < s_bbox[0] < 574.0 and (min_row_y - 2.0) <= s_bbox[1] and s_bbox[3] <= (max_row_y + 2.0):
+                                page.add_redact_annot(fitz.Rect(s_bbox), fill=(1, 1, 1))
+            page.apply_redactions()
+
+            # Determine column center X coordinates dynamically
+            v_xs = []
+            for d in page.get_drawings():
+                r = d['rect']
+                if (r.x1 - r.x0) < 1.5 and (r.y1 - r.y0) > 40 and r.x0 > 290:
+                    v_xs.append(round(r.x0, 1))
+            v_xs = sorted(list(set(v_xs)))
+
+            col_cxs = [316.0, 351.5, 401.2, 450.9, 486.3, 521.8, 557.1]
+            if len(v_xs) >= 8:
+                col_cxs = [(v_xs[i] + v_xs[i + 1]) / 2.0 for i in range(7)]
+
+            # Draw checkmarks for each row if assessment has been filled by assessor
+            for (y0, y1) in page_unit_rows:
+                cy = (y0 + y1) / 2.0 - 0.5
+
+                if is_filled and current_unit_idx < len(units_data):
+                    u = units_data[current_unit_idx]
+                    method_flags = [
+                        bool(u.get("obs")),
+                        bool(u.get("port")),
+                        bool(u.get("pihak3")),
+                        bool(u.get("lisan")),
+                        bool(u.get("tulis")),
+                        bool(u.get("proyek")),
+                        bool(u.get("lain")),
+                    ]
+                    for col_idx, is_checked in enumerate(method_flags):
+                        if is_checked and col_idx < len(col_cxs):
+                            draw_checkmark_at_point(page, col_cxs[col_idx], cy)
+
+                current_unit_idx += 1
+
+        # ----------------------------------------------------
+        # 3. REKOMENDASI HASIL ASESMEN OVERLAY
+        # ----------------------------------------------------
+        rekom_rects = page.search_for("Rekomendasi")
+        if rekom_rects:
+            rekom_y = rekom_rects[0].y0
+
+            kompeten_rects = [r for r in page.search_for("Kompeten") if abs(r.y0 - rekom_y) < 30]
+            belum_rects = [r for r in page.search_for("Belum kompeten") if abs(r.y0 - rekom_y) < 30]
+
+            kompeten_box = None
+            belum_box = None
+
+            if kompeten_rects:
+                kr = kompeten_rects[0]
+                kompeten_box = fitz.Rect(kr.x0 - 16.0, kr.y0 - 2.0, kr.x0 - 2.0, kr.y1 + 2.0)
+            if belum_rects:
+                br = belum_rects[0]
+                belum_box = fitz.Rect(br.x0 - 16.0, br.y0 - 2.0, br.x0 - 2.0, br.y1 + 2.0)
+
+            for b in page.get_text("dict")["blocks"]:
+                if "lines" in b:
+                    for l in b["lines"]:
+                        for s in l["spans"]:
+                            if abs(s["bbox"][1] - rekom_y) < 30 and "\u2610" in s["text"]:
+                                s_rect = fitz.Rect(s["bbox"])
+                                if s_rect.x0 < 350:
+                                    kompeten_box = s_rect
+                                else:
+                                    belum_box = s_rect
+
+            if is_filled and rekom_kompeten is True and kompeten_box:
+                draw_vector_checkmark(page, kompeten_box)
+            elif is_filled and rekom_kompeten is False and belum_box:
+                draw_vector_checkmark(page, belum_box)
+
+        # ----------------------------------------------------
+        # 4. TINDAK LANJUT YANG DIBUTUHKAN OVERLAY
+        # ----------------------------------------------------
+        tl_rects = page.search_for("Tindak lanjut")
+        if tl_rects:
+            tl_y = tl_rects[0].y0
+            h_lines = []
+            for d in page.get_drawings():
+                r = d['rect']
+                if (r.y1 - r.y0) < 1.5 and abs(r.x0 - 56.6) < 5.0:
+                    h_lines.append(round(r.y0, 1))
+            h_lines = sorted(list(set(h_lines)))
+
+            lines_above = [y for y in h_lines if y <= (tl_y + 1.0)]
+            lines_below = [y for y in h_lines if y > (tl_y + 1.0)]
+
+            row_top = lines_above[-1] if lines_above else tl_y - 5.0
+            row_bottom = lines_below[0] if lines_below else tl_y + 40.0
+
+            # Redact text inside value cell cleanly without touching borders
+            val_rect = fitz.Rect(302.0, row_top + 1.5, 570.0, row_bottom - 1.5)
+            page.add_redact_annot(val_rect, fill=(1, 1, 1))
+            page.apply_redactions()
+
+            if is_filled and tindak_lanjut_text:
+                text_rect = fitz.Rect(304.0, row_top + 4.0, 568.0, row_bottom - 2.0)
+                page.insert_textbox(
+                    text_rect,
+                    tindak_lanjut_text,
+                    fontfile=reg_font,
+                    fontsize=9.5,
+                    color=(0, 0, 0)
+                )
+
+        # ----------------------------------------------------
+        # 5. KOMENTAR / OBSERVASI ASESOR OVERLAY
+        # ----------------------------------------------------
+        kom_rects = page.search_for("Komentar/ Observasi") or page.search_for("Komentar")
+        if kom_rects:
+            valid_kom = [r for r in kom_rects if r.x0 < 250]
+            if valid_kom:
+                kom_y = valid_kom[0].y0
+                h_lines = []
+                for d in page.get_drawings():
+                    r = d['rect']
+                    if (r.y1 - r.y0) < 1.5 and abs(r.x0 - 56.6) < 5.0:
+                        h_lines.append(round(r.y0, 1))
+                h_lines = sorted(list(set(h_lines)))
+
+                lines_above = [y for y in h_lines if y <= (kom_y + 1.0)]
+                lines_below = [y for y in h_lines if y > (kom_y + 1.0)]
+
+                row_top = lines_above[-1] if lines_above else kom_y - 5.0
+                row_bottom = lines_below[0] if lines_below else kom_y + 55.0
+
+                val_rect = fitz.Rect(302.0, row_top + 1.5, 570.0, row_bottom - 1.5)
+                page.add_redact_annot(val_rect, fill=(1, 1, 1))
+                page.apply_redactions()
+
+                if is_filled and komentar_asesor_text:
+                    text_rect = fitz.Rect(304.0, row_top + 4.0, 568.0, row_bottom - 2.0)
+                    page.insert_textbox(
+                        text_rect,
+                        komentar_asesor_text,
+                        fontfile=reg_font,
+                        fontsize=9.5,
+                        color=(0, 0, 0)
+                    )
+
+        # ----------------------------------------------------
+        # 6. SIGNATURE TABLE OVERLAY (TANDA TANGAN ASESI & ASESOR)
+        # ----------------------------------------------------
+        asesi_labels = [r for r in (page.search_for("Asesi :") or page.search_for("Asesi:")) if r.x0 < 100]
+        asesor_labels = [r for r in (page.search_for("Asesor :") or page.search_for("Asesor:")) if r.x0 < 100]
+
+        if asesi_labels and asesor_labels:
+            sy = asesi_labels[0].y0
+            raw_sig_h = []
+            raw_sig_v = []
+            for d in page.get_drawings():
+                r = d['rect']
+                if (r.y1 - r.y0) < 2.5 and r.x1 > 500 and (sy - 15) <= r.y0 <= (sy + 225):
+                    raw_sig_h.append(round(r.y0, 1))
+                if (r.x1 - r.x0) < 3.0 and (r.y1 - r.y0) > 10 and (sy - 15) <= r.y0 <= (sy + 225):
+                    raw_sig_v.append(round(r.x0, 1))
+
+            sig_h_lines = []
+            for y in sorted(list(set(raw_sig_h))):
+                if not sig_h_lines or abs(y - sig_h_lines[-1]) > 1.0:
+                    sig_h_lines.append(y)
+
+            sig_v_lines = []
+            for x in sorted(list(set(raw_sig_v))):
+                if not sig_v_lines or abs(x - sig_v_lines[-1]) > 2.0:
+                    sig_v_lines.append(x)
+
+            if len(sig_v_lines) >= 4:
+                v_left_sig = sig_v_lines[0]
+                v_div_colon = sig_v_lines[1]
+                v_div_val = sig_v_lines[2]
+                v_right_sig = sig_v_lines[3]
+            else:
+                v_left_sig = 56.3
+                v_div_colon = 225.2
+                v_div_val = 232.3
+                v_right_sig = 571.3
+
+            # Redact value cells safely without touching borders or colons
+            if len(sig_h_lines) >= 8:
+                val_row_indices = [1, 2, 4, 5, 6]
+                for r_idx in val_row_indices:
+                    y_top = sig_h_lines[r_idx]
+                    y_bot = sig_h_lines[r_idx + 1]
+                    safe_rect = fitz.Rect(v_div_val + 1.2, y_top + 1.0, v_right_sig - 1.2, y_bot - 1.0)
+                    page.add_redact_annot(safe_rect, fill=(1, 1, 1))
+                page.apply_redactions()
+
+                sig_text_x = v_div_val + 6.0
+                asesi_nama = str(data.get("asesi_nama") or "").strip()
+                asesor_nama = str(data.get("asesor_nama") or "").strip()
+                asesor_no_reg = str(data.get("asesor_no_reg") or "").strip()
+                tanggal_asesi = str(data.get("tanggal_tanda_tangan_asesi") or data.get("tanggal_tanda_tangan") or "").strip()
+                tanggal_asesor = str(data.get("tanggal_tanda_tangan_asesor") or data.get("tanggal_tanda_tangan") or "").strip()
+                sig_asesi_data = data.get("signature_asesi")
+                sig_asesor_data = data.get("signature_asesor")
+
+                # Insert Nama Asesi (Row 1)
+                if asesi_nama:
+                    page.insert_text(
+                        fitz.Point(sig_text_x, sig_h_lines[2] - 4.5),
+                        asesi_nama,
+                        fontfile=reg_font,
+                        fontsize=10.0,
+                        color=(0, 0, 0)
+                    )
+
+                # Insert Asesi Signature & Date (Row 2)
+                if is_filled and sig_asesi_data:
+                    sig_bytes = clean_signature_image(sig_asesi_data)
+                    if sig_bytes:
+                        sig_rect = fitz.Rect(sig_text_x + 10.0, sig_h_lines[2] + 3.0, sig_text_x + 95.0, sig_h_lines[3] - 13.0)
+                        page.insert_image(sig_rect, stream=sig_bytes, keep_proportion=True)
+
+                if is_filled and tanggal_asesi:
+                    page.insert_text(
+                        fitz.Point(sig_text_x + 10.0, sig_h_lines[3] - 3.5),
+                        f"Tanggal: {tanggal_asesi}",
+                        fontfile=reg_font,
+                        fontsize=8.5,
+                        color=(0, 0, 0)
+                    )
+
+                # Insert Nama Asesor (Row 4)
+                if asesor_nama:
+                    page.insert_text(
+                        fitz.Point(sig_text_x, sig_h_lines[5] - 4.5),
+                        asesor_nama,
+                        fontfile=reg_font,
+                        fontsize=10.0,
+                        color=(0, 0, 0)
+                    )
+
+                # Insert No. Reg Asesor (Row 5)
+                if asesor_no_reg:
+                    page.insert_text(
+                        fitz.Point(sig_text_x, sig_h_lines[6] - 4.5),
+                        asesor_no_reg,
+                        fontfile=reg_font,
+                        fontsize=10.0,
+                        color=(0, 0, 0)
+                    )
+
+                # Insert Asesor Signature & Date (Row 6)
+                if is_filled and sig_asesor_data:
+                    sig_bytes = clean_signature_image(sig_asesor_data)
+                    if sig_bytes:
+                        sig_rect = fitz.Rect(sig_text_x + 10.0, sig_h_lines[6] + 3.0, sig_text_x + 95.0, sig_h_lines[7] - 13.0)
+                        page.insert_image(sig_rect, stream=sig_bytes, keep_proportion=True)
+
+                if is_filled and tanggal_asesor:
+                    page.insert_text(
+                        fitz.Point(sig_text_x + 10.0, sig_h_lines[7] - 3.5),
+                        f"Tanggal: {tanggal_asesor}",
+                        fontfile=reg_font,
+                        fontsize=8.5,
+                        color=(0, 0, 0)
+                    )
+
+                # Re-stroke signature table borders to guarantee 100% crisp visibility
+                shape_sig = page.new_shape()
+                # 1. Outer box
+                shape_sig.draw_rect(fitz.Rect(v_left_sig, sig_h_lines[0], v_right_sig, sig_h_lines[-1]))
+                shape_sig.finish(color=(0, 0, 0), width=1.2)
+
+                # 2. Right vertical border
+                shape_sig.draw_line(fitz.Point(v_right_sig, sig_h_lines[0]), fitz.Point(v_right_sig, sig_h_lines[-1]))
+                shape_sig.finish(color=(0, 0, 0), width=1.2)
+
+                # 3. Vertical lines dividing colon column and value column (inside Asesi & Asesor rows)
+                shape_sig.draw_line(fitz.Point(v_div_colon, sig_h_lines[1]), fitz.Point(v_div_colon, sig_h_lines[3]))
+                shape_sig.finish(color=(0, 0, 0), width=0.6)
+                shape_sig.draw_line(fitz.Point(v_div_val, sig_h_lines[1]), fitz.Point(v_div_val, sig_h_lines[3]))
+                shape_sig.finish(color=(0, 0, 0), width=0.6)
+
+                shape_sig.draw_line(fitz.Point(v_div_colon, sig_h_lines[4]), fitz.Point(v_div_colon, sig_h_lines[7]))
+                shape_sig.finish(color=(0, 0, 0), width=0.6)
+                shape_sig.draw_line(fitz.Point(v_div_val, sig_h_lines[4]), fitz.Point(v_div_val, sig_h_lines[7]))
+                shape_sig.finish(color=(0, 0, 0), width=0.6)
+
+                # 4. Horizontal lines for rows 1 to 6
+                for y in sig_h_lines[1:-1]:
+                    shape_sig.draw_line(fitz.Point(v_left_sig, y), fitz.Point(v_right_sig, y))
+                    shape_sig.finish(color=(0, 0, 0), width=0.6)
+                shape_sig.commit()
+
+    os.makedirs(os.path.dirname(os.path.abspath(dest_path)), exist_ok=True)
+    doc.save(dest_path)
+    doc.close()
+    print(f"OK -> Sukses generate FR.AK.02 (Multi-Scheme Master Overlay {total_pages} Halaman): {dest_path}")
+
+def find_scheme_master_pdf(scheme_code_or_name=None):
+    """Find matching AK.02 master template PDF in lsp-document-dynamic for the given scheme."""
+    base_dir = os.path.join(PROJECT_ROOT, "lsp-document-dynamic")
+    if not os.path.isdir(base_dir):
+        return DEFAULT_REF_PDF if os.path.isfile(DEFAULT_REF_PDF) else None
+
+    if scheme_code_or_name:
+        s_clean = str(scheme_code_or_name).lower()
+        m = re.search(r'(?:skm|skema)[-_ ]?0?([1-7])', s_clean)
+        num = m.group(1) if m else None
+
+        for folder in os.listdir(base_dir):
+            folder_lower = folder.lower()
+            folder_path = os.path.join(base_dir, folder)
+            if not os.path.isdir(folder_path):
+                continue
+
+            match = False
+            if num and f"skema {num}" in folder_lower:
+                match = True
+            elif any(part in folder_lower for part in s_clean.split() if len(part) > 4):
+                match = True
+
+            if match:
+                for f in os.listdir(folder_path):
+                    lf = f.lower()
+                    if lf.endswith(".pdf") and ("ak.02" in lf or "ak02" in lf or "ak 02" in lf):
+                        return os.path.join(folder_path, f)
+
+    if os.path.isfile(DEFAULT_REF_PDF):
+        return DEFAULT_REF_PDF
+
+    for root, _, files in os.walk(base_dir):
+        for f in files:
+            lf = f.lower()
+            if lf.endswith(".pdf") and ("ak.02" in lf or "ak02" in lf or "ak 02" in lf):
+                return os.path.join(root, f)
+
+    return None
 
 if __name__ == "__main__":
-    import json
-    out_dir = os.path.join(os.path.dirname(__file__), "..", "tests", "Fixtures", "muk")
+    out_dir = os.path.join(PROJECT_ROOT, "tests", "Fixtures", "muk")
     os.makedirs(out_dir, exist_ok=True)
-    out_file = os.path.join(out_dir, "FR_AK_02_generated.pdf")
-    if len(sys.argv) > 1:
-        if sys.argv[1].endswith(".json") and os.path.isfile(sys.argv[1]):
-            with open(sys.argv[1], "r", encoding="utf-8") as f:
-                DATA.update(json.load(f))
-            if len(sys.argv) > 2:
-                out_file = sys.argv[2]
+
+    out_file = OUT_FILE
+    master_pdf = None
+
+    if len(sys.argv) > 1 and sys.argv[1] != "-":
+        payload_arg = sys.argv[1]
+        if os.path.isfile(payload_arg):
+            with open(payload_arg, "r", encoding="utf-8") as f:
+                DATA = json.load(f)
         else:
-            out_file = sys.argv[1]
-    render(out_file)
+            try:
+                DATA = json.loads(payload_arg)
+            except Exception:
+                pass
+    elif len(sys.argv) > 1 and sys.argv[1] == "-":
+        DATA = json.load(sys.stdin)
+
+    if len(sys.argv) > 2:
+        out_file = sys.argv[2]
+
+    if len(sys.argv) > 3 and sys.argv[3] and os.path.isfile(sys.argv[3]):
+        master_pdf = sys.argv[3]
+    else:
+        scheme_hint = DATA.get("skema_nomor") or DATA.get("skema_nama") or ""
+        master_pdf = find_scheme_master_pdf(scheme_hint)
+
+    if not master_pdf or not os.path.isfile(master_pdf):
+        master_pdf = DEFAULT_REF_PDF
+
+    render_master_overlay(master_pdf, DATA, out_file)

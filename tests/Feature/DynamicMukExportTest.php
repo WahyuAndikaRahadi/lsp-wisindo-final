@@ -406,6 +406,80 @@ class DynamicMukExportTest extends TestCase
         $this->assertStringContainsString('Ir. Hendra Gunawan, S.T.', $pdfText);
     }
 
+    public function test_admin_can_export_dynamic_candidate_ak02_pdf_with_actual_assessor_evaluation(): void
+    {
+        $this->assessment->update([
+            'final_result' => 'KOMPETEN',
+            'follow_up_action' => 'Tindak lanjut penerbitan sertifikat ak02 spesifik.',
+            'final_notes' => 'Catatan observasi asesor ak02 yang sangat memuaskan.',
+            'assessor_signed_at' => now(),
+            'asesi_signed_at' => now(),
+        ]);
+
+        $unit = $this->schedule->scheme->competencyUnits->first() ?? $this->schedule->scheme->competencyUnits()->create([
+            'code' => 'G.45OTO01.001.2',
+            'title' => 'Melaksanakan Keselamatan dan Kesehatan Kerja',
+            'standard_reference' => 'SKKNI 2018',
+        ]);
+        $this->assessment->ak02Items()->create([
+            'competency_unit_id' => $unit->id,
+            'methods_json' => [
+                'observasi_demonstrasi' => true,
+                'portofolio' => true,
+                'lisan' => true,
+                'tulis' => false,
+                'pihak_ketiga' => false,
+                'proyek' => false,
+                'lainnya' => false,
+            ],
+            'is_competent' => true,
+        ]);
+
+        $response = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.asesi-dynamic', [
+            'assessment' => $this->assessment->id,
+            'type' => 'ak02',
+        ]));
+
+        $response->assertOk();
+        $filePath = $response->baseResponse->getFile()->getPathname();
+        $this->assertFileExists($filePath);
+
+        $nullDev = PHP_OS_FAMILY === 'Windows' ? '2>nul' : '2>/dev/null';
+        $pdfText = shell_exec('pdftotext '.escapeshellarg($filePath)." - {$nullDev}") ?? '';
+
+        $this->assertStringContainsString('Tindak lanjut penerbitan sertifikat ak02 spesifik.', $pdfText);
+        $this->assertStringContainsString('Catatan observasi asesor ak02 yang sangat memuaskan.', $pdfText);
+    }
+
+    public function test_admin_exports_ak02_pdf_empty_when_assessor_has_not_evaluated(): void
+    {
+        $this->assessment->update([
+            'final_result' => 'BELUM_SELESAI',
+            'follow_up_action' => null,
+            'final_notes' => null,
+            'assessor_signed_at' => null,
+            'asesi_signed_at' => null,
+        ]);
+        $this->assessment->ak02Items()->delete();
+
+        $response = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.asesi-dynamic', [
+            'assessment' => $this->assessment->id,
+            'type' => 'ak02',
+        ]));
+
+        $response->assertOk();
+        $filePath = $response->baseResponse->getFile()->getPathname();
+        $this->assertFileExists($filePath);
+
+        $nullDev = PHP_OS_FAMILY === 'Windows' ? '2>nul' : '2>/dev/null';
+        $pdfText = shell_exec('pdftotext '.escapeshellarg($filePath)." - {$nullDev}") ?? '';
+
+        // Must NOT contain dummy/default fallback texts
+        $this->assertStringNotContainsString('Tidak ada tindakan perbaikan yang diperlukan', $pdfText);
+        $this->assertStringNotContainsString('Perlu dilakukan asesmen ulang', $pdfText);
+        $this->assertStringNotContainsString('Asesi menunjukkan pemahaman dan keterampilan', $pdfText);
+    }
+
     public function test_asesor_can_access_dynamic_export_routes(): void
     {
         $response = $this->actingAs($this->asesor)->get(route('asesor.schedule.dynamic', [

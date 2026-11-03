@@ -599,26 +599,31 @@ class MukDynamicDocumentService
         $scheme = $assessment->scheme ?? $schedule->scheme;
 
         $startDate = $schedule->date
-            ? Carbon::parse($schedule->date)->format('d/m/Y').' '.($schedule->start_time ? Carbon::parse($schedule->start_time)->format('H:i') : '08:30')
-            : now()->format('d/m/Y 08:30');
+            ? Carbon::parse($schedule->date)->locale('id')->translatedFormat('d F Y').' '.($schedule->start_time ? Carbon::parse($schedule->start_time)->format('H:i') : '08:30')
+            : now()->locale('id')->translatedFormat('d F Y 08:30');
 
         $endDate = $schedule->date
-            ? Carbon::parse($schedule->date)->format('d/m/Y').' '.($schedule->end_time ? Carbon::parse($schedule->end_time)->format('H:i') : '12:00')
-            : now()->format('d/m/Y 12:00');
+            ? Carbon::parse($schedule->date)->locale('id')->translatedFormat('d F Y').' '.($schedule->end_time ? Carbon::parse($schedule->end_time)->format('H:i') : '12:00')
+            : now()->locale('id')->translatedFormat('d F Y 12:00');
 
         $tglTtd = $assessment->final_result_at
             ? Carbon::parse($assessment->final_result_at)->locale('id')->translatedFormat('d F Y')
             : ($schedule->date ? Carbon::parse($schedule->date)->locale('id')->translatedFormat('d F Y') : Carbon::now()->locale('id')->translatedFormat('d F Y'));
 
-        $tglAsesor = $assessment->assessor_signed_at
+        $isAk02Filled = ! empty($assessment->final_result)
+            && ! in_array($assessment->final_result, ['BELUM_SELESAI', 'PENDING'], true);
+
+        $isKompeten = $isAk02Filled
+            ? in_array($assessment->final_result, ['K', 'KOMPETEN'], true)
+            : null;
+
+        $tglAsesor = ($isAk02Filled && $assessment->assessor_signed_at)
             ? Carbon::parse($assessment->assessor_signed_at)->locale('id')->translatedFormat('d F Y')
-            : $tglTtd;
+            : '';
 
-        $tglAsesi = $assessment->asesi_signed_at
+        $tglAsesi = ($isAk02Filled && $assessment->asesi_signed_at)
             ? Carbon::parse($assessment->asesi_signed_at)->locale('id')->translatedFormat('d F Y')
-            : $tglTtd;
-
-        $isKompeten = in_array($assessment->final_result, ['K', 'KOMPETEN'], true);
+            : '';
 
         $tukType = $schedule->ak01_data['tuk_type'] ?? ($schedule->tuk_type ?? 'Sewaktu');
         $tukName = $schedule->tuk_name;
@@ -638,47 +643,38 @@ class MukDynamicDocumentService
 
         foreach ($compUnits as $cu) {
             $item = $ak02Items->get($cu->id);
-            $methods = $item?->methods_json ?? [];
+            $methods = ($isAk02Filled && $item) ? ($item->methods_json ?? []) : [];
             $units[] = [
                 'code' => $cu->code,
                 'title' => $cu->title,
-                'obs' => ! empty($methods['observasi_demonstrasi']) || empty($methods),
+                'obs' => ! empty($methods['observasi_demonstrasi']),
                 'port' => ! empty($methods['portofolio']),
                 'pihak3' => ! empty($methods['pihak_ketiga']),
                 'lisan' => ! empty($methods['lisan']),
-                'tulis' => ! empty($methods['tulis']) || empty($methods),
+                'tulis' => ! empty($methods['tulis']),
                 'proyek' => ! empty($methods['proyek']),
                 'lain' => ! empty($methods['lainnya']),
             ];
         }
 
-        if (empty($units)) {
-            $defaultUnits = [
-                'Melaksanakan Keselamatan dan Kesehatan Kerja',
-                'Menggunakan Peralatan dan Perlengkapan Tempat Kerja',
-                'Membaca Gambar Teknik',
-                'Menggunakan Alat Ukur',
-                'Melaksanakan Diagnosis',
-                'Melakukan Perawatan Berkala Engine',
-                'Memelihara Baterai',
-                'Memperbaiki Kerusakan Pada Sistem Pengaman Kelistrikan',
-                'Memperbaiki Sistem Manajemen Engine',
-            ];
-            foreach ($defaultUnits as $title) {
-                $units[] = [
-                    'title' => $title,
-                    'obs' => true,
-                    'port' => false,
-                    'pihak3' => false,
-                    'lisan' => true,
-                    'tulis' => true,
-                    'proyek' => false,
-                    'lain' => false,
-                ];
+        $assessorSignature = $assessment->assessor_signature ?? $assessor?->profile?->signature_data;
+        if (! $assessorSignature && $assessor?->profile?->signature_path) {
+            $sigDiskPath = storage_path('app/public/'.$assessor->profile->signature_path);
+            if (File::isFile($sigDiskPath)) {
+                $assessorSignature = $sigDiskPath;
+            }
+        }
+
+        $asesiSignature = $assessment->asesi_signature ?? $profile?->signature_data;
+        if (! $asesiSignature && $profile?->signature_path) {
+            $sigDiskPath = storage_path('app/public/'.$profile->signature_path);
+            if (File::isFile($sigDiskPath)) {
+                $asesiSignature = $sigDiskPath;
             }
         }
 
         return [
+            'is_filled' => $isAk02Filled,
             'skema_nama' => $scheme?->name ?? 'Maintenance Gasoline Engine Injection System',
             'skema_nomor' => $scheme?->code ?? '02/LSP PrO Indo/I/2026',
             'tuk_tipe' => $tukDisplay.'*',
@@ -688,14 +684,14 @@ class MukDynamicDocumentService
             'tanggal_mulai' => $startDate,
             'tanggal_selesai' => $endDate,
             'rekomendasi_kompeten' => $isKompeten,
-            'tindak_lanjut' => $assessment->follow_up_action ?? ($isKompeten ? 'Tidak ada tindakan perbaikan yang diperlukan. Seluruh unit kompetensi telah terpenuhi sesuai standar SKKNI.' : 'Perlu dilakukan asesmen ulang pada unit yang belum kompeten.'),
-            'komentar_asesor' => $assessment->final_notes ?? ($isKompeten ? 'Asesi menunjukkan pemahaman dan keterampilan kerja yang sangat baik dalam pelaksanaan asesmen kompetensi.' : 'Asesi perlu meningkatkan kompetensi pada unit tertentu.'),
+            'tindak_lanjut' => $isAk02Filled ? ($assessment->follow_up_action ?? '') : '',
+            'komentar_asesor' => $isAk02Filled ? ($assessment->final_notes ?? '') : '',
             'units' => $units,
             'tanggal_tanda_tangan' => $tglTtd,
             'tanggal_tanda_tangan_asesor' => $tglAsesor,
             'tanggal_tanda_tangan_asesi' => $tglAsesi,
-            'signature_asesi' => $assessment->asesi_signature ?? $profile?->signature_data,
-            'signature_asesor' => $assessment->assessor_signature ?? $assessor?->profile?->signature_data,
+            'signature_asesi' => $asesiSignature,
+            'signature_asesor' => $assessorSignature,
         ];
     }
 
@@ -1157,12 +1153,18 @@ class MukDynamicDocumentService
             if ($normType === 'ak02') {
                 $script = base_path('tools/render_fr_ak_02.py');
                 if (File::isFile($script)) {
-                    $ak02Payload = $assessment
-                        ? $this->buildAk02Data($schedule, $assessment)
+                    $targetAssessment = $assessment ?? $schedule->assessments->first();
+                    $ak02Payload = $targetAssessment
+                        ? $this->buildAk02Data($schedule, $targetAssessment)
                         : $this->buildPayload($schedule, null);
                     $tempAk02Json = $this->cacheDir.'/muk_ak02_'.uniqid().'.json';
                     File::put($tempAk02Json, json_encode($ak02Payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
-                    shell_exec("{$pythonExec} ".escapeshellarg($script).' '.escapeshellarg($tempAk02Json).' '.escapeshellarg($outputPath));
+                    if (File::isFile($outputPath)) {
+                        @unlink($outputPath);
+                    }
+                    $masterPdf = $this->getDynamicFilePath($schedule->scheme, 'ak02');
+                    $masterArg = ($masterPdf && File::isFile($masterPdf)) ? ' '.escapeshellarg($masterPdf) : '';
+                    shell_exec("{$pythonExec} ".escapeshellarg($script).' '.escapeshellarg($tempAk02Json).' '.escapeshellarg($outputPath).$masterArg.' 2>&1');
                     @unlink($tempAk02Json);
                     if (File::isFile($outputPath) && filesize($outputPath) > 1000) {
                         return $outputPath;
