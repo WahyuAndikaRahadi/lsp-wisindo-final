@@ -480,6 +480,77 @@ class DynamicMukExportTest extends TestCase
         $this->assertStringNotContainsString('Asesi menunjukkan pemahaman dan keterampilan', $pdfText);
     }
 
+    public function test_admin_can_export_dynamic_candidate_ak03_pdf_with_download_disposition(): void
+    {
+        $response = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.asesi-dynamic', [
+            'assessment' => $this->assessment->id,
+            'type' => 'ak03',
+            'download' => '1',
+        ]));
+
+        $response->assertOk();
+        $this->assertInstanceOf(BinaryFileResponse::class, $response->baseResponse);
+        $this->assertEquals('application/pdf', $response->headers->get('Content-Type'));
+        $this->assertStringContainsString('attachment', (string) $response->headers->get('Content-Disposition'));
+    }
+
+    public function test_admin_can_export_dynamic_candidate_ak03_pdf_with_actual_asesi_evaluation(): void
+    {
+        $this->assessment->ak03Item()?->delete();
+        $this->assessment->ak03Item()->create([
+            'ratings_json' => [
+                1 => ['value' => 'YA', 'comment' => 'Penjelasan awal proses uji sangat jelas sekali.'],
+                2 => ['value' => 'YA', 'comment' => 'Diberikan waktu mempelajari standar SKKNI.'],
+                3 => ['value' => 'YA', 'comment' => 'Metode uji disepakati bersama.'],
+                4 => ['value' => 'YA', 'comment' => 'Bukti portofolio digali mendalam.'],
+                5 => ['value' => 'YA', 'comment' => 'Praktik demonstrasi berjalan lancar.'],
+                6 => ['value' => 'YA', 'comment' => 'Keputusan akhir dijelaskan rinci.'],
+                7 => ['value' => 'YA', 'comment' => 'Umpan balik konstruktif.'],
+                8 => ['value' => 'YA', 'comment' => 'Tanda tangan berkas transparan.'],
+                9 => ['value' => 'YA', 'comment' => 'Kerahasiaan dokumen dijamin.'],
+                10 => ['value' => 'YA', 'comment' => 'Komunikasi asesor sangat santun.'],
+            ],
+            'general_notes' => 'Catatan umum asesi: Pengalaman asesmen di TUK sangat memuaskan.',
+        ]);
+
+        $response = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.asesi-dynamic', [
+            'assessment' => $this->assessment->id,
+            'type' => 'ak03',
+        ]));
+
+        $response->assertOk();
+        $filePath = $response->baseResponse->getFile()->getPathname();
+        $this->assertFileExists($filePath);
+
+        $python = app(MukDynamicDocumentService::class)->getPythonExecutable();
+        $extractScript = 'import fitz, sys; doc = fitz.open(sys.argv[1]); sys.stdout.buffer.write(doc[0].get_text().encode())';
+        $pdfText = shell_exec(escapeshellarg($python).' -c '.escapeshellarg($extractScript).' '.escapeshellarg($filePath)) ?? '';
+
+        $this->assertStringContainsString('Penjelasan awal proses uji', $pdfText);
+        $this->assertStringContainsString('Catatan umum asesi: Pengalaman asesmen di TUK sangat memuaskan.', $pdfText);
+    }
+
+    public function test_admin_exports_ak03_pdf_empty_when_asesi_has_not_evaluated(): void
+    {
+        $this->assessment->ak03Item()?->delete();
+
+        $response = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.asesi-dynamic', [
+            'assessment' => $this->assessment->id,
+            'type' => 'ak03',
+        ]));
+
+        $response->assertOk();
+        $filePath = $response->baseResponse->getFile()->getPathname();
+        $this->assertFileExists($filePath);
+
+        $python = app(MukDynamicDocumentService::class)->getPythonExecutable();
+        $extractScript = 'import fitz, sys; doc = fitz.open(sys.argv[1]); sys.stdout.buffer.write(doc[0].get_text().encode())';
+        $pdfText = shell_exec(escapeshellarg($python).' -c '.escapeshellarg($extractScript).' '.escapeshellarg($filePath)) ?? '';
+
+        $this->assertStringNotContainsString('Penjelasan awal proses uji sangat jelas sekali.', $pdfText);
+        $this->assertStringNotContainsString('Catatan umum asesi: Pengalaman asesmen di TUK sangat memuaskan.', $pdfText);
+    }
+
     public function test_asesor_can_access_dynamic_export_routes(): void
     {
         $response = $this->actingAs($this->asesor)->get(route('asesor.schedule.dynamic', [

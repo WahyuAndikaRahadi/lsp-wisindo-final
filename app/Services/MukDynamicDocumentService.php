@@ -696,6 +696,56 @@ class MukDynamicDocumentService
     }
 
     /**
+     * Build specific payload for FR.AK.03 (Umpan Balik dan Catatan Asesmen).
+     */
+    public function buildAk03Data(Schedule $schedule, Assessment $assessment): array
+    {
+        $asesi = $assessment->asesi;
+        $profile = $asesi?->profile;
+        $assessor = $assessment->assessor ?? $schedule->assessors->first();
+        $scheme = $assessment->scheme ?? $schedule->scheme ?? $assessment->schedule?->scheme;
+
+        $startDate = $schedule->date
+            ? Carbon::parse($schedule->date)->locale('id')->translatedFormat('d F Y').' '.($schedule->start_time ? Carbon::parse($schedule->start_time)->format('H:i') : '08:00')
+            : now()->locale('id')->translatedFormat('d F Y 08:00');
+
+        $endDate = $schedule->date
+            ? Carbon::parse($schedule->date)->locale('id')->translatedFormat('d F Y').' '.($schedule->end_time ? Carbon::parse($schedule->end_time)->format('H:i') : '16:00')
+            : now()->locale('id')->translatedFormat('d F Y 16:00');
+
+        $tukType = $schedule->ak01_data['tuk_type'] ?? ($schedule->tuk_type ?? 'Sewaktu');
+        $tukName = $schedule->tuk_name;
+        $tukDisplay = match (strtolower((string) $tukType)) {
+            'tempat_kerja', 'tempat kerja' => 'Tempat Kerja',
+            'mandiri' => 'Mandiri',
+            default => 'Sewaktu',
+        };
+        if ($tukName && ! str_contains(strtolower($tukName), strtolower($tukDisplay))) {
+            $tukDisplay = "{$tukDisplay} ({$tukName})";
+        }
+
+        if (! $assessment->relationLoaded('ak03Item')) {
+            $assessment->load('ak03Item');
+        }
+
+        $ak03Item = $assessment->ak03Item;
+        $isAk03Filled = $ak03Item !== null && ! empty($ak03Item->ratings_json);
+
+        return [
+            'is_filled' => $isAk03Filled,
+            'skema_nama' => $scheme?->name ?? 'Maintenance Gasoline Engine Injection System',
+            'skema_nomor' => $scheme?->code ?? 'SKM-02-2026',
+            'tuk_tipe' => $tukDisplay.'*',
+            'asesor_nama' => $assessor?->full_name ?? 'Ari Susanto',
+            'asesi_nama' => $asesi?->full_name ?? 'Nama Asesi',
+            'tanggal_mulai' => $startDate,
+            'tanggal_selesai' => $endDate,
+            'ratings' => $isAk03Filled ? ($ak03Item->ratings_json ?? []) : [],
+            'general_notes' => $isAk03Filled ? ($ak03Item->general_notes ?? '') : '',
+        ];
+    }
+
+    /**
      * Build specific payload for FR.AK.07 (Ceklis Penyesuaian yang Wajar dan Beralasan).
      */
     public function buildAk07Data(Schedule $schedule, Assessment $assessment): array
@@ -1166,6 +1216,28 @@ class MukDynamicDocumentService
                     $masterArg = ($masterPdf && File::isFile($masterPdf)) ? ' '.escapeshellarg($masterPdf) : '';
                     shell_exec("{$pythonExec} ".escapeshellarg($script).' '.escapeshellarg($tempAk02Json).' '.escapeshellarg($outputPath).$masterArg.' 2>&1');
                     @unlink($tempAk02Json);
+                    if (File::isFile($outputPath) && filesize($outputPath) > 1000) {
+                        return $outputPath;
+                    }
+                }
+            }
+
+            if ($normType === 'ak03') {
+                $script = base_path('tools/render_fr_ak_03.py');
+                if (File::isFile($script)) {
+                    $targetAssessment = $assessment ?? $schedule->assessments->first();
+                    $ak03Payload = $targetAssessment
+                        ? $this->buildAk03Data($schedule, $targetAssessment)
+                        : $this->buildPayload($schedule, null);
+                    $tempAk03Json = $this->cacheDir.'/muk_ak03_'.uniqid().'.json';
+                    File::put($tempAk03Json, json_encode($ak03Payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+                    if (File::isFile($outputPath)) {
+                        @unlink($outputPath);
+                    }
+                    $masterPdf = $this->getDynamicFilePath($schedule->scheme, 'ak03');
+                    $masterArg = ($masterPdf && File::isFile($masterPdf)) ? ' '.escapeshellarg($masterPdf) : '';
+                    shell_exec("{$pythonExec} ".escapeshellarg($script).' '.escapeshellarg($tempAk03Json).' '.escapeshellarg($outputPath).$masterArg.' 2>&1');
+                    @unlink($tempAk03Json);
                     if (File::isFile($outputPath) && filesize($outputPath) > 1000) {
                         return $outputPath;
                     }
