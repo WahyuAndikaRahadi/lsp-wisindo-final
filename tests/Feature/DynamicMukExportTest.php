@@ -270,6 +270,50 @@ class DynamicMukExportTest extends TestCase
         $this->assertStringContainsString('Ir. Hendra Gunawan, S.T.', $pdfText);
     }
 
+    public function test_admin_can_export_dynamic_candidate_ia01_for_scheme_2(): void
+    {
+        $scheme2 = Scheme::firstOrCreate(
+            ['code' => 'SKM-02-2026'],
+            ['name' => 'Maintenance Gasoline Engine Injection System', 'scheme_type' => 'KLASTER', 'is_active' => true]
+        );
+        $schedule2 = Schedule::create([
+            'code' => 'SCH-SCHEME2-'.uniqid(),
+            'name' => 'Jadwal Skema 2',
+            'scheme_id' => $scheme2->id,
+            'date' => '2026-10-24',
+            'start_time' => '08:00',
+            'end_time' => '12:00',
+            'tuk_name' => 'TUK Otomotif Mandiri',
+            'status' => 'ACTIVE',
+            'created_by' => $this->admin->id,
+            'selected_instruments' => ['AK01'],
+        ]);
+        $assessment2 = Assessment::create([
+            'schedule_id' => $schedule2->id,
+            'asesi_id' => $this->asesi->id,
+            'assessor_id' => $this->asesor->id,
+            'apl_status' => 'APPROVED',
+            'final_result' => 'KOMPETEN',
+        ]);
+
+        $response = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.asesi-dynamic', [
+            'assessment' => $assessment2->id,
+            'type' => 'ia01',
+        ]));
+
+        $response->assertOk();
+        $this->assertInstanceOf(BinaryFileResponse::class, $response->baseResponse);
+        $this->assertEquals('application/pdf', $response->headers->get('Content-Type'));
+        $filePath = $response->baseResponse->getFile()->getPathname();
+        $this->assertFileExists($filePath);
+
+        $nullDev = PHP_OS_FAMILY === 'Windows' ? '2>nul' : '2>/dev/null';
+        $pdfText = shell_exec('pdftotext '.escapeshellarg($filePath)." - {$nullDev}") ?? '';
+        $this->assertStringContainsString('FR.IA.01', $pdfText);
+        $this->assertStringContainsString('Bambang Sudarmono', $pdfText);
+        $this->assertStringContainsString('Ir. Hendra Gunawan, S.T.', $pdfText);
+    }
+
     public function test_admin_can_export_dynamic_candidate_ia03_pdf(): void
     {
         $response = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.asesi-dynamic', [

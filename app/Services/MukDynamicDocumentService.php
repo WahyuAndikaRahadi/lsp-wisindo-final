@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Assessment;
+use App\Models\AssessmentIaResponse;
 use App\Models\Schedule;
 use App\Models\Scheme;
 use App\Models\User;
@@ -238,7 +239,7 @@ class MukDynamicDocumentService
             'tanggal' => $formattedDate,
             'waktu' => ($schedule->start_time ?? '08:00').' - '.($schedule->end_time ?? '12:00').' WIB',
             'asesor_nama' => $leadAssessor?->full_name ?? 'Asesor LSP PrO Indo',
-            'asesor_no_reg' => $leadAssessor?->profile?->no_reg ?? 'MET.000.001234 2022',
+            'asesor_no_reg' => $leadAssessor?->assessor_registration_number ?? $leadAssessor?->profile?->no_reg ?? 'MET.000.001234 2022',
             'tanggal_dokumen' => $formattedDate,
             'penanggungjawab_nama' => $schedule->pic_name ?? 'H. Ahmad Fauzi, S.Pd., M.M.',
             'penanggungjawab_jabatan' => $schedule->pic_position ?? 'Kepala TUK',
@@ -298,7 +299,7 @@ class MukDynamicDocumentService
             $asesorList[] = [
                 'no' => $idx + 1,
                 'nama' => $as->full_name,
-                'no_met' => $as->profile?->no_reg ?? 'MET.000.001234 2022',
+                'no_met' => $as->assessor_registration_number ?? $as->profile?->no_reg ?? 'MET.000.001234 2022',
             ];
         }
         $payload['asesor'] = $asesorList;
@@ -617,11 +618,15 @@ class MukDynamicDocumentService
         $isKompeten = in_array($assessment->final_result, ['K', 'KOMPETEN'], true);
 
         $tukType = $schedule->ak01_data['tuk_type'] ?? ($schedule->tuk_type ?? 'Sewaktu');
+        $tukName = $schedule->tuk_name;
         $tukDisplay = match (strtolower((string) $tukType)) {
             'tempat_kerja', 'tempat kerja' => 'Tempat Kerja',
             'mandiri' => 'Mandiri',
             default => 'Sewaktu',
         };
+        if ($tukName && ! str_contains(strtolower($tukName), strtolower($tukDisplay))) {
+            $tukDisplay = "{$tukDisplay} ({$tukName})";
+        }
 
         // Competency Units with evidence checkmarks from ak02Items
         $units = [];
@@ -786,33 +791,162 @@ class MukDynamicDocumentService
         $asesi = $assessment->asesi;
         $profile = $asesi?->profile;
         $assessor = $assessment->assessor ?? $schedule->assessors->first();
-        $scheme = $assessment->scheme ?? $schedule->scheme;
+        $assessorProfile = $assessor?->profile;
+        $scheme = $assessment->scheme ?? $assessment->schedule?->scheme ?? $schedule->scheme;
 
         $tgl = $assessment->registered_at
             ? Carbon::parse($assessment->registered_at)->locale('id')->translatedFormat('d F Y')
             : ($schedule->date ? Carbon::parse($schedule->date)->locale('id')->translatedFormat('d F Y') : Carbon::now()->locale('id')->translatedFormat('d F Y'));
 
-        $isKompeten = ! in_array($assessment->final_result, ['BK', 'BELUM_KOMPETEN', 'BELUM KOMPETEN'], true);
+        $ia01Response = $assessment->iaResponses?->firstWhere('instrument_code', 'IA01')
+            ?? AssessmentIaResponse::where('assessment_id', $assessment->id)->where('instrument_code', 'IA01')->first();
 
-        $tukType = $schedule->tuk_type ?? 'Sewaktu';
+        $tglAsesor = $ia01Response?->assessor_signed_at
+            ? Carbon::parse($ia01Response->assessor_signed_at)->locale('id')->translatedFormat('d F Y')
+            : ($assessment->assessor_signed_at ? Carbon::parse($assessment->assessor_signed_at)->locale('id')->translatedFormat('d F Y') : $tgl);
+
+        $tglAsesi = $ia01Response?->asesi_signed_at
+            ? Carbon::parse($ia01Response->asesi_signed_at)->locale('id')->translatedFormat('d F Y')
+            : ($assessment->asesi_signed_at ? Carbon::parse($assessment->asesi_signed_at)->locale('id')->translatedFormat('d F Y') : $tgl);
+
+        $assessorNotes = $ia01Response?->assessor_notes ?? $assessment->final_notes;
+
+        $tukType = $schedule->ak01_data['tuk_type'] ?? ($schedule->tuk_type ?? 'Sewaktu');
+        $tukName = $schedule->tuk_name;
         $tukDisplay = match (strtolower((string) $tukType)) {
             'tempat_kerja', 'tempat kerja' => 'Tempat Kerja',
             'mandiri' => 'Mandiri',
             default => 'Sewaktu',
         };
+        if ($tukName && ! str_contains(strtolower($tukName), strtolower($tukDisplay))) {
+            $tukDisplay = "{$tukDisplay} ({$tukName})";
+        }
+
+        $assessorSignature = $ia01Response?->assessor_signature ?? $assessment->assessor_signature ?? $assessorProfile?->signature_data;
+        if (! $assessorSignature && $assessorProfile?->signature_path) {
+            $sigDiskPath = storage_path('app/public/'.$assessorProfile->signature_path);
+            if (File::isFile($sigDiskPath)) {
+                $assessorSignature = $sigDiskPath;
+            }
+        }
+
+        $asesiSignature = $ia01Response?->asesi_signature ?? $assessment->asesi_signature ?? $profile?->signature_data;
+        if (! $asesiSignature && $profile?->signature_path) {
+            $sigDiskPath = storage_path('app/public/'.$profile->signature_path);
+            if (File::isFile($sigDiskPath)) {
+                $asesiSignature = $sigDiskPath;
+            }
+        }
+
+        // Units, Elements & KUKs mapping from Database
+        $savedKuks = $ia01Response?->data_json['kuks'] ?? [];
+        $isFinalKompeten = in_array(strtoupper((string) $assessment->final_result), ['K', 'KOMPETEN'], true);
+        $isFinalBelumKompeten = in_array(strtoupper((string) $assessment->final_result), ['BK', 'BELUM_KOMPETEN', 'BELUM KOMPETEN'], true);
+
+        $schemeUnits = $scheme ? $scheme->competencyUnits()
+            ->with(['elements.kuks' => fn ($q) => $q->orderBy('sequence')->orderBy('id')])
+            ->orderBy('sequence')
+            ->orderBy('id')
+            ->get() : collect();
+
+        $unitsData = [];
+        $kukResultsById = [];
+        $kukResultsSeq = [];
+        $unfulfilledItems = [];
+        $allKuksKompeten = true;
+        $hasAnyEvaluated = false;
+        $globalKukIdx = 0;
+
+        foreach ($schemeUnits as $uIdx => $u) {
+            $uRow = [
+                'id' => $u->id,
+                'number' => $uIdx + 1,
+                'code' => $u->code,
+                'title' => $u->title,
+                'standard' => $u->standard_reference ?? 'SKKNI No. 097 Tahun 2018',
+                'elements' => [],
+            ];
+
+            foreach ($u->elements as $eIdx => $el) {
+                $elRow = [
+                    'id' => $el->id,
+                    'number' => $eIdx + 1,
+                    'title' => $el->title,
+                    'kuks' => [],
+                ];
+
+                foreach ($el->kuks as $k) {
+                    $kId = (string) $k->id;
+                    $eval = $savedKuks[$kId] ?? $savedKuks[(string) ($globalKukIdx + 1)] ?? $savedKuks[(string) $globalKukIdx] ?? null;
+
+                    if ($eval && isset($eval['result'])) {
+                        $hasAnyEvaluated = true;
+                        $res = strtoupper((string) $eval['result']);
+                        $note = $eval['note'] ?? '';
+                    } else {
+                        $res = $isFinalBelumKompeten ? 'BK' : 'K';
+                        $note = '';
+                    }
+
+                    $isK = in_array($res, ['K', 'KOMPETEN', 'YA'], true);
+                    if (! $isK) {
+                        $allKuksKompeten = false;
+                        $unfulfilledItems[] = [
+                            'unit' => $u->code.' '.$u->title,
+                            'element' => $el->title,
+                            'kuk' => $k->code_number.' '.$k->statement,
+                        ];
+                    }
+
+                    $kukEntry = [
+                        'id' => $k->id,
+                        'global_index' => $globalKukIdx,
+                        'code_number' => $k->code_number,
+                        'statement' => $k->statement,
+                        'standard' => $u->standard_reference ?? 'SKKNI No. 097 Tahun 2018',
+                        'result' => $isK ? 'K' : 'BK',
+                        'is_k' => $isK,
+                        'note' => $note ?: '',
+                        'unit_code' => $u->code,
+                        'unit_title' => $u->title,
+                        'element_title' => $el->title,
+                    ];
+
+                    $elRow['kuks'][] = $kukEntry;
+                    $kukResultsById[$kId] = $kukEntry;
+                    $kukResultsSeq[$globalKukIdx] = $kukEntry;
+                    $globalKukIdx++;
+                }
+
+                $uRow['elements'][] = $elRow;
+            }
+
+            $unitsData[] = $uRow;
+        }
+
+        $overallKompeten = $hasAnyEvaluated ? $allKuksKompeten : (! $isFinalBelumKompeten);
 
         return [
             'skema_nama' => $scheme?->name ?? 'Maintenance Gasoline Engine Injection System',
             'skema_nomor' => $scheme?->code ?? '02/LSP PrO Indo/I/2026',
+            'tuk_nama' => $schedule->tuk_name ?? 'TUK Otomotif Mandiri',
             'tuk_tipe' => $tukDisplay.'*',
-            'asesor_nama' => $assessor?->full_name ?? 'Drs. Budi Santoso, M.T.',
-            'asesor_no_reg' => $assessor?->profile?->no_reg ?? 'MET.000.001234 2022',
-            'asesi_nama' => $asesi?->full_name ?? 'Nama Asesi',
+            'asesor_nama' => $assessor?->full_name ?? $assessor?->name ?? 'Drs. Budi Santoso, M.T.',
+            'asesor_no_reg' => $assessor?->assessor_registration_number ?? $assessorProfile?->no_reg_asesor ?? $assessorProfile?->no_reg ?? $assessorProfile?->met_number ?? 'MET.000.001234 2022',
+            'asesi_nama' => $asesi?->full_name ?? $asesi?->name ?? 'Nama Asesi',
+            'asesi_nik' => $profile?->nik ?? '-',
             'tanggal' => $tgl,
             'tanggal_ttd' => $tgl,
-            'is_kompeten' => $isKompeten,
-            'signature_asesi' => $assessment->asesi_signature ?? $profile?->signature_data,
-            'signature_asesor' => $assessment->assessor_signature ?? $assessor?->profile?->signature_data,
+            'tanggal_ttd_asesor' => $tglAsesor,
+            'tanggal_ttd_asesi' => $tglAsesi,
+            'is_kompeten' => $overallKompeten,
+            'umpan_balik' => $assessorNotes ?: 'Asesi telah menunjukkan pemenuhan unjuk kerja praktik sesuai standar KUK SKKNI dan SOP industri yang berlaku.',
+            'signature_asesi' => $asesiSignature,
+            'signature_asesor' => $assessorSignature,
+            'units' => $unitsData,
+            'kuk_results_by_id' => $kukResultsById,
+            'kuk_results_seq' => $kukResultsSeq,
+            'unfulfilled_items' => $unfulfilledItems,
         ];
     }
 
@@ -992,12 +1126,18 @@ class MukDynamicDocumentService
             if ($normType === 'ia01') {
                 $script = base_path('tools/render_fr_ia_01.py');
                 if (File::isFile($script)) {
-                    $ia01Payload = $assessment
-                        ? $this->buildIa01Data($schedule, $assessment)
+                    $targetAssessment = $assessment ?? $schedule->assessments->first();
+                    $ia01Payload = $targetAssessment
+                        ? $this->buildIa01Data($schedule, $targetAssessment)
                         : $this->buildPayload($schedule, null);
                     $tempIa01Json = $this->cacheDir.'/muk_ia01_'.uniqid().'.json';
                     File::put($tempIa01Json, json_encode($ia01Payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
-                    shell_exec("{$pythonExec} ".escapeshellarg($script).' '.escapeshellarg($tempIa01Json).' '.escapeshellarg($outputPath));
+                    if (File::isFile($outputPath)) {
+                        @unlink($outputPath);
+                    }
+                    $masterPdf = $this->getDynamicFilePath($schedule->scheme, 'ia01');
+                    $masterArg = ($masterPdf && File::isFile($masterPdf)) ? ' '.escapeshellarg($masterPdf) : '';
+                    shell_exec("{$pythonExec} ".escapeshellarg($script).' '.escapeshellarg($tempIa01Json).' '.escapeshellarg($outputPath).$masterArg.' 2>&1');
                     @unlink($tempIa01Json);
                     if (File::isFile($outputPath) && filesize($outputPath) > 1000) {
                         return $outputPath;
