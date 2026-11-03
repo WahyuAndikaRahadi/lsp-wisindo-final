@@ -49,6 +49,14 @@ class DokumenMukController extends Controller
         ];
         $targetType = $aliasMap[$normalizedType] ?? $normalizedType;
 
+        if (in_array($targetType, ['excel-biodata', 'excel', 'xls', 'biodata-excel', 'asesi-excel'], true)) {
+            return $this->exporter->exportScheduleAsesiXls($schedule);
+        }
+
+        if (in_array($targetType, ['excel-asesor', 'asesor-excel', 'hadir-asesor-excel'], true)) {
+            return $this->exporter->exportScheduleAsesorXls($schedule);
+        }
+
         if ($request->query('source') === 'dynamic' || ($request->query('format') === 'pdf' && in_array($targetType, ['ba', 'hadir-asesor', 'hadir-asesi'], true))) {
             return $this->dynamicService->exportSchedule($schedule, $targetType, $request->boolean('download'));
         }
@@ -120,6 +128,10 @@ class DokumenMukController extends Controller
         ];
         $targetType = $aliasMap[$normalizedType] ?? $normalizedType;
 
+        if (in_array($targetType, ['excel-biodata', 'excel', 'xls', 'biodata-excel', 'asesi-excel'], true)) {
+            return $this->exporter->exportAssessmentAsesiXls($assessment);
+        }
+
         $dynamicTypes = ['apl01', 'apl02', 'ak01', 'ak02', 'ak03', 'ak04', 'ak07', 'ia01', 'ia01b', 'ia03', 'ia05c', 'pernyataan'];
         if ($request->query('source') === 'dynamic' || ($request->query('format') === 'pdf' && in_array($targetType, $dynamicTypes, true))) {
             return $this->dynamicService->exportAssessment($assessment, $targetType, $request->boolean('download'));
@@ -170,7 +182,7 @@ class DokumenMukController extends Controller
 
     public function exportExcelBiodata(Schedule $schedule)
     {
-        return $this->exportSchedule($schedule, 'excel-biodata');
+        return $this->exporter->exportScheduleAsesiXls($schedule);
     }
 
     public function exportIndividual(Assessment $assessment, Request $request)

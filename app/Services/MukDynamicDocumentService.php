@@ -290,8 +290,10 @@ class MukDynamicDocumentService
                 'signature' => $ass->asesi_signature ?? $assProfile?->signature_data,
             ];
         }
+        $totalAsesi = count($pesertaList);
         $payload['peserta'] = $pesertaList;
-        $payload['jumlah_asesi'] = count($pesertaList).' orang';
+        $payload['jumlah_asesi'] = $totalAsesi.' ('.ucwords(MukExportService::terbilang($totalAsesi)).') orang';
+        $payload['tanggal_uji'] = $formattedDate;
 
         // Add assessors list for Daftar Hadir Asesor
         $asesorList = [];
@@ -300,6 +302,7 @@ class MukDynamicDocumentService
                 'no' => $idx + 1,
                 'nama' => $as->full_name,
                 'no_met' => $as->assessor_registration_number ?? $as->profile?->no_reg ?? 'MET.000.001234 2022',
+                'signature' => $as->profile?->signature_data,
             ];
         }
         $payload['asesor'] = $asesorList;
@@ -1245,7 +1248,10 @@ class MukDynamicDocumentService
             if (in_array($normType, ['hadirasesor', 'daftarhadirasesor'], true)) {
                 $script = base_path('tools/render_daftar_hadir_asesor.py');
                 if (File::isFile($script)) {
-                    shell_exec("{$pythonExec} ".escapeshellarg($script).' '.escapeshellarg($tempJson).' '.escapeshellarg($outputPath));
+                    if (File::isFile($outputPath)) {
+                        @unlink($outputPath);
+                    }
+                    shell_exec("{$pythonExec} ".escapeshellarg($script).' '.escapeshellarg($tempJson).' '.escapeshellarg($outputPath).' 2>&1');
                     if (File::isFile($outputPath) && filesize($outputPath) > 1000) {
                         return $outputPath;
                     }
