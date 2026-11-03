@@ -971,19 +971,82 @@ class MukDynamicDocumentService
             default => 'Sewaktu',
         };
 
-        $ia03Response = $assessment->iaResponses?->firstWhere('instrument_code', 'IA03');
+        if (! $assessment->relationLoaded('iaResponses')) {
+            $assessment->load('iaResponses');
+        }
+
+        $ia03Response = $assessment->iaResponses?->first(fn ($r) => strtoupper((string) $r->instrument_code) === 'IA03')
+            ?? AssessmentIaResponse::where('assessment_id', $assessment->id)->where('instrument_code', 'IA03')->first();
+
+        $tglAsesor = $ia03Response?->assessor_signed_at
+            ? Carbon::parse($ia03Response->assessor_signed_at)->locale('id')->translatedFormat('d F Y')
+            : $tgl;
+
+        $tglAsesi = $ia03Response?->asesi_signed_at
+            ? Carbon::parse($ia03Response->asesi_signed_at)->locale('id')->translatedFormat('d F Y')
+            : $tgl;
+
+        // Umpan balik khusus form IA.03 (jika belum diisi asesor, default KOSONG)
+        $umpanBalik = $ia03Response?->assessor_notes
+            ?? $ia03Response?->data_json['notes']
+            ?? '';
+
+        $savedData = is_array($ia03Response?->data_json)
+            ? $ia03Response->data_json
+            : (json_decode($ia03Response?->data_json ?? '[]', true) ?: []);
+
+        $savedAnswers = $savedData['questions']
+            ?? $savedData['answers']
+            ?? $savedData['items']
+            ?? [];
+
+        $pmoQuestions = $scheme ? app(SchemeInstrumentService::class)->getPmoQuestions($scheme) : [];
+        $questionsList = [];
+
+        foreach ($pmoQuestions as $idx => $pmo) {
+            $num = $idx + 1;
+            $saved = $savedAnswers[$num]
+                ?? $savedAnswers[(string) $num]
+                ?? $savedAnswers[$idx]
+                ?? $savedAnswers[(string) $idx]
+                ?? null;
+
+            $result = is_array($saved) ? ($saved['result'] ?? null) : (is_string($saved) ? $saved : null);
+            $response = is_array($saved) ? ($saved['response'] ?? null) : null;
+
+            $questionsList[] = [
+                'id' => $num,
+                'number' => $pmo['number'] ?? (string) $num,
+                'question' => $pmo['question'] ?? '',
+                'expected_answer' => $pmo['expected_answer'] ?? '',
+                'result' => $result, // Null jika belum dinilai asesor (jangan dicentang apapun)
+                'response' => $response, // Null jika belum diisi asesor (jangan diisi apapun)
+            ];
+        }
+
+        $isIa03Filled = $ia03Response !== null && (! empty($savedAnswers) || ! empty($umpanBalik));
 
         return [
             'skema_nama' => $scheme?->name ?? 'Maintenance Gasoline Engine Injection System',
             'skema_nomor' => $scheme?->code ?? '02/LSP PrO Indo/I/2026',
             'tuk_tipe' => $tukDisplay.'*',
             'asesor_nama' => $assessor?->full_name ?? 'Drs. Budi Santoso, M.T.',
-            'asesor_no_reg' => $assessor?->profile?->no_reg ?? 'MET.000.001234 2022',
+            'asesor_no_reg' => $assessor?->profile?->no_reg ?? $assessor?->profile?->no_reg_asesor ?? 'MET.000.001234 2022',
             'asesi_nama' => $asesi?->full_name ?? 'Nama Asesi',
+            'asesi_nik' => $profile?->nik ?? '',
             'tanggal' => $tgl,
             'tanggal_ttd' => $tgl,
+            'tanggal_ttd_asesor' => $tglAsesor,
+            'tanggal_ttd_asesi' => $tglAsesi,
+            'is_kompeten' => ! in_array($assessment->final_result, ['BK', 'BELUM_KOMPETEN', 'BELUM KOMPETEN'], true),
+            'umpan_balik' => $umpanBalik,
+            'assessor_notes' => $umpanBalik,
             'signature_asesi' => $ia03Response?->asesi_signature ?? $assessment->asesi_signature ?? $profile?->signature_data,
             'signature_asesor' => $ia03Response?->assessor_signature ?? $assessment->assessor_signature ?? $assessor?->profile?->signature_data,
+            'questions' => $questionsList,
+            'questions_map' => $savedAnswers,
+            'has_db_response' => $isIa03Filled,
+            'is_filled' => $isIa03Filled,
         ];
     }
 
@@ -1148,12 +1211,18 @@ class MukDynamicDocumentService
             if ($normType === 'ia03') {
                 $script = base_path('tools/render_fr_ia_03.py');
                 if (File::isFile($script)) {
-                    $ia03Payload = $assessment
-                        ? $this->buildIa03Data($schedule, $assessment)
+                    $targetAssessment = $assessment ?? $schedule->assessments->first();
+                    $ia03Payload = $targetAssessment
+                        ? $this->buildIa03Data($schedule, $targetAssessment)
                         : $this->buildPayload($schedule, null);
                     $tempIa03Json = $this->cacheDir.'/muk_ia03_'.uniqid().'.json';
                     File::put($tempIa03Json, json_encode($ia03Payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
-                    shell_exec("{$pythonExec} ".escapeshellarg($script).' '.escapeshellarg($tempIa03Json).' '.escapeshellarg($outputPath));
+                    if (File::isFile($outputPath)) {
+                        @unlink($outputPath);
+                    }
+                    $masterPdf = $this->getDynamicFilePath($schedule->scheme, 'ia03');
+                    $masterArg = ($masterPdf && File::isFile($masterPdf)) ? ' '.escapeshellarg($masterPdf) : '';
+                    shell_exec("{$pythonExec} ".escapeshellarg($script).' '.escapeshellarg($tempIa03Json).' '.escapeshellarg($outputPath).$masterArg.' 2>&1');
                     @unlink($tempIa03Json);
                     if (File::isFile($outputPath) && filesize($outputPath) > 1000) {
                         return $outputPath;

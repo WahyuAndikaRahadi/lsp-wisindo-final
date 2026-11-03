@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Assessment;
+use App\Models\AssessmentIaResponse;
 use App\Models\Schedule;
 use App\Models\Scheme;
 use App\Models\User;
@@ -334,6 +335,52 @@ class DynamicMukExportTest extends TestCase
         $this->assertStringContainsString('PERTANYAAN MENDUKUNG OBSERVASI', $pdfText);
         $this->assertStringContainsString('Bambang Sudarmono', $pdfText);
         $this->assertStringContainsString('Ir. Hendra Gunawan, S.T.', $pdfText);
+        $this->assertStringNotContainsString('Diadaptasi dari template', $pdfText);
+        $this->assertStringNotContainsString('Asesi memiliki landasan teori', $pdfText);
+    }
+
+    public function test_admin_can_export_ia03_pdf_with_actual_database_response_and_notes(): void
+    {
+        AssessmentIaResponse::updateOrCreate(
+            [
+                'assessment_id' => $this->assessment->id,
+                'instrument_code' => 'IA03',
+            ],
+            [
+                'assessor_notes' => 'Catatan umpan balik asli dari form asesor ruang uji yang sangat memuaskan.',
+                'data_json' => [
+                    'questions' => [
+                        1 => [
+                            'result' => 'M',
+                            'response' => 'Tanggapan unik asesi pertanyaan 1 dari form ruang uji.',
+                        ],
+                        2 => [
+                            'result' => 'TM',
+                            'response' => 'Tanggapan unik asesi pertanyaan 2 belum memuaskan.',
+                        ],
+                    ],
+                ],
+                'assessor_signed_at' => now(),
+            ]
+        );
+
+        $response = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.asesi-dynamic', [
+            'assessment' => $this->assessment->id,
+            'type' => 'ia03',
+        ]));
+
+        $response->assertOk();
+        $this->assertInstanceOf(BinaryFileResponse::class, $response->baseResponse);
+        $filePath = $response->baseResponse->getFile()->getPathname();
+        $this->assertFileExists($filePath);
+
+        $nullDev = PHP_OS_FAMILY === 'Windows' ? '2>nul' : '2>/dev/null';
+        $pdfText = shell_exec('pdftotext '.escapeshellarg($filePath)." - {$nullDev}") ?? '';
+
+        $this->assertStringContainsString('Catatan umpan balik asli dari form asesor ruang uji yang sangat memuaskan.', $pdfText);
+        $this->assertStringContainsString('Tanggapan unik asesi pertanyaan 1 dari form ruang uji.', $pdfText);
+        $this->assertStringContainsString('Tanggapan unik asesi pertanyaan 2 belum memuaskan.', $pdfText);
+        $this->assertStringNotContainsString('Diadaptasi dari template', $pdfText);
     }
 
     public function test_admin_can_export_dynamic_candidate_ak02_pdf_with_download_disposition(): void
