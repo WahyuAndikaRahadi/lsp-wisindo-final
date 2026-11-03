@@ -111,19 +111,18 @@
             @if(in_array('IA02', $selectedInstruments))
                 @php
                     $ia02Resp = $responses['IA02'] ?? null;
-                    $hasEvidence02 = ! empty($ia02Resp?->data_json['evidence_image_path']);
                     $hasSigned02 = (bool) $ia02Resp?->asesi_signed_at;
                 @endphp
                 <div class="bg-white rounded-xl border-2 border-black shadow-[2px_2px_0_0_rgba(0,0,0,0.9)] p-5 flex flex-col justify-between hover:translate-x-0.5 hover:-translate-y-0.5 transition">
                     <div>
                         <div class="flex items-center justify-between mb-2">
-                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider {{ $hasEvidence02 ? ($hasSigned02 ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-blue-100 text-blue-800 border border-blue-300') : 'bg-amber-100 text-amber-800 border border-amber-300' }}">
-                                {{ $hasEvidence02 ? ($hasSigned02 ? '✓ Selesai & Ditandatangani' : '✓ Lembar Fisik Diunggah') : 'Paper-Based (Wajib Foto Bukti)' }}
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider {{ $hasSigned02 ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-blue-100 text-blue-800 border border-blue-300' }}">
+                                {{ $hasSigned02 ? '✓ Selesai & Ditandatangani' : 'Tugas Demonstrasi' }}
                             </span>
                             <span class="text-[11px] font-semibold text-slate-500">Unjuk Kerja</span>
                         </div>
                         <h3 class="text-base font-bold text-slate-900">FR.IA.02. Tugas Praktik Demonstrasi (TPD)</h3>
-                        <p class="text-xs text-slate-600 mt-1">Unduh lembar tugas PDF, selesaikan tugas unjuk kerja di bengkel TUK, lalu unggah foto lembar kerja fisik.</p>
+                        <p class="text-xs text-slate-600 mt-1">Unduh lembar tugas PDF, pelajari instruksi unjuk kerja, dan tinjau persetujuan tugas praktik demonstrasi.</p>
                     </div>
 
                     <div class="mt-4 pt-3 border-t border-slate-200 flex flex-col sm:flex-row gap-2">
@@ -131,7 +130,7 @@
                             📥 Unduh PDF
                         </a>
                         <a href="{{ route('asesi.assessment.instrument.view', [$assessment, 'IA02']) }}" class="inline-flex items-center justify-center flex-1 px-4 py-2 bg-[#CE181E] hover:bg-[#a61318] text-white text-xs font-bold rounded-lg border-2 border-black shadow-[2px_2px_0_0_rgba(0,0,0,0.9)] transition">
-                            {{ $hasEvidence02 ? 'Buka Bukti Fisik & Tanda Tangan →' : 'Unggah Foto Bukti Kertas →' }}
+                            {{ $hasSigned02 ? 'Lihat Tugas Praktik →' : 'Tinjau Tugas & Tanda Tangan →' }}
                         </a>
                     </div>
                 </div>
@@ -183,19 +182,20 @@
             @if(in_array('IA01B', $selectedInstruments))
                 @php
                     $ia01bResp = $responses['IA01B'] ?? null;
+                    $hasEvidence01b = ! empty($ia01bResp?->data_json['evidence_image_path']);
                     $hasEvaluated01b = (bool) $ia01bResp?->assessor_signed_at || ! empty($ia01bResp?->data_json);
                     $hasSigned01b = (bool) $ia01bResp?->asesi_signed_at;
                 @endphp
                 <div class="bg-white rounded-xl border-2 border-black shadow-[2px_2px_0_0_rgba(0,0,0,0.9)] p-5 flex flex-col justify-between hover:translate-x-0.5 hover:-translate-y-0.5 transition">
                     <div>
                         <div class="flex items-center justify-between mb-2">
-                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider {{ $hasSigned01b ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : ($hasEvaluated01b ? 'bg-amber-100 text-amber-800 border border-amber-300' : 'bg-slate-100 text-slate-700 border border-slate-300') }}">
-                                {{ $hasSigned01b ? '✓ Sudah Ditandatangani' : ($hasEvaluated01b ? 'Menunggu Tanda Tangan' : 'Menunggu Verifikasi Asesor') }}
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider {{ $hasSigned01b ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : ($hasEvidence01b ? 'bg-blue-100 text-blue-800 border border-blue-300' : ($hasEvaluated01b ? 'bg-amber-100 text-amber-800 border border-amber-300' : 'bg-slate-100 text-slate-700 border border-slate-300')) }}">
+                                {{ $hasSigned01b ? '✓ Sudah Ditandatangani' : ($hasEvidence01b ? '✓ Lembar Fisik Diunggah' : ($hasEvaluated01b ? 'Menunggu Tanda Tangan' : 'Menunggu Verifikasi Asesor')) }}
                             </span>
                             <span class="text-[11px] font-semibold text-slate-500">Pengukuran Teknis</span>
                         </div>
                         <h3 class="text-base font-bold text-slate-900">FR.IA.01B. Lembar Laporan Pemeriksaan (Report Sheet)</h3>
-                        <p class="text-xs text-slate-600 mt-1">Data hasil pengukuran teknis komponen uji dan verifikasi kesesuaian standar spesifikasi servis.</p>
+                        <p class="text-xs text-slate-600 mt-1">Data hasil pengukuran teknis komponen uji, foto bukti lembar fisik, dan verifikasi kesesuaian standar spesifikasi servis.</p>
                     </div>
 
                     <div class="mt-4 pt-3 border-t border-slate-200 flex flex-col sm:flex-row gap-2">
@@ -203,7 +203,7 @@
                             📥 PDF
                         </a>
                         <a href="{{ route('asesi.assessment.instrument.view', [$assessment, 'IA01B']) }}" class="inline-flex items-center justify-center flex-1 px-4 py-2 bg-[#1E2B6E] hover:bg-[#152055] text-white text-xs font-bold rounded-lg border-2 border-black shadow-[2px_2px_0_0_rgba(0,0,0,0.9)] transition">
-                            {{ $hasSigned01b ? 'Lihat Hasil Pengukuran →' : 'Tinjau Report Sheet & Tanda Tangan →' }}
+                            {{ $hasSigned01b ? 'Lihat Hasil Pengukuran →' : ($hasEvidence01b ? 'Tinjau Report Sheet & Tanda Tangan →' : 'Unggah Lembar Fisik & Tinjau →') }}
                         </a>
                     </div>
                 </div>

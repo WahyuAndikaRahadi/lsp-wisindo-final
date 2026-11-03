@@ -221,4 +221,247 @@ class SchemeInstrumentService
 
         return null;
     }
+
+    /**
+     * Get the exact official text of FR.IA.02 (Tugas Praktik Demonstrasi) for a scheme.
+     */
+    public function getIa02FullText(Scheme $scheme): string
+    {
+        $dirName = $this->schemeDirectoryMap[$scheme->id] ?? null;
+        if (! $dirName) {
+            foreach ($this->schemeDirectoryMap as $id => $name) {
+                if (str_contains(strtolower($name), strtolower($scheme->name ?? ''))) {
+                    $dirName = $name;
+                    break;
+                }
+            }
+        }
+
+        $searchPaths = [];
+        if ($dirName) {
+            $searchPaths[] = base_path("lsp-document-fixed/extracted/{$dirName}");
+            $searchPaths[] = base_path("all-document-lsp-ProIndo/extracted/{$dirName}");
+            $searchPaths[] = base_path("lsp-document-dynamic/extracted/{$dirName}");
+        }
+
+        $raw = '';
+        foreach ($searchPaths as $p) {
+            if (is_dir($p)) {
+                $files = glob("{$p}/*IA.02*.txt") ?: glob("{$p}/*IA*02*.txt");
+                if (! empty($files) && file_exists($files[0])) {
+                    $raw = file_get_contents($files[0]);
+                    break;
+                }
+            }
+        }
+
+        if (empty($raw)) {
+            $pdfPath = $this->getInstrumentTemplatePath($scheme, 'IA02');
+            if ($pdfPath && file_exists($pdfPath)) {
+                // If text file not found, extract from PDF via python/fitz or fallback to TPD scenario
+                $tpd = $this->getTpdData($scheme);
+
+                return "A. Petunjuk\n1. Baca dan pelajari setiap instruksi kerja di bawah ini dengan cermat sebelum melaksanakan praktek\n2. Klarifikasi kepada asesor kompetensi apabila ada hal-hal yang belum jelas\n3. Laksanakan pekerjaan sesuai dengan urutan proses yang sudah ditetapkan\n4. Seluruh proses kerja mengacu kepada SOP/WI yang dipersyaratkan\n\nB. Skenario Tugas Praktik Demonstrasi\n{$tpd['scenario']}";
+            }
+        }
+
+        $start = strpos($raw, 'A. Petunjuk');
+        if ($start === false) {
+            $start = 0;
+        }
+
+        $end = strpos($raw, 'PENYUSUN DAN VALIDATOR');
+        if ($end === false) {
+            $end = strpos($raw, 'ASESI :');
+        }
+        if ($end === false) {
+            $end = strlen($raw);
+        }
+
+        $body = substr($raw, $start, $end - $start);
+        $lines = explode("\n", $body);
+        $cleanedLines = [];
+
+        foreach ($lines as $line) {
+            $trimmed = trim($line);
+            if (preg_match('/^\x0c?\s*(Lembaga Sertifikasi Profesi|LSP-PrO Indo|\d+)\s*$/i', $trimmed)) {
+                continue;
+            }
+            $cleanedLines[] = rtrim($line, "\r");
+        }
+
+        return trim(implode("\n", $cleanedLines));
+    }
+
+    /**
+     * Format FR.IA.02 text into structured, elegant semantic HTML for web display.
+     */
+    public function getIa02FormattedHtml(Scheme $scheme): string
+    {
+        $rawText = $this->getIa02FullText($scheme);
+        if (empty($rawText)) {
+            return '';
+        }
+
+        $posA = strpos($rawText, 'A. Petunjuk');
+        $posB = strpos($rawText, 'B. Skenario');
+
+        $html = '';
+
+        // Section A: Petunjuk
+        if ($posA !== false && $posB !== false) {
+            $petunjukText = substr($rawText, $posA, $posB - $posA);
+            $lines = explode("\n", $petunjukText);
+            $items = [];
+            foreach ($lines as $l) {
+                $t = trim($l);
+                if (preg_match('/^(\d+)[\.\)]\s*(.+)/', $t, $m)) {
+                    $items[] = ['num' => $m[1], 'text' => $m[2]];
+                }
+            }
+
+            $html .= '<div class="p-5 bg-blue-50/70 border border-blue-200 rounded-xl space-y-3 mb-6 shadow-xs">';
+            $html .= '<div class="flex items-center space-x-2 text-xs font-bold text-blue-900 uppercase tracking-wider">';
+            $html .= '<span class="w-5 h-5 rounded-md bg-blue-600 text-white flex items-center justify-center text-[10px] font-bold">A</span>';
+            $html .= '<span>Petunjuk Pelaksanaan Uji Praktik Demonstrasi</span>';
+            $html .= '</div>';
+            $html .= '<div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2">';
+            foreach ($items as $it) {
+                $html .= '<div class="flex items-start gap-2.5 p-3 rounded-lg bg-white border border-blue-100 shadow-2xs">';
+                $html .= '<span class="w-5 h-5 rounded bg-blue-100 text-blue-800 font-bold text-xs flex items-center justify-center shrink-0 mt-0.5">'.$it['num'].'</span>';
+                $html .= '<p class="text-xs text-slate-800 leading-relaxed">'.htmlspecialchars($it['text']).'</p>';
+                $html .= '</div>';
+            }
+            $html .= '</div></div>';
+
+            $body = substr($rawText, $posB);
+        } else {
+            $body = $rawText;
+        }
+
+        // Section B: Skenario & Tugas Praktik
+        $paragraphs = preg_split('/\n\s*\n/', $body);
+        $html .= '<div class="space-y-6">';
+
+        foreach ($paragraphs as $para) {
+            $trimmed = trim($para);
+            if (empty($trimmed)) {
+                continue;
+            }
+
+            if (preg_match('/^B\.\s*Skenario/i', $trimmed)) {
+                $html .= '<div class="pb-2 border-b border-slate-200">';
+                $html .= '<h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">';
+                $html .= '<span class="w-6 h-6 rounded-md bg-slate-900 text-amber-400 flex items-center justify-center font-bold text-xs">B</span>';
+                $html .= '<span>Skenario Tugas Praktik Demonstrasi</span>';
+                $html .= '</h3></div>';
+
+                continue;
+            }
+
+            // Units table
+            if (preg_match_all('/([A-Z]\.[0-9A-Z]+\.[0-9A-Z]+\.[0-9A-Z]+)\s+([^\n\r]+)/', $trimmed, $unitMatches, PREG_SET_ORDER)) {
+                $html .= '<div class="rounded-xl border border-slate-200 overflow-hidden bg-white shadow-2xs my-3">';
+                $html .= '<div class="px-4 py-2.5 bg-slate-100 border-b border-slate-200 flex items-center justify-between text-xs font-bold text-slate-700">';
+                $html .= '<span>Daftar Unit Kompetensi Terkait</span>';
+                $html .= '<span class="text-[11px] font-mono text-brand-700 bg-brand-50 px-2 py-0.5 rounded border border-brand-200">'.count($unitMatches).' Unit</span>';
+                $html .= '</div>';
+                $html .= '<table class="w-full text-xs">';
+                $html .= '<thead class="bg-slate-50 text-slate-600 border-b border-slate-200"><tr>';
+                $html .= '<th class="px-3.5 py-2 text-center w-12">No</th>';
+                $html .= '<th class="px-3.5 py-2 text-left w-48">Kode Unit</th>';
+                $html .= '<th class="px-3.5 py-2 text-left">Judul Unit Kompetensi</th>';
+                $html .= '</tr></thead>';
+                $html .= '<tbody class="divide-y divide-slate-100">';
+                foreach ($unitMatches as $idx => $um) {
+                    $html .= '<tr class="hover:bg-slate-50/60">';
+                    $html .= '<td class="px-3.5 py-2 text-center font-mono text-slate-500">'.($idx + 1).'</td>';
+                    $html .= '<td class="px-3.5 py-2 font-mono font-bold text-brand-700">'.htmlspecialchars($um[1]).'</td>';
+                    $html .= '<td class="px-3.5 py-2 text-slate-800 font-medium">'.htmlspecialchars(trim($um[2])).'</td>';
+                    $html .= '</tr>';
+                }
+                $html .= '</tbody></table></div>';
+
+                continue;
+            }
+
+            // S. Skenario
+            if (preg_match('/^(?:Skenario.*?:\s*)?S\.\s*(.+)/s', $trimmed, $m)) {
+                $html .= '<div class="p-4 rounded-xl border border-sky-200 bg-sky-50/50 space-y-2 shadow-2xs">';
+                $html .= '<div class="flex items-center gap-2">';
+                $html .= '<span class="w-5 h-5 rounded-md bg-sky-600 text-white font-bold text-xs flex items-center justify-center">S</span>';
+                $html .= '<span class="font-bold text-sky-950 text-xs uppercase tracking-wide">Skenario &amp; Persyaratan Asesi</span>';
+                $html .= '</div>';
+                $html .= '<div class="text-xs text-slate-800 leading-relaxed pl-7 whitespace-pre-line">'.htmlspecialchars(trim($m[1])).'</div>';
+                $html .= '</div>';
+
+                continue;
+            }
+
+            // T. Tugas
+            if (preg_match('/^T\.\s*(.+)/s', $trimmed, $m)) {
+                $html .= '<div class="p-4 rounded-xl border border-indigo-200 bg-indigo-50/50 space-y-2 shadow-2xs">';
+                $html .= '<div class="flex items-center gap-2">';
+                $html .= '<span class="w-5 h-5 rounded-md bg-indigo-600 text-white font-bold text-xs flex items-center justify-center">T</span>';
+                $html .= '<span class="font-bold text-indigo-950 text-xs uppercase tracking-wide">Tugas Unjuk Kerja / Praktik</span>';
+                $html .= '</div>';
+                $html .= '<div class="text-xs text-slate-900 font-semibold leading-relaxed pl-7 whitespace-pre-line">'.htmlspecialchars(trim($m[1])).'</div>';
+                $html .= '</div>';
+
+                continue;
+            }
+
+            // A. Alat & Bahan
+            if (preg_match('/^A\.\s*(.+)/s', $trimmed, $m)) {
+                $html .= '<div class="p-4 rounded-xl border border-amber-200 bg-amber-50/50 space-y-2 shadow-2xs">';
+                $html .= '<div class="flex items-center gap-2">';
+                $html .= '<span class="w-5 h-5 rounded-md bg-amber-600 text-white font-bold text-xs flex items-center justify-center">A</span>';
+                $html .= '<span class="font-bold text-amber-950 text-xs uppercase tracking-wide">Alat, Bahan &amp; Perlengkapan yang Diberikan</span>';
+                $html .= '</div>';
+                $html .= '<div class="text-xs text-slate-800 leading-relaxed pl-7 whitespace-pre-line">'.htmlspecialchars(trim($m[1])).'</div>';
+                $html .= '</div>';
+
+                continue;
+            }
+
+            // R. Hasil
+            if (preg_match('/^R\.\s*(.+)/s', $trimmed, $m)) {
+                $html .= '<div class="p-4 rounded-xl border border-emerald-200 bg-emerald-50/50 space-y-2 shadow-2xs">';
+                $html .= '<div class="flex items-center gap-2">';
+                $html .= '<span class="w-5 h-5 rounded-md bg-emerald-600 text-white font-bold text-xs flex items-center justify-center">R</span>';
+                $html .= '<span class="font-bold text-emerald-950 text-xs uppercase tracking-wide">Hasil yang Diharapkan (Output)</span>';
+                $html .= '</div>';
+                $html .= '<div class="text-xs text-emerald-950 font-semibold leading-relaxed pl-7">'.htmlspecialchars(trim($m[1])).'</div>';
+                $html .= '</div>';
+
+                continue;
+            }
+
+            // Waktu
+            if (preg_match('/^Waktu\s*:\s*(.+)/i', $trimmed, $m)) {
+                $html .= '<div class="flex justify-end pt-1">';
+                $html .= '<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900 text-amber-300 font-mono text-xs font-bold shadow-2xs">';
+                $html .= '<span>⏱ Alokasi Waktu: '.htmlspecialchars(trim($m[1])).'</span>';
+                $html .= '</span></div>';
+
+                continue;
+            }
+
+            // Kelompok header
+            if (preg_match('/Kelompok\s*(?:Pekerjaan\s*)?\d+/i', $trimmed)) {
+                $html .= '<div class="pt-4 pb-1">';
+                $html .= '<h4 class="text-xs font-bold uppercase tracking-wider text-brand-700 bg-brand-50 border border-brand-200 px-3.5 py-1.5 rounded-lg inline-block">';
+                $html .= htmlspecialchars($trimmed);
+                $html .= '</h4></div>';
+
+                continue;
+            }
+
+            $html .= '<p class="text-xs text-slate-700 leading-relaxed pl-1">'.nl2br(htmlspecialchars($trimmed)).'</p>';
+        }
+
+        $html .= '</div>';
+
+        return $html;
+    }
 }

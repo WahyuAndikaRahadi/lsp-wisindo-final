@@ -55,6 +55,95 @@
     <form action="{{ route('asesor.ruang-uji.ia01b.store', $assessment->id) }}" method="POST" class="space-y-6">
         @csrf
 
+        {{-- Inspeksi Bukti Lembar Fisik Unggahan Asesi (Report Sheet FR.IA.01B) --}}
+        @php
+            $evidencePath = $response?->data_json['evidence_image_path'] ?? null;
+            $evidenceTime = $response?->data_json['evidence_uploaded_at'] ?? null;
+            $evidenceName = $response?->data_json['evidence_original_name'] ?? 'Report_Sheet_Fisik.jpg';
+            $evidenceUrl = ($response && $evidencePath) ? route('secure-file.evidence', $response) : '#';
+        @endphp
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="bg-slate-900 text-white px-6 py-3.5 border-b border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div class="flex items-center space-x-2.5">
+                    <span class="px-2 py-0.5 rounded text-[11px] font-mono font-bold bg-amber-400 text-slate-950">
+                        FR.IA.01B
+                    </span>
+                    <span class="text-xs font-bold uppercase tracking-wider text-white">Lembar Pemeriksaan Teknis Fisik (Report Sheet Unggahan Asesi)</span>
+                </div>
+                @if($evidencePath)
+                    <span class="px-2.5 py-0.5 text-[11px] font-bold bg-emerald-500 text-white rounded">
+                        ✓ Lembar Fisik Telah Diunggah Asesi
+                    </span>
+                @else
+                    <span class="px-2.5 py-0.5 text-[11px] font-bold bg-amber-500 text-slate-900 rounded">
+                        Menunggu Unggahan Asesi
+                    </span>
+                @endif
+            </div>
+
+            <div class="p-6">
+                @if($evidencePath)
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                        {{-- Preview Box --}}
+                        <div class="lg:col-span-5 bg-slate-50 rounded-xl p-4 border border-slate-200 space-y-3">
+                            <div class="relative group rounded-lg overflow-hidden border border-slate-300 bg-white aspect-4/3 flex items-center justify-center">
+                                @if(str_ends_with(strtolower($evidencePath), '.pdf'))
+                                    <div class="text-center p-6 space-y-2">
+                                        <span class="text-4xl text-rose-600 font-black block">📄</span>
+                                        <div class="text-xs font-bold text-slate-800 truncate max-w-[200px]">{{ $evidenceName }}</div>
+                                        <div class="text-[11px] text-slate-500">Dokumen PDF Report Sheet</div>
+                                    </div>
+                                @else
+                                    <img src="{{ $evidenceUrl }}" alt="Report Sheet Fisik Asesi" class="w-full h-full object-contain cursor-pointer transition hover:scale-105" onclick="window.open('{{ $evidenceUrl }}', '_blank')">
+                                @endif
+                            </div>
+                            <div class="pt-1">
+                                <a href="{{ $evidenceUrl }}" target="_blank" class="w-full text-center px-4 py-2.5 text-xs font-bold uppercase tracking-wider bg-brand-600 hover:bg-brand-700 text-white rounded-lg shadow-sm transition inline-flex items-center justify-center gap-1.5">
+                                    <span>🔍 Buka Lembar Penuh (Tab Baru)</span>
+                                    <span>&nearr;</span>
+                                </a>
+                            </div>
+                        </div>
+
+                        {{-- Metadata & Instruction --}}
+                        <div class="lg:col-span-7 space-y-4 text-xs">
+                            <div class="border border-slate-200 rounded-lg p-4 bg-slate-50/80 space-y-2">
+                                <div class="font-bold text-slate-900 text-sm">Informasi Berkas Unggahan Asesi:</div>
+                                <div class="text-slate-700">Nama Asesi: <strong class="text-slate-900">{{ $assessment->asesi->full_name }}</strong></div>
+                                <div class="text-slate-700">Waktu Unggah: <span class="font-mono font-semibold text-slate-900">{{ \Carbon\Carbon::parse($evidenceTime)->isoFormat('D MMMM Y, HH:mm') }} WIB</span></div>
+                                <div class="text-slate-700">Nama File: <span class="font-mono text-slate-700">{{ $evidenceName }}</span></div>
+                            </div>
+
+                            <div class="p-4 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-950 text-xs leading-relaxed space-y-1">
+                                <div class="font-bold flex items-center gap-1.5 text-emerald-900">
+                                    <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    <span>Verifikasi Hasil Pengukuran Fisik:</span>
+                                </div>
+                                <p class="text-emerald-900">
+                                    Asesi telah mengunggah lembar pemeriksaan teknis (Report Sheet) fisik di samping. Silakan teliti isian pengukuran teknis yang dibuat asesi dan lakukan penandatanganan verifikasi Anda di bawah.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                @else
+                    <div class="p-8 rounded-xl border-2 border-dashed border-amber-300 bg-amber-50/50 text-center space-y-3">
+                        <div class="w-12 h-12 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center mx-auto">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                        </div>
+                        <div class="max-w-md mx-auto">
+                            <h3 class="text-sm font-bold text-amber-950">Menunggu Asesi Mengunggah Lembar Report Sheet Fisik</h3>
+                            <p class="text-xs text-amber-800 mt-1 leading-relaxed">
+                                Asesi <strong>{{ $assessment->asesi->full_name }}</strong> belum mengunggah foto / scan berkas lembar kerja pemeriksaan fisik (FR.IA.01B). Asesi dapat mengunggahnya secara mandiri melalui akun portal asesi.
+                            </p>
+                            <p class="text-[11px] text-slate-500 mt-2">
+                                Setelah berkas diunggah oleh asesi, dokumen akan langsung tampil di sini untuk Anda periksa dan tandatangani.
+                            </p>
+                        </div>
+                    </div>
+                @endif
+            </div>
+        </div>
+
         {{-- Single Table for All Units with Universal Fast Actions at Top --}}
         <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
             {{-- Bagian Atas Table: Header & Tombol Universal Semua Sesuai / Semua Tidak --}}

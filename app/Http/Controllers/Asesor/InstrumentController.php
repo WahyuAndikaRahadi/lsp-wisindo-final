@@ -339,6 +339,8 @@ class InstrumentController extends Controller
 
         $breakdown = $savedData['breakdown'] ?? $savedData['items'] ?? [];
         $score = $response?->score ?? $savedData['score'] ?? ($assessment->ia05_score ?? 0);
+        $ia02Text = ($code === 'ia02') ? $instrumentService->getIa02FullText($scheme) : '';
+        $ia02Html = ($code === 'ia02') ? $instrumentService->getIa02FormattedHtml($scheme) : '';
 
         return view($viewName, compact(
             'assessment',
@@ -356,7 +358,9 @@ class InstrumentController extends Controller
             'savedGeneralNotes',
             'savedSignature',
             'breakdown',
-            'score'
+            'score',
+            'ia02Text',
+            'ia02Html'
         ));
     }
 
@@ -386,6 +390,11 @@ class InstrumentController extends Controller
             'items' => $request->input('items'),
         ];
 
+        if ($code === 'IA02') {
+            $data = is_array($data) ? $data : [];
+            $data['ia02_acknowledged'] = true;
+        }
+
         $existing = AssessmentIaResponse::where('assessment_id', $assessment->id)
             ->where('instrument_code', $code)
             ->first();
@@ -404,7 +413,8 @@ class InstrumentController extends Controller
             $request->validate([
                 'evidence_image' => 'required|file|mimes:jpeg,jpg,png,webp,pdf|max:10240',
             ]);
-            $path = $request->file('evidence_image')->store('ia02_evidence', 'local');
+            $folder = strtolower($code) === 'ia01b' ? 'ia01b_evidence' : 'ia_evidence';
+            $path = $request->file('evidence_image')->store($folder, 'local');
             $data['evidence_image_path'] = $path;
             $data['evidence_uploaded_at'] = now()->toIso8601String();
             $data['evidence_original_name'] = $request->file('evidence_image')->getClientOriginalName();

@@ -42,75 +42,54 @@
         </div>
     </div>
 
-    {{-- Penilaian oleh Asesor --}}
-    @if(strtoupper($code) === 'IA02')
+    {{-- Box Khusus Pengumpulan Lembar Kerja Fisik FR.IA.01B (Report Sheet) --}}
+    @if(strtoupper($code) === 'IA01B')
         @php
             $evidencePath = $response?->data_json['evidence_image_path'] ?? null;
             $evidenceTime = $response?->data_json['evidence_uploaded_at'] ?? null;
-            $evidenceName = $response?->data_json['evidence_original_name'] ?? 'Lembar_Jawaban_Fisik.jpg';
+            $evidenceName = $response?->data_json['evidence_original_name'] ?? 'Report_Sheet_Fisik.jpg';
             $evidenceUrl = ($response && $evidencePath) ? route('secure-file.evidence', $response) : '#';
         @endphp
-        {{-- Box Khusus Pengumpulan Lembar Kerja Kertas FR.IA.02 --}}
-        <div class="bg-white rounded-xl border-2 border-black shadow-[2px_2px_0_0_rgba(0,0,0,0.9)] overflow-hidden">
-            <div class="bg-slate-900 text-white px-6 py-3 border-b-2 border-black flex items-center justify-between">
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="bg-slate-900 text-white px-6 py-3.5 border-b border-slate-800 flex items-center justify-between">
                 <div class="flex items-center space-x-2">
-                    <span class="text-amber-300 font-bold text-xs uppercase tracking-wider font-mono">FR.IA.02 Paper-Based</span>
-                    <span class="text-xs text-slate-300">— Unggah Lembar Jawaban Fisik</span>
+                    <span class="text-amber-400 font-bold text-xs uppercase tracking-wider font-mono">FR.IA.01B Report Sheet</span>
+                    <span class="text-xs text-slate-300">— Unggah Lembar Pemeriksaan Teknis Fisik</span>
                 </div>
                 @if($evidencePath)
                     <span class="px-2.5 py-0.5 text-[11px] font-bold bg-emerald-500 text-white rounded">
-                        ✓ Lembar Kertas Terunggah
+                        ✓ Lembar Fisik Terunggah
                     </span>
                 @else
-                    <span class="px-2.5 py-0.5 text-[11px] font-bold bg-amber-500 text-slate-900 rounded">
-                        Belum Diunggah
+                    <span class="px-2.5 py-0.5 text-[11px] font-bold bg-amber-400 text-slate-950 rounded font-semibold">
+                        Wajib Diunggah
                     </span>
                 @endif
             </div>
 
             <div class="p-6 space-y-4">
                 {{-- Template Download Card --}}
-                <div class="bg-indigo-50 border-2 border-indigo-200 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+                <div class="bg-indigo-50/70 border border-indigo-200 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-lg bg-[#1E2B6E] text-white flex items-center justify-center font-bold text-lg shrink-0">
                             📄
                         </div>
                         <div>
-                            <div class="text-xs font-bold text-slate-900">Template Lembar Uji Praktik FR.IA.02 (PDF Resmi BNSP)</div>
-                            <p class="text-[11px] text-slate-600">Unduh lembar soal & instruksi demonstrasi resmi untuk dicetak atau dibaca di TUK.</p>
+                            <div class="text-xs font-bold text-slate-900">Format Lembar Pemeriksaan Teknis FR.IA.01B (PDF Resmi BNSP)</div>
+                            <p class="text-[11px] text-slate-600">Unduh lembar kerja teknis spesifikasi Report Sheet resmi untuk skema ini.</p>
                         </div>
                     </div>
-                    <a href="{{ route('asesi.assessment.instrument.download-template', [$assessment, 'IA02']) }}" class="px-4 py-2 bg-[#1E2B6E] hover:bg-[#152055] text-white text-xs font-black rounded-lg border-2 border-black shadow-[2px_2px_0_0_rgba(0,0,0,0.9)] transition shrink-0 inline-flex items-center gap-2">
+                    <a href="{{ route('asesi.assessment.instrument.download-template', [$assessment, 'IA01B']) }}" class="px-4 py-2 bg-[#1E2B6E] hover:bg-[#152055] text-white text-xs font-bold rounded-lg border border-slate-300 shadow-sm transition shrink-0 inline-flex items-center gap-2">
                         <span>📥 Unduh Template PDF</span>
                     </a>
                 </div>
 
-                <div class="bg-amber-50 border border-amber-300 rounded-lg p-3 text-xs text-amber-900 leading-relaxed">
-                    <strong>Petunjuk Uji Praktik:</strong> Instrumen Tugas Praktik Demonstrasi (FR.IA.02) dilaksanakan menggunakan <strong>lembar kerja kertas (paper-based)</strong> di TUK. Selesaikan tugas demonstrasi dan catat hasilnya pada kertas fisik. Foto lembar jawaban Anda dengan pencahayaan yang jelas dan tegak lurus, kemudian unggah pada tombol di bawah agar asesor dapat memeriksa pekerjaan Anda.
+                <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs text-amber-900 leading-relaxed">
+                    <strong>Petunjuk:</strong> Selesaikan pemeriksaan teknis pada unit kendaraan di bengkel TUK dan catat seluruh hasil pengukuran pada formulir Report Sheet fisik. Ambil foto atau pindai berkas fisik lembar Report Sheet tersebut secara jelas dan tegak lurus, kemudian unggah melalui tombol di bawah agar asesor dapat memverifikasi dan menandatangani hasil pekerjaan Anda.
                 </div>
 
-                {{-- Skenario & Langkah Kerja TPD --}}
-                @if(! empty($tpdData))
-                    <div class="border border-slate-200 rounded-lg p-4 bg-slate-50 space-y-3 text-xs">
-                        <div>
-                            <span class="font-bold text-slate-800 uppercase tracking-wider text-[11px] block">Skenario Uji Demonstrasi:</span>
-                            <p class="text-slate-700 mt-1 leading-relaxed">{{ $tpdData['scenario'] ?? '-' }}</p>
-                        </div>
-                        @if(! empty($tpdData['tasks']))
-                            <div>
-                                <span class="font-bold text-slate-800 uppercase tracking-wider text-[11px] block">Langkah & Instruksi Kerja:</span>
-                                <ol class="list-decimal list-inside space-y-1 mt-1 text-slate-700">
-                                    @foreach($tpdData['tasks'] as $t)
-                                        <li>{{ is_array($t) ? ($t['instruction'] ?? '') : $t }}</li>
-                                    @endforeach
-                                </ol>
-                            </div>
-                        @endif
-                    </div>
-                @endif
-
                 @if($evidencePath)
-                    <div class="border-2 border-slate-200 rounded-xl p-4 bg-slate-50 flex flex-col md:flex-row items-center gap-4">
+                    <div class="border border-slate-200 rounded-xl p-4 bg-slate-50 flex flex-col md:flex-row items-center gap-4">
                         <div class="w-full md:w-48 h-48 bg-slate-200 rounded-lg overflow-hidden border border-slate-300 flex items-center justify-center relative group">
                             @if(str_ends_with(strtolower($evidencePath), '.pdf'))
                                 <div class="text-center p-4">
@@ -125,7 +104,7 @@
                             </a>
                         </div>
                         <div class="flex-1 space-y-2 text-xs">
-                            <div class="font-bold text-slate-900 text-sm">Foto Lembar Jawaban Kertas Asesi</div>
+                            <div class="font-bold text-slate-900 text-sm">Foto Lembar Report Sheet Fisik Asesi</div>
                             <div class="text-slate-600">
                                 Diunggah pada: <span class="font-mono font-semibold">{{ \Carbon\Carbon::parse($evidenceTime)->isoFormat('D MMMM Y, HH:mm') }} WIB</span>
                             </div>
@@ -134,7 +113,7 @@
                             </div>
                             <div class="pt-2 flex items-center gap-2">
                                 <a href="{{ $evidenceUrl }}" target="_blank" class="inline-flex items-center px-3 py-1.5 text-xs font-bold bg-brand-600 text-white rounded-lg hover:bg-brand-700 transition">
-                                    Buka Foto di Tab Baru &nearr;
+                                    Buka Berkas di Tab Baru &nearr;
                                 </a>
                             </div>
                         </div>
@@ -142,16 +121,16 @@
                 @endif
 
                 {{-- Form Upload / Ganti Foto --}}
-                <form action="{{ route('asesi.assessment.instrument.upload-evidence', [$assessment, strtoupper($code)]) }}" method="POST" enctype="multipart/form-data" class="space-y-3 pt-2">
+                <form action="{{ route('asesi.assessment.instrument.upload-evidence', [$assessment, 'IA01B']) }}" method="POST" enctype="multipart/form-data" class="space-y-3 pt-2">
                     @csrf
                     <label class="block text-xs font-bold text-slate-800 uppercase tracking-wider">
-                        {{ $evidencePath ? 'Unggah Ulang / Perbarui Foto Lembar Jawaban:' : 'Pilih Foto Lembar Jawaban Kertas:' }}
+                        {{ $evidencePath ? 'Unggah Ulang / Perbarui Berkas Report Sheet Fisik:' : 'Pilih Berkas Foto / Scan PDF Lembar Report Sheet:' }}
                     </label>
                     <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                         <input type="file" name="evidence_image" accept="image/*,application/pdf" required
-                            class="block w-full text-xs text-slate-600 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-2 file:border-black file:text-xs file:font-bold file:bg-white file:text-slate-800 hover:file:bg-slate-100 border border-slate-300 rounded-lg p-1 bg-white cursor-pointer">
-                        <button type="submit" class="px-5 py-2.5 text-xs font-black uppercase tracking-wider bg-slate-900 hover:bg-slate-800 text-white rounded-lg border-2 border-black shadow-[2px_2px_0_0_rgba(0,0,0,0.9)] transition shrink-0">
-                            Unggah Foto Bukti &uarr;
+                            class="block w-full text-xs text-slate-600 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-slate-100 file:text-slate-800 hover:file:bg-slate-200 border border-slate-300 rounded-lg p-1 bg-white cursor-pointer">
+                        <button type="submit" class="px-5 py-2.5 text-xs font-bold uppercase tracking-wider bg-brand-600 hover:bg-brand-700 text-white rounded-lg shadow-sm transition shrink-0">
+                            Unggah Berkas Fisik &uarr;
                         </button>
                     </div>
                     <p class="text-[11px] text-slate-500">Format yang didukung: JPG, JPEG, PNG, WEBP, atau scan PDF (Maksimal 10 MB).</p>
