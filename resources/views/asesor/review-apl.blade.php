@@ -549,20 +549,27 @@
         <form action="{{ route('asesor.review-apl.update', $assessment->id) }}" method="POST" class="p-6 space-y-6">
             @csrf
 
+            @if($assessment->schedule?->is_closed)
+                <div class="p-3 bg-emerald-50 border border-emerald-300 rounded-xl text-xs text-emerald-900 font-semibold flex items-center gap-2">
+                    <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                    <span>Jadwal asesmen telah resmi ditutup dan dikunci. Formulir keputusan APL dalam mode lihat (read-only).</span>
+                </div>
+            @endif
+
             <div>
                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-3">
                     Pilih Keputusan Hasil Review:
                 </label>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {{-- Setujui --}}
-                    <label class="relative flex flex-col p-4 rounded-xl border-2 cursor-pointer transition"
+                    <label class="relative flex flex-col p-4 rounded-xl border-2 {{ $assessment->schedule?->is_closed ? 'cursor-default' : 'cursor-pointer' }} transition"
                            :class="decision === 'APPROVED' ? 'border-emerald-600 bg-emerald-50/60 ring-2 ring-emerald-500/20' : 'border-slate-200 hover:border-slate-300 bg-white'">
                         <div class="flex items-center justify-between mb-2">
                             <span class="text-sm font-bold text-emerald-800 flex items-center gap-1.5">
                                 <svg class="w-4 h-4 text-emerald-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
                                 Diterima (Disetujui)
                             </span>
-                            <input type="radio" name="apl_status" value="APPROVED" x-model="decision" class="text-emerald-600 focus:ring-emerald-500 w-4 h-4">
+                            <input type="radio" name="apl_status" value="APPROVED" x-model="decision" class="text-emerald-600 focus:ring-emerald-500 w-4 h-4" @disabled($assessment->schedule?->is_closed)>
                         </div>
                         <p class="text-xs text-slate-600">
                             Berkas administratif lengkap dan asesmen mandiri memenuhi syarat untuk lanjut ke ruang uji.
@@ -570,14 +577,14 @@
                     </label>
 
                     {{-- Minta Revisi --}}
-                    <label class="relative flex flex-col p-4 rounded-xl border-2 cursor-pointer transition"
+                    <label class="relative flex flex-col p-4 rounded-xl border-2 {{ $assessment->schedule?->is_closed ? 'cursor-default' : 'cursor-pointer' }} transition"
                            :class="decision === 'REVISION_REQUESTED' ? 'border-amber-500 bg-amber-50/60 ring-2 ring-amber-500/20' : 'border-slate-200 hover:border-slate-300 bg-white'">
                         <div class="flex items-center justify-between mb-2">
                             <span class="text-sm font-bold text-amber-800 flex items-center gap-1.5">
                                 <svg class="w-4 h-4 text-amber-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
                                 Minta Revisi
                             </span>
-                            <input type="radio" name="apl_status" value="REVISION_REQUESTED" x-model="decision" class="text-amber-600 focus:ring-amber-500 w-4 h-4">
+                            <input type="radio" name="apl_status" value="REVISION_REQUESTED" x-model="decision" class="text-amber-600 focus:ring-amber-500 w-4 h-4" @disabled($assessment->schedule?->is_closed)>
                         </div>
                         <p class="text-xs text-slate-600">
                             Dokumen bukti belum lengkap atau ada KUK yang perlu diperbaiki oleh asesi.
@@ -585,14 +592,14 @@
                     </label>
 
                     {{-- Tolak --}}
-                    <label class="relative flex flex-col p-4 rounded-xl border-2 cursor-pointer transition"
+                    <label class="relative flex flex-col p-4 rounded-xl border-2 {{ $assessment->schedule?->is_closed ? 'cursor-default' : 'cursor-pointer' }} transition"
                            :class="decision === 'REJECTED' ? 'border-rose-600 bg-rose-50/60 ring-2 ring-rose-500/20' : 'border-slate-200 hover:border-slate-300 bg-white'">
                         <div class="flex items-center justify-between mb-2">
                             <span class="text-sm font-bold text-rose-800 flex items-center gap-1.5">
                                 <svg class="w-4 h-4 text-rose-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></svg>
                                 Tidak Diterima (Ditolak)
                             </span>
-                            <input type="radio" name="apl_status" value="REJECTED" x-model="decision" class="text-rose-600 focus:ring-rose-500 w-4 h-4">
+                            <input type="radio" name="apl_status" value="REJECTED" x-model="decision" class="text-rose-600 focus:ring-rose-500 w-4 h-4" @disabled($assessment->schedule?->is_closed)>
                         </div>
                         <p class="text-xs text-slate-600">
                             Asesi tidak memenuhi persyaratan dasar skema sertifikasi secara substansial.
@@ -609,7 +616,8 @@
                 <textarea name="notes" rows="3" x-model="notes"
                           class="w-full text-xs rounded-lg border border-slate-300 p-3 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                           placeholder="Tuliskan catatan perbaikan dokumen atau alasan penolakan secara spesifik..."
-                          :required="decision === 'REVISION_REQUESTED' || decision === 'REJECTED'"></textarea>
+                          :required="(! {{ $assessment->schedule?->is_closed ? 'true' : 'false' }}) && (decision === 'REVISION_REQUESTED' || decision === 'REJECTED')"
+                          @disabled($assessment->schedule?->is_closed)></textarea>
                 <p class="text-[11px] text-slate-500">Catatan ini akan langsung ditampilkan kepada asesi pada halaman APL mereka.</p>
             </div>
 
@@ -618,11 +626,17 @@
                     &larr; Batalkan & Kembali ke Daftar Asesi
                 </a>
 
-                <button type="submit" class="w-full sm:w-auto px-8 py-3 bg-lsp-navy hover:bg-lsp-navy-dark text-white rounded-xl font-bold text-sm shadow-md transition transform active:scale-95 flex items-center justify-center gap-2"
-                        onclick="return confirm('Apakah Anda yakin ingin menyimpan keputusan review APL ini?')">
-                    <span>Simpan & Tetapkan Keputusan</span>
-                    <span>→</span>
-                </button>
+                @if($assessment->schedule?->is_closed)
+                    <button type="button" disabled class="w-full sm:w-auto px-6 py-3 bg-slate-200 text-slate-500 rounded-xl font-bold text-sm cursor-not-allowed">
+                        Jadwal Telah Ditutup (Read-Only)
+                    </button>
+                @else
+                    <button type="submit" class="w-full sm:w-auto px-8 py-3 bg-lsp-navy hover:bg-lsp-navy-dark text-white rounded-xl font-bold text-sm shadow-md transition transform active:scale-95 flex items-center justify-center gap-2"
+                            onclick="return confirm('Apakah Anda yakin ingin menyimpan keputusan review APL ini?')">
+                        <span>Simpan & Tetapkan Keputusan</span>
+                        <span>→</span>
+                    </button>
+                @endif
             </div>
         </form>
     </div>

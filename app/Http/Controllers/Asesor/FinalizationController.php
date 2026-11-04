@@ -25,9 +25,14 @@ class FinalizationController extends Controller
     /**
      * Schedule-level FR.AK.02 asesi list.
      */
-    public function scheduleAk02(Schedule $schedule): View
+    public function scheduleAk02(Schedule $schedule): View|RedirectResponse
     {
         $this->authorizeAssessorSchedule($schedule);
+
+        if (! $schedule->isStepUnlocked('ak02')) {
+            return redirect()->route('asesor.schedule.ruang-uji', $schedule->id)
+                ->with('warning', 'Selesaikan tahapan pra-asesmen (FR.AK.01 & FR.AK.07) terlebih dahulu sebelum mengakses FR.AK.02.');
+        }
 
         $schedule->load([
             'scheme.competencyUnits',
@@ -76,6 +81,101 @@ class FinalizationController extends Controller
             'codeUpper',
             'codeLower'
         ));
+    }
+
+    /**
+     * Bulk update FR.AK.02 for multiple candidates in a schedule.
+     */
+    public function bulkUpdateScheduleAk02(Schedule $schedule, Request $request): RedirectResponse
+    {
+        $this->authorizeAssessorSchedule($schedule);
+
+        if ($schedule->is_closed) {
+            return back()->with('error', 'Jadwal asesmen sudah ditutup dan dikunci.');
+        }
+
+        $results = $request->input('results', []);
+        if (empty($results)) {
+            return back()->with('error', 'Tidak ada data rekaman asesi yang dikirim.');
+        }
+
+        $user = auth()->user();
+        $isSingleAssessor = $schedule->assessors->count() === 1 && $schedule->assessors->first()?->id === $user->id;
+
+        $myAssessments = $schedule->assessments()
+            ->with(['asesi'])
+            ->get()
+            ->filter(function ($a) use ($user, $isSingleAssessor) {
+                return (int) $a->assessor_id === (int) $user->id || (empty($a->assessor_id) && $isSingleAssessor);
+            })
+            ->keyBy('id');
+
+        $units = $schedule->scheme->competencyUnits;
+        $now = now();
+        $savedCount = 0;
+
+        $methods = [
+            'observasi_demonstrasi' => (bool) $request->input('methods.observasi_demonstrasi', true),
+            'portofolio' => (bool) $request->input('methods.portofolio', true),
+            'pihak_ketiga' => false,
+            'lisan' => (bool) $request->input('methods.lisan', true),
+            'tulis' => (bool) $request->input('methods.tulis', true),
+        ];
+
+        $assessorSignature = $user->profile?->signature_data;
+
+        DB::transaction(function () use ($results, $myAssessments, $units, $methods, $assessorSignature, $now, &$savedCount) {
+            foreach ($results as $assessmentId => $data) {
+                if (! $myAssessments->has($assessmentId)) {
+                    continue;
+                }
+
+                $assessment = $myAssessments->get($assessmentId);
+
+                // Only process candidates whose APL has been approved
+                if ($assessment->apl_status !== 'APPROVED') {
+                    continue;
+                }
+
+                $finalResultRaw = strtoupper((string) ($data['final_result'] ?? 'KOMPETEN'));
+                $finalResult = in_array($finalResultRaw, ['K', 'KOMPETEN'], true) ? 'KOMPETEN' : 'BELUM_KOMPETEN';
+                $isComp = ($finalResult === 'KOMPETEN');
+
+                $notes = $data['final_notes'] ?? ($isComp ? 'Asesi menunjukkan unjuk kerja optimal sesuai standar skema' : 'Terdapat kriteria unjuk kerja yang belum terpenuhi');
+                $followUp = $data['follow_up_action'] ?? ($isComp ? 'Diusulkan penerbitan sertifikat kompetensi BNSP' : 'Perlu asesmen ulang pada unit yang belum kompeten');
+
+                // Upsert AK02 items for all units
+                foreach ($units as $unit) {
+                    AssessmentAk02Item::updateOrCreate(
+                        [
+                            'assessment_id' => $assessment->id,
+                            'competency_unit_id' => $unit->id,
+                        ],
+                        [
+                            'methods_json' => $methods,
+                            'is_competent' => $isComp,
+                        ]
+                    );
+                }
+
+                $assessment->update([
+                    'final_result' => $finalResult,
+                    'final_notes' => $notes,
+                    'follow_up_action' => $followUp,
+                    'status' => 'COMPLETED',
+                    'completed_at' => $assessment->completed_at ?? $now,
+                    'assessor_id' => auth()->id(),
+                    'assessor_signature' => $assessorSignature ?? $assessment->assessor_signature,
+                    'assessor_signed_at' => $assessorSignature ? $now : $assessment->assessor_signed_at,
+                    'last_active_step' => 'ruang-uji',
+                ]);
+
+                $savedCount++;
+            }
+        });
+
+        return redirect()->route('asesor.schedule.ak02', $schedule->id)
+            ->with('success', "Sebanyak {$savedCount} rekaman FR.AK.02 asesi berhasil disimpan.");
     }
 
     /**
@@ -212,9 +312,14 @@ class FinalizationController extends Controller
     /**
      * View FR.AK.05 (Laporan Asesmen) & FR.AK.06 (Tinjauan Proses).
      */
-    public function showReports(Schedule $schedule): View
+    public function showReports(Schedule $schedule): View|RedirectResponse
     {
         $this->authorizeAssessorSchedule($schedule);
+
+        if (! $schedule->isStepUnlocked('reports')) {
+            return redirect()->route('asesor.schedule.ak02', $schedule->id)
+                ->with('warning', 'Rekam seluruh rekomendasi hasil akhir asesmen (FR.AK.02) terlebih dahulu sebelum membuka laporan penutupan jadwal.');
+        }
 
         $schedule->load('scheme', 'assessors', 'assessments.asesi');
 

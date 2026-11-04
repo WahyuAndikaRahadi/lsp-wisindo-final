@@ -5,13 +5,13 @@ namespace App\Http\Controllers\Asesi;
 use App\Http\Controllers\Controller;
 use App\Models\Assessment;
 use App\Models\AssessmentAk07Item;
-use App\Models\AssessmentAppeal;
 use App\Models\AssessmentIaResponse;
 use App\Models\QuestionBank;
 use App\Rules\ValidSignature;
 use App\Services\AkWorkflowService;
 use App\Services\AutoGradeService;
 use App\Services\SchemeInstrumentService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -61,7 +61,10 @@ class RuangUjiController extends Controller
         ]);
 
         $now = now();
-        $signature = $request->input('signature_data') ?? $request->input('asesi_signature') ?? $assessment->asesi_signature;
+        $signature = $request->input('signature_data')
+            ?? $request->input('asesi_signature')
+            ?? $assessment->asesi_signature
+            ?? auth()->user()->profile?->signature_data;
 
         if ($assessment->asesi_signature && $signature !== $assessment->asesi_signature) {
             Log::info("Signature updated for assessment #{$assessment->id} by asesi #{$assessment->asesi_id}");
@@ -90,10 +93,143 @@ class RuangUjiController extends Controller
         }
 
         $assessment->load('schedule.scheme', 'schedule.assessors', 'iaResponses', 'assessor');
-        $selectedInstruments = $assessment->schedule->getEffectiveInstruments();
+        $schedule = $assessment->schedule;
         $responses = $assessment->iaResponses->keyBy('instrument_code');
 
-        return view('asesi.ruang-uji.hub', compact('assessment', 'selectedInstruments', 'responses'));
+        $assignedCodes = array_values(array_filter(
+            $assessment->getAssignedInstruments(),
+            fn ($c) => str_starts_with(strtoupper($c), 'IA')
+        ));
+
+        $catalog = [
+            'IA01' => [
+                'code' => 'FR.IA.01',
+                'title' => 'Ceklis Observasi Aktivitas di Tempat Kerja',
+                'desc' => 'Daftar periksa observasi langsung terhadap KUK dan elemen kompetensi pada unit unjuk kerja.',
+                'badge' => 'Observasi Praktik',
+                'badge_color' => 'bg-blue-50 text-blue-700 border-blue-200',
+                'has_download' => false,
+                'download_url' => null,
+                'action_url' => route('asesi.assessment.instrument.view', [$assessment, 'IA01']),
+            ],
+            'IA01B' => [
+                'code' => 'FR.IA.01B',
+                'title' => 'Lembar Pemeriksaan Teknis (Report Sheet)',
+                'desc' => 'Pencatatan dan verifikasi hasil pengukuran parameter fisik komponen serta lembar kerja asesi.',
+                'badge' => 'Report Sheet',
+                'badge_color' => 'bg-cyan-50 text-cyan-700 border-cyan-200',
+                'has_download' => false,
+                'download_url' => null,
+                'action_url' => route('asesi.assessment.instrument.view', [$assessment, 'IA01B']),
+            ],
+            'IA02' => [
+                'code' => 'FR.IA.02',
+                'title' => 'Tugas Praktik Demonstrasi (TPD)',
+                'desc' => 'Penilaian tugas praktik unjuk kerja berdasarkan skenario dan instruksi demonstrasi standar di TUK.',
+                'badge' => 'Praktik Demonstrasi',
+                'badge_color' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                'has_download' => false,
+                'download_url' => null,
+                'action_url' => route('asesi.assessment.instrument.view', [$assessment, 'IA02']),
+            ],
+            'IA03' => [
+                'code' => 'FR.IA.03',
+                'title' => 'Pertanyaan Mendukung Observasi (PMO / Lisan)',
+                'desc' => 'Daftar pertanyaan lisan terstruktur untuk mengonfirmasi pemahaman teknis dan dasar teori asesi.',
+                'badge' => 'Tanya Jawab',
+                'badge_color' => 'bg-amber-50 text-amber-700 border-amber-200',
+                'has_download' => false,
+                'download_url' => null,
+                'action_url' => route('asesi.assessment.instrument.view', [$assessment, 'IA03']),
+            ],
+            'IA05' => [
+                'code' => 'FR.IA.05',
+                'title' => 'Pertanyaan Tertulis Pilihan Ganda (CBT)',
+                'desc' => 'Ujian teori pilihan ganda terstandar BNSP. Sistem CBT mengoreksi secara otomatis.',
+                'badge' => 'Ujian CBT',
+                'badge_color' => 'bg-purple-50 text-purple-700 border-purple-200',
+                'has_download' => false,
+                'download_url' => null,
+                'action_url' => route('asesi.assessment.instrument.ia05', $assessment),
+            ],
+        ];
+
+        $instruments = [];
+        foreach ($assignedCodes as $code) {
+            $codeUpper = strtoupper($code);
+            $meta = $catalog[$codeUpper] ?? [
+                'code' => "FR.{$codeUpper}",
+                'title' => "Instrumen FR.{$codeUpper}",
+                'desc' => "Pelaksanaan instrumen FR.{$codeUpper} pada jadwal asesmen kompetensi.",
+                'badge' => "Instrumen {$codeUpper}",
+                'badge_color' => 'bg-slate-50 text-slate-700 border-slate-200',
+                'has_download' => false,
+                'download_url' => null,
+                'action_url' => route('asesi.assessment.instrument.view', [$assessment, $codeUpper]),
+            ];
+
+            $resp = $responses[$codeUpper] ?? null;
+
+            if ($codeUpper === 'IA05') {
+                $isDone = (bool) ($resp && ($resp->score !== null || $resp->asesi_signed_at !== null));
+                $meta['status_label'] = ($isDone || $schedule->is_closed) ? '✓ Selesai CBT' : 'Ujian Teori CBT';
+                $meta['status_badge_class'] = ($isDone || $schedule->is_closed) ? 'text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200' : 'text-purple-700 bg-purple-50 px-2 py-0.5 rounded border border-purple-200';
+                $meta['progress_percent'] = ($isDone || $schedule->is_closed) ? 100 : 0;
+                $meta['progress_bar_color'] = ($isDone || $schedule->is_closed) ? 'bg-emerald-600' : 'bg-purple-600';
+                $meta['progress_text'] = ($isDone || $schedule->is_closed) ? '1 / 1 Selesai' : '0 / 1 Belum Ujian';
+                $meta['action_label'] = ($isDone || $schedule->is_closed) ? 'Lihat Hasil CBT' : 'Mulai Kerjakan CBT';
+                $meta['action_button_class'] = ($isDone || $schedule->is_closed) ? 'bg-slate-800 hover:bg-slate-900 text-white' : 'bg-brand-600 hover:bg-brand-700 text-white';
+            } elseif ($codeUpper === 'IA02') {
+                $hasSigned = (bool) $resp?->asesi_signed_at || (bool) $resp?->assessor_signed_at;
+                $meta['status_label'] = 'Praktik Demonstrasi';
+                $meta['status_badge_class'] = 'text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200';
+                $meta['progress_percent'] = 100;
+                $meta['progress_bar_color'] = 'bg-emerald-600';
+                $meta['progress_text'] = 'Instruksi Kerja Praktik';
+                $meta['action_label'] = 'Lihat Praktik Demonstrasi';
+                $meta['action_button_class'] = $schedule->is_closed ? 'bg-slate-800 hover:bg-slate-900 text-white' : 'bg-brand-600 hover:bg-brand-700 text-white';
+            } elseif ($codeUpper === 'IA01') {
+                $hasEvaluated = (bool) $resp?->assessor_signed_at || ! empty($resp?->assessor_notes);
+                $meta['status_label'] = ($hasEvaluated || $schedule->is_closed) ? '✓ Telah Dievaluasi Asesor' : 'Observasi Praktik';
+                $meta['status_badge_class'] = ($hasEvaluated || $schedule->is_closed) ? 'text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200' : 'text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200';
+                $meta['progress_percent'] = ($hasEvaluated || $schedule->is_closed) ? 100 : 0;
+                $meta['progress_bar_color'] = ($hasEvaluated || $schedule->is_closed) ? 'bg-emerald-600' : 'bg-slate-400';
+                $meta['progress_text'] = ($hasEvaluated || $schedule->is_closed) ? '1 / 1 Telah Dievaluasi' : '0 / 1 Evaluasi Asesor';
+                $meta['action_label'] = 'Lihat Evaluasi Asesor';
+                $meta['action_button_class'] = ($hasEvaluated || $schedule->is_closed) ? 'bg-slate-800 hover:bg-slate-900 text-white' : 'bg-slate-700 hover:bg-slate-800 text-white';
+            } elseif ($codeUpper === 'IA01B') {
+                $hasEvidence = ! empty($resp?->data_json['evidence_image_path']);
+                $meta['status_label'] = ($hasEvidence || $schedule->is_closed) ? '✓ Lembar Fisik Diunggah' : 'Unggah Lembar Fisik';
+                $meta['status_badge_class'] = ($hasEvidence || $schedule->is_closed) ? 'text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200' : 'text-cyan-700 bg-cyan-50 px-2 py-0.5 rounded border border-cyan-200';
+                $meta['progress_percent'] = ($hasEvidence || $schedule->is_closed) ? 100 : 0;
+                $meta['progress_bar_color'] = ($hasEvidence || $schedule->is_closed) ? 'bg-emerald-600' : 'bg-blue-500';
+                $meta['progress_text'] = ($hasEvidence || $schedule->is_closed) ? '1 / 1 Terunggah' : '0 / 1 Belum Diunggah';
+                $meta['action_label'] = ($hasEvidence || $schedule->is_closed) ? 'Lihat Lembar Pemeriksaan' : 'Unggah Lembar Fisik';
+                $meta['action_button_class'] = ($hasEvidence || $schedule->is_closed) ? 'bg-slate-800 hover:bg-slate-900 text-white' : 'bg-brand-600 hover:bg-brand-700 text-white';
+            } elseif ($codeUpper === 'IA03') {
+                $hasEvaluated = (bool) $resp?->assessor_signed_at || ! empty($resp?->assessor_notes);
+                $meta['status_label'] = ($hasEvaluated || $schedule->is_closed) ? '✓ Telah Dievaluasi Asesor' : 'Tanya Jawab (PMO)';
+                $meta['status_badge_class'] = ($hasEvaluated || $schedule->is_closed) ? 'text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200' : 'text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200';
+                $meta['progress_percent'] = ($hasEvaluated || $schedule->is_closed) ? 100 : 0;
+                $meta['progress_bar_color'] = ($hasEvaluated || $schedule->is_closed) ? 'bg-emerald-600' : 'bg-slate-400';
+                $meta['progress_text'] = ($hasEvaluated || $schedule->is_closed) ? '1 / 1 Telah Dievaluasi' : '0 / 1 Evaluasi Asesor';
+                $meta['action_label'] = 'Lihat Evaluasi Asesor';
+                $meta['action_button_class'] = ($hasEvaluated || $schedule->is_closed) ? 'bg-slate-800 hover:bg-slate-900 text-white' : 'bg-slate-700 hover:bg-slate-800 text-white';
+            } else {
+                $hasEvaluated = (bool) $resp?->assessor_signed_at;
+                $meta['status_label'] = $hasEvaluated ? '✓ Selesai' : 'Belum Selesai';
+                $meta['status_badge_class'] = $hasEvaluated ? 'text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200' : 'text-slate-600 bg-slate-100 px-2 py-0.5 rounded border border-slate-200';
+                $meta['progress_percent'] = $hasEvaluated ? 100 : 0;
+                $meta['progress_bar_color'] = 'bg-slate-400';
+                $meta['progress_text'] = $hasEvaluated ? '1 / 1 Selesai' : '0 / 1 Belum Selesai';
+                $meta['action_label'] = 'Lihat Instrumen';
+                $meta['action_button_class'] = 'bg-brand-600 hover:bg-brand-700 text-white';
+            }
+
+            $instruments[] = $meta;
+        }
+
+        return view('asesi.ruang-uji.hub', compact('assessment', 'schedule', 'instruments', 'responses'));
     }
 
     public function downloadTemplate(Assessment $assessment, string $code, SchemeInstrumentService $instrumentService)
@@ -118,10 +254,80 @@ class RuangUjiController extends Controller
     {
         abort_if($assessment->asesi_id !== auth()->id(), 403);
 
-        $assessment->load('schedule.scheme');
-        $questions = QuestionBank::where('scheme_id', $assessment->schedule->scheme_id)->get();
+        $assessment->load('schedule.scheme', 'iaResponses');
+        $questionIds = $assessment->schedule ? $assessment->schedule->getCbtQuestionIds() : [];
+        $questions = ! empty($questionIds)
+            ? QuestionBank::whereIn('id', $questionIds)->get()
+            : QuestionBank::where('scheme_id', $assessment->schedule->scheme_id)->get();
 
-        return view('asesi.ruang-uji.ia05', compact('assessment', 'questions'));
+        $existingResp = $assessment->iaResponses->firstWhere('instrument_code', 'IA05');
+        $isSubmitted = (bool) ($existingResp && ($existingResp->asesi_signed_at !== null || $existingResp->score !== null)) || (bool) ($assessment->schedule?->is_closed);
+
+        $draftAnswers = [];
+        $draftDoubtful = [];
+        if ($existingResp && ! empty($existingResp->data_json)) {
+            $data = is_array($existingResp->data_json)
+                ? $existingResp->data_json
+                : (json_decode($existingResp->data_json, true) ?: []);
+
+            if (isset($data['answers']) && is_array($data['answers'])) {
+                $draftAnswers = $data['answers'];
+                $draftDoubtful = $data['doubtful'] ?? [];
+            } else {
+                $draftAnswers = $data;
+            }
+        }
+
+        return view('asesi.ruang-uji.ia05', compact('assessment', 'questions', 'existingResp', 'isSubmitted', 'draftAnswers', 'draftDoubtful'));
+    }
+
+    public function autosaveIa05(Assessment $assessment, Request $request): JsonResponse
+    {
+        abort_if($assessment->asesi_id !== auth()->id(), 403);
+
+        if ($assessment->schedule && $assessment->schedule->is_closed) {
+            return response()->json(['error' => 'Jadwal telah ditutup.'], 403);
+        }
+
+        if ($assessment->apl_status !== 'APPROVED') {
+            return response()->json(['error' => 'APL belum disetujui.'], 403);
+        }
+
+        // Do not overwrite if already submitted
+        $existing = AssessmentIaResponse::where('assessment_id', $assessment->id)
+            ->where('instrument_code', 'IA05')
+            ->whereNotNull('asesi_signed_at')
+            ->first();
+
+        if ($existing) {
+            return response()->json(['status' => 'already_submitted'], 200);
+        }
+
+        $answers = $request->input('answers', []);
+        $doubtful = $request->input('doubtful', []);
+
+        $response = AssessmentIaResponse::firstOrNew([
+            'assessment_id' => $assessment->id,
+            'instrument_code' => 'IA05',
+        ]);
+
+        $currentData = is_array($response->data_json)
+            ? $response->data_json
+            : (json_decode($response->data_json ?? '[]', true) ?: []);
+
+        $currentData['answers'] = is_array($answers) ? $answers : [];
+        $currentData['doubtful'] = is_array($doubtful) ? $doubtful : [];
+        $currentData['status'] = 'DRAFT';
+
+        $response->data_json = $currentData;
+        $response->save();
+
+        return response()->json([
+            'success' => true,
+            'status' => 'success',
+            'message' => 'Jawaban tersimpan otomatis.',
+            'saved_at' => now()->toIso8601String(),
+        ]);
     }
 
     public function submitIa05(Assessment $assessment, Request $request, AutoGradeService $grader): RedirectResponse
@@ -147,15 +353,30 @@ class RuangUjiController extends Controller
                 ->with('info', "Jawaban ujian CBT (IA.05) Anda telah tersimpan sebelumnya dengan skor: {$existing->score}.");
         }
 
-        $result = DB::transaction(function () use ($assessment, $request, $grader) {
-            $graded = $grader->grade($assessment, $request->input('answers', []));
+        $rawAnswers = $request->input('answers', []);
+        $draftAnswers = [];
+        $existingDraft = AssessmentIaResponse::where('assessment_id', $assessment->id)
+            ->where('instrument_code', 'IA05')
+            ->first();
+
+        if ($existingDraft && ! empty($existingDraft->data_json)) {
+            $data = is_array($existingDraft->data_json)
+                ? $existingDraft->data_json
+                : (json_decode($existingDraft->data_json, true) ?: []);
+            $draftAnswers = $data['answers'] ?? (isset($data[0]) ? [] : $data);
+        }
+
+        $answers = array_replace(is_array($draftAnswers) ? $draftAnswers : [], is_array($rawAnswers) ? $rawAnswers : []);
+
+        $result = DB::transaction(function () use ($assessment, $answers, $grader) {
+            $graded = $grader->grade($assessment, $answers);
             $assessment->update(['last_active_step' => 'ruang-uji']);
 
             return $graded;
         });
 
         return redirect()->route('asesi.assessment.ruang-uji', $assessment)
-            ->with('success', "Jawaban tersimpan. Skor: {$result->score}");
+            ->with('success', 'Jawaban CBT berhasil dikirim.');
     }
 
     public function iaView(Assessment $assessment, $code, SchemeInstrumentService $instrumentService): View
@@ -177,6 +398,10 @@ class RuangUjiController extends Controller
     public function submitFeedback(Assessment $assessment, $code, Request $request): RedirectResponse
     {
         abort_if($assessment->asesi_id !== auth()->id(), 403);
+
+        if ($assessment->schedule && $assessment->schedule->is_closed) {
+            return back()->with('error', 'Jadwal asesmen sudah resmi ditutup.');
+        }
 
         $codeUpper = strtoupper($code);
         $response = AssessmentIaResponse::firstOrNew([
@@ -210,7 +435,10 @@ class RuangUjiController extends Controller
             'asesi_signature' => ['nullable', 'string', new ValidSignature],
         ]);
 
-        $signature = $request->input('signature_data') ?? $request->input('asesi_signature');
+        $signature = $request->input('signature_data')
+            ?? $request->input('asesi_signature')
+            ?? $assessment->asesi_signature
+            ?? auth()->user()->profile?->signature_data;
         if ($signature) {
             $response->asesi_signature = $signature;
             $response->asesi_signed_at = now();
@@ -230,6 +458,10 @@ class RuangUjiController extends Controller
     public function uploadEvidence(Assessment $assessment, $code, Request $request): RedirectResponse
     {
         abort_if($assessment->asesi_id !== auth()->id(), 403);
+
+        if ($assessment->schedule && $assessment->schedule->is_closed) {
+            return back()->with('error', 'Jadwal asesmen sudah resmi ditutup.');
+        }
 
         $request->validate([
             'evidence_image' => 'required|file|mimes:jpeg,jpg,png,webp,pdf|max:10240',
@@ -291,8 +523,9 @@ class RuangUjiController extends Controller
     {
         abort_if($assessment->asesi_id !== auth()->id(), 403);
 
-        if ($assessment->schedule && $assessment->schedule->is_closed) {
-            return back()->with('error', 'Jadwal asesmen sudah resmi ditutup.');
+        if ($assessment->ak03Item) {
+            return redirect()->route('asesi.dashboard')
+                ->with('info', 'Formulir FR.AK.03 Umpan Balik Asesi sudah pernah dikirim dan tidak dapat diubah kembali.');
         }
 
         $validated = $request->validate([
@@ -310,7 +543,7 @@ class RuangUjiController extends Controller
             app(AkWorkflowService::class)->submitAk03Feedback($assessment, $validated['ratings'], $validated['general_notes'] ?? null);
         });
 
-        return redirect()->route('asesi.jadwal.index')
+        return redirect()->route('asesi.dashboard')
             ->with('success', 'Formulir FR.AK.03 Umpan Balik Asesi berhasil dikirim.');
     }
 
@@ -335,30 +568,47 @@ class RuangUjiController extends Controller
     {
         abort_if($assessment->asesi_id !== auth()->id(), 403);
 
-        // Prevent duplicate pending appeals on double click / refresh
-        $existingPending = AssessmentAppeal::where('assessment_id', $assessment->id)
-            ->where('status', 'SUBMITTED')
-            ->first();
-
-        if ($existingPending) {
-            return redirect()->route('asesi.jadwal.index')
-                ->with('info', 'Permohonan banding asesmen Anda sudah tercatat dan sedang dalam peninjauan Tim Banding LSP.');
+        if ($assessment->appeals()->exists()) {
+            return redirect()->route('asesi.dashboard')
+                ->with('info', 'Permohonan banding asesmen (FR.AK.04) sudah pernah diajukan dan tidak dapat diubah kembali.');
         }
 
         $request->validate([
             'appeal_reasons' => 'required|string|min:10',
             'contested_units' => 'nullable|array',
+            'is_process_explained' => 'nullable',
+            'is_discussed_with_assessor' => 'nullable',
+            'involves_other_person' => 'nullable',
+            'other_person_name' => 'nullable|string|max:255',
         ]);
 
-        DB::transaction(function () use ($assessment, $request) {
+        $isProcessExplained = $request->has('is_process_explained')
+            ? filter_var($request->input('is_process_explained'), FILTER_VALIDATE_BOOLEAN)
+            : true;
+        $isDiscussedWithAssessor = $request->has('is_discussed_with_assessor')
+            ? filter_var($request->input('is_discussed_with_assessor'), FILTER_VALIDATE_BOOLEAN)
+            : true;
+        $involvesOtherPerson = $request->has('involves_other_person')
+            ? filter_var($request->input('involves_other_person'), FILTER_VALIDATE_BOOLEAN)
+            : false;
+        $otherPersonName = $request->input('other_person_name');
+        $appealReasons = $request->input('appeal_reasons');
+        $contestedUnits = $request->input('contested_units', []);
+
+        DB::transaction(function () use ($assessment, $appealReasons, $contestedUnits, $isProcessExplained, $isDiscussedWithAssessor, $involvesOtherPerson, $otherPersonName) {
             app(AkWorkflowService::class)->submitAppeal(
                 $assessment,
-                $request->input('appeal_reasons'),
-                $request->input('contested_units', [])
+                $appealReasons,
+                $contestedUnits,
+                null,
+                $isProcessExplained,
+                $isDiscussedWithAssessor,
+                $involvesOtherPerson,
+                $otherPersonName
             );
         });
 
-        return redirect()->route('asesi.jadwal.index')
+        return redirect()->route('asesi.dashboard')
             ->with('success', 'Pengajuan Banding Asesmen (FR.AK.04) berhasil dikirimkan ke Admin LSP.');
     }
 }

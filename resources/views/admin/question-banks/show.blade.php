@@ -24,6 +24,11 @@
         <div>
             <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Pertanyaan:</span>
             <p class="text-base font-semibold text-slate-900 leading-relaxed">{{ $questionBank->question_text }}</p>
+            @if($questionBank->question_image)
+                <div class="mt-4">
+                    <img src="{{ asset('storage/' . $questionBank->question_image) }}" alt="Gambar Soal" class="max-h-64 rounded-lg border border-slate-200 shadow-xs">
+                </div>
+            @endif
         </div>
 
         <div class="pt-4 border-t border-slate-100 space-y-2.5">

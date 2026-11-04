@@ -8,7 +8,7 @@
         <p class="text-sm text-slate-500">Perbarui pertanyaan tertulis dan pilihan jawaban</p>
     </div>
 
-    <form action="{{ route('admin.question-banks.update', $questionBank->id) }}" method="POST" class="space-y-6">
+    <form action="{{ route('admin.question-banks.update', $questionBank->id) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
         @csrf
         @method('PUT')
 
@@ -52,6 +52,27 @@
                 <label class="block text-sm font-semibold text-slate-700 mb-1">Teks Pertanyaan / Soal <span class="text-rose-500">*</span></label>
                 <textarea name="question_text" rows="4" required class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">{{ old('question_text', $questionBank->question_text) }}</textarea>
                 @error('question_text')
+                    <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-1">Gambar Pendukung Soal (Opsional)</label>
+                @if($questionBank->question_image)
+                    <div class="mb-3 p-3 bg-slate-50 border border-slate-200 rounded-lg flex items-center justify-between gap-4">
+                        <div class="flex items-center space-x-3">
+                            <img src="{{ asset('storage/' . $questionBank->question_image) }}" alt="Preview Soal" class="h-20 w-auto object-contain rounded border border-slate-300">
+                            <span class="text-xs text-slate-600 font-mono">{{ $questionBank->question_image }}</span>
+                        </div>
+                        <label class="inline-flex items-center space-x-1.5 text-xs font-semibold text-rose-700 cursor-pointer">
+                            <input type="checkbox" name="remove_image" value="1" class="rounded border-rose-300 text-rose-600 focus:ring-rose-500">
+                            <span>Hapus Gambar</span>
+                        </label>
+                    </div>
+                @endif
+                <input type="file" name="question_image" accept="image/*" class="w-full px-4 py-2 rounded-lg border border-slate-300 text-sm bg-white file:mr-4 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100">
+                <p class="text-xs text-slate-400 mt-1">Unggah file baru jika ingin mengganti gambar sebelumnya. Format: JPG, PNG, WEBP (maks. 2MB).</p>
+                @error('question_image')
                     <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
                 @enderror
             </div>

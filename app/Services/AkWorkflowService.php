@@ -36,7 +36,7 @@ class AkWorkflowService
 
         $hasDemonstration = $iaResponses->has('IA01') || $iaResponses->has('IA01B') || $iaResponses->has('IA02');
         $hasOral = $iaResponses->has('IA03');
-        $hasWritten = $iaResponses->has('IA05');
+        $hasWritten = $iaResponses->has('IA05') && $iaResponses['IA05']->score !== null;
 
         $allUnitsCompetent = true;
         $finalResult = 'KOMPETEN';
@@ -238,8 +238,16 @@ class AkWorkflowService
     /**
      * Submit FR.AK.04 Banding Asesmen by Asesi.
      */
-    public function submitAppeal(Assessment $assessment, string $reasons, array $contestedUnits = [], ?Carbon $appealDate = null): AssessmentAppeal
-    {
+    public function submitAppeal(
+        Assessment $assessment,
+        string $reasons,
+        array $contestedUnits = [],
+        ?Carbon $appealDate = null,
+        bool $isProcessExplained = true,
+        bool $isDiscussedWithAssessor = true,
+        bool $involvesOtherPerson = false,
+        ?string $otherPersonName = null
+    ): AssessmentAppeal {
         $date = $appealDate ?? now();
 
         if (! $this->isWithinAppealDeadline($assessment, $date)) {
@@ -252,7 +260,7 @@ class AkWorkflowService
             ]);
         }
 
-        return DB::transaction(function () use ($assessment, $date, $reasons, $contestedUnits) {
+        return DB::transaction(function () use ($assessment, $date, $reasons, $contestedUnits, $isProcessExplained, $isDiscussedWithAssessor, $involvesOtherPerson, $otherPersonName) {
             $lockedAssessment = Assessment::where('id', $assessment->id)->lockForUpdate()->first();
 
             $existingAppeal = AssessmentAppeal::where('assessment_id', $lockedAssessment->id)
@@ -261,14 +269,26 @@ class AkWorkflowService
                 ->first();
 
             if ($existingAppeal) {
-                throw ValidationException::withMessages([
-                    'appeal_reasons' => 'Pengajuan banding untuk asesmen ini sedang aktif atau dalam proses peninjauan.',
+                $existingAppeal->update([
+                    'appeal_date' => $date->toDateString(),
+                    'appeal_reasons' => $reasons,
+                    'contested_units' => $contestedUnits,
+                    'is_process_explained' => $isProcessExplained,
+                    'is_discussed_with_assessor' => $isDiscussedWithAssessor,
+                    'involves_other_person' => $involvesOtherPerson,
+                    'other_person_name' => $otherPersonName,
                 ]);
+
+                return $existingAppeal;
             }
 
             return AssessmentAppeal::create([
                 'assessment_id' => $lockedAssessment->id,
                 'appeal_date' => $date->toDateString(),
+                'is_process_explained' => $isProcessExplained,
+                'is_discussed_with_assessor' => $isDiscussedWithAssessor,
+                'involves_other_person' => $involvesOtherPerson,
+                'other_person_name' => $otherPersonName,
                 'appeal_reasons' => $reasons,
                 'contested_units' => $contestedUnits,
                 'status' => 'SUBMITTED',

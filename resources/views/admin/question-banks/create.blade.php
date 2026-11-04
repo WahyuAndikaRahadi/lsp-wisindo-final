@@ -8,7 +8,7 @@
         <p class="text-sm text-slate-500">Tambahkan butir pertanyaan tertulis pilihan ganda untuk ujian asesi</p>
     </div>
 
-    <form action="{{ route('admin.question-banks.store') }}" method="POST" class="space-y-6">
+    <form action="{{ route('admin.question-banks.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
         @csrf
 
         <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 space-y-4">
@@ -52,6 +52,15 @@
                 <label class="block text-sm font-semibold text-slate-700 mb-1">Teks Pertanyaan / Soal <span class="text-rose-500">*</span></label>
                 <textarea name="question_text" rows="4" required class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="Tuliskan pertanyaan uji tertulis di sini...">{{ old('question_text') }}</textarea>
                 @error('question_text')
+                    <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-1">Gambar Pendukung Soal (Opsional)</label>
+                <input type="file" name="question_image" accept="image/*" class="w-full px-4 py-2 rounded-lg border border-slate-300 text-sm bg-white file:mr-4 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100">
+                <p class="text-xs text-slate-400 mt-1">Format: JPG, PNG, WEBP (maks. 2MB). Ditampilkan pada lembar ujian asesi jika soal memerlukan ilustrasi atau diagram.</p>
+                @error('question_image')
                     <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
                 @enderror
             </div>

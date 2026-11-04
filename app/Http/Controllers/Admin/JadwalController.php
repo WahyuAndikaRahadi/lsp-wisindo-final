@@ -73,7 +73,7 @@ class JadwalController extends Controller
             'start_time' => $validated['start_time'] ?? null,
             'end_time' => $validated['end_time'] ?? null,
             'duration_minutes' => $validated['duration_minutes'] ?? null,
-            'selected_instruments' => $validated['selected_instruments'] ?? [],
+            'selected_instruments' => $validated['selected_instruments'] ?? ['AK01', 'IA01', 'IA01B', 'IA02', 'IA03', 'IA05'],
             'notes' => $validated['notes'] ?? null,
             'code' => $code,
             'status' => 'ACTIVE',
@@ -121,7 +121,7 @@ class JadwalController extends Controller
             'assessor_ids' => 'nullable|array',
         ]);
 
-        $instruments = $request->input('selected_instruments', $request->input('instruments', $jadwal->selected_instruments));
+        $instruments = $request->input('selected_instruments', $request->input('instruments', $jadwal->selected_instruments ?? ['AK01', 'IA01', 'IA01B', 'IA02', 'IA03', 'IA05']));
         $validated['selected_instruments'] = $instruments;
         unset($validated['instruments']);
 

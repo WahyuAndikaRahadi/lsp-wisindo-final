@@ -115,9 +115,15 @@
                                 <span class="px-2.5 py-1 rounded bg-brand-50 text-brand-700 font-mono text-xs font-bold">
                                     {{ $sch->code }}
                                 </span>
-                                <span class="px-2.5 py-0.5 rounded text-xs font-semibold border {{ $aplBadge }}">
-                                    APL: {{ str_replace('_', ' ', $aplStatus) }}
-                                </span>
+                                @if($sch->is_closed)
+                                    <span class="px-2.5 py-0.5 rounded text-xs font-bold border bg-emerald-50 text-emerald-800 border-emerald-300">
+                                        🔒 Selesai &amp; Ditutup
+                                    </span>
+                                @else
+                                    <span class="px-2.5 py-0.5 rounded text-xs font-semibold border {{ $aplBadge }}">
+                                        APL: {{ str_replace('_', ' ', $aplStatus) }}
+                                    </span>
+                                @endif
                             </div>
 
                             <div>
@@ -158,7 +164,7 @@
                                 @endif
                             </div>
 
-                            @if($aplStatus === 'REVISION_REQUESTED' && $item->apl_revision_notes)
+                            @if($aplStatus === 'REVISION_REQUESTED' && $item->apl_revision_notes && ! $sch->is_closed)
                                 <div class="p-2.5 rounded bg-amber-50 border border-amber-200 text-xs text-amber-900">
                                     <strong class="font-bold">Catatan Revisi Asesor:</strong>
                                     <p class="mt-0.5">{{ $item->apl_revision_notes }}</p>
@@ -171,9 +177,10 @@
                                 Terdaftar: {{ $item->created_at ? $item->created_at->diffForHumans() : '-' }}
                             </span>
 
-                            @if($item->status === 'COMPLETED')
-                                <a href="{{ route('asesi.assessment.ruang-uji', $item->id) }}" class="px-4 py-2 text-xs font-bold bg-slate-800 hover:bg-slate-900 text-white rounded-lg transition">
-                                    Lihat Hasil Asesmen &rarr;
+                            @if($sch->is_closed || $item->status === 'COMPLETED')
+                                <a href="{{ route('asesi.assessment.ruang-uji', $item->id) }}" class="px-4 py-2 text-xs font-bold bg-slate-800 hover:bg-slate-900 text-white rounded-lg transition flex items-center gap-1.5">
+                                    <svg class="w-3.5 h-3.5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                    <span>Lihat Ruang Uji &rarr;</span>
                                 </a>
                             @elseif($isResume)
                                 <a href="{{ $actionUrl }}" class="px-4 py-2 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg shadow-sm transition">

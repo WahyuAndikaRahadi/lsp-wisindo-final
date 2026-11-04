@@ -140,14 +140,9 @@
                             $stageTitle = 'Tahap 5 dari 5: Hasil Keputusan Asesmen (' . ($item->final_result ?? 'Selesai') . ')';
                             $stageBadgeColor = in_array($item->final_result, ['KOMPETEN', 'K'], true) ? 'bg-emerald-100 text-emerald-800 border-emerald-300' : 'bg-rose-100 text-rose-800 border-rose-300';
                             $targetUrl = route('asesi.assessment.ruang-uji', $item->id);
-                        } elseif ($item->apl_status === 'APPROVED' && !empty($item->ak01_agreed_at)) {
-                            $stageNumber = 4;
-                            $stageTitle = 'Tahap 4 dari 5: Pelaksanaan Uji Kompetensi (Ruang Uji & CBT)';
-                            $stageBadgeColor = 'bg-indigo-100 text-indigo-800 border-indigo-200';
-                            $targetUrl = route('asesi.assessment.ruang-uji', $item->id);
                         } elseif ($item->apl_status === 'APPROVED') {
-                            $stageNumber = 3;
-                            $stageTitle = 'Disetujui: Siap Uji Kompetensi (Ruang Uji & CBT)';
+                            $stageNumber = 4;
+                            $stageTitle = 'Pelaksanaan Uji Kompetensi (Ruang Uji & CBT)';
                             $stageBadgeColor = 'bg-emerald-100 text-emerald-800 border-emerald-200';
                             $targetUrl = route('asesi.assessment.ruang-uji', $item->id);
                         } elseif ($item->apl_status === 'SUBMITTED') {
@@ -227,18 +222,12 @@
                                 <a href="{{ route('asesi.assessment.ak03', $item->id) }}" class="px-3 py-2 text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 rounded-lg shadow-xs transition" title="FR.AK.03 Umpan Balik Asesmen">
                                     Umpan Balik (AK.03)
                                 </a>
-                                @if($item->final_result === 'BELUM_KOMPETEN' || $item->final_result === 'BK')
-                                    <a href="{{ route('asesi.assessment.appeal', $item->id) }}" class="px-3 py-2 text-xs font-bold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-300 rounded-lg shadow-xs transition" title="FR.AK.04 Banding Asesmen">
-                                        Banding (AK.04)
-                                    </a>
-                                @endif
+                                <a href="{{ route('asesi.assessment.appeal', $item->id) }}" class="px-3 py-2 text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 border border-slate-300 rounded-lg shadow-xs transition" title="FR.AK.04 Banding Asesmen">
+                                    Banding (AK.04)
+                                </a>
                             @elseif($item->apl_status === 'REVISION_REQUESTED')
                                 <a href="{{ route('asesi.assessment.apl', $item->id) }}" class="w-full sm:w-auto text-center justify-center px-5 py-2.5 text-xs font-bold bg-amber-500 hover:bg-amber-600 text-white rounded-lg shadow-sm transition">
                                     Perbaiki Formulir APL &rarr;
-                                </a>
-                            @elseif($item->apl_status === 'APPROVED' && empty($item->ak01_agreed_at))
-                                <a href="{{ route('asesi.assessment.ak01', $item->id) }}" class="w-full sm:w-auto text-center justify-center px-5 py-2.5 text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-sm transition">
-                                    Setujui Persetujuan (AK.01) &rarr;
                                 </a>
                             @elseif($item->apl_status === 'APPROVED')
                                 <a href="{{ route('asesi.assessment.ruang-uji', $item->id) }}" class="w-full sm:w-auto text-center justify-center px-5 py-2.5 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg shadow-sm transition">

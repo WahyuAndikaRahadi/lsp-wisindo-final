@@ -247,6 +247,7 @@ Route::middleware(['auth', 'role:ASESI'])->prefix('asesi')->name('asesi.')->grou
         // FR.IA Instruments
         Route::get('/instrument/IA05', [Asesi\RuangUjiController::class, 'ia05'])->name('instrument.ia05');
         Route::post('/instrument/IA05', [Asesi\RuangUjiController::class, 'submitIa05'])->name('instrument.ia05.submit');
+        Route::post('/instrument/IA05/autosave', [Asesi\RuangUjiController::class, 'autosaveIa05'])->name('instrument.ia05.autosave');
 
         Route::get('/instrument/{code}/download-template', [Asesi\RuangUjiController::class, 'downloadTemplate'])->name('instrument.download-template');
         Route::get('/instrument/{code}', [Asesi\RuangUjiController::class, 'iaView'])->name('instrument.view');
@@ -273,6 +274,7 @@ Route::middleware(['auth', 'role:ASESOR'])->prefix('asesor')->name('asesor.')->g
     Route::post('/assessment/{assessment}/review-apl', [Asesor\AplReviewController::class, 'decide'])->name('apl.decide');
     Route::get('/review-apl/{assessment}', [Asesor\AplReviewController::class, 'show'])->name('review-apl');
     Route::post('/review-apl/{assessment}', [Asesor\AplReviewController::class, 'decide'])->name('review-apl.update');
+    Route::post('/schedule/{schedule}/bulk-review-apl', [Asesor\AplReviewController::class, 'bulkApprove'])->name('schedule.apl.bulk-review');
 
     // AK01
     Route::get('/schedule/{schedule}/ak01', [Asesor\Ak01Controller::class, 'index'])->name('schedule.ak01');
@@ -313,6 +315,7 @@ Route::middleware(['auth', 'role:ASESOR'])->prefix('asesor')->name('asesor.')->g
 
     // AK02 Rekaman Asesmen (schedule-level list + per-assessment form)
     Route::get('/schedule/{schedule}/ak02', [Asesor\FinalizationController::class, 'scheduleAk02'])->name('schedule.ak02');
+    Route::post('/schedule/{schedule}/ak02/bulk', [Asesor\FinalizationController::class, 'bulkUpdateScheduleAk02'])->name('schedule.ak02.bulk');
     Route::get('/assessment/{assessment}/ak02', [Asesor\FinalizationController::class, 'showAk02'])->name('assessment.ak02');
     Route::post('/assessment/{assessment}/ak02', [Asesor\FinalizationController::class, 'updateAk02'])->name('assessment.ak02.update');
 

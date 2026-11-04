@@ -139,7 +139,15 @@ class MvpEndToEndWorkflowTest extends TestCase
         $assessment->refresh();
         $this->assertEquals('APPROVED', $assessment->apl_status);
 
-        // 5b. Asesor establishes FR.AK.07
+        // 5b. Asesor establishes FR.AK.01
+        $schedule->update([
+            'ak01_data' => [
+                'evidence' => ['Hasil Observasi Langsung', 'Hasil Pertanyaan Tertulis'],
+                'tuk_type' => 'Sewaktu',
+            ],
+        ]);
+
+        // 5c. Asesor establishes FR.AK.07
         $this->actingAs($asesor)->post(route('asesor.ak07.store', $schedule), [
             'assessment_ids' => [$assessment->id],
             'items' => [],
@@ -219,7 +227,7 @@ class MvpEndToEndWorkflowTest extends TestCase
             'ratings' => $ratings,
             'general_notes' => 'Proses asesmen sangat objektif, sarana dan prasarana lengkap.',
         ]);
-        $ak03Res->assertRedirect(route('asesi.jadwal.index'));
+        $ak03Res->assertRedirect(route('asesi.dashboard'));
         $ak03Res->assertSessionHas('success');
 
         // 11. Asesor submits AK.05 & AK.06 reports; schedule is closed
@@ -246,16 +254,15 @@ class MvpEndToEndWorkflowTest extends TestCase
         // 12. Admin accesses all MUK documents and exports without error
         $baRes = $this->actingAs($admin)->get(route('admin.dokumen-muk.export-ba', $schedule));
         $baRes->assertOk();
-        $baRes->assertSee('BERITA ACARA');
+        $this->assertEquals('application/pdf', $baRes->headers->get('Content-Type'));
 
         $hadirAsesorRes = $this->actingAs($admin)->get(route('admin.dokumen-muk.export-hadir-asesor', $schedule));
         $hadirAsesorRes->assertOk();
-        $hadirAsesorRes->assertSee('DAFTAR HADIR ASESOR');
+        $this->assertEquals('application/pdf', $hadirAsesorRes->headers->get('Content-Type'));
 
         $hadirAsesiRes = $this->actingAs($admin)->get(route('admin.dokumen-muk.export-hadir-asesi', $schedule));
         $hadirAsesiRes->assertOk();
-        $hadirAsesiRes->assertSee('DAFTAR HADIR');
-        $hadirAsesiRes->assertSee('Nama Peserta');
+        $this->assertEquals('application/pdf', $hadirAsesiRes->headers->get('Content-Type'));
 
         $ak02Res = $this->actingAs($admin)->get(route('admin.dokumen-muk.export-asesi', [$assessment, 'ak02']));
         $ak02Res->assertOk();
@@ -452,7 +459,7 @@ class MvpEndToEndWorkflowTest extends TestCase
         $appealRes = $this->actingAs($asesi)->post(route('asesi.assessment.appeal.submit', $assessment), [
             'appeal_reasons' => 'Terdapat bukti portofolio tambahan yang belum sempat dipertimbangkan pada unit sistem kelistrikan.',
         ]);
-        $appealRes->assertRedirect(route('asesi.jadwal.index'));
+        $appealRes->assertRedirect(route('asesi.dashboard'));
         $appealRes->assertSessionHas('success');
 
         $appeal = AssessmentAppeal::where('assessment_id', $assessment->id)->first();

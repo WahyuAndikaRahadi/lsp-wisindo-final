@@ -46,18 +46,23 @@
         <tbody>
             <tr>
                 <td style="padding: 6px 8px;">Apakah Proses Banding telah dijelaskan kepada Anda?</td>
-                <td style="text-align: center; vertical-align: middle; font-weight: bold;">&radic;</td>
-                <td style="text-align: center; vertical-align: middle;"></td>
+                <td style="text-align: center; vertical-align: middle; font-weight: bold;">{{ ($latestAppeal?->is_process_explained ?? true) ? '√' : '' }}</td>
+                <td style="text-align: center; vertical-align: middle; font-weight: bold;">{{ !($latestAppeal?->is_process_explained ?? true) ? '√' : '' }}</td>
             </tr>
             <tr>
                 <td style="padding: 6px 8px;">Apakah Anda telah mendiskusikan Banding dengan Asesor?</td>
-                <td style="text-align: center; vertical-align: middle; font-weight: bold;">&radic;</td>
-                <td style="text-align: center; vertical-align: middle;"></td>
+                <td style="text-align: center; vertical-align: middle; font-weight: bold;">{{ ($latestAppeal?->is_discussed_with_assessor ?? true) ? '√' : '' }}</td>
+                <td style="text-align: center; vertical-align: middle; font-weight: bold;">{{ !($latestAppeal?->is_discussed_with_assessor ?? true) ? '√' : '' }}</td>
             </tr>
             <tr>
-                <td style="padding: 6px 8px;">Apakah Anda mau melibatkan "orang lain" membantu Anda dalam Proses Banding?</td>
-                <td style="text-align: center; vertical-align: middle;"></td>
-                <td style="text-align: center; vertical-align: middle; font-weight: bold;">&radic;</td>
+                <td style="padding: 6px 8px;">
+                    Apakah Anda mau melibatkan "orang lain" membantu Anda dalam Proses Banding?
+                    @if($latestAppeal?->other_person_name)
+                        <div style="font-size: 8pt; color: #555; margin-top: 2px;">(Nama Pendamping: <strong>{{ $latestAppeal->other_person_name }}</strong>)</div>
+                    @endif
+                </td>
+                <td style="text-align: center; vertical-align: middle; font-weight: bold;">{{ ($latestAppeal?->involves_other_person ?? false) ? '√' : '' }}</td>
+                <td style="text-align: center; vertical-align: middle; font-weight: bold;">{{ !($latestAppeal?->involves_other_person ?? false) ? '√' : '' }}</td>
             </tr>
         </tbody>
     </table>

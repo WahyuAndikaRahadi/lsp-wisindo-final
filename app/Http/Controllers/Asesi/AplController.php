@@ -119,7 +119,7 @@ class AplController extends Controller
         $request->validate([
             'statement_integrity' => 'accepted',
         ], [
-            'statement_integrity.accepted' => 'Pernyataan kejujuran dan integritas asesmen mandiri (FR.APL.02) wajib dicentang.',
+            'statement_integrity.accepted' => 'Pernyataan kebenaran data dan kerahasiaan permohonan sertifikasi (FR.APL.01 & FR.APL.02) wajib dicentang.',
         ]);
 
         $user = auth()->user();

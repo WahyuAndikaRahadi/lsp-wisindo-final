@@ -1,28 +1,30 @@
-@extends('layouts.app', ['title' => $meta['code'] . ' - ' . $meta['title']])
+@extends('layouts.app', ['title' => 'FR.AK.02 Rekaman Asesmen Kompetensi - ' . ($schedule->name ?? $schedule->scheme->name)])
 
 @section('content')
 <div class="space-y-6">
-    {{-- Header & Back Navigation --}}
+    {{-- Unified Top Lifecycle Navigation --}}
+    @include('asesor.partials.schedule-nav', ['schedule' => $schedule, 'active' => 'ak02'])
+
+    @if($schedule->is_closed)
+        <div class="p-3.5 bg-emerald-50 border border-emerald-300 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-emerald-900">
+            <div class="flex items-center space-x-2">
+                <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                <span><strong>Jadwal Telah Resmi Ditutup & Dikunci:</strong> Seluruh rekaman dan rekomendasi FR.AK.02 dalam mode lihat (read-only).</span>
+            </div>
+            <span class="font-bold font-mono text-[11px] bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded border border-emerald-300 shrink-0">STATUS: FINISHED</span>
+        </div>
+    @endif
+
+    {{-- Header --}}
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-            <div class="flex items-center space-x-2 text-xs font-semibold mb-1">
-                <a href="{{ route('asesor.schedule.ruang-uji', $schedule->id) }}" class="text-brand-600 hover:text-brand-700 font-bold">&larr; Kembali ke Ruang Uji Jadwal</a>
-                <span class="text-slate-300">/</span>
-                <span class="text-slate-700">{{ $meta['code'] }}</span>
-            </div>
             <div class="flex items-center space-x-3 mt-1">
-                <span class="font-mono text-xs font-black px-2.5 py-1 rounded border-2 border-black {{ $meta['badge_color'] }}">
-                    {{ $meta['code'] }}
+                <span class="font-mono text-xs font-black px-2.5 py-1 rounded border-2 border-black bg-teal-50 text-teal-800 border-teal-300">
+                    FR.AK.02
                 </span>
-                <h1 class="text-2xl font-black text-slate-900 tracking-tight">{{ $meta['title'] }}</h1>
+                <h1 class="text-2xl font-black text-slate-900 tracking-tight">FR.AK.02. Rekaman Asesmen Kompetensi</h1>
             </div>
-            <p class="text-xs text-slate-600 mt-1">{{ $meta['desc'] }}</p>
-        </div>
-
-        <div class="flex items-center space-x-2">
-            <a href="{{ route('asesor.schedule.ruang-uji', $schedule->id) }}" class="px-4 py-2 text-xs font-semibold bg-white text-slate-800 border border-slate-300 rounded-lg shadow-sm hover:bg-slate-50 transition">
-                Kembali ke Instrumen
-            </a>
+            <p class="text-xs text-slate-600 mt-1">Penetapan rekomendasi hasil akhir (Kompeten / Belum Kompeten) kolektif dan individual untuk peserta uji</p>
         </div>
     </div>
 
@@ -33,7 +35,7 @@
             <div class="text-2xl font-black text-slate-900 mt-0.5">{{ $asesiList->count() }} Orang</div>
         </div>
         <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
-            <span class="text-xs font-bold text-emerald-600 uppercase tracking-wider">Sudah Direkam</span>
+            <span class="text-xs font-bold text-emerald-600 uppercase tracking-wider">Sudah Ditetapkan</span>
             <div class="text-2xl font-black text-emerald-600 mt-0.5">{{ $asesiList->where('is_completed', true)->count() }} Asesi</div>
         </div>
         <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
@@ -42,109 +44,261 @@
         </div>
     </div>
 
-    {{-- Asesi List Table --}}
-    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-        <div class="px-6 py-4 border-b border-slate-200 bg-slate-50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-            <div>
-                <h2 class="text-base font-black text-slate-900">Daftar Asesi untuk {{ $meta['code'] }}</h2>
-                <p class="text-xs text-slate-500">Pilih asesi untuk mengisi rekaman asesmen dan menetapkan rekomendasi hasil</p>
-            </div>
-            <div class="text-xs font-bold text-slate-700 bg-white px-3 py-1 rounded border border-slate-300">
-                Skema: {{ $schedule->scheme->code }}
-            </div>
+    @if($asesiList->isEmpty())
+        <div class="bg-white rounded-xl border border-slate-200 p-8 text-center text-slate-500 text-sm shadow-sm">
+            Belum ada asesi terdaftar pada jadwal ini.
         </div>
+    @else
+        {{-- Main Bulk Evaluation Form Container --}}
+        <form action="{{ route('asesor.schedule.ak02.bulk', $schedule->id) }}" method="POST" id="bulkAk02Form" class="space-y-6">
+            @csrf
 
-        @if($asesiList->isEmpty())
-            <div class="p-8 text-center text-slate-500 text-sm">
-                Belum ada asesi terdaftar pada jadwal ini.
-            </div>
-        @else
-            <div class="overflow-x-auto">
-                <table class="w-full text-sm">
-                    <thead class="bg-slate-100 text-left text-xs font-bold text-slate-700 uppercase tracking-wider border-b-2 border-black">
-                        <tr>
-                            <th class="px-6 py-3 w-16 text-center">No</th>
-                            <th class="px-6 py-3">Data Peserta Asesi</th>
-                            <th class="px-6 py-3 text-center">Status {{ $meta['code'] }}</th>
-                            <th class="px-6 py-3 text-right">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y-2 divide-slate-200">
-                        @foreach($asesiList as $idx => $item)
-                            <tr class="hover:bg-slate-50/80 transition">
-                                <td class="px-6 py-4 text-center font-mono font-bold text-xs text-slate-600">
-                                    {{ $idx + 1 }}
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center space-x-3">
-                                        <div class="w-9 h-9 rounded-full bg-slate-900 text-white font-bold flex items-center justify-center text-xs shrink-0 border border-black">
-                                            {{ strtoupper(substr($item->asesi->full_name, 0, 2)) }}
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                {{-- Form Header & Quick Bulk Action Toolbar --}}
+                <div class="px-6 py-4 bg-slate-50 border-b border-slate-200 space-y-4">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                        <div>
+                            <h2 class="text-base font-black text-slate-900">Penetapan Hasil Rekaman Asesmen Kolektif (FR.AK.02)</h2>
+                            <p class="text-xs text-slate-500">Tentukan rekomendasi Kompeten (K) atau Belum Kompeten (BK) secara massal atau per asesi</p>
+                        </div>
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <button type="button" id="btnSetAllK" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white rounded-lg text-xs font-bold shadow-xs transition flex items-center gap-1.5">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                <span>Tandai Semua Kompeten (K)</span>
+                            </button>
+                            <button type="button" id="btnSetAllBk" class="px-3.5 py-1.5 bg-rose-600 hover:bg-rose-700 active:bg-rose-800 text-white rounded-lg text-xs font-bold shadow-xs transition flex items-center gap-1.5">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                                <span>Tandai Semua Belum Kompeten (BK)</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    {{-- Global Methods Preset --}}
+                    <div class="p-3 bg-white rounded-lg border border-slate-200 text-xs flex flex-col md:flex-row md:items-center justify-between gap-2.5">
+                        <span class="font-bold text-slate-800 shrink-0">Metode Pengumpulan Bukti Terpilih (Kolektif):</span>
+                        <div class="flex items-center gap-4 flex-wrap text-slate-700">
+                            <label class="inline-flex items-center gap-1.5 cursor-pointer">
+                                <input type="checkbox" name="methods[observasi_demonstrasi]" value="1" checked class="rounded border-slate-300 text-brand-600 focus:ring-brand-500 w-4 h-4">
+                                <span>Observasi Praktik</span>
+                            </label>
+                            <label class="inline-flex items-center gap-1.5 cursor-pointer">
+                                <input type="checkbox" name="methods[tulis]" value="1" checked class="rounded border-slate-300 text-brand-600 focus:ring-brand-500 w-4 h-4">
+                                <span>Pertanyaan Tulis (CBT)</span>
+                            </label>
+                            <label class="inline-flex items-center gap-1.5 cursor-pointer">
+                                <input type="checkbox" name="methods[lisan]" value="1" checked class="rounded border-slate-300 text-brand-600 focus:ring-brand-500 w-4 h-4">
+                                <span>Pertanyaan Lisan (PMO)</span>
+                            </label>
+                            <label class="inline-flex items-center gap-1.5 cursor-pointer">
+                                <input type="checkbox" name="methods[portofolio]" value="1" checked class="rounded border-slate-300 text-brand-600 focus:ring-brand-500 w-4 h-4">
+                                <span>Verifikasi Portofolio</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Table Container --}}
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead class="bg-slate-100 text-left text-xs font-bold text-slate-700 uppercase tracking-wider border-b-2 border-black">
+                            <tr>
+                                <th class="px-4 py-3 w-10 text-center">
+                                    <input type="checkbox" id="checkAllAk02" checked class="rounded border-slate-300 text-brand-600 focus:ring-brand-500 w-4 h-4 cursor-pointer" title="Pilih Semua Asesi">
+                                </th>
+                                <th class="px-4 py-3 w-12 text-center">No</th>
+                                <th class="px-5 py-3 min-w-[220px]">Data Peserta Asesi</th>
+                                <th class="px-5 py-3 text-center min-w-[200px]">Rekomendasi Hasil Akhir</th>
+                                <th class="px-5 py-3 min-w-[260px]">Tindak Lanjut &amp; Catatan Asesor</th>
+                                <th class="px-4 py-3 text-right w-24">Detail Unit</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-200">
+                            @foreach($asesiList as $idx => $item)
+                                @php
+                                    $asm = $item->assessment;
+                                    $cbtResp = $asm->iaResponses->firstWhere('instrument_code', 'IA05');
+                                    $currentResult = $asm->final_result ?? 'KOMPETEN';
+                                    $isK = in_array($currentResult, ['KOMPETEN', 'K'], true);
+                                    $defaultNotes = $asm->final_notes ?: ($isK ? 'Asesi menunjukkan unjuk kerja optimal sesuai standar skema' : 'Terdapat kriteria unjuk kerja yang belum terpenuhi');
+                                    $defaultFollowUp = $asm->follow_up_action ?: ($isK ? 'Diusulkan penerbitan sertifikat kompetensi BNSP' : 'Perlu asesmen ulang pada unit yang belum kompeten');
+                                @endphp
+                                <tr class="hover:bg-slate-50/70 transition align-top">
+                                    <td class="px-4 py-4 text-center">
+                                        @if($item->is_my_candidate && $asm->apl_status === 'APPROVED')
+                                            <input type="checkbox" class="ak02-row-checkbox rounded border-slate-300 text-brand-600 focus:ring-brand-500 w-4 h-4 cursor-pointer mt-1" checked data-asm-id="{{ $asm->id }}">
+                                        @else
+                                            <span class="text-slate-300 text-xs">-</span>
+                                        @endif
+                                    </td>
+                                    <td class="px-4 py-4 text-center font-mono font-bold text-xs text-slate-500">
+                                        {{ $idx + 1 }}
+                                    </td>
+                                    <td class="px-5 py-4">
+                                        <div class="font-bold text-slate-900 text-sm">{{ $item->asesi->full_name }}</div>
+                                        <div class="text-xs text-slate-500 font-mono mt-0.5">
+                                            NIK: {{ $item->asesi->profile?->nik ?? '-' }}
                                         </div>
-                                        <div>
-                                            <div class="font-bold text-slate-900 text-sm">{{ $item->asesi->full_name }}</div>
-                                            <div class="text-xs text-slate-500">
-                                                {{ $item->asesi->email }}
-                                                @if(!empty($item->asesi->profile?->nik))
-                                                    &bull; <span class="font-mono">NIK: {{ $item->asesi->profile->nik }}</span>
-                                                @endif
-                                            </div>
+                                        <div class="flex items-center gap-1.5 mt-1.5 flex-wrap">
+                                            @if($cbtResp)
+                                                <span class="text-[10px] font-bold px-2 py-0.5 rounded border border-indigo-200 bg-indigo-50 text-indigo-700">
+                                                    Skor CBT: {{ $cbtResp->score }}%
+                                                </span>
+                                            @endif
                                             @if($item->is_my_candidate)
-                                                <span class="inline-flex items-center text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200 mt-1">
-                                                    ✓ Plottingan Anda
+                                                <span class="text-[10px] font-bold px-1.5 py-0.2 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                                    Plottingan Anda
                                                 </span>
                                             @else
-                                                <span class="inline-flex items-center text-[10px] font-medium text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200 mt-1">
-                                                    Asesor: {{ $item->assessment->assessor?->full_name ?? 'Lain' }}
+                                                <span class="text-[10px] font-medium px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 border border-slate-200">
+                                                    Asesor: {{ $asm->assessor?->full_name ?? 'Lain' }}
                                                 </span>
                                             @endif
                                         </div>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 text-center">
-                                    <span class="px-3 py-1 rounded-full text-xs font-bold border {{ $item->status_class }}">
-                                        {{ $item->status_label }}
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 text-right">
-                                    @if($item->is_my_candidate)
-                                        <a href="{{ $item->inspect_url }}"
-                                           class="inline-flex items-center space-x-1.5 px-4 py-2 text-xs font-bold {{ $item->is_completed ? 'bg-slate-900 hover:bg-slate-800 text-white' : 'bg-brand-600 hover:bg-brand-700 text-white' }} rounded-lg shadow-sm transition">
-                                            <span>{{ $item->is_completed ? 'Tinjau / Ubah' : 'Isi Rekaman AK.02' }}</span>
-                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                                            </svg>
-                                        </a>
-                                    @else
-                                        <button type="button" disabled
-                                            class="inline-flex items-center space-x-1.5 px-3.5 py-2 text-xs font-semibold bg-slate-100 text-slate-400 border border-slate-200 rounded-lg cursor-not-allowed select-none"
-                                            title="Asesi ini di-plot kepada {{ $item->assessment->assessor?->full_name ?? 'rekan asesor lain' }}.">
-                                            <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-                                            <span>Terkunci (Asesor Lain)</span>
-                                        </button>
-                                    @endif
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-        @endif
-    </div>
+                                    </td>
+                                    <td class="px-5 py-4 text-center">
+                                        @if($item->is_my_candidate && $asm->apl_status === 'APPROVED' && ! $schedule->is_closed)
+                                            <div class="inline-flex rounded-lg border border-slate-300 p-1 bg-slate-100 gap-1 result-button-group" data-asm-id="{{ $asm->id }}">
+                                                <button type="button" 
+                                                        class="px-3 py-1.5 rounded-md text-xs font-bold transition btn-k {{ $isK ? 'bg-emerald-600 text-white shadow-xs' : 'text-slate-700 hover:bg-slate-200' }}"
+                                                        onclick="setCandidateResult({{ $asm->id }}, 'KOMPETEN')">
+                                                    KOMPETEN (K)
+                                                </button>
+                                                <button type="button" 
+                                                        class="px-3 py-1.5 rounded-md text-xs font-bold transition btn-bk {{ !$isK ? 'bg-rose-600 text-white shadow-xs' : 'text-slate-700 hover:bg-slate-200' }}"
+                                                        onclick="setCandidateResult({{ $asm->id }}, 'BELUM_KOMPETEN')">
+                                                    BELUM KOMPETEN (BK)
+                                                </button>
+                                            </div>
+                                            <input type="hidden" name="results[{{ $asm->id }}][final_result]" id="input_result_{{ $asm->id }}" value="{{ $isK ? 'KOMPETEN' : 'BELUM_KOMPETEN' }}">
+                                        @elseif($asm->apl_status === 'APPROVED')
+                                            <span class="px-2.5 py-1 rounded text-xs font-bold border {{ $isK ? 'bg-emerald-50 text-emerald-700 border-emerald-300' : 'bg-rose-50 text-rose-700 border-rose-300' }}">
+                                                {{ $isK ? 'KOMPETEN (K)' : 'BELUM KOMPETEN (BK)' }}
+                                            </span>
+                                        @else
+                                            <span class="px-2.5 py-1 rounded text-xs font-bold border {{ $item->status_class }}">
+                                                {{ $item->status_label }}
+                                            </span>
+                                        @endif
+                                    </td>
+                                    <td class="px-5 py-4 space-y-2">
+                                        @if($item->is_my_candidate && $asm->apl_status === 'APPROVED')
+                                            <div>
+                                                <label class="block text-[11px] font-bold text-slate-600 mb-0.5">Tindak Lanjut:</label>
+                                                <input type="text" name="results[{{ $asm->id }}][follow_up_action]" id="input_follow_up_{{ $asm->id }}" value="{{ $defaultFollowUp }}" @disabled($schedule->is_closed) class="w-full text-xs rounded border-slate-300 focus:ring-brand-500 py-1 px-2.5 {{ $schedule->is_closed ? 'bg-slate-50 text-slate-700' : '' }}">
+                                            </div>
+                                            <div>
+                                                <label class="block text-[11px] font-bold text-slate-600 mb-0.5">Catatan Asesor:</label>
+                                                <input type="text" name="results[{{ $asm->id }}][final_notes]" id="input_notes_{{ $asm->id }}" value="{{ $defaultNotes }}" @disabled($schedule->is_closed) class="w-full text-xs rounded border-slate-300 focus:ring-brand-500 py-1 px-2.5 {{ $schedule->is_closed ? 'bg-slate-50 text-slate-700' : '' }}">
+                                            </div>
+                                        @else
+                                            <div class="text-xs text-slate-500 italic">
+                                                {{ $asm->apl_status !== 'APPROVED' ? 'APL Belum Disetujui' : 'Dikelola oleh rekan asesor lain' }}
+                                            </div>
+                                        @endif
+                                    </td>
+                                    <td class="px-4 py-4 text-right">
+                                        @if($item->is_my_candidate)
+                                            <a href="{{ $item->inspect_url }}" target="_blank" class="inline-flex items-center px-2.5 py-1.5 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-300 rounded-lg shadow-xs transition" title="Buka formulir rincian unit per unit">
+                                                <span>Unit</span>
+                                                <svg class="w-3 h-3 ml-1 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                            </a>
+                                        @else
+                                            <span class="text-slate-300 text-xs">-</span>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
 
-    {{-- Finalize Schedule Banner --}}
-    <div class="bg-slate-900 text-white rounded-xl border border-slate-800 p-5 sm:p-6 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-            <h3 class="text-base font-bold text-white">Selesai Menilai Seluruh Asesi?</h3>
-            <p class="text-xs text-slate-300 mt-0.5">Setelah semua asesi direkam FR.AK.02-nya, Anda dapat menyelesaikan jadwal uji dan menerbitkan berita acara.</p>
-        </div>
-        <div>
-            <form action="{{ route('asesor.schedule.finalize', $schedule->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menyelesaikan seluruh rangkaian asesmen untuk jadwal ini?')">
-                @csrf
-                <button type="submit" class="w-full sm:w-auto px-5 py-2.5 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg shadow-sm transition">
-                    Selesaikan & Finalisasi Asesmen
-                </button>
-            </form>
-        </div>
-    </div>
+                {{-- Action Bar at Bottom of Container --}}
+                <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <span class="text-xs text-slate-500">
+                        {{ $schedule->is_closed ? 'Jadwal telah ditutup. Seluruh data rekaman tersimpan permanen.' : 'Klik tombol simpan untuk merekam hasil FR.AK.02 seluruh asesi binaan Anda sekaligus.' }}
+                    </span>
+                    @if($schedule->is_closed)
+                        <button type="button" disabled 
+                                class="px-6 py-3 bg-slate-200 text-slate-500 font-bold text-xs uppercase tracking-wider rounded-xl cursor-not-allowed">
+                            Jadwal Telah Ditutup (Read-Only)
+                        </button>
+                    @else
+                        <button type="submit" onclick="return confirm('Apakah Anda yakin ingin menyimpan seluruh penetapan rekaman FR.AK.02 untuk jadwal ini?')" 
+                                class="px-6 py-3 bg-brand-600 hover:bg-brand-700 active:bg-brand-800 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-md transition flex items-center justify-center space-x-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                            <span>Simpan Seluruh Rekaman FR.AK.02 (Bulk Save)</span>
+                        </button>
+                    @endif
+                </div>
+            </div>
+        </form>
+    @endif
 </div>
+
+<script>
+    function setCandidateResult(asmId, result) {
+        const input = document.getElementById('input_result_' + asmId);
+        if (!input) return;
+        input.value = result;
+
+        const group = document.querySelector(`.result-button-group[data-asm-id="${asmId}"]`);
+        if (!group) return;
+
+        const btnK = group.querySelector('.btn-k');
+        const btnBk = group.querySelector('.btn-bk');
+        const followUpInput = document.getElementById('input_follow_up_' + asmId);
+        const notesInput = document.getElementById('input_notes_' + asmId);
+
+        if (result === 'KOMPETEN') {
+            btnK.className = 'px-3 py-1.5 rounded-md text-xs font-bold transition btn-k bg-emerald-600 text-white shadow-xs';
+            btnBk.className = 'px-3 py-1.5 rounded-md text-xs font-bold transition btn-bk text-slate-700 hover:bg-slate-200';
+            if (followUpInput && (!followUpInput.value || followUpInput.value.includes('belum kompeten'))) {
+                followUpInput.value = 'Diusulkan penerbitan sertifikat kompetensi BNSP';
+            }
+            if (notesInput && (!notesInput.value || notesInput.value.includes('belum terpenuhi'))) {
+                notesInput.value = 'Asesi menunjukkan unjuk kerja optimal sesuai standar skema';
+            }
+        } else {
+            btnK.className = 'px-3 py-1.5 rounded-md text-xs font-bold transition btn-k text-slate-700 hover:bg-slate-200';
+            btnBk.className = 'px-3 py-1.5 rounded-md text-xs font-bold transition btn-bk bg-rose-600 text-white shadow-xs';
+            if (followUpInput && (!followUpInput.value || followUpInput.value.includes('Diusulkan'))) {
+                followUpInput.value = 'Perlu asesmen ulang pada unit yang belum kompeten';
+            }
+            if (notesInput && (!notesInput.value || notesInput.value.includes('optimal'))) {
+                notesInput.value = 'Terdapat kriteria unjuk kerja yang belum terpenuhi';
+            }
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const btnSetAllK = document.getElementById('btnSetAllK');
+        const btnSetAllBk = document.getElementById('btnSetAllBk');
+        const checkAll = document.getElementById('checkAllAk02');
+        const rowCheckboxes = document.querySelectorAll('.ak02-row-checkbox');
+
+        if (checkAll) {
+            checkAll.addEventListener('change', function() {
+                rowCheckboxes.forEach(cb => cb.checked = checkAll.checked);
+            });
+        }
+
+        if (btnSetAllK) {
+            btnSetAllK.addEventListener('click', function() {
+                rowCheckboxes.forEach(cb => {
+                    const asmId = cb.getAttribute('data-asm-id');
+                    if (asmId) setCandidateResult(asmId, 'KOMPETEN');
+                });
+            });
+        }
+
+        if (btnSetAllBk) {
+            btnSetAllBk.addEventListener('click', function() {
+                rowCheckboxes.forEach(cb => {
+                    const asmId = cb.getAttribute('data-asm-id');
+                    if (asmId) setCandidateResult(asmId, 'BELUM_KOMPETEN');
+                });
+            });
+        }
+    });
+</script>
 @endsection

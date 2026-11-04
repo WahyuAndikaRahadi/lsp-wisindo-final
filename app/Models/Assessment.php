@@ -131,4 +131,71 @@ class Assessment extends Model
     {
         return $this->belongsTo(User::class, 'admin_reviewer_id');
     }
+
+    /**
+     * Get list of assigned FR.IA instrument codes for this assessment.
+     *
+     * @return array<string>
+     */
+    public function getAssignedInstruments(): array
+    {
+        $raw = $this->ak01_data['selected_instruments'] ?? null;
+        if (! empty($raw) && is_array($raw)) {
+            $filtered = array_values(array_filter($raw, fn ($c) => str_starts_with(strtoupper($c), 'IA')));
+            if (! empty($filtered)) {
+                return $filtered;
+            }
+        }
+
+        $scheduleRaw = $this->schedule?->selected_instruments ?? null;
+        if (! empty($scheduleRaw) && is_array($scheduleRaw)) {
+            $filtered = array_values(array_filter($scheduleRaw, fn ($c) => str_starts_with(strtoupper($c), 'IA')));
+            if (! empty($filtered)) {
+                return $filtered;
+            }
+        }
+
+        return ['IA01', 'IA01B', 'IA02', 'IA03', 'IA05'];
+    }
+
+    /**
+     * Check if a specific FR.IA instrument is assigned to this candidate.
+     */
+    public function hasAssignedInstrument(string $code): bool
+    {
+        $clean = strtoupper(str_replace(['FR.', 'fr.', '.'], '', $code));
+
+        return in_array($clean, $this->getAssignedInstruments(), true);
+    }
+
+    /**
+     * Determine if all assigned FR.IA instruments for this candidate have been evaluated/completed.
+     */
+    public function hasCompletedAllAssignedInstruments(): bool
+    {
+        $assigned = $this->getAssignedInstruments();
+        if (empty($assigned)) {
+            return true;
+        }
+
+        $responses = $this->iaResponses->keyBy(fn ($r) => strtoupper($r->instrument_code));
+
+        foreach ($assigned as $code) {
+            $codeUpper = strtoupper($code);
+            $resp = $responses->get($codeUpper);
+            if (! $resp) {
+                return false;
+            }
+
+            // CBT (IA05) autosave draft does not count as complete until submitted
+            if ($codeUpper === 'IA05') {
+                $dataJson = is_array($resp->data_json) ? $resp->data_json : (json_decode($resp->data_json ?? '[]', true) ?: []);
+                if (($dataJson['status'] ?? null) === 'DRAFT') {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
 }

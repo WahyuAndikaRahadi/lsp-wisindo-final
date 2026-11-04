@@ -4,8 +4,15 @@
 
 @section('content')
 <div class="max-w-5xl mx-auto space-y-6 py-6">
-    {{-- Stepper Component --}}
-    <x-progress-stepper currentStep="apl" :assessment="$assessment" />
+    @if($assessment->schedule?->is_closed)
+        <div class="p-4 bg-emerald-50 border-2 border-emerald-300 rounded-xl text-emerald-900 flex items-center gap-3 shadow-xs">
+            <span class="text-xl">🔒</span>
+            <div>
+                <div class="font-bold text-sm">Jadwal Asesmen Telah Resmi Ditutup &amp; Dikunci</div>
+                <p class="text-xs text-emerald-800 mt-0.5">Seluruh berkas permohonan APL dan asesmen mandiri dalam jadwal ini berada dalam mode lihat (read-only).</p>
+            </div>
+        </div>
+    @endif
 
     {{-- Header --}}
     <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -596,22 +603,32 @@
                 <div class="w-full md:w-80">
                     <x-signature-pad 
                         name="signature_data" 
-                        :value="$assessment->asesi_signature ?? old('signature_data')" 
+                        :value="$assessment->asesi_signature ?? $profile?->signature_data ?? old('signature_data')" 
                         :profileSignature="$profile?->signature_data"
                         label="Tanda Tangan Pemohon (Asesi)" 
                         :required="true"
                         height="140" 
-                        :disabled="$assessment->apl_status === 'SUBMITTED'"
+                        :disabled="$assessment->apl_status === 'SUBMITTED' || (bool) $assessment->schedule?->is_closed"
                     />
                 </div>
 
                 <div class="w-full md:w-auto flex flex-col items-end gap-2">
-                    @if($assessment->apl_status === 'APPROVED')
+                    @if($assessment->schedule?->is_closed)
+                        <div class="flex items-center gap-3">
+                            <a href="{{ route('asesi.assessment.ruang-uji', $assessment) }}" class="px-5 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs uppercase tracking-wider rounded-xl border border-slate-300 transition">
+                                Kembali ke Ruang Uji →
+                            </a>
+                            <button type="button" disabled class="px-6 py-3.5 bg-slate-200 text-slate-500 font-bold text-xs uppercase tracking-wider rounded-xl cursor-not-allowed flex items-center gap-2 border border-slate-300 shadow-none">
+                                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                                <span>Jadwal Telah Ditutup (Read-Only)</span>
+                            </button>
+                        </div>
+                    @elseif($assessment->apl_status === 'APPROVED')
                         <div class="mb-2 p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-left w-full md:max-w-md">
                             <label class="flex items-start gap-2.5 cursor-pointer">
                                 <input type="checkbox" name="statement_integrity" value="1" checked required class="mt-0.5 rounded border-emerald-300 text-emerald-600 focus:ring-emerald-500">
                                 <span class="text-xs text-emerald-950 leading-relaxed">
-                                    <strong>Pernyataan Pemohon (Asesi):</strong> Data permohonan APL telah diverifikasi asesor. Anda dapat memperbarui data berkas ini dan menyimpannya tanpa membatalkan status verifikasi.
+                                    <strong>Pernyataan Pemohon (Asesi):</strong> Data permohonan APL dan komitmen kerahasiaan telah diverifikasi asesor. Anda dapat memperbarui data berkas ini dan menyimpannya tanpa membatalkan status verifikasi.
                                 </span>
                             </label>
                         </div>
@@ -629,11 +646,11 @@
                             Menunggu Verifikasi Asesor
                         </button>
                     @else
-                        <div class="mb-2 p-3 bg-indigo-50/70 border border-indigo-200 rounded-lg text-left w-full md:max-w-md">
+                        <div class="mb-2 p-3.5 bg-indigo-50/80 border border-indigo-200 rounded-xl text-left w-full md:max-w-md">
                             <label class="flex items-start gap-2.5 cursor-pointer">
-                                <input type="checkbox" name="statement_integrity" value="1" required class="mt-0.5 rounded border-indigo-300 text-indigo-600 focus:ring-indigo-500">
+                                <input type="checkbox" name="statement_integrity" value="1" required class="mt-0.5 rounded border-indigo-300 text-brand-600 focus:ring-brand-500 w-4 h-4 shrink-0">
                                 <span class="text-xs text-indigo-950 leading-relaxed">
-                                    <strong>Pernyataan Pemohon (Asesi):</strong> Saya menyatakan dengan sesungguhnya bahwa seluruh data asesmen mandiri (FR.APL.02) ini saya isi secara jujur, mandiri, dan bertanggung jawab sesuai bukti yang sah.
+                                    <strong>Pernyataan Pemohon (Asesi):</strong>Saya berkomitmen untuk mematuhi seluruh tata tertib asesmen, menjaga kerahasiaan materi uji kompetensi, serta mematuhi seluruh ketentuan asesmen LSP PrO Indo.
                                 </span>
                             </label>
                         </div>

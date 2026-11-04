@@ -12,6 +12,10 @@ class Scheme extends Model
 
     protected $table = 'm_schemes';
 
+    protected $attributes = [
+        'scheme_type' => 'KLASTER',
+    ];
+
     protected $fillable = [
         'code',
         'name',

@@ -9,7 +9,6 @@ use App\Models\Schedule;
 use App\Models\Scheme;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -53,21 +52,26 @@ class AsesiRuangUjiFeatureTest extends TestCase
         $response = $this->actingAs($asesi)->get(route('asesi.assessment.ruang-uji', $assessment));
         $response->assertOk();
 
-        // Check header and sections
-        $response->assertSee('Ruang Uji Asesi');
-        $response->assertSee('1. Instrumen Dikerjakan Mandiri oleh Asesi');
-        $response->assertSee('2. Instrumen Penilaian Asesor');
+        // Check header and instruments
+        $response->assertSee('Instrumen Asesmen Terpilih');
+        $response->assertSee('Pilih dan kerjakan instrumen asesmen kompetensi yang telah ditetapkan untuk Anda');
 
         // Check self-actionable instruments
-        $response->assertSee('FR.IA.05. Pertanyaan Tertulis (CBT)');
-        $response->assertSee('FR.IA.02. Tugas Praktik Demonstrasi (TPD)');
+        $response->assertSee('FR.IA.05');
+        $response->assertSee('FR.IA.02');
         $response->assertSee(route('asesi.assessment.instrument.ia05', $assessment));
-        $response->assertSee(route('asesi.assessment.instrument.download-template', [$assessment, 'IA02']));
+        $response->assertDontSee(route('asesi.assessment.instrument.download-template', [$assessment, 'IA02']));
 
         // Check assessor evaluation instruments
-        $response->assertSee('FR.IA.01. Ceklis Observasi Aktivitas Praktik');
-        $response->assertSee('FR.IA.01B. Lembar Laporan Pemeriksaan (Report Sheet)');
-        $response->assertSee('FR.IA.03. Pertanyaan Mendukung Observasi (PMO)');
+        $response->assertSee('FR.IA.01');
+        $response->assertSee('FR.IA.01B');
+        $response->assertSee('FR.IA.03');
+
+        // Check that AK.01, top unlock navbar, and "Selesaikan Asesmen Mandiri" are NOT shown
+        $response->assertDontSee('FR.AK.01');
+        $response->assertDontSee('Alur Asesmen Kompetensi');
+        $response->assertDontSee('Penyelesaian Akhir Asesi');
+        $response->assertDontSee('Selesaikan Asesmen Mandiri');
     }
 
     public function test_asesi_can_download_instrument_pdf_templates(): void
@@ -107,16 +111,16 @@ class AsesiRuangUjiFeatureTest extends TestCase
         $this->assertEquals('application/pdf', $responseIa01b->headers->get('Content-Type'));
     }
 
-    public function test_ia02_asesi_view_displays_template_download_and_supports_photo_upload(): void
+    public function test_ia02_asesi_view_is_review_only_without_upload_or_assessor_notes(): void
     {
-        Storage::fake('local');
+        $asesor = User::where('role', 'ASESOR')->first();
         $asesi = User::where('role', 'ASESI')->first();
         $scheme = Scheme::first();
         $admin = User::where('role', 'ADMIN_LSP')->first();
 
         $schedule = Schedule::create([
             'scheme_id' => $scheme->id,
-            'name' => 'Jadwal IA02 Work',
+            'name' => 'Jadwal IA02 Review Only',
             'code' => 'SCH-IA02-'.uniqid(),
             'tuk_name' => 'TUK Otomotif Mandiri',
             'date' => now()->toDateString(),
@@ -129,31 +133,157 @@ class AsesiRuangUjiFeatureTest extends TestCase
 
         $assessment = Assessment::create([
             'asesi_id' => $asesi->id,
+            'assessor_id' => $asesor->id,
             'schedule_id' => $schedule->id,
             'scheme_id' => $scheme->id,
             'apl_status' => 'APPROVED',
+            'asesi_signature' => 'data:image/png;base64,mockSignatureAsesi123',
+        ]);
+
+        AssessmentIaResponse::create([
+            'assessment_id' => $assessment->id,
+            'instrument_code' => 'IA02',
+            'assessor_notes' => 'Catatan ini tidak boleh muncul di view asesi IA02.',
+            'assessor_signature' => 'data:image/png;base64,mockSignatureAsesor123',
+            'assessor_signed_at' => now(),
         ]);
 
         // View IA02 as asesi
         $viewRes = $this->actingAs($asesi)->get(route('asesi.assessment.instrument.view', [$assessment, 'IA02']));
         $viewRes->assertOk();
-        $viewRes->assertSee('Template Lembar Uji Praktik FR.IA.02 (PDF Resmi BNSP)');
-        $viewRes->assertSee(route('asesi.assessment.instrument.download-template', [$assessment, 'IA02']));
-        $viewRes->assertSee('Petunjuk Uji Praktik');
 
-        // Upload evidence image
-        $image = UploadedFile::fake()->image('hasil_kerja_praktik.jpg', 800, 1000);
-        $uploadRes = $this->actingAs($asesi)->post(
-            route('asesi.assessment.instrument.upload-evidence', [$assessment, 'IA02']),
-            ['evidence_image' => $image]
-        );
-        $uploadRes->assertSessionHasNoErrors();
-        $uploadRes->assertRedirect();
+        // Must NOT have upload form or PDF download
+        $viewRes->assertDontSee('Template Lembar Uji Praktik FR.IA.02 (PDF Resmi BNSP)');
+        $viewRes->assertDontSee(route('asesi.assessment.instrument.download-template', [$assessment, 'IA02']));
+        $viewRes->assertDontSee('Pilih Foto Lembar Jawaban Kertas:');
+        $viewRes->assertDontSee('Unggah Foto Bukti');
 
-        $record = AssessmentIaResponse::where('assessment_id', $assessment->id)->where('instrument_code', 'IA02')->first();
-        $this->assertNotNull($record);
-        $this->assertNotEmpty($record->data_json['evidence_image_path']);
-        Storage::disk('local')->assertExists($record->data_json['evidence_image_path']);
+        // Must NOT have assessor notes card
+        $viewRes->assertDontSee('Catatan Rekomendasi & Hasil Asesmen');
+        $viewRes->assertDontSee('Catatan ini tidak boleh muncul di view asesi IA02.');
+
+        // Must have demonstration instructions and signatures
+        $viewRes->assertSee('FR.IA.02. TUGAS PRAKTIK DEMONSTRASI');
+        $viewRes->assertSee('Tugas Praktik Demonstrasi');
+        $viewRes->assertSee('Tanda Tangan Asesor');
+        $viewRes->assertSee('Tanda Tangan Asesi');
+    }
+
+    public function test_ia01_and_ia03_asesi_views_only_show_assessor_evaluation_and_signatures(): void
+    {
+        $asesor = User::where('role', 'ASESOR')->first();
+        $asesi = User::where('role', 'ASESI')->first();
+        $scheme = Scheme::first();
+        $admin = User::where('role', 'ADMIN_LSP')->first();
+
+        $schedule = Schedule::create([
+            'scheme_id' => $scheme->id,
+            'name' => 'Jadwal Review IA01 and IA03',
+            'code' => 'SCH-REV-'.uniqid(),
+            'tuk_name' => 'TUK Otomotif Mandiri',
+            'date' => now()->toDateString(),
+            'start_time' => '08:00:00',
+            'end_time' => '16:00:00',
+            'selected_instruments' => ['IA01', 'IA03'],
+            'status' => 'ACTIVE',
+            'created_by' => $admin->id,
+        ]);
+
+        $assessment = Assessment::create([
+            'asesi_id' => $asesi->id,
+            'assessor_id' => $asesor->id,
+            'schedule_id' => $schedule->id,
+            'scheme_id' => $scheme->id,
+            'apl_status' => 'APPROVED',
+            'asesi_signature' => 'data:image/png;base64,mockAsesiSign',
+        ]);
+
+        AssessmentIaResponse::create([
+            'assessment_id' => $assessment->id,
+            'instrument_code' => 'IA01',
+            'assessor_notes' => 'Praktik observasi dilakukan dengan sangat aman dan teliti.',
+            'assessor_signature' => 'data:image/png;base64,mockAsesorSign',
+            'assessor_signed_at' => now(),
+        ]);
+
+        AssessmentIaResponse::create([
+            'assessment_id' => $assessment->id,
+            'instrument_code' => 'IA03',
+            'assessor_notes' => 'Seluruh pertanyaan lisan teknis dijawab dengan jelas dan tepat.',
+            'assessor_signature' => 'data:image/png;base64,mockAsesorSign',
+            'assessor_signed_at' => now(),
+        ]);
+
+        // IA01 view: No KUK observation table/summary, only evaluation and signature
+        $resIa01 = $this->actingAs($asesi)->get(route('asesi.assessment.instrument.view', [$assessment, 'IA01']));
+        $resIa01->assertOk();
+        $resIa01->assertDontSee('Ringkasan Hasil Observasi Aktivitas Praktik');
+        $resIa01->assertDontSee('Total Kriteria (KUK)');
+        $resIa01->assertSee('FR.IA.01. CEKLIS OBSERVASI AKTIVITAS PRAKTIK');
+        $resIa01->assertSee('Catatan Rekomendasi & Hasil Asesmen', false);
+        $resIa01->assertSee('Praktik observasi dilakukan dengan sangat aman dan teliti.');
+        $resIa01->assertSee('Tanda Tangan Asesor');
+        $resIa01->assertSee('Tanda Tangan Asesi');
+
+        // IA03 view: No PMO questions list, only evaluation and signature
+        $resIa03 = $this->actingAs($asesi)->get(route('asesi.assessment.instrument.view', [$assessment, 'IA03']));
+        $resIa03->assertOk();
+        $resIa03->assertDontSee('Hasil Tanya Jawab Teknis Lisan / Wawancara');
+        $resIa03->assertDontSee('Kunci Jawaban yang Diharapkan:');
+        $resIa03->assertSee('FR.IA.03. PERTANYAAN MENDUKUNG OBSERVASI (PMO)');
+        $resIa03->assertSee('Catatan Rekomendasi & Hasil Asesmen', false);
+        $resIa03->assertSee('Seluruh pertanyaan lisan teknis dijawab dengan jelas dan tepat.');
+        $resIa03->assertSee('Tanda Tangan Asesor');
+        $resIa03->assertSee('Tanda Tangan Asesi');
+    }
+
+    public function test_ia01b_view_has_clean_upload_space_without_bloated_tables_or_duplicate_downloads(): void
+    {
+        $asesi = User::where('role', 'ASESI')->first();
+        $scheme = Scheme::first();
+        $admin = User::where('role', 'ADMIN_LSP')->first();
+
+        $schedule = Schedule::create([
+            'scheme_id' => $scheme->id,
+            'name' => 'Jadwal IA01B Clean',
+            'code' => 'SCH-IA01B-'.uniqid(),
+            'tuk_name' => 'TUK Otomotif Mandiri',
+            'date' => now()->toDateString(),
+            'start_time' => '08:00:00',
+            'end_time' => '16:00:00',
+            'selected_instruments' => ['IA01B'],
+            'status' => 'ACTIVE',
+            'created_by' => $admin->id,
+        ]);
+
+        $assessment = Assessment::create([
+            'asesi_id' => $asesi->id,
+            'schedule_id' => $schedule->id,
+            'scheme_id' => $scheme->id,
+            'apl_status' => 'APPROVED',
+        ]);
+
+        $res = $this->actingAs($asesi)->get(route('asesi.assessment.instrument.view', [$assessment, 'IA01B']));
+        $res->assertOk();
+
+        // Must NOT have PDF template download
+        $res->assertDontSee('Unduh Template PDF');
+        $res->assertDontSee('Unduh Report Sheet PDF');
+        $res->assertDontSee(route('asesi.assessment.instrument.download-template', [$assessment, 'IA01B']));
+
+        // Must NOT have bloated stats or empty digital measurement table
+        $res->assertDontSee('Total Item Ukur');
+        $res->assertDontSee('0% COMPLIANT');
+        $res->assertDontSee('Belum ada data rekaman item pengukuran FR.IA.01B');
+
+        // Must have the clean physical upload space
+        $res->assertSee('Ruang Unggah Lembar Pemeriksaan Teknis Fisik');
+        $res->assertSee('Pilih Berkas Foto / Scan PDF Lembar Report Sheet:');
+        $res->assertSee('Unggah Berkas Fisik');
+
+        // Must NOT have bloated signature explanation paragraphs
+        $res->assertDontSee('Disematkan otomatis secara sah dari data permohonan sertifikasi Anda');
+        $res->assertDontSee('Tanda tangan digital Anda telah disematkan secara otomatis pada instrumen ini');
     }
 
     public function test_ia05_cbt_flow_and_completion(): void
@@ -186,10 +316,27 @@ class AsesiRuangUjiFeatureTest extends TestCase
         $cbtPage = $this->actingAs($asesi)->get(route('asesi.assessment.instrument.ia05', $assessment));
         $cbtPage->assertOk();
         $cbtPage->assertSee('FR.IA.05. PERTANYAAN TERTULIS (CBT)');
+        $cbtPage->assertSee('Nomor Soal');
+        $cbtPage->assertSee('Ragu-ragu');
         $cbtPage->assertSee('Kirim Jawaban CBT');
 
-        // Submit answers
+        // Test jQuery AJAX Autosave
         $questions = QuestionBank::where('scheme_id', $scheme->id)->take(5)->get();
+        $firstQ = $questions->first();
+        $autosaveRes = $this->actingAs($asesi)->postJson(route('asesi.assessment.instrument.ia05.autosave', $assessment), [
+            'answers' => [$firstQ->id => 'A'],
+            'doubtful' => [$firstQ->id],
+        ]);
+        $autosaveRes->assertOk();
+        $autosaveRes->assertJson(['success' => true]);
+
+        // Draft response exists, but score is still null and instruments are NOT completed
+        $draftResp = AssessmentIaResponse::where('assessment_id', $assessment->id)->where('instrument_code', 'IA05')->first();
+        $this->assertNotNull($draftResp);
+        $this->assertNull($draftResp->score);
+        $this->assertFalse($assessment->fresh()->hasCompletedAllAssignedInstruments());
+
+        // Submit final answers
         $answers = [];
         foreach ($questions as $q) {
             $answers[$q->id] = $q->correct_answer;
@@ -250,7 +397,8 @@ class AsesiRuangUjiFeatureTest extends TestCase
         // Asesi views IA01B
         $viewRes = $this->actingAs($asesi)->get(route('asesi.assessment.instrument.view', [$assessment, 'IA01B']));
         $viewRes->assertOk();
-        $viewRes->assertSee('Format Lembar Pemeriksaan FR.IA.01B (PDF Resmi BNSP)');
+        $viewRes->assertDontSee('Format Lembar Pemeriksaan FR.IA.01B (PDF Resmi BNSP)');
+        $viewRes->assertSee('FR.IA.01B. LEMBAR PENGUKURAN TEKNIS (REPORT SHEET)');
         $viewRes->assertSee('Pengukuran sangat presisi dan teliti.');
 
         // Asesi submits feedback and signature

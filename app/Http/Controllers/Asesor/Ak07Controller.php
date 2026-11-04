@@ -19,7 +19,7 @@ class Ak07Controller extends Controller
     {
         $this->authorizeAssessorSchedule($schedule);
 
-        $schedule->load('scheme', 'assessments.asesi', 'assessments.ak07Items', 'assessors');
+        $schedule->load('scheme', 'assessments.asesi.profile', 'assessments.ak07Items', 'assessors');
 
         $user = auth()->user();
         $isSingleAssessor = $schedule->assessors->count() === 1 && $schedule->assessors->first()?->id === $user?->id;
@@ -34,10 +34,9 @@ class Ak07Controller extends Controller
             })
             ->values();
 
-        $unapprovedCount = $myAssessments->where('apl_status', '!=', 'APPROVED')->count();
-        if ($unapprovedCount > 0) {
-            return redirect()->route('asesor.schedule.ruang-uji', $schedule->id)
-                ->with('error', "Formulir FR.AK07 belum dapat dibuka. Masih ada {$unapprovedCount} asesi binaan Anda yang belum disetujui APL-nya.");
+        if (! $schedule->isStepUnlocked('ak07')) {
+            return redirect()->route('asesor.schedule.ak01', $schedule->id)
+                ->with('warning', 'Lengkapi dan simpan persetujuan FR.AK.01 terlebih dahulu sebelum melanjutkan ke FR.AK.07.');
         }
 
         $jadwal = $schedule;
@@ -70,10 +69,9 @@ class Ak07Controller extends Controller
             })
             ->values();
 
-        $unapprovedCount = $myAssessments->where('apl_status', '!=', 'APPROVED')->count();
-        if ($unapprovedCount > 0) {
-            return redirect()->route('asesor.schedule.ruang-uji', $schedule->id)
-                ->with('error', 'Penyesuaian tidak dapat disimpan karena belum seluruh asesi binaan Anda disetujui APL-nya.');
+        if (! $schedule->isStepUnlocked('ak07')) {
+            return redirect()->route('asesor.schedule.ak01', $schedule->id)
+                ->with('warning', 'Lengkapi dan simpan persetujuan FR.AK.01 terlebih dahulu sebelum menyimpan FR.AK.07.');
         }
 
         $rawIds = array_map('intval', (array) $request->input('assessment_ids', $request->input('asesi_ids', [])));
@@ -91,6 +89,14 @@ class Ak07Controller extends Controller
                     'assessor_id' => auth()->id(),
                 ]);
             }
+
+            $schedule->update([
+                'ak07_data' => [
+                    'saved_at' => now()->toIso8601String(),
+                    'assessor_id' => auth()->id(),
+                    'adjustment_type' => 'STANDAR',
+                ],
+            ]);
 
             return redirect()->route('asesor.schedule.ruang-uji', $schedule->id)
                 ->with('info', 'FR.AK07 ditetapkan tanpa penyesuaian khusus. Masuk ke Ruang Uji.');
@@ -194,6 +200,15 @@ class Ak07Controller extends Controller
                 }
             }
         });
+
+        $schedule->update([
+            'ak07_data' => [
+                'saved_at' => now()->toIso8601String(),
+                'assessor_id' => auth()->id(),
+                'adjustment_type' => $savedAny ? 'CUSTOM' : 'STANDAR',
+                'assessment_ids' => $ids,
+            ],
+        ]);
 
         $msg = $savedAny
             ? 'Penyesuaian yang wajar (FR.AK07) berhasil disimpan. Masuk ke Ruang Uji.'

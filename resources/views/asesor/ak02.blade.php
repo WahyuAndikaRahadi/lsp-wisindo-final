@@ -2,11 +2,13 @@
 
 @section('content')
 <div class="max-w-5xl mx-auto space-y-6">
+    {{-- Unified Top Lifecycle Navigation --}}
+    @include('asesor.partials.schedule-nav', ['schedule' => $assessment->schedule, 'active' => 'ak02'])
+
     <div class="flex items-center justify-between">
         <div>
-            <a href="{{ route('asesor.schedule.ruang-uji', $assessment->schedule_id) }}" class="text-xs text-brand-600 hover:text-brand-700 font-semibold">&larr; Kembali ke Ruang Uji</a>
-            <h1 class="text-2xl font-black text-slate-900 tracking-tight mt-1">FR.AK.02 Rekaman Asesmen Kompetensi</h1>
-            <p class="text-xs text-slate-500">Rekapitulasi bukti dan penetapan rekomendasi hasil asesmen kompetensi</p>
+            <h1 class="text-2xl font-black text-slate-900 tracking-tight mt-1">FR.AK.02 Rekaman Asesmen Kompetensi (Detail)</h1>
+            <p class="text-xs text-slate-500">Rekapitulasi bukti dan penetapan rekomendasi hasil asesmen kompetensi per unit</p>
         </div>
         <div class="flex items-center space-x-2">
             <span class="px-3 py-1 text-xs font-bold rounded-lg border {{ $assessment->final_result === 'KOMPETEN' ? 'bg-emerald-50 text-emerald-700 border-emerald-300' : 'bg-amber-50 text-amber-700 border-amber-300' }}">
@@ -154,7 +156,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label class="block font-bold text-slate-700 mb-1">Rekomendasi Hasil Asesmen (*):</label>
-                    <select name="final_result" id="finalResultSelect" required class="w-full text-xs font-bold rounded-lg border-slate-300 focus:ring-brand-500">
+                    <select name="final_result" id="finalResultSelect" required @disabled($assessment->schedule?->is_closed) class="w-full text-xs font-bold rounded-lg border-slate-300 focus:ring-brand-500 {{ $assessment->schedule?->is_closed ? 'bg-slate-50 text-slate-700' : '' }}">
                         <option value="" disabled {{ empty($assessment->final_result) ? 'selected' : '' }}>-- Pilih Rekomendasi Akhir (Wajib) --</option>
                         <option value="KOMPETEN" {{ in_array($assessment->final_result, ['KOMPETEN', 'K']) ? 'selected' : '' }}>KOMPETEN (K)</option>
                         <option value="BELUM_KOMPETEN" {{ in_array($assessment->final_result, ['BELUM_KOMPETEN', 'BK']) ? 'selected' : '' }}>BELUM KOMPETEN (BK)</option>
@@ -163,22 +165,28 @@
 
                 <div>
                     <label class="block font-bold text-slate-700 mb-1">Tindak Lanjut yang Dibutuhkan:</label>
-                    <input type="text" name="follow_up_action" value="{{ old('follow_up_action', $assessment->follow_up_action ?? '') }}" class="w-full text-xs rounded-lg border-slate-300 focus:ring-brand-500" placeholder="Pekerjaan tambahan jika BK atau usulan sertifikat jika K">
+                    <input type="text" name="follow_up_action" value="{{ old('follow_up_action', $assessment->follow_up_action ?? '') }}" @disabled($assessment->schedule?->is_closed) class="w-full text-xs rounded-lg border-slate-300 focus:ring-brand-500 {{ $assessment->schedule?->is_closed ? 'bg-slate-50 text-slate-700' : '' }}" placeholder="Pekerjaan tambahan jika BK atau usulan sertifikat jika K">
                 </div>
             </div>
 
             <div>
                 <label class="block font-bold text-slate-700 mb-1">Komentar / Catatan Asesor:</label>
-                <textarea name="final_notes" rows="3" class="w-full text-xs rounded-lg border-slate-300 focus:ring-brand-500" placeholder="Catatan objektif mengenai unjuk kerja asesi...">{{ old('final_notes', $assessment->final_notes ?? '') }}</textarea>
+                <textarea name="final_notes" rows="3" @disabled($assessment->schedule?->is_closed) class="w-full text-xs rounded-lg border-slate-300 focus:ring-brand-500 {{ $assessment->schedule?->is_closed ? 'bg-slate-50 text-slate-700' : '' }}" placeholder="Catatan objektif mengenai unjuk kerja asesi...">{{ old('final_notes', $assessment->final_notes ?? '') }}</textarea>
             </div>
 
             <div class="flex items-center justify-between pt-4 border-t border-slate-200">
                 <a href="{{ route('asesor.schedule.ak02', $assessment->schedule_id) }}" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-900">
-                    Batal
+                    Kembali
                 </a>
-                <button type="submit" class="px-6 py-2.5 text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 rounded-lg shadow-sm transition">
-                    Simpan FR.AK.02 Rekaman Asesmen
-                </button>
+                @if($assessment->schedule?->is_closed)
+                    <button type="button" disabled class="px-6 py-2.5 text-xs font-bold text-slate-500 bg-slate-200 rounded-lg cursor-not-allowed">
+                        Jadwal Telah Ditutup (Read-Only)
+                    </button>
+                @else
+                    <button type="submit" class="px-6 py-2.5 text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 rounded-lg shadow-sm transition">
+                        Simpan FR.AK.02 Rekaman Asesmen
+                    </button>
+                @endif
             </div>
         </div>
     </form>

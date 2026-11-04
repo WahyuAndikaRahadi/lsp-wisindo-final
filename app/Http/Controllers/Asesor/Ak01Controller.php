@@ -19,6 +19,11 @@ class Ak01Controller extends Controller
     {
         $this->authorizeAssessorSchedule($schedule);
 
+        if (! $schedule->isStepUnlocked('ak01')) {
+            return redirect()->route('asesor.schedule.instrument', ['schedule' => $schedule->id, 'code' => 'apl'])
+                ->with('warning', 'Harap selesaikan peninjauan seluruh berkas APL asesi terlebih dahulu sebelum mengisi FR.AK.01.');
+        }
+
         $schedule->load(['scheme', 'assessments.asesi.profile', 'assessors']);
 
         $user = auth()->user();
@@ -41,6 +46,7 @@ class Ak01Controller extends Controller
         $savedEvidence = $schedule->ak01_data['evidence'] ?? $defaultEvidence;
         $savedOtherEvidence = $schedule->ak01_data['other_evidence'] ?? '';
         $savedTukType = $schedule->ak01_data['tuk_type'] ?? 'Sewaktu';
+        $selectedInstruments = $schedule->getEffectiveInstruments();
 
         return view('asesor.ak01', compact(
             'schedule',
@@ -48,7 +54,8 @@ class Ak01Controller extends Controller
             'selectedAssessmentId',
             'savedEvidence',
             'savedOtherEvidence',
-            'savedTukType'
+            'savedTukType',
+            'selectedInstruments'
         ));
     }
 
@@ -104,19 +111,43 @@ class Ak01Controller extends Controller
             ? $myAssessments->whereIn('id', $selectedIds)
             : $myAssessments;
 
-        DB::transaction(function () use ($schedule, $targetAssessments, $ak01Data, $assessorSignature) {
-            $schedule->update([
-                'ak01_data' => $ak01Data,
-            ]);
+        $selectedInstruments = (array) $request->input('selected_instruments', []);
+        $selectedIa = array_values(array_filter($selectedInstruments, fn ($c) => str_starts_with(strtoupper($c), 'IA')));
+        if (empty($selectedIa)) {
+            $selectedIa = ['IA01', 'IA01B', 'IA02', 'IA03', 'IA05'];
+        }
 
+        DB::transaction(function () use ($schedule, $targetAssessments, $ak01Data, $assessorSignature, $selectedIa) {
             foreach ($targetAssessments as $assessment) {
+                $candAk01 = $assessment->ak01_data ?? [];
+                $candAk01 = array_merge($candAk01, $ak01Data);
+                $candAk01['selected_instruments'] = $selectedIa;
+
                 $assessment->update([
-                    'ak01_data' => $ak01Data,
+                    'ak01_data' => $candAk01,
                     'assessor_signature' => $assessorSignature ?? $assessment->assessor_signature,
                     'assessor_signed_at' => $assessorSignature ? now() : $assessment->assessor_signed_at,
                     'assessor_id' => $assessment->assessor_id ?? auth()->id(),
                 ]);
             }
+
+            // Union of all assigned IA instruments across schedule assessments
+            $allScheduleIa = $schedule->assessments()
+                ->get()
+                ->flatMap(fn ($asm) => $asm->ak01_data['selected_instruments'] ?? [])
+                ->filter()
+                ->unique()
+                ->values()
+                ->all();
+
+            if (empty($allScheduleIa)) {
+                $allScheduleIa = $selectedIa;
+            }
+
+            $schedule->update([
+                'ak01_data' => $ak01Data,
+                'selected_instruments' => array_values(array_unique(array_merge(['AK01'], $allScheduleIa))),
+            ]);
         });
 
         return redirect()->route('asesor.schedule.ak07', $schedule->id)

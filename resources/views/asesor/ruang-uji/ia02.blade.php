@@ -1,5 +1,6 @@
 @php
     $isCompleted = (bool) $response?->assessor_signed_at;
+    $isScheduleClosed = (bool) ($assessment->schedule?->is_closed);
     $asesiSig = $response?->asesi_signature ?? $assessment->asesi_signature ?? $assessment->asesi?->profile?->signature_data;
     $asesiSignedAt = $response?->asesi_signed_at ?? ($asesiSig ? ($assessment->asesi_signed_at ?? $assessment->schedule->date) : null);
     $assessorSig = $response?->assessor_signature ?? auth()->user()->profile?->signature_data;
@@ -8,7 +9,17 @@
 @extends('layouts.app', ['title' => 'FR.IA.02 - Tugas Praktik Demonstrasi'])
 
 @section('content')
-<div class="space-y-6 max-w-5xl mx-auto pb-16" x-data="{ isEditing: {{ $isCompleted ? 'false' : 'true' }} }">
+<div class="space-y-6 max-w-5xl mx-auto pb-16" x-data="{ isEditing: {{ ($isCompleted || $isScheduleClosed) ? 'false' : 'true' }} }">
+    @if($isScheduleClosed)
+        <div class="p-4 bg-emerald-50 border-2 border-emerald-300 rounded-xl text-emerald-900 flex items-center gap-3 shadow-xs">
+            <span class="text-xl">🔒</span>
+            <div>
+                <div class="font-bold text-sm">Jadwal Asesmen Telah Resmi Ditutup &amp; Dikunci</div>
+                <p class="text-xs text-emerald-800 mt-0.5">Seluruh instrumen pada jadwal ini berada dalam mode lihat (read-only). Tanda tangan dan status demonstrasi tidak dapat diubah lagi.</p>
+            </div>
+        </div>
+    @endif
+
     {{-- Breadcrumb Navigation --}}
     <div class="flex items-center space-x-2 text-xs font-semibold text-slate-500">
         <a href="{{ route('asesor.jadwal.index') }}" class="text-brand-600 hover:text-brand-700 flex items-center gap-1">
@@ -53,7 +64,7 @@
         </div>
 
         <div class="flex items-center gap-2 shrink-0">
-            @if($isCompleted)
+            @if($isCompleted && ! $isScheduleClosed)
                 <button type="button" x-show="!isEditing" @click="isEditing = true" class="px-3.5 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-lg shadow-xs transition flex items-center gap-1.5">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
                     <span>Ubah Tanda Tangan</span>
@@ -255,7 +266,7 @@
                                 </div>
 
                                 <div x-show="isEditing || '{{ empty($assessorSig) }}' === '1'" style="{{ $isCompleted ? 'display: none;' : '' }}">
-                                    <x-signature-pad name="assessor_signature" :value="$assessorSig ?? null" label="Tanda Tangan Asesor" :required="true" />
+                                    <x-signature-pad name="assessor_signature" :value="$assessorSig ?? null" label="Tanda Tangan Asesor" :required="! $isScheduleClosed" :disabled="$isScheduleClosed" />
                                 </div>
                             </div>
                         </div>
@@ -275,10 +286,17 @@
                 <span>Kembali ke Daftar Asesi</span>
             </a>
 
-            <button type="submit" class="px-6 py-2.5 text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 rounded-lg shadow-sm transition flex items-center justify-center space-x-2">
-                <span>{{ $isCompleted ? 'Perbarui Tanda Tangan FR.IA.02' : 'Simpan & Tanda Tangani FR.IA.02' }}</span>
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-            </button>
+            @if($isScheduleClosed)
+                <button type="button" disabled class="px-6 py-2.5 text-xs font-bold text-slate-500 bg-slate-200 border border-slate-300 rounded-lg cursor-not-allowed flex items-center justify-center space-x-2">
+                    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                    <span>Jadwal Telah Ditutup (Read-Only)</span>
+                </button>
+            @else
+                <button type="submit" class="px-6 py-2.5 text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 rounded-lg shadow-sm transition flex items-center justify-center space-x-2">
+                    <span>{{ $isCompleted ? 'Perbarui Tanda Tangan FR.IA.02' : 'Simpan & Tanda Tangani FR.IA.02' }}</span>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                </button>
+            @endif
         </div>
     </form>
 </div>

@@ -2,18 +2,22 @@
 
 @section('content')
 <div class="space-y-6">
+    {{-- Unified Top Lifecycle Navigation --}}
+    @include('asesor.partials.schedule-nav', ['schedule' => $schedule, 'active' => $meta['route_code'] === 'apl' ? 'apl' : 'ruang-uji'])
+
+    @if($schedule->is_closed)
+        <div class="p-3.5 bg-emerald-50 border border-emerald-300 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-emerald-900">
+            <div class="flex items-center space-x-2">
+                <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                <span><strong>Jadwal Telah Resmi Ditutup & Dikunci:</strong> Seluruh berkas dan instrumen dalam mode lihat (read-only). Anda tetap dapat memeriksa lembar kerja dan rekaman penilaian peserta.</span>
+            </div>
+            <span class="font-bold font-mono text-[11px] bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded border border-emerald-300 shrink-0">STATUS: FINISHED</span>
+        </div>
+    @endif
+
     {{-- Header & Back Navigation --}}
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-            <div class="flex items-center space-x-2 text-xs font-semibold mb-1">
-                @if($meta['route_code'] === 'apl')
-                    <a href="{{ route('asesor.jadwal.index') }}" class="text-brand-600 hover:text-brand-700 font-bold">&larr; Jadwal Penugasan</a>
-                @else
-                    <a href="{{ route('asesor.schedule.ruang-uji', $schedule->id) }}" class="text-brand-600 hover:text-brand-700 font-bold">&larr; Kembali ke Ruang Uji Jadwal</a>
-                @endif
-                <span class="text-slate-300">/</span>
-                <span class="text-slate-700">{{ $meta['code'] }}</span>
-            </div>
             <div class="flex items-center space-x-3 mt-1">
                 <span class="font-mono text-xs font-black px-2.5 py-1 rounded border-2 border-black {{ $meta['badge_color'] }}">
                     {{ $meta['code'] }}
@@ -24,16 +28,9 @@
         </div>
 
         <div class="flex items-center space-x-2">
-            @if($meta['route_code'] === 'apl')
-                <a href="{{ route('asesor.schedule.ak01', $schedule->id) }}" class="inline-flex items-center space-x-1.5 px-4 py-2 text-xs font-bold bg-brand-600 text-white rounded-lg shadow-sm hover:bg-brand-700 transition">
-                    <span>Selanjutnya: FR.AK.01</span>
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
-                    </svg>
-                </a>
-            @else
+            @if($meta['route_code'] !== 'apl')
                 <a href="{{ route('asesor.schedule.ruang-uji', $schedule->id) }}" class="px-4 py-2 text-xs font-semibold bg-white text-slate-800 border border-slate-300 rounded-lg shadow-sm hover:bg-slate-50 transition">
-                    Ganti Instrumen
+                    Kembali ke Ruang Uji
                 </a>
             @endif
         </div>
@@ -72,10 +69,34 @@
                 Belum ada asesi terdaftar pada jadwal ini.
             </div>
         @else
+            @if($meta['route_code'] === 'apl' && ! $schedule->is_closed)
+                <form action="{{ route('asesor.schedule.apl.bulk-review', $schedule->id) }}" method="POST" id="bulkAplForm">
+                    @csrf
+                    <div class="px-6 py-3 bg-amber-50/80 border-b border-amber-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                        <div class="flex items-center space-x-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
+                            <span class="font-bold text-amber-950">Verifikasi Cepat / Bulk Approval APL:</span>
+                            <span class="text-amber-800">Centang asesi yang memenuhi syarat untuk langsung disetujui sekaligus.</span>
+                        </div>
+                        <div class="flex items-center space-x-2 shrink-0">
+                            <button type="submit" onclick="return confirm('Apakah Anda yakin ingin menyetujui seluruh APL asesi yang dipilih?')" 
+                                    class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold rounded-lg shadow-sm transition inline-flex items-center space-x-1.5">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                <span>Setujui APL Terpilih (Bulk Approve)</span>
+                            </button>
+                        </div>
+                    </div>
+            @endif
+
             <div class="overflow-x-auto">
                 <table class="w-full text-sm">
                     <thead class="bg-slate-100 text-left text-xs font-bold text-slate-700 uppercase tracking-wider border-b-2 border-black">
                         <tr>
+                            @if($meta['route_code'] === 'apl' && ! $schedule->is_closed)
+                                <th class="px-4 py-3 w-10 text-center">
+                                    <input type="checkbox" id="checkAllApl" checked class="rounded border-slate-300 text-brand-600 focus:ring-brand-500 w-4 h-4 cursor-pointer" title="Pilih Semua">
+                                </th>
+                            @endif
                             <th class="px-6 py-3 w-16 text-center">No</th>
                             <th class="px-6 py-3">Data Peserta Asesi</th>
                             @if($meta['route_code'] !== 'apl')
@@ -88,6 +109,17 @@
                     <tbody class="divide-y-2 divide-slate-200">
                         @foreach($asesiList as $idx => $item)
                             <tr class="hover:bg-slate-50/80 transition">
+                                @if($meta['route_code'] === 'apl' && ! $schedule->is_closed)
+                                    <td class="px-4 py-4 text-center">
+                                        @if($item->is_my_candidate)
+                                            <input type="checkbox" name="assessment_ids[]" value="{{ $item->assessment->id }}"
+                                                class="apl-item-checkbox rounded border-slate-300 text-brand-600 focus:ring-brand-500 w-4 h-4 cursor-pointer"
+                                                checked>
+                                        @else
+                                            <span class="text-slate-300 text-xs">-</span>
+                                        @endif
+                                    </td>
+                                @endif
                                 <td class="px-6 py-4 text-center font-mono font-bold text-xs text-slate-600">
                                     {{ $idx + 1 }}
                                 </td>
@@ -149,9 +181,11 @@
                                 <td class="px-6 py-4 text-right">
                                     @if($item->is_my_candidate)
                                         <a href="{{ $item->inspect_url }}"
-                                           class="inline-flex items-center space-x-1.5 px-4 py-2 text-xs font-bold {{ $item->is_completed ? 'bg-slate-900 hover:bg-slate-800 text-white' : 'bg-brand-600 hover:bg-brand-700 text-white' }} rounded-lg shadow-sm transition">
+                                           class="inline-flex items-center space-x-1.5 px-4 py-2 text-xs font-bold {{ $item->is_completed || $schedule->is_closed ? 'bg-slate-900 hover:bg-slate-800 text-white' : 'bg-brand-600 hover:bg-brand-700 text-white' }} rounded-lg shadow-sm transition">
                                             <span>
-                                                @if($meta['route_code'] === 'apl')
+                                                @if($schedule->is_closed)
+                                                    {{ $meta['route_code'] === 'apl' ? 'Lihat Berkas APL' : 'Lihat Penilaian' }}
+                                                @elseif($meta['route_code'] === 'apl')
                                                     {{ $item->is_completed ? 'Tinjau Verifikasi APL' : 'Verifikasi APL' }}
                                                 @else
                                                     {{ $item->is_completed ? 'Tinjau / Ubah Penilaian' : 'Periksa Hasil Asesi' }}
@@ -175,19 +209,32 @@
                     </tbody>
                 </table>
             </div>
+            @if($meta['route_code'] === 'apl' && ! $schedule->is_closed)
+                </form>
+            @endif
         @endif
     </div>
 
     @if($meta['route_code'] === 'apl')
-        <div class="flex justify-end pt-2">
-            <a href="{{ route('asesor.schedule.ak01', $schedule->id) }}"
-               class="inline-flex items-center space-x-2 px-6 py-3 text-sm font-bold bg-brand-600 hover:bg-brand-700 text-white rounded-lg shadow-sm transition">
-                <span>Selanjutnya: FR.AK.01 Persetujuan Asesmen</span>
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
-                </svg>
-            </a>
-        </div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const checkAll = document.getElementById('checkAllApl');
+                const itemCheckboxes = document.querySelectorAll('.apl-item-checkbox');
+
+                if (checkAll) {
+                    checkAll.addEventListener('change', function() {
+                        itemCheckboxes.forEach(cb => cb.checked = checkAll.checked);
+                    });
+
+                    itemCheckboxes.forEach(cb => {
+                        cb.addEventListener('change', function() {
+                            const allChecked = Array.from(itemCheckboxes).every(c => c.checked);
+                            checkAll.checked = allChecked;
+                        });
+                    });
+                }
+            });
+        </script>
     @endif
 </div>
 @endsection

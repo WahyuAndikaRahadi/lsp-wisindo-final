@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Asesor;
 use App\Http\Controllers\Concerns\AuthorizesAssessor;
 use App\Http\Controllers\Controller;
 use App\Models\Assessment;
-use App\Models\AssessmentAk07Item;
+use App\Models\Schedule;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -86,22 +86,72 @@ class AplReviewController extends Controller
             ]);
 
             if ($status === 'APPROVED') {
-                // Auto-generate standard FR.AK.07
-                AssessmentAk07Item::firstOrCreate([
-                    'assessment_id' => $assessment->id,
-                ], [
-                    'adjustment_category' => 'Standar',
-                    'adjustment_detail' => 'Tidak ada penyesuaian khusus yang diperlukan (asesmen standar).',
-                    'assessor_id' => $assessorId,
-                ]);
-
                 $assessment->update([
-                    'last_active_step' => 'ruang-uji',
+                    'last_active_step' => 'ak01',
                 ]);
             }
         });
 
         return redirect()->route('asesor.schedule.instrument', ['schedule' => $assessment->schedule_id, 'code' => 'apl'])
             ->with('success', $status === 'APPROVED' ? 'APL asesi berhasil disetujui.' : 'Keputusan review APL berhasil disimpan.');
+    }
+
+    public function bulkApprove(Schedule $schedule, Request $request): RedirectResponse
+    {
+        $this->authorizeAssessorSchedule($schedule);
+
+        if ($schedule->is_closed) {
+            return back()->with('error', 'Jadwal asesmen sudah ditutup dan dikunci.');
+        }
+
+        $assessmentIds = $request->input('assessment_ids', []);
+        if (empty($assessmentIds)) {
+            return back()->with('error', 'Silakan pilih setidaknya satu asesi untuk disetujui APL-nya.');
+        }
+
+        $user = auth()->user();
+        $isSingleAssessor = $schedule->assessors->count() === 1 && $schedule->assessors->first()?->id === $user->id;
+
+        $assessments = $schedule->assessments()
+            ->whereIn('id', $assessmentIds)
+            ->where('admin_status', '!=', 'REJECTED')
+            ->get()
+            ->filter(function ($a) use ($user, $isSingleAssessor) {
+                if ((int) $a->assessor_id === (int) $user->id) {
+                    return true;
+                }
+                if (empty($a->assessor_id) && $isSingleAssessor) {
+                    return true;
+                }
+
+                return false;
+            });
+
+        if ($assessments->isEmpty()) {
+            return back()->with('error', 'Tidak ada asesi binaan yang valid untuk disetujui.');
+        }
+
+        $now = now();
+        $approvedCount = 0;
+
+        DB::transaction(function () use ($assessments, $user, $now, &$approvedCount) {
+            foreach ($assessments as $assessment) {
+                $assessorId = $assessment->assessor_id ?? $user->id;
+
+                $assessment->update([
+                    'apl_status' => 'APPROVED',
+                    'apl_revision_notes' => null,
+                    'assessor_id' => $assessorId,
+                    'approved_at' => $now,
+                    'admin_status' => 'APPROVED',
+                    'last_active_step' => 'ak01',
+                ]);
+
+                $approvedCount++;
+            }
+        });
+
+        return redirect()->route('asesor.schedule.instrument', ['schedule' => $schedule->id, 'code' => 'apl'])
+            ->with('success', "Sebanyak {$approvedCount} asesi berhasil disetujui (verifikasi APL selesai).");
     }
 }

@@ -4,8 +4,15 @@
 
 @section('content')
 <div class="max-w-4xl mx-auto py-6 space-y-6">
-    {{-- Stepper Component --}}
-    <x-progress-stepper currentStep="ruang-uji" :assessment="$assessment" />
+    @if($assessment->schedule?->is_closed)
+        <div class="p-4 bg-emerald-50 border-2 border-emerald-300 rounded-xl text-emerald-900 flex items-center gap-3 shadow-xs">
+            <span class="text-xl">🔒</span>
+            <div>
+                <div class="font-bold text-sm">Jadwal Asesmen Telah Resmi Ditutup &amp; Dikunci</div>
+                <p class="text-xs text-emerald-800 mt-0.5">Seluruh persetujuan FR.AK.01 dalam jadwal ini berada dalam mode lihat (read-only).</p>
+            </div>
+        </div>
+    @endif
 
     {{-- Form AK01 Card --}}
     <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
@@ -93,16 +100,29 @@
             </div>
 
             {{-- Tanda Tangan & Konfirmasi --}}
-            <div class="flex flex-col md:flex-row items-end justify-between gap-6 pt-4 border-t border-slate-200">
-                <div class="w-full md:w-80">
-                    <x-signature-pad 
-                        name="signature_data" 
-                        :value="$assessment->asesi_signature ?? old('signature_data')" 
-                        :profileSignature="auth()->user()->profile?->signature_data"
-                        label="Tanda Tangan Persetujuan Asesi" 
-                        height="140" 
-                        :disabled="(bool)$assessment->ak01_agreed_at"
-                    />
+            @php
+                $effectiveAsesiSig = $assessment->asesi_signature ?? auth()->user()->profile?->signature_data;
+            @endphp
+            <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pt-4 border-t border-slate-200">
+                <div class="w-full md:w-auto">
+                    @if($effectiveAsesiSig)
+                        <input type="hidden" name="signature_data" value="{{ $effectiveAsesiSig }}">
+                        <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 flex items-center gap-3">
+                            <div class="w-20 h-12 bg-white border border-slate-200 rounded p-1 flex items-center justify-center shrink-0">
+                                <img src="{{ $effectiveAsesiSig }}" alt="Tanda Tangan Asesi" class="max-h-full max-w-full object-contain">
+                            </div>
+                            <div>
+                                <span class="text-xs font-bold text-slate-900 block">Tanda Tangan Asesi Terverifikasi</span>
+                                <span class="text-[11px] text-emerald-700 font-semibold flex items-center gap-1 mt-0.5">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                    Tersemat Otomatis dari APL
+                                </span>
+                            </div>
+                        </div>
+                    @else
+                        <input type="hidden" name="signature_data" value="">
+                        <div class="text-xs text-slate-500">Tanda tangan pemohon diverifikasi dari data akun asesi terdaftar.</div>
+                    @endif
                 </div>
 
                 <div class="w-full md:w-auto flex items-center gap-3">
@@ -110,10 +130,16 @@
                         ← Kembali ke Ruang Uji
                     </a>
                     @if(!$assessment->ak01_agreed_at)
-                        <button type="submit" class="w-full md:w-auto px-8 py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-md transition flex items-center justify-center gap-2">
-                            <span>Setujui & Masuk Ruang Uji</span>
-                            <span>→</span>
-                        </button>
+                        @if($assessment->schedule?->is_closed)
+                            <button type="button" disabled class="w-full md:w-auto px-6 py-3.5 bg-slate-200 text-slate-500 font-bold text-xs uppercase tracking-wider rounded-xl cursor-not-allowed border border-slate-300">
+                                Jadwal Telah Ditutup (Read-Only)
+                            </button>
+                        @else
+                            <button type="submit" class="w-full md:w-auto px-8 py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-md transition flex items-center justify-center gap-2">
+                                <span>Setujui & Masuk Ruang Uji</span>
+                                <span>→</span>
+                            </button>
+                        @endif
                     @endif
                 </div>
             </div>

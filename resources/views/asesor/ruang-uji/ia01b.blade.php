@@ -1,11 +1,12 @@
 @php
     $isCompleted = (bool) $response;
+    $isScheduleClosed = (bool) ($assessment->schedule?->is_closed);
 @endphp
 @extends('layouts.app', ['title' => 'FR.IA.01B - Lembar Pemeriksaan Teknis (Report Sheet)'])
 
 @section('content')
 <div class="space-y-6" x-data="{
-    isEditing: {{ $isCompleted ? 'false' : 'true' }},
+    isEditing: {{ ($isCompleted || $isScheduleClosed) ? 'false' : 'true' }},
     setAllItems(val) {
         if (!this.isEditing) return;
         const targetVal = (val === 'K' || val === 'SESUAI') ? 'sesuai' : 'tidak';
@@ -15,6 +16,16 @@
         });
     }
 }">
+    @if($isScheduleClosed)
+        <div class="p-4 bg-emerald-50 border-2 border-emerald-300 rounded-xl text-emerald-900 flex items-center gap-3 shadow-xs">
+            <span class="text-xl">🔒</span>
+            <div>
+                <div class="font-bold text-sm">Jadwal Asesmen Telah Resmi Ditutup &amp; Dikunci</div>
+                <p class="text-xs text-emerald-800 mt-0.5">Seluruh instrumen pada jadwal ini berada dalam mode lihat (read-only). Data pengukuran dan penilaian tidak dapat diubah lagi.</p>
+            </div>
+        </div>
+    @endif
+
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
             <a href="{{ route('asesor.schedule.instrument', ['schedule' => $assessment->schedule_id, 'code' => 'ia01b']) }}" class="text-xs text-brand-600 hover:text-brand-700 font-bold">&larr; Kembali ke Daftar Asesi IA.01B</a>
@@ -22,7 +33,7 @@
             <p class="text-sm text-slate-500">Asesi: <strong>{{ $assessment->asesi->full_name }}</strong> | Skema: <strong>{{ $assessment->schedule->scheme->name }}</strong></p>
         </div>
 
-        @if($isCompleted)
+        @if($isCompleted && ! $isScheduleClosed)
             <div class="flex items-center gap-2">
                 <button type="button" x-show="!isEditing" @click="isEditing = true" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-lg shadow-xs transition flex items-center gap-1.5">
                     <span>✎ Edit Penilaian</span>
@@ -252,18 +263,25 @@
             </div>
 
             <div class="pt-4 border-t border-slate-200">
-                <x-signature-pad name="assessor_signature" :value="$savedSignature ?? null" label="Tanda Tangan Asesor" :required="true" />
+                <x-signature-pad name="assessor_signature" :value="$savedSignature ?? null" label="Tanda Tangan Asesor" :required="! $isScheduleClosed" :disabled="$isScheduleClosed" />
             </div>
         </div>
 
         <div class="flex items-center justify-end space-x-3">
             <a href="{{ route('asesor.schedule.instrument', ['schedule' => $assessment->schedule_id, 'code' => 'ia01b']) }}" class="px-5 py-2.5 text-sm font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition">Kembali</a>
-            <button type="button" x-show="!isEditing" @click="isEditing = true" class="px-6 py-2.5 text-sm font-bold bg-amber-500 hover:bg-amber-600 text-white rounded-lg shadow-sm transition">
-                ✎ Edit Penilaian
-            </button>
-            <button type="submit" x-show="isEditing" class="px-6 py-2.5 text-sm font-bold bg-brand-600 hover:bg-brand-700 text-white rounded-lg shadow-sm transition">
-                {{ $isCompleted ? 'Simpan Perubahan Penilaian' : 'Simpan Penilaian FR.IA.01B' }}
-            </button>
+            @if($isScheduleClosed)
+                <button type="button" disabled class="px-6 py-2.5 text-sm font-bold bg-slate-200 text-slate-500 border border-slate-300 rounded-lg cursor-not-allowed flex items-center gap-2 shadow-none">
+                    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                    <span>Jadwal Telah Ditutup (Read-Only)</span>
+                </button>
+            @else
+                <button type="button" x-show="!isEditing" @click="isEditing = true" class="px-6 py-2.5 text-sm font-bold bg-amber-500 hover:bg-amber-600 text-white rounded-lg shadow-sm transition">
+                    ✎ Edit Penilaian
+                </button>
+                <button type="submit" x-show="isEditing" class="px-6 py-2.5 text-sm font-bold bg-brand-600 hover:bg-brand-700 text-white rounded-lg shadow-sm transition">
+                    {{ $isCompleted ? 'Simpan Perubahan Penilaian' : 'Simpan Penilaian FR.IA.01B' }}
+                </button>
+            @endif
         </div>
     </form>
 </div>

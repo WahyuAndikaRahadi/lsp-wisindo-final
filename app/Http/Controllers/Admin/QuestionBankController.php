@@ -7,6 +7,7 @@ use App\Models\QuestionBank;
 use App\Models\Scheme;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class QuestionBankController extends Controller
@@ -40,12 +41,17 @@ class QuestionBankController extends Controller
             'scheme_id' => 'required|exists:m_schemes,id',
             'competency_unit_id' => 'nullable|exists:m_competency_units,id',
             'question_text' => 'required|string',
+            'question_image' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:2048',
             'option_a' => 'required|string',
             'option_b' => 'required|string',
             'option_c' => 'required|string',
             'option_d' => 'required|string',
             'correct_answer' => 'required|in:A,B,C,D',
         ]);
+
+        if ($request->hasFile('question_image')) {
+            $validated['question_image'] = $request->file('question_image')->store('question-images', 'public');
+        }
 
         QuestionBank::create($validated);
 
@@ -66,12 +72,25 @@ class QuestionBankController extends Controller
             'scheme_id' => 'required|exists:m_schemes,id',
             'competency_unit_id' => 'nullable|exists:m_competency_units,id',
             'question_text' => 'required|string',
+            'question_image' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:2048',
             'option_a' => 'required|string',
             'option_b' => 'required|string',
             'option_c' => 'required|string',
             'option_d' => 'required|string',
             'correct_answer' => 'required|in:A,B,C,D',
         ]);
+
+        if ($request->hasFile('question_image')) {
+            if ($questionBank->question_image && Storage::disk('public')->exists($questionBank->question_image)) {
+                Storage::disk('public')->delete($questionBank->question_image);
+            }
+            $validated['question_image'] = $request->file('question_image')->store('question-images', 'public');
+        } elseif ($request->boolean('remove_image')) {
+            if ($questionBank->question_image && Storage::disk('public')->exists($questionBank->question_image)) {
+                Storage::disk('public')->delete($questionBank->question_image);
+            }
+            $validated['question_image'] = null;
+        }
 
         $questionBank->update($validated);
 
@@ -81,6 +100,10 @@ class QuestionBankController extends Controller
 
     public function destroy(QuestionBank $questionBank): RedirectResponse
     {
+        if ($questionBank->question_image && Storage::disk('public')->exists($questionBank->question_image)) {
+            Storage::disk('public')->delete($questionBank->question_image);
+        }
+
         $questionBank->delete();
 
         return redirect()->route('admin.question-banks.index')

@@ -1,302 +1,135 @@
-@extends('layouts.app')
-
-@section('title', 'Ruang Uji Kompetensi - LSP PrO Indo')
+@extends('layouts.app', ['title' => 'Ruang Uji Asesmen - ' . ($schedule->name ?? $schedule->scheme->name)])
 
 @section('content')
-<div class="max-w-5xl mx-auto py-6 space-y-6">
-    {{-- Stepper Component --}}
-    <x-progress-stepper currentStep="{{ $assessment->last_active_step ?? 'ruang-uji' }}" :assessment="$assessment" />
-
-    {{-- Header Info --}}
-    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-        <div class="h-1.5 w-full flex">
-            <div class="bg-[#1E2B6E] w-[65%]"></div>
-            <div class="bg-[#CE181E] w-[35%]"></div>
-        </div>
-        <div class="p-5 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div class="space-y-6">
+    @if($schedule->is_closed)
+        <div class="p-4 bg-emerald-50 border-2 border-emerald-300 rounded-xl text-emerald-900 flex items-center gap-3 shadow-xs">
+            <span class="text-xl">🔒</span>
             <div>
-                <div class="flex items-center gap-2">
-                    <span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-[#1E2B6E] text-white uppercase tracking-wider font-mono">
-                        Ruang Uji Asesi
-                    </span>
-                    <span class="text-xs font-mono font-bold text-slate-500">
-                        {{ $assessment->schedule->code }}
-                    </span>
-                </div>
-                <h1 class="text-xl sm:text-2xl font-extrabold text-slate-900 mt-2 font-sans">{{ $assessment->schedule->scheme->name }}</h1>
-                <p class="text-xs text-slate-600 mt-1">
-                    TUK: <span class="font-bold text-slate-800">{{ $assessment->schedule->tuk_name }}</span> | 
-                    Asesor: <span class="font-bold text-slate-800">{{ $assessment->assessor?->full_name ?? 'Tim Asesor LSP' }}</span>
-                </p>
+                <div class="font-bold text-sm">Jadwal Asesmen Telah Resmi Ditutup &amp; Dikunci</div>
+                <p class="text-xs text-emerald-800 mt-0.5">Seluruh pelaksanaan asesmen telah selesai. Ruang uji ini sekarang dalam mode lihat (read-only).</p>
             </div>
+        </div>
+    @endif
 
-            <div class="flex items-center gap-3 shrink-0 flex-wrap">
-                @if($assessment->apl_status === 'APPROVED')
-                    <a href="{{ route('asesi.assessment.apl', $assessment) }}" class="inline-flex items-center gap-1.5 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-lg border border-slate-300 transition shadow-xs" title="Kembali ke formulir APL">
-                        <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-                        <span>Sebelumnya</span>
+    {{-- Header --}}
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-black text-slate-900 tracking-tight">{{ $schedule->name ?? $schedule->scheme->name }}</h1>
+            <p class="text-sm text-slate-500">Ruang pelaksanaan asesmen kompetensi mandiri dan observasi uji</p>
+        </div>
+        <div class="flex items-center space-x-2">
+            <span class="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                Kode Jadwal: {{ $schedule->code }}
+            </span>
+            <span class="px-3 py-1.5 rounded-lg text-xs font-bold bg-brand-50 text-brand-700 border border-brand-200 font-mono">
+                No. Peserta: #{{ $assessment->id }}
+            </span>
+        </div>
+    </div>
+
+    {{-- Schedule Details Card --}}
+    <div class="bg-white rounded-xl border border-slate-200 p-5 sm:p-6 shadow-sm">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+            <div>
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Skema Sertifikasi</span>
+                <p class="text-slate-900 font-bold mt-1 text-sm">{{ $schedule->scheme->name }}</p>
+                <span class="font-mono text-xs text-brand-700 bg-brand-50 px-2 py-0.5 rounded border border-brand-200 mt-1 inline-block">
+                    {{ $schedule->scheme->code }}
+                </span>
+            </div>
+            <div>
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Tempat Uji Kompetensi (TUK)</span>
+                <p class="text-slate-900 font-bold mt-1 text-sm">{{ $schedule->tuk_name }}</p>
+                <p class="text-xs text-slate-500 mt-0.5">{{ $schedule->code }}</p>
+            </div>
+            <div>
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Waktu Pelaksanaan</span>
+                <p class="text-slate-900 font-bold mt-1 text-sm">{{ \Carbon\Carbon::parse($schedule->date)->isoFormat('dddd, D MMMM Y') }}</p>
+                <p class="text-xs text-slate-500 mt-0.5">{{ substr($schedule->start_time, 0, 5) }} - {{ substr($schedule->end_time, 0, 5) }} WIB</p>
+            </div>
+            <div>
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Asesor Pembina</span>
+                <p class="text-slate-900 font-bold mt-1 text-sm">{{ $assessment->assessor?->full_name ?? 'Tim Asesor LSP' }}</p>
+                <span class="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 mt-1 inline-block">
+                    Status: {{ $assessment->status === 'COMPLETED' ? 'SELESAI' : 'AKTIF UJI' }}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    {{-- Selected Instruments Heading --}}
+    <div>
+        <h2 class="text-lg font-black text-slate-900 tracking-tight">Instrumen Asesmen Terpilih</h2>
+        <p class="text-xs text-slate-500">Pilih dan kerjakan instrumen asesmen kompetensi yang telah ditetapkan untuk Anda</p>
+    </div>
+
+    {{-- Grid of Selected Instruments --}}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        @forelse($instruments as $inst)
+            <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm flex flex-col justify-between hover:shadow-md transition">
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="font-mono text-xs font-bold px-2.5 py-1 rounded border {{ $inst['badge_color'] }}">
+                            {{ $inst['code'] }}
+                        </span>
+                        <span class="text-xs font-semibold {{ $inst['status_badge_class'] }}">
+                            {{ $inst['status_label'] }}
+                        </span>
+                    </div>
+
+                    <div>
+                        <h3 class="text-base font-bold text-slate-900 leading-snug">{{ $inst['title'] }}</h3>
+                        <p class="text-xs text-slate-600 mt-1.5 leading-relaxed">{{ $inst['desc'] }}</p>
+                    </div>
+
+                    {{-- Progress Bar --}}
+                    <div class="pt-2">
+                        <div class="flex items-center justify-between text-xs font-semibold mb-1">
+                            <span class="text-slate-600">Status Penyelesaian</span>
+                            <span class="text-slate-900 font-bold">{{ $inst['progress_text'] }}</span>
+                        </div>
+                        <div class="w-full bg-slate-100 rounded-full h-2 border border-slate-200 overflow-hidden">
+                            <div class="{{ $inst['progress_bar_color'] }} h-2 rounded-full transition-all" style="width: {{ $inst['progress_percent'] }}%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Action Buttons --}}
+                <div class="pt-5 mt-4 border-t border-slate-100 flex items-center">
+                    <a href="{{ $inst['action_url'] }}"
+                       class="w-full flex items-center justify-center space-x-2 px-4 py-2.5 text-xs font-bold {{ $inst['action_button_class'] }} rounded-lg shadow-sm transition">
+                        <span>{{ $inst['action_label'] }}</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                        </svg>
                     </a>
-                @endif
-
-                @if($assessment->status === 'COMPLETED')
-                    <div class="px-4 py-2 bg-emerald-50 border border-emerald-300 rounded-lg text-emerald-800 text-xs font-bold uppercase tracking-wider flex items-center gap-2 shadow-xs shrink-0">
-                        <span>✓ Asesmen Telah Selesai</span>
-                    </div>
-                @endif
+                </div>
             </div>
-        </div>
+        @empty
+            <div class="col-span-full bg-white rounded-xl border border-slate-200 p-8 text-center shadow-sm">
+                <p class="text-sm text-slate-500">Tidak ada instrumen yang terdaftar untuk asesmen ini.</p>
+            </div>
+        @endforelse
     </div>
 
-    @php
-        $selectedInstruments = $selectedInstruments ?? $assessment->schedule->getEffectiveInstruments();
-        $responses = $responses ?? $assessment->iaResponses->keyBy('instrument_code');
-        $scheme = $assessment->schedule->scheme;
-    @endphp
-
-    {{-- Petunjuk Alur Ruang Uji --}}
-    <div class="bg-blue-50 border-2 border-blue-900/20 rounded-xl p-4 text-xs text-slate-700 leading-relaxed shadow-sm">
-        <div class="flex items-start gap-3">
-            <span class="text-xl">ℹ️</span>
+    {{-- Pasca Asesmen (Hanya jika asesmen telah diselesaikan oleh Asesor) --}}
+    @if($assessment->status === 'COMPLETED')
+        <div class="bg-white rounded-xl border border-slate-200 p-5 sm:p-6 shadow-sm flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
             <div>
-                <span class="font-bold text-slate-900">Petunjuk Ruang Uji Kompetensi:</span>
-                <p class="mt-0.5">
-                    1. <strong>Instrumen Mandiri (IA.05 & IA.02):</strong> Dikerjakan langsung oleh Anda. Pada FR.IA.02, silakan unduh template PDF demonstrasi, selesaikan tugas di lembar fisik di TUK, lalu foto dan unggah bukti kertasnya. Pada FR.IA.05, kerjakan ujian teori CBT secara langsung.<br>
-                    2. <strong>Instrumen Observasi (IA.01, IA.01B, IA.03):</strong> Dinilai langsung oleh Asesor di bengkel TUK. Anda bertugas memeriksa ringkasan hasil penilaian yang direkam asesor, memberikan komentar umpan balik, dan menandatangani secara digital.
-                </p>
+                <span class="text-xs font-bold uppercase tracking-wider text-emerald-700">Tahap Pasca Asesmen</span>
+                <h4 class="text-base font-bold text-slate-900 mt-0.5">Rangkaian Asesmen Selesai ({{ $assessment->final_result ?? 'KOMPETEN' }})</h4>
+                <p class="text-xs text-slate-500 mt-1">Silakan lengkapi formulir umpan balik proses asesmen (FR.AK.03) atau ajukan banding (FR.AK.04) jika terdapat sanggahan hasil atau ketidaksesuaian prosedur uji.</p>
             </div>
-        </div>
-    </div>
-
-    {{-- SEKSI 1: INSTRUMEN DIKERJAKAN MANDIRI OLEH ASESI --}}
-    <div class="space-y-3">
-        <div class="flex items-center gap-2 border-b-2 border-black pb-2">
-            <span class="w-3 h-3 rounded-full bg-[#CE181E]"></span>
-            <h2 class="text-sm font-black text-slate-900 uppercase tracking-wider">
-                1. Instrumen Dikerjakan Mandiri oleh Asesi
-            </h2>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {{-- FR.IA.05 CBT --}}
-            @if(in_array('IA05', $selectedInstruments))
-                @php
-                    $ia05Resp = $responses['IA05'] ?? null;
-                    $isDone05 = (bool) $ia05Resp;
-                    $passingGrade = $scheme->passing_grade_theory ?? 75;
-                    $isPassed05 = $isDone05 && ($ia05Resp->score >= $passingGrade);
-                @endphp
-                <div class="bg-white rounded-xl border-2 border-black shadow-[2px_2px_0_0_rgba(0,0,0,0.9)] p-5 flex flex-col justify-between hover:translate-x-0.5 hover:-translate-y-0.5 transition">
-                    <div>
-                        <div class="flex items-center justify-between mb-2">
-                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider {{ $isDone05 ? ($isPassed05 ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-rose-100 text-rose-800 border border-rose-300') : 'bg-indigo-100 text-indigo-800 border border-indigo-200' }}">
-                                {{ $isDone05 ? ($isPassed05 ? '✓ Selesai CBT (LULUS)' : '✓ Selesai CBT (BELUM LULUS)') : 'Dikerjakan Asesi' }}
-                            </span>
-                            @if($isDone05)
-                                <span class="text-xs font-black font-mono text-slate-800">Skor: {{ $ia05Resp->score }}%</span>
-                            @endif
-                        </div>
-                        <h3 class="text-base font-bold text-slate-900">FR.IA.05. Pertanyaan Tertulis (CBT)</h3>
-                        <p class="text-xs text-slate-600 mt-1">Ujian teori pilihan ganda terstandar. Sistem mengoreksi secara otomatis.</p>
-                    </div>
-
-                    <div class="mt-4 pt-3 border-t border-slate-200">
-                        <a href="{{ route('asesi.assessment.instrument.ia05', $assessment) }}" class="inline-flex items-center justify-center w-full px-4 py-2.5 bg-[#1E2B6E] hover:bg-[#152055] text-white text-xs font-bold rounded-lg border-2 border-black shadow-[2px_2px_0_0_rgba(0,0,0,0.9)] transition">
-                            {{ $isDone05 ? 'Tinjau Hasil Ujian CBT →' : 'Mulai Kerjakan Ujian Teori (CBT) →' }}
-                        </a>
-                    </div>
-                </div>
-            @endif
-
-            {{-- FR.IA.02 Tugas Praktik Demonstrasi --}}
-            @if(in_array('IA02', $selectedInstruments))
-                @php
-                    $ia02Resp = $responses['IA02'] ?? null;
-                    $hasSigned02 = (bool) $ia02Resp?->asesi_signed_at;
-                @endphp
-                <div class="bg-white rounded-xl border-2 border-black shadow-[2px_2px_0_0_rgba(0,0,0,0.9)] p-5 flex flex-col justify-between hover:translate-x-0.5 hover:-translate-y-0.5 transition">
-                    <div>
-                        <div class="flex items-center justify-between mb-2">
-                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider {{ $hasSigned02 ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-blue-100 text-blue-800 border border-blue-300' }}">
-                                {{ $hasSigned02 ? '✓ Selesai & Ditandatangani' : 'Tugas Demonstrasi' }}
-                            </span>
-                            <span class="text-[11px] font-semibold text-slate-500">Unjuk Kerja</span>
-                        </div>
-                        <h3 class="text-base font-bold text-slate-900">FR.IA.02. Tugas Praktik Demonstrasi (TPD)</h3>
-                        <p class="text-xs text-slate-600 mt-1">Unduh lembar tugas PDF, pelajari instruksi unjuk kerja, dan tinjau persetujuan tugas praktik demonstrasi.</p>
-                    </div>
-
-                    <div class="mt-4 pt-3 border-t border-slate-200 flex flex-col sm:flex-row gap-2">
-                        <a href="{{ route('asesi.assessment.instrument.download-template', [$assessment, 'IA02']) }}" class="inline-flex items-center justify-center px-3 py-2 bg-white hover:bg-slate-50 text-slate-800 text-xs font-bold rounded-lg border border-slate-300 transition shrink-0" title="Unduh Lembar Soal & Template PDF Resmi BNSP">
-                            📥 Unduh PDF
-                        </a>
-                        <a href="{{ route('asesi.assessment.instrument.view', [$assessment, 'IA02']) }}" class="inline-flex items-center justify-center flex-1 px-4 py-2 bg-[#CE181E] hover:bg-[#a61318] text-white text-xs font-bold rounded-lg border-2 border-black shadow-[2px_2px_0_0_rgba(0,0,0,0.9)] transition">
-                            {{ $hasSigned02 ? 'Lihat Tugas Praktik →' : 'Tinjau Tugas & Tanda Tangan →' }}
-                        </a>
-                    </div>
-                </div>
-            @endif
-        </div>
-    </div>
-
-    {{-- SEKSI 2: INSTRUMEN PENILAIAN ASESOR (VIEW, FEEDBACK & SIGN) --}}
-    <div class="space-y-3 pt-2">
-        <div class="flex items-center gap-2 border-b-2 border-black pb-2">
-            <span class="w-3 h-3 rounded-full bg-[#1E2B6E]"></span>
-            <h2 class="text-sm font-black text-slate-900 uppercase tracking-wider">
-                2. Instrumen Penilaian Asesor (Tinjau Hasil, Umpan Balik & Tanda Tangan)
-            </h2>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {{-- FR.IA.01 Ceklis Observasi Praktik --}}
-            @if(in_array('IA01', $selectedInstruments))
-                @php
-                    $ia01Resp = $responses['IA01'] ?? null;
-                    $hasEvaluated01 = (bool) $ia01Resp?->assessor_signed_at || ! empty($ia01Resp?->data_json['kuks']);
-                    $hasSigned01 = (bool) $ia01Resp?->asesi_signed_at;
-                @endphp
-                <div class="bg-white rounded-xl border-2 border-black shadow-[2px_2px_0_0_rgba(0,0,0,0.9)] p-5 flex flex-col justify-between hover:translate-x-0.5 hover:-translate-y-0.5 transition">
-                    <div>
-                        <div class="flex items-center justify-between mb-2">
-                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider {{ $hasSigned01 ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : ($hasEvaluated01 ? 'bg-amber-100 text-amber-800 border border-amber-300' : 'bg-slate-100 text-slate-700 border border-slate-300') }}">
-                                {{ $hasSigned01 ? '✓ Sudah Ditandatangani' : ($hasEvaluated01 ? 'Menunggu Tanda Tangan' : 'Menunggu Penilaian Asesor') }}
-                            </span>
-                            <span class="text-[11px] font-semibold text-slate-500">Dinilai Asesor</span>
-                        </div>
-                        <h3 class="text-base font-bold text-slate-900">FR.IA.01. Ceklis Observasi Aktivitas Praktik</h3>
-                        <p class="text-xs text-slate-600 mt-1">Hasil pengamatan langsung unjuk kerja seluruh Kriteria Unjuk Kerja (KUK) oleh asesor.</p>
-                    </div>
-
-                    <div class="mt-4 pt-3 border-t border-slate-200 flex flex-col sm:flex-row gap-2">
-                        <a href="{{ route('asesi.assessment.instrument.download-template', [$assessment, 'IA01']) }}" class="inline-flex items-center justify-center px-3 py-2 bg-white hover:bg-slate-50 text-slate-800 text-xs font-bold rounded-lg border border-slate-300 transition shrink-0" title="Unduh Format Ceklis Observasi PDF">
-                            📥 PDF
-                        </a>
-                        <a href="{{ route('asesi.assessment.instrument.view', [$assessment, 'IA01']) }}" class="inline-flex items-center justify-center flex-1 px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-lg border-2 border-black shadow-[2px_2px_0_0_rgba(0,0,0,0.9)] transition">
-                            {{ $hasSigned01 ? 'Lihat Ceklis Observasi →' : 'Tinjau Hasil & Tanda Tangan →' }}
-                        </a>
-                    </div>
-                </div>
-            @endif
-
-            {{-- FR.IA.01B Report Sheet --}}
-            @if(in_array('IA01B', $selectedInstruments))
-                @php
-                    $ia01bResp = $responses['IA01B'] ?? null;
-                    $hasEvidence01b = ! empty($ia01bResp?->data_json['evidence_image_path']);
-                    $hasEvaluated01b = (bool) $ia01bResp?->assessor_signed_at || ! empty($ia01bResp?->data_json);
-                    $hasSigned01b = (bool) $ia01bResp?->asesi_signed_at;
-                @endphp
-                <div class="bg-white rounded-xl border-2 border-black shadow-[2px_2px_0_0_rgba(0,0,0,0.9)] p-5 flex flex-col justify-between hover:translate-x-0.5 hover:-translate-y-0.5 transition">
-                    <div>
-                        <div class="flex items-center justify-between mb-2">
-                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider {{ $hasSigned01b ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : ($hasEvidence01b ? 'bg-blue-100 text-blue-800 border border-blue-300' : ($hasEvaluated01b ? 'bg-amber-100 text-amber-800 border border-amber-300' : 'bg-slate-100 text-slate-700 border border-slate-300')) }}">
-                                {{ $hasSigned01b ? '✓ Sudah Ditandatangani' : ($hasEvidence01b ? '✓ Lembar Fisik Diunggah' : ($hasEvaluated01b ? 'Menunggu Tanda Tangan' : 'Menunggu Verifikasi Asesor')) }}
-                            </span>
-                            <span class="text-[11px] font-semibold text-slate-500">Pengukuran Teknis</span>
-                        </div>
-                        <h3 class="text-base font-bold text-slate-900">FR.IA.01B. Lembar Laporan Pemeriksaan (Report Sheet)</h3>
-                        <p class="text-xs text-slate-600 mt-1">Data hasil pengukuran teknis komponen uji, foto bukti lembar fisik, dan verifikasi kesesuaian standar spesifikasi servis.</p>
-                    </div>
-
-                    <div class="mt-4 pt-3 border-t border-slate-200 flex flex-col sm:flex-row gap-2">
-                        <a href="{{ route('asesi.assessment.instrument.download-template', [$assessment, 'IA01B']) }}" class="inline-flex items-center justify-center px-3 py-2 bg-white hover:bg-slate-50 text-slate-800 text-xs font-bold rounded-lg border border-slate-300 transition shrink-0" title="Unduh Format Report Sheet PDF">
-                            📥 PDF
-                        </a>
-                        <a href="{{ route('asesi.assessment.instrument.view', [$assessment, 'IA01B']) }}" class="inline-flex items-center justify-center flex-1 px-4 py-2 bg-[#1E2B6E] hover:bg-[#152055] text-white text-xs font-bold rounded-lg border-2 border-black shadow-[2px_2px_0_0_rgba(0,0,0,0.9)] transition">
-                            {{ $hasSigned01b ? 'Lihat Hasil Pengukuran →' : ($hasEvidence01b ? 'Tinjau Report Sheet & Tanda Tangan →' : 'Unggah Lembar Fisik & Tinjau →') }}
-                        </a>
-                    </div>
-                </div>
-            @endif
-
-            {{-- FR.IA.03 Pertanyaan Mendukung Observasi (PMO) --}}
-            @if(in_array('IA03', $selectedInstruments))
-                @php
-                    $ia03Resp = $responses['IA03'] ?? null;
-                    $hasEvaluated03 = (bool) $ia03Resp?->assessor_signed_at || ! empty($ia03Resp?->data_json['questions']);
-                    $hasSigned03 = (bool) $ia03Resp?->asesi_signed_at;
-                @endphp
-                <div class="bg-white rounded-xl border-2 border-black shadow-[2px_2px_0_0_rgba(0,0,0,0.9)] p-5 flex flex-col justify-between hover:translate-x-0.5 hover:-translate-y-0.5 transition">
-                    <div>
-                        <div class="flex items-center justify-between mb-2">
-                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider {{ $hasSigned03 ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : ($hasEvaluated03 ? 'bg-amber-100 text-amber-800 border border-amber-300' : 'bg-slate-100 text-slate-700 border border-slate-300') }}">
-                                {{ $hasSigned03 ? '✓ Sudah Ditandatangani' : ($hasEvaluated03 ? 'Menunggu Tanda Tangan' : 'Menunggu Sesi Tanya Jawab') }}
-                            </span>
-                            <span class="text-[11px] font-semibold text-slate-500">Tanya Jawab Lisan</span>
-                        </div>
-                        <h3 class="text-base font-bold text-slate-900">FR.IA.03. Pertanyaan Mendukung Observasi (PMO)</h3>
-                        <p class="text-xs text-slate-600 mt-1">Hasil klarifikasi teknis dan tanya jawab lisan saat proses observasi demonstrasi.</p>
-                    </div>
-
-                    <div class="mt-4 pt-3 border-t border-slate-200 flex flex-col sm:flex-row gap-2">
-                        <a href="{{ route('asesi.assessment.instrument.download-template', [$assessment, 'IA03']) }}" class="inline-flex items-center justify-center px-3 py-2 bg-white hover:bg-slate-50 text-slate-800 text-xs font-bold rounded-lg border border-slate-300 transition shrink-0" title="Unduh Soal Tanya Jawab PMO PDF">
-                            📥 PDF
-                        </a>
-                        <a href="{{ route('asesi.assessment.instrument.view', [$assessment, 'IA03']) }}" class="inline-flex items-center justify-center flex-1 px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-lg border-2 border-black shadow-[2px_2px_0_0_rgba(0,0,0,0.9)] transition">
-                            {{ $hasSigned03 ? 'Lihat Tanya Jawab PMO →' : 'Tinjau Tanya Jawab & Tanda Tangan →' }}
-                        </a>
-                    </div>
-                </div>
-            @endif
-
-            {{-- FR.AK.01 Persetujuan Asesmen (Jika Termasuk Dalam Jadwal) --}}
-            @if(in_array('AK01', $selectedInstruments))
-                @php
-                    $hasSignedAk01 = ! empty($assessment->asesi_signed_at);
-                @endphp
-                <div class="bg-white rounded-xl border-2 border-black shadow-[2px_2px_0_0_rgba(0,0,0,0.9)] p-5 flex flex-col justify-between hover:translate-x-0.5 hover:-translate-y-0.5 transition">
-                    <div>
-                        <div class="flex items-center justify-between mb-2">
-                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider {{ $hasSignedAk01 ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-amber-100 text-amber-800 border border-amber-300' }}">
-                                {{ $hasSignedAk01 ? '✓ Sudah Disetujui' : 'Menunggu Persetujuan' }}
-                            </span>
-                            <span class="text-[11px] font-semibold text-slate-500">Persetujuan & Kerahasiaan</span>
-                        </div>
-                        <h3 class="text-base font-bold text-slate-900">FR.AK.01. Persetujuan Asesmen & Kerahasiaan</h3>
-                        <p class="text-xs text-slate-600 mt-1">Kesepakatan jadwal, metode uji, dan jaminan kerahasiaan materi uji kompetensi.</p>
-                    </div>
-
-                    <div class="mt-4 pt-3 border-t border-slate-200 flex flex-col sm:flex-row gap-2">
-                        <a href="{{ route('asesi.assessment.instrument.download-template', [$assessment, 'AK01']) }}" class="inline-flex items-center justify-center px-3 py-2 bg-white hover:bg-slate-50 text-slate-800 text-xs font-bold rounded-lg border border-slate-300 transition shrink-0" title="Unduh Lembar AK.01 PDF">
-                            📥 PDF
-                        </a>
-                        <a href="{{ route('asesi.assessment.ak01', $assessment) }}" class="inline-flex items-center justify-center flex-1 px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-lg border-2 border-black shadow-[2px_2px_0_0_rgba(0,0,0,0.9)] transition">
-                            {{ $hasSignedAk01 ? 'Lihat Persetujuan AK.01 →' : 'Tinjau & Tanda Tangani AK.01 →' }}
-                        </a>
-                    </div>
-                </div>
-            @endif
-        </div>
-    </div>
-
-    {{-- Tombol Selesaikan Seluruh Rangkaian Asesmen --}}
-    @if($assessment->status !== 'COMPLETED')
-        <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 shadow-sm flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
-            <div>
-                <span class="text-xs font-bold uppercase tracking-wider text-[#1E2B6E] font-mono">Penyelesaian Akhir</span>
-                <h4 class="text-base font-bold text-slate-900 font-sans">Selesaikan Seluruh Rangkaian Uji Mandiri</h4>
-                <p class="text-xs text-slate-600 mt-0.5">Pastikan Anda telah menyelesaikan ujian teori CBT (IA.05), mengunggah bukti fisik tugas demonstrasi (IA.02), serta menandatangani instrumen observasi.</p>
-            </div>
-            <form action="{{ route('asesi.assessment.finish', $assessment) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menyelesaikan proses uji kompetensi ini?')">
-                @csrf
-                <button type="submit" class="w-full sm:w-auto px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold uppercase tracking-wider rounded-lg shadow-sm transition shrink-0">
-                    Selesaikan Asesmen Mandiri ✓
-                </button>
-            </form>
-        </div>
-    @else
-        <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-5 sm:p-6 shadow-sm flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
-            <div>
-                <span class="text-xs font-bold uppercase tracking-wider text-emerald-800 font-mono">Tahap Pasca Asesmen</span>
-                <h4 class="text-base font-bold text-slate-900">Rangkaian Asesmen Selesai ({{ $assessment->final_result ?? 'KOMPETEN' }})</h4>
-                <p class="text-xs text-slate-600 mt-0.5">Silakan lengkapi umpan balik proses asesmen (FR.AK.03) atau ajukan banding asesmen (FR.AK.04) jika ada sanggahan.</p>
-            </div>
-            <div class="flex items-center space-x-2 shrink-0">
+            <div class="flex items-center space-x-2 shrink-0 flex-wrap gap-y-2">
                 <a href="{{ route('asesi.assessment.ak03', $assessment) }}" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold rounded-lg shadow-sm transition">
                     FR.AK.03 Umpan Balik &rarr;
                 </a>
-                <a href="{{ route('asesi.assessment.appeal', $assessment) }}" class="px-4 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 text-xs font-bold rounded-lg shadow-sm transition">
-                    FR.AK.04 Banding
+                <a href="{{ route('asesi.assessment.appeal', $assessment) }}" class="px-4 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 text-xs font-bold rounded-lg shadow-sm transition flex items-center gap-1.5">
+                    <span>FR.AK.04 Banding</span>
+                    @if($assessment->appeals->isNotEmpty())
+                        <span class="px-1.5 py-0.2 bg-amber-100 text-amber-800 text-[10px] rounded font-mono font-semibold">Tercatat</span>
+                    @endif
                 </a>
             </div>
         </div>

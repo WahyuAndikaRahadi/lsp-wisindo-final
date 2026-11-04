@@ -85,9 +85,19 @@ class InstrumentController extends Controller
     /**
      * Ruang Uji Jadwal: Menampilkan seluruh instrumen terpilih untuk jadwal uji.
      */
-    public function scheduleRuangUji(Schedule $schedule): View
+    public function scheduleRuangUji(Schedule $schedule): View|RedirectResponse
     {
         $this->authorizeAssessorSchedule($schedule);
+
+        if (! $schedule->isStepUnlocked('ruang-uji')) {
+            if (! $schedule->isStepUnlocked('ak07')) {
+                return redirect()->route('asesor.schedule.ak01', $schedule->id)
+                    ->with('warning', 'Lengkapi persetujuan FR.AK.01 terlebih dahulu sebelum masuk ke Ruang Uji.');
+            }
+
+            return redirect()->route('asesor.schedule.ak07', $schedule->id)
+                ->with('warning', 'Lengkapi formulir penyesuaian FR.AK.07 terlebih dahulu sebelum masuk ke Ruang Uji.');
+        }
 
         $schedule->load([
             'scheme.competencyUnits.elements.kuks',
@@ -96,18 +106,32 @@ class InstrumentController extends Controller
             'assessors',
         ]);
 
-        $selectedCodes = ! empty($schedule->selected_instruments)
-            ? (array) $schedule->selected_instruments
-            : ['AK01', 'IA01', 'IA01B', 'IA02', 'IA03', 'IA05'];
+        // Filter ONLY FR.IA instruments. Exclude APL and AK01!
+        $allAssignedIaCodes = $schedule->assessments
+            ->flatMap(fn ($ass) => $ass->getAssignedInstruments())
+            ->filter(fn ($c) => str_starts_with(strtoupper($c), 'IA'))
+            ->unique()
+            ->values()
+            ->all();
 
-        if (! in_array('APL', $selectedCodes, true)) {
-            array_unshift($selectedCodes, 'APL');
+        if (empty($allAssignedIaCodes)) {
+            $allAssignedIaCodes = array_values(array_filter(
+                (array) ($schedule->selected_instruments ?? ['IA01', 'IA01B', 'IA02', 'IA03', 'IA05']),
+                fn ($c) => str_starts_with(strtoupper($c), 'IA')
+            ));
         }
+
+        $allAssignedIaCodes = array_values(array_filter(
+            $allAssignedIaCodes,
+            fn ($c) => ! in_array(strtoupper($c), ['APL', 'AK01'], true)
+        ));
+
+        sort($allAssignedIaCodes);
 
         $totalAsesi = $schedule->assessments->count();
 
         $instruments = [];
-        foreach ($selectedCodes as $code) {
+        foreach ($allAssignedIaCodes as $code) {
             $c = strtoupper($code);
             $meta = $this->instrumentsMeta[$c] ?? [
                 'code' => 'FR.'.$c,
@@ -118,29 +142,19 @@ class InstrumentController extends Controller
                 'route_code' => strtolower($c),
             ];
 
+            // Target asesi specifically assigned to this FR.IA instrument
+            $targetAssessmentsForInstrument = $schedule->assessments->filter(fn ($ass) => $ass->hasAssignedInstrument($c));
+            $targetCount = $targetAssessmentsForInstrument->count();
+
             // Hitung asesi yang sudah dinilai/selesai pada instrumen ini
-            $completedCount = 0;
-            if ($c === 'APL') {
-                $completedCount = $schedule->assessments->where('apl_status', 'APPROVED')->count();
-            } else {
-                foreach ($schedule->assessments as $ass) {
-                    if ($c === 'AK01') {
-                        if (! empty($ass->assessor_signature) || ! empty($ass->ak01_data) || ! empty($schedule->ak01_data)) {
-                            $completedCount++;
-                        }
-                    } else {
-                        $hasResp = $ass->iaResponses->firstWhere('instrument_code', $c);
-                        if ($hasResp) {
-                            $completedCount++;
-                        }
-                    }
-                }
-            }
+            $completedCount = $targetAssessmentsForInstrument->filter(function ($ass) use ($c) {
+                return $ass->iaResponses->contains('instrument_code', $c);
+            })->count();
 
             $meta['raw_code'] = $c;
             $meta['completed_count'] = $completedCount;
-            $meta['total_asesi'] = $totalAsesi;
-            $meta['percentage'] = $totalAsesi > 0 ? round(($completedCount / $totalAsesi) * 100) : 0;
+            $meta['total_asesi'] = $targetCount;
+            $meta['percentage'] = $targetCount > 0 ? round(($completedCount / $targetCount) * 100) : 0;
 
             $instruments[] = $meta;
         }
@@ -178,7 +192,11 @@ class InstrumentController extends Controller
             'route_code' => $codeLower,
         ];
 
-        $asesiList = $schedule->assessments->map(function ($assessment) use ($codeUpper, $codeLower, $schedule) {
+        $targetAssessments = ($codeUpper === 'APL')
+            ? $schedule->assessments
+            : $schedule->assessments->filter(fn ($a) => $a->hasAssignedInstrument($codeUpper));
+
+        $asesiList = $targetAssessments->map(function ($assessment) use ($codeUpper, $codeLower, $schedule) {
             $response = $assessment->iaResponses->firstWhere('instrument_code', $codeUpper);
             $isCompleted = false;
             $scoreLabel = null;
@@ -241,7 +259,11 @@ class InstrumentController extends Controller
                 'has_evidence' => $hasEvidence,
                 'is_my_candidate' => $isMyCandidate,
             ];
-        });
+        })->values();
+
+        $meta['completed_count'] = $asesiList->where('is_completed', true)->count();
+        $meta['total_asesi'] = $targetAssessments->count();
+        $meta['percentage'] = $meta['total_asesi'] > 0 ? round(($meta['completed_count'] / $meta['total_asesi']) * 100) : 0;
 
         return view('asesor.ruang-uji.instrument-asesi-list', compact(
             'schedule',

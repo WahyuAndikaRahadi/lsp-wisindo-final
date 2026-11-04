@@ -2,12 +2,32 @@
 
 @section('content')
 <div class="max-w-4xl mx-auto space-y-6">
+    @if($ak03)
+        <div class="p-4 bg-emerald-50 border-2 border-emerald-300 rounded-xl text-emerald-900 flex items-center justify-between gap-3 shadow-xs">
+            <div class="flex items-center gap-2.5">
+                <span class="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-xs shrink-0">✓</span>
+                <div>
+                    <span class="font-bold text-sm block">Formulir FR.AK.03 Umpan Balik Telah Terkirim (Terkunci)</span>
+                    <span class="text-xs text-emerald-800">Tersimpan pada {{ \Carbon\Carbon::parse($ak03->created_at)->isoFormat('D MMMM Y, HH:mm') }} WIB. Seluruh isian evaluasi telah tersimpan permanen dan tidak dapat diubah kembali.</span>
+                </div>
+            </div>
+            <a href="{{ route('asesi.dashboard') }}" class="shrink-0 px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-lg transition shadow-xs">
+                Ke Dashboard &rarr;
+            </a>
+        </div>
+    @endif
+
     <div class="flex items-center justify-between">
         <div>
-            <a href="{{ route('asesi.assessment.ruang-uji', $assessment->id) }}" class="text-xs text-brand-600 hover:text-brand-700 font-semibold">&larr; Kembali ke Ruang Uji</a>
+            <a href="{{ route('asesi.dashboard') }}" class="text-xs text-brand-600 hover:text-brand-700 font-semibold">&larr; Kembali ke Dashboard</a>
             <h1 class="text-2xl font-black text-slate-900 tracking-tight mt-1">FR.AK.03 Umpan Balik dan Catatan Asesmen</h1>
             <p class="text-xs text-slate-500">Evaluasi pengalaman asesi terhadap transparansi dan kenyamanan pelaksanaan uji kompetensi</p>
         </div>
+        @if($ak03)
+            <span class="px-3 py-1 rounded-lg text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                ✓ Selesai &amp; Terkunci
+            </span>
+        @endif
     </div>
 
     {{-- Info Card --}}
@@ -78,18 +98,18 @@
                                 <td class="px-4 py-3 text-slate-800 leading-relaxed">{{ $text }}</td>
                                 <td class="px-3 py-3 text-center">
                                     <div class="inline-flex items-center space-x-2">
-                                        <label class="inline-flex items-center space-x-1 cursor-pointer">
-                                            <input type="radio" name="ratings[{{ $no }}][value]" value="YA" {{ $val === 'YA' ? 'checked' : '' }} required class="text-brand-600 focus:ring-brand-500">
+                                        <label class="inline-flex items-center space-x-1 {{ $ak03 ? 'cursor-default' : 'cursor-pointer' }}">
+                                            <input type="radio" name="ratings[{{ $no }}][value]" value="YA" {{ $val === 'YA' ? 'checked' : '' }} @disabled((bool) $ak03) required class="text-brand-600 focus:ring-brand-500">
                                             <span class="font-bold text-emerald-700">Ya</span>
                                         </label>
-                                        <label class="inline-flex items-center space-x-1 cursor-pointer">
-                                            <input type="radio" name="ratings[{{ $no }}][value]" value="TIDAK" {{ $val === 'TIDAK' ? 'checked' : '' }} required class="text-rose-600 focus:ring-rose-500">
+                                        <label class="inline-flex items-center space-x-1 {{ $ak03 ? 'cursor-default' : 'cursor-pointer' }}">
+                                            <input type="radio" name="ratings[{{ $no }}][value]" value="TIDAK" {{ $val === 'TIDAK' ? 'checked' : '' }} @disabled((bool) $ak03) required class="text-rose-600 focus:ring-rose-500">
                                             <span class="font-bold text-rose-700">Tidak</span>
                                         </label>
                                     </div>
                                 </td>
                                 <td class="px-4 py-3">
-                                    <input type="text" name="ratings[{{ $no }}][comment]" value="{{ $comment }}" class="w-full text-xs rounded border-slate-300 focus:ring-brand-500" placeholder="Opsional">
+                                    <input type="text" name="ratings[{{ $no }}][comment]" value="{{ $comment }}" @disabled((bool) $ak03) class="w-full text-xs rounded border-slate-300 focus:ring-brand-500 @if($ak03) bg-slate-50 text-slate-600 @endif" placeholder="Opsional">
                                 </td>
                             </tr>
                         @endforeach
@@ -99,17 +119,25 @@
 
             <div class="p-6 border-t border-slate-200 bg-slate-50/50 space-y-2">
                 <label class="block text-xs font-bold text-slate-700">Catatan / Komentar Tambahan Lainnya (apabila ada):</label>
-                <textarea name="general_notes" rows="2" class="w-full text-xs rounded-lg border-slate-300 focus:ring-brand-500" placeholder="Kesan, pesan, atau masukan untuk pelaksanaan asesmen...">{{ $ak03?->general_notes ?? '' }}</textarea>
+                <textarea name="general_notes" rows="2" @disabled((bool) $ak03) class="w-full text-xs rounded-lg border-slate-300 focus:ring-brand-500 @if($ak03) bg-slate-50 text-slate-600 @endif" placeholder="Kesan, pesan, atau masukan untuk pelaksanaan asesmen...">{{ $ak03?->general_notes ?? '' }}</textarea>
             </div>
         </div>
 
         <div class="flex items-center justify-between">
-            <a href="{{ route('asesi.jadwal.index') }}" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-900">
-                Kembali ke Jadwal
+            <a href="{{ route('asesi.dashboard') }}" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-900">
+                &larr; Kembali ke Dashboard
             </a>
-            <button type="submit" class="px-6 py-2.5 text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 rounded-lg shadow-sm transition">
-                Kirim Umpan Balik (FR.AK.03) & Selesai
-            </button>
+            @if($ak03)
+                <button type="button" disabled class="px-6 py-2.5 text-xs font-bold text-slate-500 bg-slate-200 border border-slate-300 rounded-lg cursor-not-allowed flex items-center gap-1.5">
+                    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                    <span>Umpan Balik Telah Terkirim (Terkunci)</span>
+                </button>
+            @else
+                <button type="submit" class="px-6 py-2.5 text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 rounded-lg shadow-sm transition flex items-center gap-2">
+                    <span>Kirim Umpan Balik (FR.AK.03) &amp; Selesai</span>
+                    <span>✓</span>
+                </button>
+            @endif
         </div>
     </form>
 </div>
