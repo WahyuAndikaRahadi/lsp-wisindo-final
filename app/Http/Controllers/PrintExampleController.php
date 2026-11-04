@@ -6,6 +6,7 @@ use App\Models\Assessment;
 use App\Models\Schedule;
 use App\Services\MukDynamicDocumentService;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class PrintExampleController extends Controller
 {
@@ -48,7 +49,14 @@ class PrintExampleController extends Controller
 
         if ($schedule) {
             if ($assessment && ! in_array($docType, ['ba', 'hadir-asesor', 'daftar-periksa'], true)) {
-                return $this->dynamicService->exportAssessment($assessment, $docType, $request->boolean('download'));
+                try {
+                    return $this->dynamicService->exportAssessment($assessment, $docType, $request->boolean('download'));
+                } catch (HttpException $e) {
+                    if ($refPath && file_exists($refPath)) {
+                        return response()->file($refPath, ['Content-Type' => 'application/pdf', 'Content-Disposition' => 'inline']);
+                    }
+                    throw $e;
+                }
             }
 
             return $this->dynamicService->exportSchedule($schedule, $docType, $request->boolean('download'));
@@ -64,7 +72,6 @@ class PrintExampleController extends Controller
             'ak04' => 'tests/Fixtures/muk/FR_AK_04_generated.pdf',
             'ak07' => 'tests/Fixtures/muk/FR_AK_07_generated.pdf',
             'ia01' => 'tests/Fixtures/muk/FR_IA_01_generated.pdf',
-            'ia01b' => 'tests/Fixtures/muk/FR_IA_01_B_generated.pdf',
             'ia03' => 'tests/Fixtures/muk/FR_IA_03_generated.pdf',
             'ia05c' => 'tests/Fixtures/muk/FR_IA_05_C_generated.pdf',
             'ba' => 'tests/Fixtures/muk/Berita_Acara_Peserta_generated.pdf',

@@ -58,15 +58,7 @@ def run_diff(ref_pdf, gen_pdf):
     gen_text = res.stdout
 
     gen_lower = gen_pdf.lower()
-    if "ia_01_b" in gen_lower or "ia01b" in gen_lower:
-        required_keywords = [
-            "FR.IA.01B",
-            "LEMBAR HASIL PENGUKURAN",
-            "REPORT SHEET",
-            "G.45OTO01.065.2",
-            "Tanda tangan",
-        ]
-    elif "ia_01" in gen_lower or "ia01" in gen_lower:
+    if "ia_01" in gen_lower or "ia01" in gen_lower:
         required_keywords = [
             "FR.IA.01.",
             "CL - CEKLIS OBSERVASI AKTIVITAS",

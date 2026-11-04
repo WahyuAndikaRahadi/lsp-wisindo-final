@@ -6,11 +6,13 @@ use App\Models\Assessment;
 use App\Models\AssessmentAk02Item;
 use App\Models\AssessmentAk03Item;
 use App\Models\AssessmentAppeal;
+use App\Models\AssessmentIaResponse;
 use App\Models\CompetencyUnit;
 use App\Models\Schedule;
 use App\Models\Scheme;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class DokumenMukPrintViewsTest extends TestCase
@@ -376,14 +378,37 @@ class DokumenMukPrintViewsTest extends TestCase
         $res01->assertSee('FR.IA.01');
         $res01->assertSee('CEKLIS OBSERVASI AKTIVITAS');
 
-        // IA.01B Report Sheet
+        // IA.01B Report Sheet (exports assessee's uploaded file)
+        $res01bMissing = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.export-asesi', [
+            'assessment' => $this->assessment->id,
+            'type' => 'ia01b',
+        ]));
+        $res01bMissing->assertNotFound();
+
+        Storage::fake('local');
+        $uploadedPath = 'ia01b_evidence/test_report_sheet.pdf';
+        Storage::disk('local')->put($uploadedPath, '%PDF-1.4 sample report sheet');
+
+        AssessmentIaResponse::create([
+            'assessment_id' => $this->assessment->id,
+            'instrument_code' => 'IA01B',
+            'data_json' => [
+                'evidence_image_path' => $uploadedPath,
+                'evidence_original_name' => 'Report_Sheet_Asesi.pdf',
+            ],
+        ]);
+
         $res01b = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.export-asesi', [
             'assessment' => $this->assessment->id,
             'type' => 'ia01b',
         ]));
         $res01b->assertOk();
-        $res01b->assertSee('FR.IA.01B');
-        $res01b->assertSee('REPORT SHEET');
+
+        $resDynamic01b = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.asesi-dynamic', [
+            'assessment' => $this->assessment->id,
+            'type' => 'ia01b',
+        ]));
+        $resDynamic01b->assertOk();
 
         // IA.02 Practical Demonstration
         $res02 = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.export-asesi', [

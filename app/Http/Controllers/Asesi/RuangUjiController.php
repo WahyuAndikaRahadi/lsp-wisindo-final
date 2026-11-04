@@ -192,7 +192,8 @@ class RuangUjiController extends Controller
             $request->validate([
                 'evidence_image' => 'required|file|mimes:jpeg,jpg,png,webp,pdf|max:10240',
             ]);
-            $path = $request->file('evidence_image')->store('ia02_evidence', 'local');
+            $folder = strtolower($code) === 'ia01b' ? 'ia01b_evidence' : 'ia02_evidence';
+            $path = $request->file('evidence_image')->store($folder, 'local');
             $dataJson['evidence_image_path'] = $path;
             $dataJson['evidence_uploaded_at'] = now()->toIso8601String();
             $dataJson['evidence_original_name'] = $request->file('evidence_image')->getClientOriginalName();
@@ -235,7 +236,8 @@ class RuangUjiController extends Controller
         ]);
 
         $codeUpper = strtoupper($code);
-        $path = $request->file('evidence_image')->store('ia02_evidence', 'local');
+        $folder = strtolower($code) === 'ia01b' ? 'ia01b_evidence' : 'ia02_evidence';
+        $path = $request->file('evidence_image')->store($folder, 'local');
 
         $response = AssessmentIaResponse::firstOrNew([
             'assessment_id' => $assessment->id,

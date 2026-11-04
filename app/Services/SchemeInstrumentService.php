@@ -161,7 +161,6 @@ class SchemeInstrumentService
 
         $cleanFixtures = [
             'IA01' => base_path('tests/Fixtures/muk/FR_IA_01_generated.pdf'),
-            'IA01B' => base_path('tests/Fixtures/muk/FR_IA_01_B_generated.pdf'),
             'AK07' => base_path('tests/Fixtures/muk/FR_AK_07_generated.pdf'),
             'APL02' => base_path('tests/Fixtures/muk/FR_APL_02_generated.pdf'),
         ];
@@ -217,6 +216,13 @@ class SchemeInstrumentService
         $fixedPath = $fixedService->getFixedFilePath($scheme, $instrumentCode);
         if ($fixedPath && file_exists($fixedPath)) {
             return $fixedPath;
+        }
+
+        // Check in official dynamic document store
+        $dynamicService = app(MukDynamicDocumentService::class);
+        $dynamicPath = $dynamicService->getDynamicFilePath($scheme, $instrumentCode);
+        if ($dynamicPath && file_exists($dynamicPath)) {
+            return $dynamicPath;
         }
 
         return null;

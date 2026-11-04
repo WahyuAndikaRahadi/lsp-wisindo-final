@@ -9,6 +9,7 @@ use App\Models\Scheme;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class MukDynamicDocumentService
@@ -1130,6 +1131,15 @@ class MukDynamicDocumentService
     public function generateDynamicPdf(string $docType, Schedule $schedule, ?Assessment $assessment = null): string
     {
         $normType = strtolower(str_replace(['_', ' ', '-', '.'], '', $docType));
+
+        if (in_array($normType, ['ia01b', 'fria01b'], true)) {
+            $targetAssessment = $assessment ?? $schedule->assessments->first();
+            if ($targetAssessment) {
+                return $this->getUploadedIa01bPath($targetAssessment);
+            }
+            abort(404, 'Berkas FR.IA.01B (Report Sheet) belum diunggah oleh asesi.');
+        }
+
         $cacheKey = "dyn_{$schedule->id}_".($assessment?->id ?? 'sch')."_{$normType}.pdf";
         $outputPath = $this->cacheDir.'/'.$cacheKey;
 
@@ -1376,7 +1386,6 @@ class MukDynamicDocumentService
                 'ak04' => 'tests/Fixtures/muk/FR_AK_04_generated.pdf',
                 'ak07' => 'tests/Fixtures/muk/FR_AK_07_generated.pdf',
                 'ia01' => 'tests/Fixtures/muk/FR_IA_01_generated.pdf',
-                'ia01b' => 'tests/Fixtures/muk/FR_IA_01_B_generated.pdf',
                 'ia03' => 'tests/Fixtures/muk/FR_IA_03_generated.pdf',
                 'ia05c' => 'tests/Fixtures/muk/FR_IA_05_C_generated.pdf',
                 'daftarperiksa' => 'tests/Fixtures/muk/DAFTAR_PERIKSA_generated.pdf',
@@ -1392,6 +1401,75 @@ class MukDynamicDocumentService
         }
 
         abort(404, "Dokumen dinamis MUK untuk skema {$schedule->scheme?->name} ({$docType}) tidak ditemukan.");
+    }
+
+    /**
+     * Get file path of FR.IA.01B uploaded by assessee.
+     */
+    public function getUploadedIa01bPath(Assessment $assessment): string
+    {
+        $iaResponse = $assessment->iaResponses?->first(fn ($r) => strtoupper((string) $r->instrument_code) === 'IA01B')
+            ?? AssessmentIaResponse::where('assessment_id', $assessment->id)
+                ->whereIn('instrument_code', ['IA01B', 'ia01b'])
+                ->first();
+
+        $data = is_array($iaResponse?->data_json)
+            ? $iaResponse->data_json
+            : (json_decode($iaResponse?->data_json ?? '[]', true) ?: []);
+
+        $relativePath = $data['evidence_image_path'] ?? $data['file_path'] ?? $data['uploaded_file'] ?? null;
+
+        if (! $relativePath) {
+            abort(404, 'Berkas FR.IA.01B (Report Sheet) belum diunggah oleh asesi.');
+        }
+
+        $fullPath = null;
+        if (Storage::disk('local')->exists($relativePath)) {
+            $fullPath = Storage::disk('local')->path($relativePath);
+        } elseif (Storage::disk('public')->exists($relativePath)) {
+            $fullPath = Storage::disk('public')->path($relativePath);
+        } elseif (file_exists(storage_path('app/'.$relativePath))) {
+            $fullPath = storage_path('app/'.$relativePath);
+        } elseif (file_exists(storage_path('app/private/'.$relativePath))) {
+            $fullPath = storage_path('app/private/'.$relativePath);
+        } elseif (file_exists($relativePath)) {
+            $fullPath = $relativePath;
+        }
+
+        if (! $fullPath || ! file_exists($fullPath)) {
+            abort(404, 'Berkas fisik FR.IA.01B yang diunggah asesi tidak ditemukan pada penyimpanan server.');
+        }
+
+        return $fullPath;
+    }
+
+    /**
+     * Export FR.IA.01B file uploaded by assessee.
+     */
+    public function exportUploadedIa01b(Assessment $assessment, bool $download = false): BinaryFileResponse
+    {
+        $filePath = $this->getUploadedIa01bPath($assessment);
+        $asesiName = preg_replace('/[^A-Za-z0-9_-]/', '_', $assessment->asesi?->full_name ?? 'Asesi');
+        $ext = pathinfo($filePath, PATHINFO_EXTENSION) ?: 'pdf';
+        $filename = "FR.IA.01B-REPORT_SHEET-{$asesiName}.{$ext}";
+
+        $rawMime = @mime_content_type($filePath);
+        $mimeType = (! empty($rawMime) && ! in_array($rawMime, ['application/x-empty'], true))
+            ? $rawMime
+            : match (strtolower($ext)) {
+                'pdf' => 'application/pdf',
+                'jpg', 'jpeg' => 'image/jpeg',
+                'png' => 'image/png',
+                'webp' => 'image/webp',
+                default => $rawMime ?: 'application/octet-stream',
+            };
+
+        $disposition = ($download ? 'attachment' : 'inline').'; filename="'.$filename.'"';
+
+        return response()->file($filePath, [
+            'Content-Type' => $mimeType,
+            'Content-Disposition' => $disposition,
+        ]);
     }
 
     /**
@@ -1413,6 +1491,11 @@ class MukDynamicDocumentService
      */
     public function exportAssessment(Assessment $assessment, string $docType, bool $download = false): BinaryFileResponse
     {
+        $normType = strtolower(str_replace(['_', ' ', '-', '.'], '', $docType));
+        if (in_array($normType, ['ia01b', 'fria01b'], true)) {
+            return $this->exportUploadedIa01b($assessment, $download);
+        }
+
         $schedule = $assessment->schedule;
         $asesiName = $assessment->asesi?->full_name ?? 'Asesi';
         $filePath = $this->generateDynamicPdf($docType, $schedule, $assessment);

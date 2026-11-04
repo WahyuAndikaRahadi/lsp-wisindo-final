@@ -981,6 +981,15 @@ class LspWorkflowIntegrationTest extends TestCase
         }
 
         // 2. Asesi-level individual documents
+        Storage::fake('local');
+        $uploadedPath = 'ia01b_evidence/test_sheet.pdf';
+        Storage::disk('local')->put($uploadedPath, '%PDF-1.4 sample');
+        AssessmentIaResponse::create([
+            'assessment_id' => $assessment->id,
+            'instrument_code' => 'IA01B',
+            'data_json' => ['evidence_image_path' => $uploadedPath],
+        ]);
+
         $asesiDocExpectations = [
             'apl01' => 'FR.APL.01',
             'apl02' => 'FR.APL.02',
@@ -1002,7 +1011,11 @@ class LspWorkflowIntegrationTest extends TestCase
         foreach ($asesiDocExpectations as $type => $expectedSnippet) {
             $res = $this->actingAs($admin)->get(route('admin.dokumen-muk.export-asesi', [$assessment, $type]));
             $res->assertOk();
-            $res->assertSee($expectedSnippet);
+            if ($type === 'ia01b') {
+                $this->assertStringContainsString($expectedSnippet, $res->headers->get('Content-Disposition', ''));
+            } else {
+                $res->assertSee($expectedSnippet);
+            }
         }
     }
 }
