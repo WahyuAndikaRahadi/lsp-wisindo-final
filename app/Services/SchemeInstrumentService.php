@@ -125,6 +125,13 @@ class SchemeInstrumentService
         5 => 'MUK SKEMA 5 Mekanik Junior pdf',
         6 => 'MUK SKEMA 6 Servis Sepeda Motor Listrik.pdf',
         7 => 'MUK SKEMA 7 Klaster Servis Sepeda Motor Injeksi',
+        106 => 'MUK SKEMA 1 Engine Junior Technician',
+        107 => 'MUK SKEMA 2 Klaster Maintenance Gasoline Engine Injection',
+        108 => 'MUK SKEMA 3 Maintenence Electrical Vehicle.pdf',
+        109 => 'MUK SKEMA 4 Memperbaiki Panel Bodi Kendaraan',
+        110 => 'MUK SKEMA 5 Mekanik Junior pdf',
+        111 => 'MUK SKEMA 6 Servis Sepeda Motor Listrik.pdf',
+        112 => 'MUK SKEMA 7 Klaster Servis Sepeda Motor Injeksi',
     ];
 
     /**
@@ -276,13 +283,16 @@ class SchemeInstrumentService
             $start = 0;
         }
 
-        $end = strpos($raw, 'PENYUSUN DAN VALIDATOR');
-        if ($end === false) {
-            $end = strpos($raw, 'ASESI :');
+        $candidates = [];
+        if (preg_match('/(?:\n|\r)\s*ASESI\s*:/i', $raw, $m, PREG_OFFSET_CAPTURE)) {
+            $candidates[] = $m[0][1];
         }
-        if ($end === false) {
-            $end = strlen($raw);
+        $posPenyusun = strpos($raw, 'PENYUSUN DAN VALIDATOR');
+        if ($posPenyusun !== false) {
+            $candidates[] = $posPenyusun;
         }
+
+        $end = ! empty($candidates) ? min($candidates) : strlen($raw);
 
         $body = substr($raw, $start, $end - $start);
         $lines = explode("\n", $body);
@@ -290,10 +300,18 @@ class SchemeInstrumentService
 
         foreach ($lines as $line) {
             $trimmed = trim($line);
-            if (preg_match('/^\x0c?\s*(Lembaga Sertifikasi Profesi|LSP-PrO Indo|\d+)\s*$/i', $trimmed)) {
+            if (empty($trimmed)) {
+                $cleanedLines[] = '';
+
                 continue;
             }
-            $cleanedLines[] = rtrim($line, "\r");
+            if (preg_match('/^\d+$/', $trimmed)) {
+                continue;
+            }
+            if (str_contains($trimmed, 'Lembaga Sertifikasi Profesi') || str_contains($trimmed, 'LSP-PrO Indo')) {
+                continue;
+            }
+            $cleanedLines[] = str_replace("\x0c", '', rtrim($line, "\r"));
         }
 
         return trim(implode("\n", $cleanedLines));
@@ -347,10 +365,24 @@ class SchemeInstrumentService
 
         // Section B: Skenario & Tugas Praktik
         $paragraphs = preg_split('/\n\s*\n/', $body);
-        $html .= '<div class="space-y-6">';
-
+        $subBlocks = [];
         foreach ($paragraphs as $para) {
-            $trimmed = trim($para);
+            $pTrim = trim($para);
+            if (empty($pTrim)) {
+                continue;
+            }
+            $splits = preg_split('/(?=(?:^|\n)\s*(?:[STAR]\.|\bWaktu\s*:))/i', $pTrim);
+            foreach ($splits as $s) {
+                $st = trim($s);
+                if (! empty($st)) {
+                    $subBlocks[] = $st;
+                }
+            }
+        }
+
+        $html .= '<div class="space-y-5">';
+
+        foreach ($subBlocks as $trimmed) {
             if (empty($trimmed)) {
                 continue;
             }
@@ -365,22 +397,27 @@ class SchemeInstrumentService
                 continue;
             }
 
+            // Skip bare header lines like "No. Kode Unit Judul Unit"
+            if (preg_match('/^No\.\s*Kode\s*Unit\s*Judul\s*Unit$/i', $trimmed)) {
+                continue;
+            }
+
             // Units table
             if (preg_match_all('/([A-Z]\.[0-9A-Z]+\.[0-9A-Z]+\.[0-9A-Z]+)\s+([^\n\r]+)/', $trimmed, $unitMatches, PREG_SET_ORDER)) {
                 $html .= '<div class="rounded-xl border border-slate-200 overflow-hidden bg-white shadow-2xs my-3">';
                 $html .= '<div class="px-4 py-2.5 bg-slate-100 border-b border-slate-200 flex items-center justify-between text-xs font-bold text-slate-700">';
-                $html .= '<span>Daftar Unit Kompetensi Terkait</span>';
+                $html .= '<span class="flex items-center gap-1.5"><svg class="w-4 h-4 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>Daftar Unit Kompetensi Terkait</span>';
                 $html .= '<span class="text-[11px] font-mono text-brand-700 bg-brand-50 px-2 py-0.5 rounded border border-brand-200">'.count($unitMatches).' Unit</span>';
                 $html .= '</div>';
                 $html .= '<table class="w-full text-xs">';
-                $html .= '<thead class="bg-slate-50 text-slate-600 border-b border-slate-200"><tr>';
+                $html .= '<thead class="bg-slate-50 text-slate-600 border-b border-slate-200 font-semibold"><tr>';
                 $html .= '<th class="px-3.5 py-2 text-center w-12">No</th>';
                 $html .= '<th class="px-3.5 py-2 text-left w-48">Kode Unit</th>';
                 $html .= '<th class="px-3.5 py-2 text-left">Judul Unit Kompetensi</th>';
                 $html .= '</tr></thead>';
                 $html .= '<tbody class="divide-y divide-slate-100">';
                 foreach ($unitMatches as $idx => $um) {
-                    $html .= '<tr class="hover:bg-slate-50/60">';
+                    $html .= '<tr class="hover:bg-slate-50/70 transition">';
                     $html .= '<td class="px-3.5 py-2 text-center font-mono text-slate-500">'.($idx + 1).'</td>';
                     $html .= '<td class="px-3.5 py-2 font-mono font-bold text-brand-700">'.htmlspecialchars($um[1]).'</td>';
                     $html .= '<td class="px-3.5 py-2 text-slate-800 font-medium">'.htmlspecialchars(trim($um[2])).'</td>';
@@ -393,7 +430,7 @@ class SchemeInstrumentService
 
             // S. Skenario
             if (preg_match('/^(?:Skenario.*?:\s*)?S\.\s*(.+)/s', $trimmed, $m)) {
-                $html .= '<div class="p-4 rounded-xl border border-sky-200 bg-sky-50/50 space-y-2 shadow-2xs">';
+                $html .= '<div class="p-4 rounded-xl border border-sky-200 bg-sky-50/60 space-y-2 shadow-2xs">';
                 $html .= '<div class="flex items-center gap-2">';
                 $html .= '<span class="w-5 h-5 rounded-md bg-sky-600 text-white font-bold text-xs flex items-center justify-center">S</span>';
                 $html .= '<span class="font-bold text-sky-950 text-xs uppercase tracking-wide">Skenario &amp; Persyaratan Asesi</span>';
@@ -406,7 +443,7 @@ class SchemeInstrumentService
 
             // T. Tugas
             if (preg_match('/^T\.\s*(.+)/s', $trimmed, $m)) {
-                $html .= '<div class="p-4 rounded-xl border border-indigo-200 bg-indigo-50/50 space-y-2 shadow-2xs">';
+                $html .= '<div class="p-4 rounded-xl border border-indigo-200 bg-indigo-50/60 space-y-2 shadow-2xs">';
                 $html .= '<div class="flex items-center gap-2">';
                 $html .= '<span class="w-5 h-5 rounded-md bg-indigo-600 text-white font-bold text-xs flex items-center justify-center">T</span>';
                 $html .= '<span class="font-bold text-indigo-950 text-xs uppercase tracking-wide">Tugas Unjuk Kerja / Praktik</span>';
@@ -419,7 +456,7 @@ class SchemeInstrumentService
 
             // A. Alat & Bahan
             if (preg_match('/^A\.\s*(.+)/s', $trimmed, $m)) {
-                $html .= '<div class="p-4 rounded-xl border border-amber-200 bg-amber-50/50 space-y-2 shadow-2xs">';
+                $html .= '<div class="p-4 rounded-xl border border-amber-200 bg-amber-50/60 space-y-2 shadow-2xs">';
                 $html .= '<div class="flex items-center gap-2">';
                 $html .= '<span class="w-5 h-5 rounded-md bg-amber-600 text-white font-bold text-xs flex items-center justify-center">A</span>';
                 $html .= '<span class="font-bold text-amber-950 text-xs uppercase tracking-wide">Alat, Bahan &amp; Perlengkapan yang Diberikan</span>';
@@ -432,7 +469,7 @@ class SchemeInstrumentService
 
             // R. Hasil
             if (preg_match('/^R\.\s*(.+)/s', $trimmed, $m)) {
-                $html .= '<div class="p-4 rounded-xl border border-emerald-200 bg-emerald-50/50 space-y-2 shadow-2xs">';
+                $html .= '<div class="p-4 rounded-xl border border-emerald-200 bg-emerald-50/60 space-y-2 shadow-2xs">';
                 $html .= '<div class="flex items-center gap-2">';
                 $html .= '<span class="w-5 h-5 rounded-md bg-emerald-600 text-white font-bold text-xs flex items-center justify-center">R</span>';
                 $html .= '<span class="font-bold text-emerald-950 text-xs uppercase tracking-wide">Hasil yang Diharapkan (Output)</span>';
@@ -453,8 +490,8 @@ class SchemeInstrumentService
                 continue;
             }
 
-            // Kelompok header
-            if (preg_match('/Kelompok\s*(?:Pekerjaan\s*)?\d+/i', $trimmed)) {
+            // Kelompok header (only if short string)
+            if (strlen($trimmed) < 120 && preg_match('/(?:^|\b)Kelompok\s*(?:Pekerjaan\s*)?\d+/i', $trimmed)) {
                 $html .= '<div class="pt-4 pb-1">';
                 $html .= '<h4 class="text-xs font-bold uppercase tracking-wider text-brand-700 bg-brand-50 border border-brand-200 px-3.5 py-1.5 rounded-lg inline-block">';
                 $html .= htmlspecialchars($trimmed);

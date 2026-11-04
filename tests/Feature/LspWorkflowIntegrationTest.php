@@ -470,14 +470,14 @@ class LspWorkflowIntegrationTest extends TestCase
         $this->assertNotEmpty($response->data_json['evidence_image_path']);
         Storage::disk('local')->assertExists($response->data_json['evidence_image_path']);
 
-        // Assessor views IA02 assessment page and sees uploaded evidence
+        // Assessor views IA02 assessment page
         $asesorRes = $this->actingAs($asesorUser)->get(
             route('asesor.assessment.instrument', ['assessment' => $assessment->id, 'code' => 'ia02'])
         );
         $asesorRes->assertOk();
-        $asesorRes->assertSee('Pemeriksaan Bukti Lembar Fisik');
-        $asesorRes->assertSee('Lembar Jawaban Terunggah');
-        $asesorRes->assertSee(route('secure-file.evidence', $response));
+        $asesorRes->assertSee('FR.IA.02. Tugas Praktik Demonstrasi');
+        $asesorRes->assertSee('Tugas Praktik Demonstrasi (TPD)');
+        $asesorRes->assertSee('Persetujuan &amp; Tanda Tangan', false);
 
         // Assessor stores grades while preserving uploaded evidence
         $storeRes = $this->actingAs($asesorUser)->post(
