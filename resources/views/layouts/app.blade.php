@@ -234,6 +234,13 @@
                                 </svg>
                                 <span>Jadwal Asesmen Uji</span>
                             </a>
+                            <a href="{{ route('asesi.certificates.index') }}" 
+                               class="flex items-center space-x-3 px-3 py-2.5 rounded text-xs font-semibold transition {{ request()->routeIs('asesi.certificates.*') ? 'bg-lsp-input-bg text-lsp-navy border-l-4 border-lsp-navy font-bold' : 'text-slate-600 hover:text-lsp-navy hover:bg-slate-50' }}">
+                                <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                                </svg>
+                                <span>Sertifikat Saya</span>
+                            </a>
 
                         @elseif(auth()->user()->isRole('ASESOR'))
                             <div class="px-3 pt-3 pb-1 text-[10px] font-extrabold text-lsp-muted uppercase tracking-wider">
@@ -265,12 +272,26 @@
                                 </svg>
                                 <span>Dashboard Admin</span>
                             </a>
+                            <a href="{{ route('admin.profile.edit') }}" 
+                               class="flex items-center space-x-3 px-3 py-2.5 rounded text-xs font-semibold transition {{ request()->routeIs('admin.profile.*') ? 'bg-lsp-input-bg text-lsp-navy border-l-4 border-lsp-navy font-bold' : 'text-slate-600 hover:text-lsp-navy hover:bg-slate-50' }}">
+                                <svg class="w-4 h-4 text-lsp-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7 7z"/>
+                                </svg>
+                                <span>Profil &amp; TTD Admin</span>
+                            </a>
                             <a href="{{ route('admin.jadwal.index') }}" 
                                class="flex items-center space-x-3 px-3 py-2.5 rounded text-xs font-semibold transition {{ request()->routeIs('admin.jadwal.*') ? 'bg-lsp-input-bg text-lsp-navy border-l-4 border-lsp-navy font-bold' : 'text-slate-600 hover:text-lsp-navy hover:bg-slate-50' }}">
                                 <svg class="w-4 h-4 text-lsp-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                                 </svg>
                                 <span>Kelola Jadwal Asesmen</span>
+                            </a>
+                            <a href="{{ route('admin.certificates.index') }}" 
+                               class="flex items-center space-x-3 px-3 py-2.5 rounded text-xs font-semibold transition {{ request()->routeIs('admin.certificates.*') ? 'bg-lsp-input-bg text-lsp-navy border-l-4 border-lsp-navy font-bold' : 'text-slate-600 hover:text-lsp-navy hover:bg-slate-50' }}">
+                                <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                                </svg>
+                                <span>Kelola Sertifikat</span>
                             </a>
                             <a href="{{ route('admin.dokumen-muk.index') }}" 
                                class="flex items-center space-x-3 px-3 py-2.5 rounded text-xs font-semibold transition {{ request()->routeIs('admin.dokumen-muk.*') ? 'bg-lsp-input-bg text-lsp-navy border-l-4 border-lsp-navy font-bold' : 'text-slate-600 hover:text-lsp-navy hover:bg-slate-50' }}">
@@ -328,19 +349,43 @@
                 <!-- Sidebar Bottom: User Profile & Logout -->
                 <div class="p-3 border-t border-slate-200 bg-slate-50/50">
                     <div class="flex items-center justify-between p-2">
-                        <div class="flex items-center space-x-2.5 overflow-hidden">
-                            <div class="w-8 h-8 rounded bg-lsp-navy text-white font-bold text-xs flex items-center justify-center flex-shrink-0 shadow-sm">
-                                {{ strtoupper(substr(auth()->user()->full_name, 0, 2)) }}
+                        @php
+                            $userProfileLink = match(true) {
+                                auth()->user()->isRole('ASESI') => route('asesi.profile.edit'),
+                                auth()->user()->isRole('ASESOR') => route('asesor.profile.edit'),
+                                auth()->user()->isAdmin() => route('admin.profile.edit'),
+                                default => null,
+                            };
+                        @endphp
+                        @if($userProfileLink)
+                            <a href="{{ $userProfileLink }}" title="Buka Profil &amp; Pengaturan" class="flex items-center space-x-2.5 overflow-hidden group hover:opacity-85 transition">
+                                <div class="w-8 h-8 rounded bg-lsp-navy group-hover:bg-lsp-navy-dark text-white font-bold text-xs flex items-center justify-center flex-shrink-0 shadow-sm">
+                                    {{ strtoupper(substr(auth()->user()->full_name, 0, 2)) }}
+                                </div>
+                                <div class="truncate">
+                                    <p class="text-xs font-bold text-slate-800 group-hover:text-lsp-navy truncate leading-tight">
+                                        {{ auth()->user()->full_name }}
+                                    </p>
+                                    <span class="inline-block px-1.5 py-0.2 text-[9px] font-bold rounded bg-lsp-navy/10 text-lsp-navy uppercase tracking-wider mt-0.5">
+                                        {{ auth()->user()->role }}
+                                    </span>
+                                </div>
+                            </a>
+                        @else
+                            <div class="flex items-center space-x-2.5 overflow-hidden">
+                                <div class="w-8 h-8 rounded bg-lsp-navy text-white font-bold text-xs flex items-center justify-center flex-shrink-0 shadow-sm">
+                                    {{ strtoupper(substr(auth()->user()->full_name, 0, 2)) }}
+                                </div>
+                                <div class="truncate">
+                                    <p class="text-xs font-bold text-slate-800 truncate leading-tight">
+                                        {{ auth()->user()->full_name }}
+                                    </p>
+                                    <span class="inline-block px-1.5 py-0.2 text-[9px] font-bold rounded bg-lsp-navy/10 text-lsp-navy uppercase tracking-wider mt-0.5">
+                                        {{ auth()->user()->role }}
+                                    </span>
+                                </div>
                             </div>
-                            <div class="truncate">
-                                <p class="text-xs font-bold text-slate-800 truncate leading-tight">
-                                    {{ auth()->user()->full_name }}
-                                </p>
-                                <span class="inline-block px-1.5 py-0.2 text-[9px] font-bold rounded bg-lsp-navy/10 text-lsp-navy uppercase tracking-wider mt-0.5">
-                                    {{ auth()->user()->role }}
-                                </span>
-                            </div>
-                        </div>
+                        @endif
 
                         <!-- Logout Form -->
                         <form action="{{ route('logout') }}" method="POST">

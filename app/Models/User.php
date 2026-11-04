@@ -70,6 +70,11 @@ class User extends Authenticatable
         return $this->belongsToMany(Schedule::class, 't_schedule_assessors', 'assessor_id', 'schedule_id');
     }
 
+    public function certificates(): HasMany
+    {
+        return $this->hasMany(Certificate::class, 'asesi_id');
+    }
+
     public function scopeRole($query, $role)
     {
         return $query->where('role', $role);

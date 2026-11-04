@@ -78,6 +78,16 @@
                     <span>Skema Aktif dan Siap Digunakan dalam Jadwal Asesmen</span>
                 </label>
             </div>
+
+            <div class="p-4 bg-slate-50 border border-slate-200 rounded-lg flex items-center justify-between text-xs">
+                <div>
+                    <span class="font-bold text-slate-800 block">Unit Kompetensi &amp; KUK ({{ $scheme->competencyUnits->count() }} Unit Terdaftar)</span>
+                    <span class="text-slate-500">Kelola dan edit butir unit kompetensi, elemen, dan KUK langsung pada halaman detail skema.</span>
+                </div>
+                <a href="{{ route('admin.schemes.show', $scheme->id) }}" class="px-3 py-1.5 bg-brand-50 text-brand-700 hover:bg-brand-100 font-bold rounded border border-brand-200 transition shrink-0">
+                    Kelola Unit &amp; KUK &rarr;
+                </a>
+            </div>
         </div>
 
         <div class="flex items-center justify-between">

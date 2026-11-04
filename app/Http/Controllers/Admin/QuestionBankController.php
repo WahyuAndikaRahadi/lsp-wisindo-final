@@ -12,13 +12,38 @@ use Illuminate\View\View;
 
 class QuestionBankController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        $questions = QuestionBank::with('scheme', 'competencyUnit')
-            ->latest()
-            ->paginate(20);
+        $selectedSchemeId = $request->query('scheme_id');
+        $search = $request->query('search');
 
-        return view('admin.question-banks.index', compact('questions'));
+        $schemes = Scheme::active()
+            ->withCount('questionBanks')
+            ->get();
+
+        $questionBanks = $schemes->map(function ($scheme) {
+            return (object) [
+                'id' => $scheme->id,
+                'title' => "Paket Soal CBT - {$scheme->name}",
+                'code' => "BANK-{$scheme->code}",
+                'scheme' => $scheme,
+                'type' => 'IA05 (CBT)',
+                'questions_count' => $scheme->question_banks_count,
+                'status' => $scheme->is_active ? 'ACTIVE' : 'INACTIVE',
+            ];
+        });
+
+        $questionsQuery = QuestionBank::with('scheme', 'competencyUnit')->latest();
+        if ($selectedSchemeId) {
+            $questionsQuery->where('scheme_id', $selectedSchemeId);
+        }
+        if ($search) {
+            $questionsQuery->where('question_text', 'like', "%{$search}%");
+        }
+
+        $questions = $questionsQuery->paginate(15)->withQueryString();
+
+        return view('admin.question-banks.index', compact('questionBanks', 'questions', 'schemes', 'selectedSchemeId', 'search'));
     }
 
     public function show(QuestionBank $questionBank): View

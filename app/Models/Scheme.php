@@ -39,6 +39,11 @@ class Scheme extends Model
         return $this->hasMany(CompetencyUnit::class);
     }
 
+    public function units(): HasMany
+    {
+        return $this->competencyUnits();
+    }
+
     public function questionBanks(): HasMany
     {
         return $this->hasMany(QuestionBank::class);

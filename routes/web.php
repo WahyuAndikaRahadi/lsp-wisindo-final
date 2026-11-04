@@ -229,6 +229,11 @@ Route::middleware(['auth', 'role:ASESI'])->prefix('asesi')->name('asesi.')->grou
     Route::get('/profile', [Asesi\ProfileController::class, 'edit'])->name('profile.edit');
     Route::post('/profile', [Asesi\ProfileController::class, 'update'])->name('profile.update');
 
+    // Sertifikat Saya
+    Route::get('/sertifikat', [Asesi\CertificateController::class, 'index'])->name('certificates.index');
+    Route::get('/sertifikat/{certificate}/preview', [Asesi\CertificateController::class, 'preview'])->name('certificates.preview');
+    Route::get('/sertifikat/{certificate}/download', [Asesi\CertificateController::class, 'download'])->name('certificates.download');
+
     // Jadwal
     Route::get('/jadwal', [Asesi\JadwalController::class, 'index'])->name('jadwal.index');
     Route::post('/jadwal/join', [Asesi\JadwalController::class, 'join'])->middleware('throttle:10,1')->name('jadwal.join');
@@ -339,11 +344,23 @@ Route::middleware(['auth', 'role:ASESOR'])->prefix('asesor')->name('asesor.')->g
 Route::middleware(['auth', 'role:SUPER_ADMIN,ADMIN_LSP,KOMITE_TEKNIS,TUK_ADMIN'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [Admin\DashboardController::class, 'index'])->name('dashboard');
 
+    // Admin Profile & Digital Signature Settings
+    Route::get('/profile', [Admin\ProfileController::class, 'edit'])->name('profile.edit');
+    Route::post('/profile', [Admin\ProfileController::class, 'update'])->name('profile.update');
+
     // Appeals (FR.AK.04) - Read list
     Route::get('/appeals', [Admin\AppealController::class, 'index'])->name('appeals.index');
 
     // Jadwal - Read list
     Route::get('/jadwal', [Admin\JadwalController::class, 'index'])->name('jadwal.index');
+
+    // Sertifikat Kompetensi
+    Route::get('/certificates', [Admin\CertificateController::class, 'index'])->name('certificates.index');
+    Route::get('/jadwal/{schedule}/sertifikat', [Admin\CertificateController::class, 'scheduleCertificates'])->name('certificates.schedule');
+    Route::post('/jadwal/{schedule}/sertifikat', [Admin\CertificateController::class, 'store'])->name('certificates.store');
+    Route::delete('/certificates/{certificate}', [Admin\CertificateController::class, 'destroy'])->name('certificates.destroy');
+    Route::get('/certificates/{certificate}/preview', [Admin\CertificateController::class, 'preview'])->name('certificates.preview');
+    Route::get('/certificates/{certificate}/download', [Admin\CertificateController::class, 'download'])->name('certificates.download');
 
     // Write actions restricted strictly to SUPER_ADMIN and ADMIN_LSP
     Route::middleware(['role:SUPER_ADMIN,ADMIN_LSP'])->group(function () {
@@ -391,6 +408,19 @@ Route::middleware(['auth', 'role:SUPER_ADMIN,ADMIN_LSP,KOMITE_TEKNIS,TUK_ADMIN']
         Route::resource('users', Admin\UserController::class);
         Route::resource('schemes', Admin\SchemeController::class);
         Route::resource('question-banks', Admin\QuestionBankController::class);
+
+        // Scheme Competency Units, Elements & KUK Management
+        Route::post('/schemes/{scheme}/units', [Admin\SchemeController::class, 'storeUnit'])->name('schemes.units.store');
+        Route::put('/units/{unit}', [Admin\SchemeController::class, 'updateUnit'])->name('schemes.units.update');
+        Route::delete('/units/{unit}', [Admin\SchemeController::class, 'destroyUnit'])->name('schemes.units.destroy');
+
+        Route::post('/units/{unit}/elements', [Admin\SchemeController::class, 'storeElement'])->name('schemes.elements.store');
+        Route::put('/elements/{element}', [Admin\SchemeController::class, 'updateElement'])->name('schemes.elements.update');
+        Route::delete('/elements/{element}', [Admin\SchemeController::class, 'destroyElement'])->name('schemes.elements.destroy');
+
+        Route::post('/elements/{element}/kuks', [Admin\SchemeController::class, 'storeKuk'])->name('schemes.kuks.store');
+        Route::put('/kuks/{kuk}', [Admin\SchemeController::class, 'updateKuk'])->name('schemes.kuks.update');
+        Route::delete('/kuks/{kuk}', [Admin\SchemeController::class, 'destroyKuk'])->name('schemes.kuks.destroy');
     });
 });
 

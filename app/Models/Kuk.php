@@ -40,6 +40,11 @@ class Kuk extends Model
         return $this->statement;
     }
 
+    public function getCriteriaNumberAttribute(): ?string
+    {
+        return $this->code_number;
+    }
+
     public function getElementTitleAttribute(): ?string
     {
         return $this->unitElement?->title;

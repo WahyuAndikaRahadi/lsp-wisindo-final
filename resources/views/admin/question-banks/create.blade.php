@@ -20,7 +20,7 @@
                     <select name="scheme_id" required class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none bg-white">
                         <option value="">-- Pilih Skema --</option>
                         @foreach($schemes ?? [] as $scheme)
-                            <option value="{{ $scheme->id }}" {{ old('scheme_id') == $scheme->id ? 'selected' : '' }}>
+                            <option value="{{ $scheme->id }}" {{ old('scheme_id', request('scheme_id')) == $scheme->id ? 'selected' : '' }}>
                                 {{ $scheme->name }} ({{ $scheme->code }})
                             </option>
                         @endforeach

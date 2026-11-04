@@ -122,6 +122,11 @@ class Assessment extends Model
         return $this->hasOne(AssessmentAppeal::class)->latestOfMany();
     }
 
+    public function certificate(): HasOne
+    {
+        return $this->hasOne(Certificate::class);
+    }
+
     public function iaResponses(): HasMany
     {
         return $this->hasMany(AssessmentIaResponse::class);

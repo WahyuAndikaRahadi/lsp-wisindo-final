@@ -134,6 +134,11 @@ class Schedule extends Model
         return $this->hasMany(Assessment::class);
     }
 
+    public function certificates(): HasMany
+    {
+        return $this->hasMany(Certificate::class);
+    }
+
     /**
      * Determine whether a lifecycle step in the assessment workflow is unlocked for this schedule.
      */
