@@ -10,6 +10,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class MukDynamicDocumentService
@@ -1488,9 +1489,9 @@ class MukDynamicDocumentService
     }
 
     /**
-     * Get file path of FR.IA.01B uploaded by assessee.
+     * Get file path of FR.IA.01B uploaded by assessee, or null if not yet uploaded.
      */
-    public function getUploadedIa01bPath(Assessment $assessment): string
+    public function getUploadedIa01bPath(Assessment $assessment): ?string
     {
         $iaResponse = $assessment->iaResponses?->first(fn ($r) => strtoupper((string) $r->instrument_code) === 'IA01B')
             ?? AssessmentIaResponse::where('assessment_id', $assessment->id)
@@ -1504,7 +1505,7 @@ class MukDynamicDocumentService
         $relativePath = $data['evidence_image_path'] ?? $data['file_path'] ?? $data['uploaded_file'] ?? null;
 
         if (! $relativePath) {
-            abort(404, 'Berkas FR.IA.01B (Report Sheet) belum diunggah oleh asesi.');
+            return null;
         }
 
         $fullPath = null;
@@ -1521,7 +1522,7 @@ class MukDynamicDocumentService
         }
 
         if (! $fullPath || ! file_exists($fullPath)) {
-            abort(404, 'Berkas fisik FR.IA.01B yang diunggah asesi tidak ditemukan pada penyimpanan server.');
+            return null;
         }
 
         return $fullPath;
@@ -1530,9 +1531,16 @@ class MukDynamicDocumentService
     /**
      * Export FR.IA.01B file uploaded by assessee.
      */
-    public function exportUploadedIa01b(Assessment $assessment, bool $download = false): BinaryFileResponse
+    public function exportUploadedIa01b(Assessment $assessment, bool $download = false): BinaryFileResponse|View
     {
         $filePath = $this->getUploadedIa01bPath($assessment);
+        if (! $filePath) {
+            return view('admin.dokumen-muk.not-uploaded', [
+                'assessment' => $assessment,
+                'documentCode' => 'FR.IA.01B',
+                'documentName' => 'FR.IA.01B (Report Sheet / Lembar Pemeriksaan Teknis)',
+            ]);
+        }
         $asesiName = preg_replace('/[^A-Za-z0-9_-]/', '_', $assessment->asesi?->full_name ?? 'Asesi');
         $ext = pathinfo($filePath, PATHINFO_EXTENSION) ?: 'pdf';
         $filename = "FR.IA.01B-REPORT_SHEET-{$asesiName}.{$ext}";
@@ -1573,7 +1581,7 @@ class MukDynamicDocumentService
     /**
      * Export dynamic candidate assessment document.
      */
-    public function exportAssessment(Assessment $assessment, string $docType, bool $download = false): BinaryFileResponse
+    public function exportAssessment(Assessment $assessment, string $docType, bool $download = false): BinaryFileResponse|View
     {
         $normType = strtolower(str_replace(['_', ' ', '-', '.'], '', $docType));
         if (in_array($normType, ['ia01b', 'fria01b'], true)) {

@@ -21,7 +21,7 @@ class DokumenMukController extends Controller
 
     public function index(): View
     {
-        $schedules = Schedule::with('scheme', 'assessments')
+        $schedules = Schedule::with(['scheme', 'assessments.asesi.profile', 'assessments.iaResponses'])
             ->latest('date')
             ->paginate(15);
 

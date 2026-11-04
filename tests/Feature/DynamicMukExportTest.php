@@ -337,6 +337,25 @@ class DynamicMukExportTest extends TestCase
         $this->assertStringContainsString('PENYUSUN DAN VALIDATOR', $pdfText);
     }
 
+    public function test_admin_sees_not_uploaded_page_when_candidate_has_not_uploaded_ia01b(): void
+    {
+        // Ensure no IA01B upload
+        AssessmentIaResponse::where('assessment_id', $this->assessment->id)
+            ->whereIn('instrument_code', ['IA01B', 'ia01b'])
+            ->delete();
+
+        $response = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.asesi-dynamic', [
+            'assessment' => $this->assessment->id,
+            'type' => 'ia01b',
+        ]));
+
+        $response->assertOk();
+        $response->assertViewIs('admin.dokumen-muk.not-uploaded');
+        $response->assertSee('Dokumen Belum Diunggah');
+        $response->assertSee('FR.IA.01B');
+        $response->assertSee('Bambang Sudarmono');
+    }
+
     public function test_admin_can_export_dynamic_candidate_ia03_pdf(): void
     {
         $response = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.asesi-dynamic', [
