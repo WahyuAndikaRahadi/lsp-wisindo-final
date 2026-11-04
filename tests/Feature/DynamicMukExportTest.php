@@ -76,7 +76,7 @@ class DynamicMukExportTest extends TestCase
         $service = app(MukDynamicDocumentService::class);
         $scheme = $this->schedule->scheme;
 
-        $types = ['apl01', 'apl02', 'ak01', 'ak02', 'ak03', 'ak07', 'ia01', 'ia01b', 'ia03', 'ia05c', 'ba', 'hadir-asesor'];
+        $types = ['apl01', 'apl02', 'ak01', 'ak02', 'ak03', 'ak07', 'ia01', 'ia01b', 'ia02', 'ia03', 'ia05c', 'ba', 'hadir-asesor'];
         foreach ($types as $type) {
             $path = $service->getDynamicFilePath($scheme, $type);
             $this->assertNotNull($path, "Failed finding dynamic path for type: {$type}");
@@ -313,6 +313,28 @@ class DynamicMukExportTest extends TestCase
         $this->assertStringContainsString('FR.IA.01', $pdfText);
         $this->assertStringContainsString('Bambang Sudarmono', $pdfText);
         $this->assertStringContainsString('Ir. Hendra Gunawan, S.T.', $pdfText);
+    }
+
+    public function test_admin_can_export_dynamic_candidate_ia02_pdf(): void
+    {
+        $response = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.asesi-dynamic', [
+            'assessment' => $this->assessment->id,
+            'type' => 'ia02',
+        ]));
+
+        $response->assertOk();
+        $this->assertInstanceOf(BinaryFileResponse::class, $response->baseResponse);
+        $this->assertEquals('application/pdf', $response->headers->get('Content-Type'));
+        $filePath = $response->baseResponse->getFile()->getPathname();
+        $this->assertFileExists($filePath);
+
+        $nullDev = PHP_OS_FAMILY === 'Windows' ? '2>nul' : '2>/dev/null';
+        $pdfText = shell_exec('pdftotext '.escapeshellarg($filePath)." - {$nullDev}") ?? '';
+        $this->assertStringContainsString('FR.IA.02', $pdfText);
+        $this->assertStringContainsString('TUGAS PRAKTIK DEMONSTRASI', $pdfText);
+        $this->assertStringContainsString('Bambang Sudarmono', $pdfText);
+        $this->assertStringContainsString('Ir. Hendra Gunawan, S.T.', $pdfText);
+        $this->assertStringContainsString('PENYUSUN DAN VALIDATOR', $pdfText);
     }
 
     public function test_admin_can_export_dynamic_candidate_ia03_pdf(): void

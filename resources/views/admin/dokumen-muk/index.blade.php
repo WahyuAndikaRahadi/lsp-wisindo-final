@@ -134,7 +134,7 @@
                                                     <a href="{{ route('admin.dokumen-muk.asesi-dynamic', ['assessment' => $assessment->id, 'type' => 'ia01b']) }}" target="_blank" class="px-1.5 py-0.5 text-[10px] font-medium bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded border border-indigo-200" title="FR.IA.01B Report Sheet">
                                                         IA.01B
                                                     </a>
-                                                    <a href="{{ route('admin.dokumen-muk.asesi-fixed', ['assessment' => $assessment->id, 'type' => 'ia02']) }}" target="_blank" class="px-1.5 py-0.5 text-[10px] font-medium bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded border border-indigo-200" title="Fixed Master PDF: FR.IA.02 Tugas Praktik Demonstrasi">
+                                                    <a href="{{ route('admin.dokumen-muk.asesi-dynamic', ['assessment' => $assessment->id, 'type' => 'ia02']) }}" target="_blank" class="px-1.5 py-0.5 text-[10px] font-medium bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded border border-indigo-200" title="FR.IA.02 Tugas Praktik Demonstrasi">
                                                         IA.02
                                                     </a>
                                                     <a href="{{ route('admin.dokumen-muk.asesi-dynamic', ['assessment' => $assessment->id, 'type' => 'ia03']) }}" target="_blank" class="px-1.5 py-0.5 text-[10px] font-medium bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded border border-indigo-200" title="FR.IA.03 Pertanyaan Lisan">

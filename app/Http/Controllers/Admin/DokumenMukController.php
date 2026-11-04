@@ -132,7 +132,7 @@ class DokumenMukController extends Controller
             return $this->exporter->exportAssessmentAsesiXls($assessment);
         }
 
-        $dynamicTypes = ['apl01', 'apl02', 'ak01', 'ak02', 'ak03', 'ak04', 'ak07', 'ia01', 'ia01b', 'ia03', 'ia05c', 'pernyataan'];
+        $dynamicTypes = ['apl01', 'apl02', 'ak01', 'ak02', 'ak03', 'ak04', 'ak07', 'ia01', 'ia01b', 'ia02', 'ia03', 'ia05c', 'pernyataan'];
         if ($targetType === 'ia01b' || $request->query('source') === 'dynamic' || ($request->query('format') === 'pdf' && in_array($targetType, $dynamicTypes, true))) {
             return $this->dynamicService->exportAssessment($assessment, $targetType, $request->boolean('download'));
         }

@@ -188,6 +188,12 @@ class MukDynamicDocumentService
                         return $file->getPathname();
                     }
                     break;
+                case 'ia02':
+                case 'fria02':
+                    if (str_contains($name, 'ia.02') || str_contains($name, 'ia 02') || str_contains($name, 'ia-02')) {
+                        return $file->getPathname();
+                    }
+                    break;
                 case 'ia03':
                 case 'fria03':
                     if (str_contains($name, 'ia.03') || str_contains($name, 'ia 03') || str_contains($name, 'ia-03')) {
@@ -1003,6 +1009,62 @@ class MukDynamicDocumentService
     /**
      * Build specific payload for FR.IA.03 (Pertanyaan Mendukung Observasi).
      */
+    public function buildIa02Data(Schedule $schedule, Assessment $assessment): array
+    {
+        $asesi = $assessment->asesi;
+        $profile = $asesi?->profile;
+        $assessor = $assessment->assessor ?? $schedule->assessors->first();
+        $scheme = $assessment->scheme ?? $schedule->scheme;
+
+        $tgl = $assessment->registered_at
+            ? Carbon::parse($assessment->registered_at)->locale('id')->translatedFormat('d F Y')
+            : ($schedule->date ? Carbon::parse($schedule->date)->locale('id')->translatedFormat('d F Y') : Carbon::now()->locale('id')->translatedFormat('d F Y'));
+
+        $tukType = $schedule->tuk_type ?? 'Sewaktu';
+        $tukDisplay = match (strtolower((string) $tukType)) {
+            'tempat_kerja', 'tempat kerja' => 'Tempat Kerja',
+            'mandiri' => 'Mandiri',
+            default => 'Sewaktu',
+        };
+
+        if (! $assessment->relationLoaded('iaResponses')) {
+            $assessment->load('iaResponses');
+        }
+
+        $ia02Response = $assessment->iaResponses?->first(fn ($r) => strtoupper((string) $r->instrument_code) === 'IA02')
+            ?? AssessmentIaResponse::where('assessment_id', $assessment->id)->where('instrument_code', 'IA02')->first();
+
+        $tglAsesor = $ia02Response?->assessor_signed_at
+            ? Carbon::parse($ia02Response->assessor_signed_at)->locale('id')->translatedFormat('d F Y')
+            : ($schedule->date ? Carbon::parse($schedule->date)->locale('id')->translatedFormat('d F Y') : $tgl);
+
+        $tglAsesi = $ia02Response?->asesi_signed_at
+            ? Carbon::parse($ia02Response->asesi_signed_at)->locale('id')->translatedFormat('d F Y')
+            : ($schedule->date ? Carbon::parse($schedule->date)->locale('id')->translatedFormat('d F Y') : $tgl);
+
+        $isIa02Filled = $ia02Response !== null;
+
+        return [
+            'skema_nama' => $scheme?->name ?? 'Engine Junior Technician',
+            'skema_nomor' => $scheme?->code ?? '01/LSP PrO Indo/I/2026',
+            'tuk_nama' => $schedule->tuk_name,
+            'tuk_tipe' => $tukDisplay.'*',
+            'asesor_nama' => $assessor?->full_name ?? 'Ir. Hendra Gunawan, S.T.',
+            'asesor_no_reg' => $assessor?->profile?->no_reg ?? $assessor?->profile?->no_reg_asesor ?? 'MET.000.001234 2021',
+            'asesi_nama' => $asesi?->full_name ?? 'Nama Asesi',
+            'asesi_nik' => $profile?->nik ?? '',
+            'tanggal' => $tgl,
+            'tanggal_ttd' => $tgl,
+            'tanggal_ttd_asesor' => $tglAsesor,
+            'tanggal_ttd_asesi' => $tglAsesi,
+            'is_kompeten' => ! in_array($assessment->final_result, ['BK', 'BELUM_KOMPETEN', 'BELUM KOMPETEN'], true),
+            'signature_asesi' => $ia02Response?->asesi_signature ?? $assessment->asesi_signature ?? $profile?->signature_data,
+            'signature_asesor' => $ia02Response?->assessor_signature ?? $assessment->assessor_signature ?? $assessor?->profile?->signature_data,
+            'has_db_response' => $isIa02Filled,
+            'is_filled' => $isIa02Filled,
+        ];
+    }
+
     public function buildIa03Data(Schedule $schedule, Assessment $assessment): array
     {
         $asesi = $assessment->asesi;
@@ -1289,6 +1351,28 @@ class MukDynamicDocumentService
                     $masterArg = ($masterPdf && File::isFile($masterPdf)) ? ' '.escapeshellarg($masterPdf) : '';
                     shell_exec("{$pythonExec} ".escapeshellarg($script).' '.escapeshellarg($tempIa01Json).' '.escapeshellarg($outputPath).$masterArg.' 2>&1');
                     @unlink($tempIa01Json);
+                    if (File::isFile($outputPath) && filesize($outputPath) > 1000) {
+                        return $outputPath;
+                    }
+                }
+            }
+
+            if ($normType === 'ia02') {
+                $script = base_path('tools/render_fr_ia_02.py');
+                if (File::isFile($script)) {
+                    $targetAssessment = $assessment ?? $schedule->assessments->first();
+                    $ia02Payload = $targetAssessment
+                        ? $this->buildIa02Data($schedule, $targetAssessment)
+                        : $this->buildPayload($schedule, null);
+                    $tempIa02Json = $this->cacheDir.'/muk_ia02_'.uniqid().'.json';
+                    File::put($tempIa02Json, json_encode($ia02Payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+                    if (File::isFile($outputPath)) {
+                        @unlink($outputPath);
+                    }
+                    $masterPdf = $this->getDynamicFilePath($schedule->scheme, 'ia02');
+                    $masterArg = ($masterPdf && File::isFile($masterPdf)) ? ' '.escapeshellarg($masterPdf) : '';
+                    shell_exec("{$pythonExec} ".escapeshellarg($script).' '.escapeshellarg($tempIa02Json).' '.escapeshellarg($outputPath).$masterArg.' 2>&1');
+                    @unlink($tempIa02Json);
                     if (File::isFile($outputPath) && filesize($outputPath) > 1000) {
                         return $outputPath;
                     }
