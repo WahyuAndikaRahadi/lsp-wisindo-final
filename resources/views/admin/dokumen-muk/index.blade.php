@@ -131,7 +131,12 @@
                                                     <a href="{{ route('admin.dokumen-muk.asesi-dynamic', ['assessment' => $assessment->id, 'type' => 'ia01']) }}" target="_blank" class="px-1.5 py-0.5 text-[10px] font-medium bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded border border-indigo-200" title="FR.IA.01 Ceklis Observasi">
                                                         IA.01
                                                     </a>
-                                                    <a href="{{ route('admin.dokumen-muk.asesi-dynamic', ['assessment' => $assessment->id, 'type' => 'ia01b']) }}" target="_blank" class="px-1.5 py-0.5 text-[10px] font-medium bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded border border-indigo-200" title="FR.IA.01B Report Sheet">
+                                                    @php
+                                                        $ia01bResp = $assessment->iaResponses?->first(fn($r) => strtoupper((string)$r->instrument_code) === 'IA01B');
+                                                        $ia01bData = is_array($ia01bResp?->data_json) ? $ia01bResp->data_json : (json_decode($ia01bResp?->data_json ?? '[]', true) ?: []);
+                                                        $hasIa01b = !empty($ia01bData['evidence_image_path'] ?? $ia01bData['file_path'] ?? $ia01bData['uploaded_file'] ?? null);
+                                                    @endphp
+                                                    <a href="{{ route('admin.dokumen-muk.asesi-dynamic', ['assessment' => $assessment->id, 'type' => 'ia01b']) }}" target="_blank" class="px-1.5 py-0.5 text-[10px] font-medium rounded border {{ $hasIa01b ? 'bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border-indigo-200' : 'bg-slate-100 hover:bg-slate-200 text-slate-400 border-slate-200' }}" title="{{ $hasIa01b ? 'FR.IA.01B Report Sheet (Sudah Diunggah)' : 'FR.IA.01B Report Sheet (Belum Diunggah Asesi)' }}">
                                                         IA.01B
                                                     </a>
                                                     <a href="{{ route('admin.dokumen-muk.asesi-dynamic', ['assessment' => $assessment->id, 'type' => 'ia02']) }}" target="_blank" class="px-1.5 py-0.5 text-[10px] font-medium bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded border border-indigo-200" title="FR.IA.02 Tugas Praktik Demonstrasi">
