@@ -8,22 +8,57 @@
     </div>
 
     {{-- Filter / Search Tabs --}}
-    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 flex flex-col sm:flex-row items-center justify-between gap-4" x-data="{ roleFilter: 'ALL' }">
-        <div class="flex items-center space-x-2">
-            <button type="button" @click="roleFilter = 'ALL'" :class="roleFilter === 'ALL' ? 'bg-brand-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'" class="px-3 py-1.5 rounded-lg text-xs font-bold transition">
-                Semua Pengguna
-            </button>
-            <button type="button" @click="roleFilter = 'ASESOR'" :class="roleFilter === 'ASESOR' ? 'bg-brand-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'" class="px-3 py-1.5 rounded-lg text-xs font-bold transition">
-                Asesor Saja
-            </button>
-            <button type="button" @click="roleFilter = 'ASESI'" :class="roleFilter === 'ASESI' ? 'bg-brand-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'" class="px-3 py-1.5 rounded-lg text-xs font-bold transition">
-                Asesi Saja
-            </button>
-        </div>
+    @php
+        $currentRole = request('role', 'ALL');
+        $hasFilter = request()->filled('search') || (request()->filled('role') && request('role') !== 'ALL');
+    @endphp
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
+        <form method="GET" action="{{ route('admin.proxy.index') }}" class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+            <input type="hidden" name="role" id="proxyRoleInput" value="{{ $currentRole }}">
 
-        <div class="w-full sm:w-72">
-            <input type="text" placeholder="Cari nama atau email..." class="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none">
-        </div>
+            <div class="flex items-center space-x-2 overflow-x-auto pb-1 md:pb-0">
+                <a href="{{ route('admin.proxy.index', array_merge(request()->except('role', 'page'), ['role' => 'ALL'])) }}"
+                   class="px-3.5 py-2 rounded-lg text-xs font-bold transition whitespace-nowrap {{ $currentRole === 'ALL' ? 'bg-brand-600 text-white shadow-xs' : 'bg-slate-100 text-slate-700 hover:bg-slate-200' }}">
+                    Semua Pengguna
+                </a>
+                <a href="{{ route('admin.proxy.index', array_merge(request()->except('role', 'page'), ['role' => 'ASESOR'])) }}"
+                   class="px-3.5 py-2 rounded-lg text-xs font-bold transition whitespace-nowrap {{ $currentRole === 'ASESOR' ? 'bg-brand-600 text-white shadow-xs' : 'bg-slate-100 text-slate-700 hover:bg-slate-200' }}">
+                    Asesor Saja
+                </a>
+                <a href="{{ route('admin.proxy.index', array_merge(request()->except('role', 'page'), ['role' => 'ASESI'])) }}"
+                   class="px-3.5 py-2 rounded-lg text-xs font-bold transition whitespace-nowrap {{ $currentRole === 'ASESI' ? 'bg-brand-600 text-white shadow-xs' : 'bg-slate-100 text-slate-700 hover:bg-slate-200' }}">
+                    Asesi Saja
+                </a>
+                <a href="{{ route('admin.proxy.index', array_merge(request()->except('role', 'page'), ['role' => 'ADMIN_LSP'])) }}"
+                   class="px-3.5 py-2 rounded-lg text-xs font-bold transition whitespace-nowrap {{ $currentRole === 'ADMIN_LSP' ? 'bg-brand-600 text-white shadow-xs' : 'bg-slate-100 text-slate-700 hover:bg-slate-200' }}">
+                    Admin LSP
+                </a>
+                <a href="{{ route('admin.proxy.index', array_merge(request()->except('role', 'page'), ['role' => 'TUK_ADMIN'])) }}"
+                   class="px-3.5 py-2 rounded-lg text-xs font-bold transition whitespace-nowrap {{ $currentRole === 'TUK_ADMIN' ? 'bg-brand-600 text-white shadow-xs' : 'bg-slate-100 text-slate-700 hover:bg-slate-200' }}">
+                    Admin TUK
+                </a>
+            </div>
+
+            <div class="flex items-center gap-2 w-full md:w-auto">
+                <div class="relative flex-1 md:w-72">
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama atau email..."
+                           class="w-full pl-9 pr-3 py-2 rounded-lg border border-slate-300 text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                    <svg class="w-4 h-4 text-slate-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                </div>
+                <button type="submit" class="px-3.5 py-2 bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs rounded-lg shadow-sm transition flex items-center justify-center gap-1 shrink-0" title="Cari">
+                    <span>Cari</span>
+                </button>
+                @if($hasFilter)
+                    <a href="{{ route('admin.proxy.index') }}" class="p-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg text-xs font-bold transition flex items-center justify-center border border-slate-200 shrink-0" title="Reset Pencarian & Filter">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </a>
+                @endif
+            </div>
+        </form>
     </div>
 
     {{-- Users Table --}}
@@ -83,7 +118,13 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="px-6 py-8 text-center text-slate-500 text-xs">Tidak ada data pengguna untuk proxy.</td>
+                            <td colspan="5" class="px-6 py-8 text-center text-slate-500 text-xs">
+                                @if($hasFilter)
+                                    Tidak ada data pengguna yang sesuai dengan pencarian atau filter. <a href="{{ route('admin.proxy.index') }}" class="text-brand-600 font-bold hover:underline">Reset filter</a>
+                                @else
+                                    Tidak ada data pengguna untuk proxy.
+                                @endif
+                            </td>
                         </tr>
                     @endforelse
                 </tbody>

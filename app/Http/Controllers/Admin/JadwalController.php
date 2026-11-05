@@ -19,6 +19,7 @@ class JadwalController extends Controller
     {
         $user = $request->user();
         $query = Schedule::with('scheme', 'assessors', 'creator')
+            ->withCount('assessments')
             ->latest('date');
 
         if ($user && $user->role === 'TUK_ADMIN') {
@@ -33,9 +34,30 @@ class JadwalController extends Controller
             });
         }
 
-        $schedules = $query->paginate(15);
+        if ($request->filled('search')) {
+            $search = trim($request->input('search'));
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('code', 'like', "%{$search}%");
+            });
+        }
 
-        return view('admin.jadwal.index', compact('schedules'));
+        if ($request->filled('scheme_id')) {
+            $query->where('scheme_id', $request->input('scheme_id'));
+        }
+
+        if ($request->filled('start_date')) {
+            $query->whereDate('date', '>=', $request->input('start_date'));
+        }
+
+        if ($request->filled('end_date')) {
+            $query->whereDate('date', '<=', $request->input('end_date'));
+        }
+
+        $schedules = $query->paginate(15)->withQueryString();
+        $schemes = Scheme::orderBy('name')->get();
+
+        return view('admin.jadwal.index', compact('schedules', 'schemes'));
     }
 
     public function create(): View
