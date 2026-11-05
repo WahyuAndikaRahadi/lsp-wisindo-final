@@ -385,6 +385,7 @@ Route::middleware(['auth', 'role:SUPER_ADMIN,ADMIN_LSP,KOMITE_TEKNIS,TUK_ADMIN']
 
     // Dokumen MUK
     Route::get('/dokumen-muk', [Admin\DokumenMukController::class, 'index'])->name('dokumen-muk.index');
+    Route::get('/dokumen-muk/{schedule}', [Admin\DokumenMukController::class, 'show'])->name('dokumen-muk.show')->whereNumber('schedule');
     Route::get('/dokumen-muk/{schedule}/fixed/{type}', [Admin\DokumenMukController::class, 'exportFixed'])->name('dokumen-muk.fixed');
     Route::get('/dokumen-muk/asesi/{assessment}/fixed/{type}', [Admin\DokumenMukController::class, 'exportAsesiFixed'])->name('dokumen-muk.asesi-fixed');
     Route::get('/dokumen-muk/{schedule}/dynamic/{type}', [Admin\DokumenMukController::class, 'exportDynamic'])->name('dokumen-muk.dynamic');

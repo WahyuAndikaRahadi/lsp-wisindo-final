@@ -155,11 +155,50 @@ class DokumenMukPrintViewsTest extends TestCase
         $response = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.index'));
         $response->assertOk();
         $response->assertSee('SCH-PRINT-TEST');
+        $response->assertSee('Dokumen MUK');
+        $response->assertSee('Cari Jadwal');
+    }
+
+    public function test_admin_can_search_schedules_on_index_page(): void
+    {
+        $response = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.index', ['search' => 'SCH-PRINT-TEST']));
+        $response->assertOk();
+        $response->assertSee('SCH-PRINT-TEST');
+
+        $notFoundResponse = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.index', ['search' => 'NON_EXISTENT_SCHEDULE_12345']));
+        $notFoundResponse->assertOk();
+        $notFoundResponse->assertSee('Tidak ada jadwal asesmen ditemukan');
+    }
+
+    public function test_admin_can_access_dokumen_muk_show_page(): void
+    {
+        $response = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.show', $this->schedule));
+        $response->assertOk();
+        $response->assertSee('SCH-PRINT-TEST');
         $response->assertSee('Berita Acara (BA)');
         $response->assertSee('Hadir Asesor');
         $response->assertSee('Hadir Asesi');
         $response->assertSee('FR.AK.05 (Laporan)');
         $response->assertSee('FR.AK.06 (Tinjauan)');
+        $response->assertSee('Rian Kurniawan');
+        $response->assertSee('Cari Asesi');
+    }
+
+    public function test_admin_can_search_assessees_on_show_page(): void
+    {
+        $response = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.show', [
+            'schedule' => $this->schedule->id,
+            'search' => 'Rian',
+        ]));
+        $response->assertOk();
+        $response->assertSee('Rian Kurniawan');
+
+        $notFoundResponse = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.show', [
+            'schedule' => $this->schedule->id,
+            'search' => 'NON_EXISTENT_ASSESSEE_XYZ',
+        ]));
+        $notFoundResponse->assertOk();
+        $notFoundResponse->assertSee('Tidak ada asesi ditemukan');
     }
 
     public function test_can_render_berita_acara_matching_master(): void

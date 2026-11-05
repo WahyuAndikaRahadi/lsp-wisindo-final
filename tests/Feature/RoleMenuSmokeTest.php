@@ -125,6 +125,7 @@ class RoleMenuSmokeTest extends TestCase
             'jadwal.show' => route('admin.jadwal.show', $sch),
             'jadwal.edit' => route('admin.jadwal.edit', $sch),
             'dokumen-muk.index' => route('admin.dokumen-muk.index'),
+            'dokumen-muk.show' => route('admin.dokumen-muk.show', $sch),
             'appeals.index' => route('admin.appeals.index'),
             'proxy.index' => route('admin.proxy.index'),
         ];

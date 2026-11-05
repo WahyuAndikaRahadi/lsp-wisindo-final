@@ -19,13 +19,67 @@ class DokumenMukController extends Controller
         private MukDynamicDocumentService $dynamicService,
     ) {}
 
-    public function index(): View
+    public function index(Request $request): View
     {
-        $schedules = Schedule::with(['scheme', 'assessments.asesi.profile', 'assessments.iaResponses'])
-            ->latest('date')
-            ->paginate(15);
+        $search = trim((string) $request->query('search', ''));
 
-        return view('admin.dokumen-muk.index', compact('schedules'));
+        $query = Schedule::with(['scheme', 'assessors'])
+            ->withCount('assessments');
+
+        $user = $request->user();
+        if ($user && $user->role === 'TUK_ADMIN') {
+            $user->loadMissing('tuk');
+            $query->where(function ($q) use ($user) {
+                if ($user->tuk_id) {
+                    $q->where('tuk_id', $user->tuk_id);
+                }
+                if ($user->tuk?->name) {
+                    $q->orWhere('tuk_name', $user->tuk->name);
+                }
+            });
+        }
+
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('code', 'like', "%{$search}%")
+                    ->orWhere('tuk_name', 'like', "%{$search}%")
+                    ->orWhereHas('scheme', function ($sq) use ($search) {
+                        $sq->where('name', 'like', "%{$search}%")
+                            ->orWhere('code', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        $schedules = $query->latest('date')
+            ->paginate(15)
+            ->withQueryString();
+
+        return view('admin.dokumen-muk.index', compact('schedules', 'search'));
+    }
+
+    public function show(Schedule $schedule, Request $request): View
+    {
+        $schedule->loadMissing(['scheme', 'assessors']);
+
+        $search = trim((string) $request->query('search', ''));
+
+        $assessmentsQuery = $schedule->assessments()
+            ->with(['asesi.profile', 'iaResponses', 'assessor']);
+
+        if ($search !== '') {
+            $assessmentsQuery->whereHas('asesi', function ($q) use ($search) {
+                $q->where('full_name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhereHas('profile', function ($pq) use ($search) {
+                        $pq->where('nik', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        $assessments = $assessmentsQuery->paginate(25)->withQueryString();
+
+        return view('admin.dokumen-muk.show', compact('schedule', 'assessments', 'search'));
     }
 
     public function exportSchedule(Schedule $schedule, string $type, ?Request $request = null)
