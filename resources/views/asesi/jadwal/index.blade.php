@@ -1,11 +1,23 @@
 @extends('layouts.app', ['title' => 'Jadwal Asesmen'])
 
 @section('content')
-<div class="space-y-6">
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-6">
+    {{-- Header & Navigasi Terstruktur --}}
+    <div class="space-y-3 pb-2 border-b border-slate-200/80">
+        <div class="flex items-center justify-between gap-3">
+            <a href="{{ route('asesi.dashboard') }}" class="inline-flex items-center gap-1.5 text-xs font-bold text-brand-600 hover:text-brand-800 transition py-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                <span>Kembali ke Dashboard</span>
+            </a>
+            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                Jadwal Uji
+            </span>
+        </div>
         <div>
-            <h1 class="text-2xl font-black text-slate-900 tracking-tight">Jadwal Asesmen Kompetensi</h1>
-            <p class="text-sm text-slate-500">
+            <h1 class="text-xl sm:text-2xl md:text-3xl font-black text-slate-900 tracking-tight leading-snug">
+                Jadwal Asesmen Kompetensi
+            </h1>
+            <p class="text-xs sm:text-sm text-slate-500 mt-1 leading-relaxed max-w-2xl">
                 Pilih atau masukkan kode jadwal untuk mengikuti asesmen sertifikasi profesi
             </p>
         </div>
@@ -16,10 +28,10 @@
         $profileComplete = auth()->user()->isProfileComplete();
     @endphp
 
-    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 sm:p-6">
         <div class="max-w-2xl">
-            <h2 class="text-base font-bold text-slate-900">Gabung Jadwal Asesmen Baru</h2>
-            <p class="text-xs text-slate-500 mt-0.5 mb-4">
+            <h2 class="text-sm sm:text-base font-bold text-slate-900">Gabung Jadwal Asesmen Baru</h2>
+            <p class="text-xs text-slate-500 mt-1 mb-4 leading-relaxed">
                 Masukkan kode verifikasi jadwal (contoh: <code class="px-1.5 py-0.5 bg-slate-100 rounded text-brand-700 font-semibold font-mono">LSP-xxxx</code>) yang diberikan oleh penyelenggara atau sekolah Anda.
             </p>
 
@@ -56,7 +68,7 @@
                         <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
                     @enderror
                 </div>
-                <button type="submit" @disabled(! $profileComplete) class="px-6 py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm rounded-lg shadow-sm transition shrink-0 flex items-center justify-center space-x-2 @if(! $profileComplete) opacity-50 cursor-not-allowed pointer-events-none @endif">
+                <button type="submit" @disabled(! $profileComplete) class="w-full sm:w-auto px-6 py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm rounded-lg shadow-sm transition shrink-0 flex items-center justify-center space-x-2 @if(! $profileComplete) opacity-50 cursor-not-allowed pointer-events-none @endif">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                     </svg>
@@ -109,7 +121,7 @@
                         }
                     @endphp
 
-                    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 flex flex-col justify-between hover:shadow-md transition">
+                    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 sm:p-6 flex flex-col justify-between hover:shadow-md transition">
                         <div class="space-y-3">
                             <div class="flex items-center justify-between">
                                 <span class="px-2.5 py-1 rounded bg-brand-50 text-brand-700 font-mono text-xs font-bold">

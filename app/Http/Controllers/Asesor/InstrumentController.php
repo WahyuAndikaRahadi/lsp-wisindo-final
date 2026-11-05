@@ -106,8 +106,10 @@ class InstrumentController extends Controller
             'assessors',
         ]);
 
+        $myAssessments = $schedule->assessorAssessments();
+
         // Filter ONLY FR.IA instruments. Exclude APL and AK01!
-        $allAssignedIaCodes = $schedule->assessments
+        $allAssignedIaCodes = $myAssessments
             ->flatMap(fn ($ass) => $ass->getAssignedInstruments())
             ->filter(fn ($c) => str_starts_with(strtoupper($c), 'IA'))
             ->unique()
@@ -128,7 +130,7 @@ class InstrumentController extends Controller
 
         sort($allAssignedIaCodes);
 
-        $totalAsesi = $schedule->assessments->count();
+        $totalAsesi = $myAssessments->count();
 
         $instruments = [];
         foreach ($allAssignedIaCodes as $code) {
@@ -142,13 +144,21 @@ class InstrumentController extends Controller
                 'route_code' => strtolower($c),
             ];
 
-            // Target asesi specifically assigned to this FR.IA instrument
-            $targetAssessmentsForInstrument = $schedule->assessments->filter(fn ($ass) => $ass->hasAssignedInstrument($c));
+            // Target asesi specifically assigned to this FR.IA instrument and this assessor
+            $targetAssessmentsForInstrument = $myAssessments->filter(fn ($ass) => $ass->hasAssignedInstrument($c));
             $targetCount = $targetAssessmentsForInstrument->count();
 
             // Hitung asesi yang sudah dinilai/selesai pada instrumen ini
             $completedCount = $targetAssessmentsForInstrument->filter(function ($ass) use ($c) {
-                return $ass->iaResponses->contains('instrument_code', $c);
+                $resp = $ass->iaResponses->firstWhere('instrument_code', $c);
+                if (! $resp) {
+                    return false;
+                }
+                if ($c === 'IA02') {
+                    return ! empty($resp->assessor_signed_at);
+                }
+
+                return true;
             })->count();
 
             $meta['raw_code'] = $c;
@@ -192,9 +202,11 @@ class InstrumentController extends Controller
             'route_code' => $codeLower,
         ];
 
+        $myAssessments = $schedule->assessorAssessments();
+
         $targetAssessments = ($codeUpper === 'APL')
-            ? $schedule->assessments
-            : $schedule->assessments->filter(fn ($a) => $a->hasAssignedInstrument($codeUpper));
+            ? $myAssessments
+            : $myAssessments->filter(fn ($a) => $a->hasAssignedInstrument($codeUpper));
 
         $asesiList = $targetAssessments->map(function ($assessment) use ($codeUpper, $codeLower, $schedule) {
             $response = $assessment->iaResponses->firstWhere('instrument_code', $codeUpper);
@@ -227,16 +239,27 @@ class InstrumentController extends Controller
                 $inspectUrl = route('asesor.schedule.ak01', ['schedule' => $assessment->schedule_id, 'assessment' => $assessment->id]);
             } else {
                 if ($response) {
-                    $isCompleted = true;
                     if ($codeUpper === 'IA05') {
+                        $isCompleted = true;
                         $score = $response->score ?? ($assessment->ia05_score ?? 0);
                         $scoreLabel = "Nilai CBT: {$score}%";
                         $passingGrade = (float) ($assessment->schedule?->scheme?->passing_grade_theory ?? Setting::get('cbt_passing_grade', 75.0));
                         $statusLabel = $score >= $passingGrade ? 'Kompeten (K)' : 'Belum Kompeten (BK)';
                         $statusClass = $score >= $passingGrade ? 'bg-emerald-50 text-emerald-700 border-emerald-300' : 'bg-rose-50 text-rose-700 border-rose-300';
+                    } elseif ($codeUpper === 'IA02') {
+                        $isSigned = ! empty($response->assessor_signed_at);
+                        $isCompleted = $isSigned;
+                        $statusLabel = $isSigned ? 'Sudah Ditandatangani' : 'Belum Ditandatangani';
+                        $statusClass = $isSigned ? 'bg-emerald-50 text-emerald-700 border-emerald-300' : 'bg-amber-50 text-amber-700 border-amber-300';
                     } else {
+                        $isCompleted = true;
                         $statusLabel = 'Sudah Dinilai';
                         $statusClass = 'bg-emerald-50 text-emerald-700 border-emerald-300';
+                    }
+                } else {
+                    if ($codeUpper === 'IA02') {
+                        $statusLabel = 'Belum Ditandatangani';
+                        $statusClass = 'bg-amber-50 text-amber-700 border-amber-300';
                     }
                 }
                 $inspectUrl = route('asesor.assessment.instrument', ['assessment' => $assessment->id, 'code' => $codeLower]);
@@ -292,6 +315,10 @@ class InstrumentController extends Controller
     public function ak01Sign(Assessment $assessment, Request $request): RedirectResponse
     {
         $this->authorizeAssessorAssessment($assessment);
+
+        if ($assessment->schedule && $assessment->schedule->isClosedForAssessor()) {
+            return back()->with('error', 'Jadwal asesmen sudah ditutup dan dikunci.');
+        }
 
         $request->validate([
             'assessor_signature' => ['nullable', 'string', new ValidSignature],
@@ -392,7 +419,7 @@ class InstrumentController extends Controller
 
         $code = strtoupper($code);
 
-        if ($assessment->schedule && $assessment->schedule->is_closed) {
+        if ($assessment->schedule && $assessment->schedule->isClosedForAssessor()) {
             return back()->with('error', 'Jadwal asesmen sudah ditutup dan dikunci.');
         }
 
@@ -473,5 +500,109 @@ class InstrumentController extends Controller
             'schedule' => $assessment->schedule_id,
             'code' => strtolower($code),
         ])->with('success', "Penilaian {$code} untuk {$assessment->asesi->full_name} berhasil disimpan.");
+    }
+
+    /**
+     * Tanda tangani massal (Bulk Sign) dokumen FR.IA.02 untuk asesi terpilih.
+     */
+    public function bulkSignIa02(Schedule $schedule, Request $request): RedirectResponse
+    {
+        $this->authorizeAssessorSchedule($schedule);
+
+        if ($schedule->isClosedForAssessor()) {
+            return back()->with('error', 'Jadwal asesmen sudah ditutup dan dikunci.');
+        }
+
+        $assessmentIds = $request->input('assessment_ids', []);
+        if (empty($assessmentIds)) {
+            return back()->with('error', 'Silakan pilih setidaknya satu asesi untuk menandatangani FR.IA.02.');
+        }
+
+        $user = auth()->user();
+        $isSingleAssessor = $schedule->assessors->count() === 1 && $schedule->assessors->first()?->id === $user->id;
+
+        $assessments = $schedule->assessments()
+            ->with(['asesi.profile', 'iaResponses'])
+            ->whereIn('id', $assessmentIds)
+            ->where('apl_status', 'APPROVED')
+            ->get()
+            ->filter(function ($a) use ($user, $isSingleAssessor) {
+                if ((int) $a->assessor_id === (int) $user->id) {
+                    return true;
+                }
+                if (empty($a->assessor_id) && $isSingleAssessor) {
+                    return true;
+                }
+
+                return false;
+            });
+
+        if ($assessments->isEmpty()) {
+            return back()->with('error', 'Tidak ada asesi binaan yang valid (dengan status APL disetujui) untuk ditandatangani.');
+        }
+
+        if ($request->filled('assessor_signature')) {
+            $request->validate([
+                'assessor_signature' => [new ValidSignature],
+            ]);
+        }
+
+        $signature = $request->input('assessor_signature') ?? $request->input('signature_data') ?? $user->profile?->signature_data;
+
+        if (empty($signature)) {
+            return back()->with('error', 'Tanda tangan digital asesor belum tersedia. Silakan buat tanda tangan terlebih dahulu atau simpan di profil Anda.');
+        }
+
+        if ($request->boolean('save_signature_to_profile') && ! empty($request->input('assessor_signature'))) {
+            $user->profile()->updateOrCreate(
+                ['user_id' => $user->id],
+                ['signature_data' => $signature]
+            );
+        }
+
+        $now = now();
+        $signedCount = 0;
+
+        DB::transaction(function () use ($assessments, $user, $signature, $now, $request, &$signedCount) {
+            foreach ($assessments as $assessment) {
+                $existing = $assessment->iaResponses->firstWhere('instrument_code', 'IA02');
+                $existingData = is_array($existing?->data_json)
+                    ? $existing->data_json
+                    : (json_decode($existing?->data_json ?? '[]', true) ?: []);
+
+                $data = $existingData;
+                $data['ia02_acknowledged'] = true;
+                $data['audit_trail'] = [
+                    'evaluated_by_id' => $user->id,
+                    'evaluated_by_name' => $user->full_name,
+                    'evaluated_at' => $now->toIso8601String(),
+                    'ip_address' => $request->ip(),
+                    'is_bulk_signed' => true,
+                ];
+
+                $asesiSig = $existing?->asesi_signature ?? $assessment->asesi_signature ?? $assessment->asesi?->profile?->signature_data;
+                $asesiSignedAt = $existing?->asesi_signed_at ?? ($asesiSig ? $now : null);
+
+                AssessmentIaResponse::updateOrCreate(
+                    [
+                        'assessment_id' => $assessment->id,
+                        'instrument_code' => 'IA02',
+                    ],
+                    [
+                        'data_json' => $data,
+                        'assessor_notes' => $existing?->assessor_notes ?? 'Tugas Praktik Demonstrasi (FR.IA.02) telah disetujui dan ditandatangani oleh Asesor.',
+                        'assessor_signature' => $signature,
+                        'assessor_signed_at' => $now,
+                        'asesi_signature' => $asesiSig,
+                        'asesi_signed_at' => $asesiSignedAt,
+                    ]
+                );
+
+                $signedCount++;
+            }
+        });
+
+        return redirect()->route('asesor.schedule.instrument', ['schedule' => $schedule->id, 'code' => 'ia02'])
+            ->with('success', "Sebanyak {$signedCount} asesi berhasil ditandatangani dokumen FR.IA.02 secara massal.");
     }
 }

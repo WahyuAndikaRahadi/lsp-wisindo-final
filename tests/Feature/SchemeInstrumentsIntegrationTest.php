@@ -87,6 +87,7 @@ class SchemeInstrumentsIntegrationTest extends TestCase
             'status' => 'ACTIVE',
             'created_by' => $admin->id,
         ]);
+        $schedule->assessors()->attach($asesor->id);
 
         $assessment = Assessment::create([
             'schedule_id' => $schedule->id,

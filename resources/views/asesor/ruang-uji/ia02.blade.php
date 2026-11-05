@@ -1,6 +1,6 @@
 @php
     $isCompleted = (bool) $response?->assessor_signed_at;
-    $isScheduleClosed = (bool) ($assessment->schedule?->is_closed);
+    $isScheduleClosed = (bool) ($assessment->schedule?->isClosedForAssessor());
     $asesiSig = $response?->asesi_signature ?? $assessment->asesi_signature ?? $assessment->asesi?->profile?->signature_data;
     $asesiSignedAt = $response?->asesi_signed_at ?? ($asesiSig ? ($assessment->asesi_signed_at ?? $assessment->schedule->date) : null);
     $assessorSig = $response?->assessor_signature ?? auth()->user()->profile?->signature_data;
@@ -225,9 +225,11 @@
                                 <div class="text-slate-600">Nama Asesi: <strong class="text-slate-900">{{ $assessment->asesi->full_name }}</strong></div>
                             </div>
 
-                            <div class="mt-2.5 p-3 border border-slate-200 rounded-lg bg-slate-50/70 flex flex-col items-center justify-center min-h-[120px]">
+                            <div class="mt-2.5 w-[340px] max-w-full h-[140px] p-3 border border-slate-200 rounded-xl bg-slate-50/70 flex flex-col items-center justify-center mx-auto">
                                 @if($asesiSig)
-                                    <img src="{{ $asesiSig }}" alt="TTD Asesi" class="max-h-20 object-contain">
+                                    <div class="w-full h-24 flex items-center justify-center">
+                                        <img src="{{ $asesiSig }}" alt="TTD Asesi" class="max-h-full max-w-full object-contain">
+                                    </div>
                                     <span class="text-[10px] text-emerald-700 font-semibold mt-1">✓ Tanda Tangan Asesi Terverifikasi</span>
                                 @else
                                     <div class="text-center py-2 text-slate-500">
@@ -258,15 +260,17 @@
                             </div>
 
                             <div class="mt-2.5">
-                                <div x-show="!isEditing && '{{ !empty($assessorSig) }}' === '1'" class="p-3 border border-slate-200 rounded-lg bg-slate-50/70 flex flex-col items-center justify-center min-h-[120px]">
+                                <div x-show="!isEditing && '{{ !empty($assessorSig) }}' === '1'" class="w-[340px] max-w-full h-[140px] p-3 border border-slate-200 rounded-xl bg-slate-50/70 flex flex-col items-center justify-center mx-auto">
                                     @if($assessorSig)
-                                        <img src="{{ $assessorSig }}" alt="TTD Asesor" class="max-h-20 object-contain">
+                                        <div class="w-full h-24 flex items-center justify-center">
+                                            <img src="{{ $assessorSig }}" alt="TTD Asesor" class="max-h-full max-w-full object-contain">
+                                        </div>
                                         <span class="text-[10px] text-emerald-700 font-semibold mt-1">✓ Tanda Tangan Asesor Tersimpan</span>
                                     @endif
                                 </div>
 
-                                <div x-show="isEditing || '{{ empty($assessorSig) }}' === '1'" style="{{ $isCompleted ? 'display: none;' : '' }}">
-                                    <x-signature-pad name="assessor_signature" :value="$assessorSig ?? null" label="Tanda Tangan Asesor" :required="! $isScheduleClosed" :disabled="$isScheduleClosed" />
+                                <div x-show="isEditing || '{{ empty($assessorSig) }}' === '1'" style="{{ $isCompleted ? 'display: none;' : '' }}" class="max-w-[340px] mx-auto">
+                                    <x-signature-pad name="assessor_signature" :value="$assessorSig ?? null" label="Tanda Tangan Asesor" :required="! $isScheduleClosed" :disabled="$isScheduleClosed" :height="140" />
                                 </div>
                             </div>
                         </div>

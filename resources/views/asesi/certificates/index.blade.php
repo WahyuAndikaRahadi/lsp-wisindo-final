@@ -1,7 +1,7 @@
 @extends('layouts.app', ['title' => 'Sertifikat Saya'])
 
 @section('content')
-<div class="max-w-5xl mx-auto space-y-6" x-data="{
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-6" x-data="{
     showPreviewModal: false,
     previewUrl: '',
     previewTitle: '',
@@ -12,19 +12,25 @@
         this.showPreviewModal = true;
     }
 }">
-    {{-- Header --}}
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-            <h1 class="text-2xl font-black text-slate-900 tracking-tight">Sertifikat Saya</h1>
-            <p class="text-sm text-slate-500">
-                Koleksi sertifikat kompetensi kerja resmi BNSP yang berhasil Anda raih melalui uji sertifikasi di LSP Praktisi Otomotif Indonesia.
-            </p>
+    {{-- Header & Navigasi Terstruktur --}}
+    <div class="space-y-3 pb-2 border-b border-slate-200/80">
+        <div class="flex items-center justify-between gap-3">
+            <a href="{{ route('asesi.dashboard') }}" class="inline-flex items-center gap-1.5 text-xs font-bold text-brand-600 hover:text-brand-800 transition py-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                <span>Kembali ke Dashboard</span>
+            </a>
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold shadow-xs">
+                <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                <span>{{ $certificates->count() }} Sertifikat</span>
+            </span>
         </div>
         <div>
-            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold shadow-xs">
-                <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-                <span>{{ $certificates->count() }} Sertifikat Kompetensi</span>
-            </span>
+            <h1 class="text-xl sm:text-2xl md:text-3xl font-black text-slate-900 tracking-tight leading-snug">
+                Sertifikat Saya
+            </h1>
+            <p class="text-xs sm:text-sm text-slate-500 mt-1 leading-relaxed max-w-2xl">
+                Koleksi sertifikat kompetensi kerja resmi BNSP yang berhasil Anda raih melalui uji sertifikasi di LSP Praktisi Otomotif Indonesia.
+            </p>
         </div>
     </div>
 
@@ -111,16 +117,16 @@
                     </div>
 
                     {{-- Card Actions --}}
-                    <div class="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-2">
+                    <div class="p-4 bg-slate-50 border-t border-slate-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
                         <button type="button"
                             @click="openPreview('{{ route('asesi.certificates.preview', $cert->id) }}', '{{ addslashes($cert->scheme->name ?? 'Sertifikat') }}')"
-                            class="px-4 py-2 text-xs font-bold text-slate-700 bg-white hover:bg-slate-100 border border-slate-300 rounded-lg shadow-2xs transition flex items-center gap-1.5">
+                            class="w-full sm:w-auto px-4 py-2.5 text-xs font-bold text-slate-700 bg-white hover:bg-slate-100 border border-slate-300 rounded-lg shadow-2xs transition flex items-center justify-center gap-1.5">
                             <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                             <span>Preview Modal</span>
                         </button>
 
                         <a href="{{ route('asesi.certificates.download', $cert->id) }}"
-                            class="px-4 py-2 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg shadow-sm transition flex items-center gap-1.5">
+                            class="w-full sm:w-auto px-4 py-2.5 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg shadow-sm transition flex items-center justify-center gap-1.5">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                             <span>Unduh PDF Resmi</span>
                         </a>

@@ -4,7 +4,7 @@
     'signature' => null,
     'label' => 'Tanda Tangan Digital',
     'required' => false,
-    'height' => 160,
+    'height' => 140,
     'profileSignature' => null,
     'disabled' => false,
 ])
@@ -14,6 +14,7 @@
     $userProfileSignature = $profileSignature ?? auth()->user()?->profile?->signature_data;
     $padId = 'sig_pad_' . md5($name . microtime());
     $isDisabled = (bool) $disabled;
+    $canvasHeight = (int) $height ?: 140;
 @endphp
 
 <div x-data="signaturePadComponent({
@@ -23,44 +24,45 @@
     profileSignature: @js($userProfileSignature),
     disabled: @js($isDisabled),
     required: @js((bool) $required)
-})" x-init="initPad()" class="w-full">
+})" x-init="initPad()" class="w-full max-w-[340px]">
     @if($label)
-        <div class="flex items-center justify-between mb-1.5">
-            <label class="block text-sm font-semibold text-slate-700">
+        <div class="flex items-center justify-between mb-1.5 max-w-[340px]">
+            <label class="block text-xs sm:text-sm font-semibold text-slate-700">
                 {{ $label }} @if($required && ! $isDisabled)<span class="text-rose-500">*</span>@endif
             </label>
             @if($isDisabled)
-                <span class="inline-flex items-center text-[11px] font-semibold text-slate-500 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                <span class="inline-flex items-center text-[10px] sm:text-[11px] font-semibold text-slate-500 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
                     <svg class="w-3 h-3 mr-1 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                    Terkunci (Telah Disimpan)
+                    Terkunci
                 </span>
-            @else
-                <span class="text-xs text-slate-400 font-normal">Gunakan mouse, stylus, atau sentuhan</span>
             @endif
         </div>
     @endif
 
-    <div class="relative border-2 rounded-lg overflow-hidden transition"
-         :class="hasError ? 'border-rose-500 ring-2 ring-rose-200' : (@js($isDisabled) ? 'border-slate-200 bg-slate-100/70' : 'border-dashed border-slate-300 bg-slate-50 hover:border-slate-400')">
+    <div class="relative border-2 rounded-xl overflow-hidden transition w-full max-w-[340px] bg-white shadow-2xs"
+         style="height: {{ $canvasHeight }}px;"
+         :class="hasError ? 'border-rose-500 ring-2 ring-rose-200' : (@js($isDisabled) ? 'border-slate-200 bg-slate-50' : 'border-dashed border-slate-300 hover:border-slate-400')">
         <canvas 
             id="{{ $padId }}" 
-            class="w-full bg-white block @if($isDisabled) pointer-events-none cursor-default @else touch-none cursor-crosshair @endif" 
-            style="height: {{ $height }}px;"
+            width="680" 
+            height="280"
+            class="w-full h-full block bg-white @if($isDisabled) pointer-events-none cursor-default @else touch-none cursor-crosshair @endif" 
+            style="aspect-ratio: 17 / 7;"
         ></canvas>
 
         @if(! $isDisabled)
-            <div class="absolute bottom-2 right-2 flex items-center space-x-2">
+            <div class="absolute bottom-2 right-2 flex items-center space-x-1.5 z-10">
                 <button 
                     type="button" 
                     @click="clearCanvas()" 
-                    class="px-2.5 py-1 text-xs font-medium text-slate-600 bg-white/95 hover:bg-slate-100 border border-slate-200 rounded shadow-xs transition"
+                    class="px-2.5 py-1 text-[11px] font-semibold text-slate-600 bg-white/95 hover:bg-slate-100 border border-slate-200 rounded-md shadow-2xs transition"
                 >
                     Hapus / Reset
                 </button>
             </div>
 
             <div x-show="isEmpty && !hasDrawn" class="absolute inset-0 flex items-center justify-center pointer-events-none text-slate-400 text-xs italic select-none">
-                Goreskan tanda tangan di area ini
+                Goreskan tanda tangan di sini
             </div>
         @endif
     </div>
@@ -73,7 +75,7 @@
     </template>
 
     @if(! $isDisabled && $userProfileSignature)
-        <div class="mt-2 flex items-center">
+        <div class="mt-2 flex items-center max-w-[340px]">
             <label class="inline-flex items-center text-xs font-semibold text-slate-700 cursor-pointer select-none">
                 <input 
                     type="checkbox" 
@@ -81,7 +83,7 @@
                     @change="toggleProfileSignature()" 
                     class="rounded border-slate-300 text-brand-600 focus:ring-brand-500 mr-2 cursor-pointer"
                 >
-                <span>Gunakan tanda tangan dari profil saya</span>
+                <span>Gunakan tanda tangan profil</span>
             </label>
         </div>
     @endif
@@ -131,14 +133,21 @@ function signaturePadComponent(config) {
                 this.canvas = document.getElementById(this.canvasId);
                 if (!this.canvas) return;
 
+                // Fixed internal buffer resolution (2x HiDPI of standard 340x140)
+                this.canvas.width = 680;
+                this.canvas.height = 280;
+
                 this.ctx = this.canvas.getContext('2d');
-                this.resizeCanvas();
-                window.addEventListener('resize', () => this.resizeCanvas());
+                this.setupContext();
+
+                if (config.initialImage) {
+                    this.loadInitialImage(config.initialImage);
+                    if (config.profileSignature && config.initialImage === config.profileSignature) {
+                        this.useProfileSignature = true;
+                    }
+                }
 
                 if (this.disabled) {
-                    if (config.initialImage) {
-                        this.loadInitialImage(config.initialImage);
-                    }
                     return;
                 }
 
@@ -165,45 +174,16 @@ function signaturePadComponent(config) {
                         }
                     });
                 }
-
-                if (config.initialImage) {
-                    this.loadInitialImage(config.initialImage);
-                    if (config.profileSignature && config.initialImage === config.profileSignature) {
-                        this.useProfileSignature = true;
-                    }
-                }
             });
         },
 
         setupContext() {
             if (!this.ctx) return;
-            this.ctx.lineWidth = 2.5;
+            this.ctx.lineWidth = 4; // 4px on 680x280 buffer = 2px on 340x140 screen (natural pen stroke)
             this.ctx.lineCap = 'round';
             this.ctx.lineJoin = 'round';
             this.ctx.strokeStyle = '#0f172a'; // slate-900
             this.ctx.fillStyle = '#0f172a';
-        },
-
-        resizeCanvas() {
-            if (!this.canvas) return;
-            const rect = this.canvas.getBoundingClientRect();
-            const displayWidth = Math.round(rect.width) || this.canvas.offsetWidth || 350;
-            const displayHeight = Math.round(rect.height) || this.canvas.offsetHeight || 150;
-
-            if (this.canvas.width === displayWidth && this.canvas.height === displayHeight) {
-                return;
-            }
-
-            const currentData = this.signatureData;
-
-            this.canvas.width = displayWidth;
-            this.canvas.height = displayHeight;
-
-            this.setupContext();
-
-            if (currentData) {
-                this.loadInitialImage(currentData);
-            }
         },
 
         loadInitialImage(dataUrl) {
@@ -212,7 +192,17 @@ function signaturePadComponent(config) {
             img.onload = () => {
                 if (!this.canvas || !this.ctx) return;
                 this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-                this.ctx.drawImage(img, 0, 0, this.canvas.width, this.canvas.height);
+
+                // Aspect-ratio preserving contain fit inside standard 680x280 box
+                const hRatio = this.canvas.width / img.width;
+                const vRatio = this.canvas.height / img.height;
+                const ratio = Math.min(hRatio, vRatio);
+                const drawW = img.width * ratio;
+                const drawH = img.height * ratio;
+                const shiftX = (this.canvas.width - drawW) / 2;
+                const shiftY = (this.canvas.height - drawH) / 2;
+
+                this.ctx.drawImage(img, 0, 0, img.width, img.height, shiftX, shiftY, drawW, drawH);
                 this.isEmpty = false;
                 this.hasDrawn = true;
             };

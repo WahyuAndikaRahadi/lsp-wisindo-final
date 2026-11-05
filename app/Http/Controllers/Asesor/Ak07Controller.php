@@ -50,7 +50,7 @@ class Ak07Controller extends Controller
     {
         $this->authorizeAssessorSchedule($schedule);
 
-        if ($schedule->is_closed) {
+        if ($schedule->isClosedForAssessor()) {
             return back()->with('error', 'Jadwal asesmen sudah resmi ditutup.');
         }
 

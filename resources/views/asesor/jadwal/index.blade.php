@@ -56,14 +56,19 @@
                                 {{ $jadwal->code }}
                             </span>
                             @php
-                                $statusBadge = match($jadwal->status ?? 'ACTIVE') {
-                                    'COMPLETED' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
-                                    'CANCELLED' => 'bg-rose-50 text-rose-700 border-rose-200',
-                                    default => 'bg-blue-50 text-blue-700 border-blue-200',
-                                };
+                                $isClosedForMe = $jadwal->isClosedForAssessor();
+                                $statusBadge = $isClosedForMe || $jadwal->is_closed || in_array($jadwal->status, ['COMPLETED', 'FINISHED'])
+                                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                                    : match($jadwal->status ?? 'ACTIVE') {
+                                        'CANCELLED' => 'bg-rose-50 text-rose-700 border-rose-200',
+                                        default => 'bg-blue-50 text-blue-700 border-blue-200',
+                                    };
+                                $statusLabel = $isClosedForMe && ! $jadwal->is_closed
+                                    ? 'BINAAN SELESAI'
+                                    : ($jadwal->is_closed || in_array($jadwal->status, ['COMPLETED', 'FINISHED']) ? 'SELESAI' : ($jadwal->status ?? 'AKTIF'));
                             @endphp
                             <span class="px-2.5 py-0.5 rounded text-xs font-semibold border {{ $statusBadge }}">
-                                {{ $jadwal->status ?? 'AKTIF' }}
+                                {{ $statusLabel }}
                             </span>
                         </div>
 
@@ -99,15 +104,25 @@
                                 <svg class="w-4 h-4 mr-2 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
                                 </svg>
-                                <span>Jumlah Asesi: <strong class="text-slate-800">{{ $jadwal->assessments_count ?? $jadwal->assessments->count() }}</strong></span>
+                                @php
+                                    $myCandidatesCount = $jadwal->assessorAssessments()->count();
+                                    $allCandidatesCount = $jadwal->assessments->count();
+                                @endphp
+                                <span>Jumlah Asesi: <strong class="text-slate-800">{{ $myCandidatesCount }} Asesi Binaan</strong> @if($allCandidatesCount > $myCandidatesCount)<span class="text-slate-400 font-normal">({{ $allCandidatesCount }} total jadwal)</span>@endif</span>
                             </div>
                         </div>
                     </div>
 
                     <div class="mt-5 pt-4 border-t border-slate-100">
-                        <a href="{{ route('asesor.schedule.ruang-uji', $jadwal->id) }}" class="w-full inline-flex items-center justify-center px-4 py-2.5 text-xs font-bold uppercase tracking-wider bg-brand-600 hover:bg-brand-700 text-white rounded-lg shadow-sm transition">
-                            Masuk Ruang Uji Jadwal &rarr;
-                        </a>
+                        @if($isClosedForMe)
+                            <a href="{{ route('asesor.schedule.ruang-uji', $jadwal->id) }}" class="w-full inline-flex items-center justify-center px-4 py-2.5 text-xs font-bold uppercase tracking-wider bg-slate-800 hover:bg-slate-900 text-white rounded-lg shadow-sm transition">
+                                Lihat Rekaman / Ruang Uji (Selesai) &rarr;
+                            </a>
+                        @else
+                            <a href="{{ route('asesor.schedule.ruang-uji', $jadwal->id) }}" class="w-full inline-flex items-center justify-center px-4 py-2.5 text-xs font-bold uppercase tracking-wider bg-brand-600 hover:bg-brand-700 text-white rounded-lg shadow-sm transition">
+                                Masuk Ruang Uji Jadwal &rarr;
+                            </a>
+                        @endif
                     </div>
                 </div>
             @endforeach

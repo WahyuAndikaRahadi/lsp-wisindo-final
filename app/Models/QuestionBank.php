@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Storage;
 
 class QuestionBank extends Model
 {
@@ -23,6 +24,15 @@ class QuestionBank extends Model
         'option_d',
         'correct_answer',
     ];
+
+    public function getImageUrlAttribute(): ?string
+    {
+        if (! $this->question_image) {
+            return null;
+        }
+
+        return Storage::disk('public')->url($this->question_image);
+    }
 
     public function scheme(): BelongsTo
     {

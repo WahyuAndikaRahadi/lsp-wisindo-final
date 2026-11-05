@@ -184,17 +184,7 @@ class UserSeeder extends Seeder
                 'status' => 'ACTIVE',
                 'password' => $password,
             ],
-            // 18. TUK Admin Cikarang
-            [
-                'full_name' => 'TUK Admin Cikarang',
-                'email' => 'tukadmin@gmail.com',
-                'phone' => '08666666666',
-                'role' => 'TUK_ADMIN',
-                'tuk_id' => $tuk?->id,
-                'status' => 'ACTIVE',
-                'password' => $password,
-            ],
-            // 19. Anggota Komite - Dedi Kurniawan
+            // 18. Anggota Komite - Dedi Kurniawan
             [
                 'full_name' => 'Anggota Komite - Dedi Kurniawan',
                 'email' => 'komite2@gmail.com',
@@ -204,7 +194,7 @@ class UserSeeder extends Seeder
                 'status' => 'ACTIVE',
                 'password' => $password,
             ],
-            // 20. Anggota Komite - Siti Aminah
+            // 19. Anggota Komite - Siti Aminah
             [
                 'full_name' => 'Anggota Komite - Siti Aminah',
                 'email' => 'komite3@gmail.com',
@@ -214,7 +204,7 @@ class UserSeeder extends Seeder
                 'status' => 'ACTIVE',
                 'password' => $password,
             ],
-            // 21. Asesi Ani Rahayu
+            // 20. Asesi Ani Rahayu
             [
                 'full_name' => 'Asesi Ani Rahayu',
                 'email' => 'asesi1@gmail.com',
@@ -223,7 +213,7 @@ class UserSeeder extends Seeder
                 'status' => 'ACTIVE',
                 'password' => $password,
             ],
-            // 22. Asesi Budi Pratama
+            // 21. Asesi Budi Pratama
             [
                 'full_name' => 'Asesi Budi Pratama',
                 'email' => 'asesi2@gmail.com',
@@ -232,7 +222,7 @@ class UserSeeder extends Seeder
                 'status' => 'ACTIVE',
                 'password' => $password,
             ],
-            // 23. Asesi Cahya Ningrum
+            // 22. Asesi Cahya Ningrum
             [
                 'full_name' => 'Asesi Cahya Ningrum',
                 'email' => 'asesi3@gmail.com',
@@ -241,7 +231,7 @@ class UserSeeder extends Seeder
                 'status' => 'ACTIVE',
                 'password' => $password,
             ],
-            // 24. Asesi Wahyu Andika Rahadi
+            // 23. Asesi Wahyu Andika Rahadi
             [
                 'full_name' => 'Wahyu Andika Rahadi',
                 'email' => 'wahyu@gmail.com',

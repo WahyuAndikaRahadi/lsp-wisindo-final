@@ -13,7 +13,7 @@ class ProxyController extends Controller
 {
     public function index(Request $request): View
     {
-        $query = User::where('role', '!=', 'SUPER_ADMIN');
+        $query = User::whereNotIn('role', ['SUPER_ADMIN', 'TUK_ADMIN']);
 
         if ($request->filled('role') && $request->input('role') !== 'ALL') {
             $query->where('role', $request->input('role'));

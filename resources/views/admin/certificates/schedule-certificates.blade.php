@@ -228,14 +228,14 @@
                             <label class="block font-bold text-slate-700 mb-1">Nomor Sertifikat <span class="text-rose-500">*</span></label>
                             <input type="text" name="certificate_number" required x-model="formData.certificate_number"
                                 placeholder="Contoh: No. 74100 2412 0000001 2026"
-                                class="w-full text-xs font-mono rounded-lg border-slate-300 focus:ring-brand-500">
+                                class="w-full px-3.5 py-2 text-xs font-mono rounded-xl border border-slate-300 bg-white text-slate-900 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:outline-none transition shadow-2xs">
                         </div>
 
                         <div>
                             <label class="block font-bold text-slate-700 mb-1">Nomor Blanko BNSP <span class="text-rose-500">*</span></label>
                             <input type="text" name="blanko_number" required x-model="formData.blanko_number"
                                 placeholder="Contoh: BL-2026-004512"
-                                class="w-full text-xs font-mono rounded-lg border-slate-300 focus:ring-brand-500">
+                                class="w-full px-3.5 py-2 text-xs font-mono rounded-xl border border-slate-300 bg-white text-slate-900 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:outline-none transition shadow-2xs">
                         </div>
                     </div>
 
@@ -243,13 +243,13 @@
                         <div>
                             <label class="block font-bold text-slate-700 mb-1">Dibuat Pada (Tanggal Terbit) <span class="text-rose-500">*</span></label>
                             <input type="date" name="issued_date" required x-model="formData.issued_date"
-                                class="w-full text-xs rounded-lg border-slate-300 focus:ring-brand-500">
+                                class="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-300 bg-white text-slate-900 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:outline-none transition shadow-2xs">
                         </div>
 
                         <div>
                             <label class="block font-bold text-slate-700 mb-1">Masa Berlaku Hingga <span class="text-rose-500">*</span></label>
                             <input type="date" name="valid_until" required x-model="formData.valid_until"
-                                class="w-full text-xs rounded-lg border-slate-300 focus:ring-brand-500">
+                                class="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-300 bg-white text-slate-900 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:outline-none transition shadow-2xs">
                             <span class="text-[10px] text-slate-400 mt-0.5 block">Standar BNSP: 3 Tahun</span>
                         </div>
                     </div>
@@ -259,7 +259,7 @@
                             Berkas Sertifikat PDF Resmi <span x-show="!formData.is_edit" class="text-rose-500">*</span>
                         </label>
                         <input type="file" name="certificate_file" accept="application/pdf" :required="!formData.is_edit"
-                            class="w-full text-xs rounded-lg border border-slate-300 file:mr-3 file:py-2 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100">
+                            class="w-full text-xs rounded-xl border border-slate-300 bg-white p-1.5 text-slate-700 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:outline-none file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100 transition shadow-2xs">
                         <span class="text-[11px] text-slate-400 mt-1 block">Format file: Dokumen PDF (Maksimal 10 MB).</span>
                     </div>
 

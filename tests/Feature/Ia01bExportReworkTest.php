@@ -71,21 +71,24 @@ class Ia01bExportReworkTest extends TestCase
         $this->assertFileDoesNotExist(resource_path('views/admin/dokumen-muk/export-asesi-ia01b.blade.php'));
     }
 
-    public function test_export_ia01b_returns_404_when_assessee_has_not_uploaded_file(): void
+    public function test_export_ia01b_returns_not_uploaded_view_when_assessee_has_not_uploaded_file(): void
     {
-        // 1. Dynamic route
+        // 1. Dynamic route returns friendly not-uploaded view
         $resDynamic = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.asesi-dynamic', [
             'assessment' => $this->assessment->id,
             'type' => 'ia01b',
         ]));
-        $resDynamic->assertNotFound();
+        $resDynamic->assertOk();
+        $resDynamic->assertViewIs('admin.dokumen-muk.not-uploaded');
+        $resDynamic->assertSee('FR.IA.01B');
 
-        // 2. Export asesi route
+        // 2. Export asesi route also returns not-uploaded view
         $resExport = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.export-asesi', [
             'assessment' => $this->assessment->id,
             'type' => 'ia01b',
         ]));
-        $resExport->assertNotFound();
+        $resExport->assertOk();
+        $resExport->assertViewIs('admin.dokumen-muk.not-uploaded');
     }
 
     public function test_export_ia01b_serves_uploaded_pdf_file(): void

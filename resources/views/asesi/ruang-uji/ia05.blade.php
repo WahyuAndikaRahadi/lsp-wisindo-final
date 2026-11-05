@@ -3,47 +3,48 @@
 @section('title', 'FR.IA.05 - Ujian Teori CBT Pilihan Ganda')
 
 @section('content')
-<div class="max-w-6xl mx-auto py-6 space-y-6">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-6">
+    {{-- Header & Navigasi Terstruktur --}}
+    <div class="space-y-3 pb-2 border-b border-slate-200/80">
+        <div class="flex items-center justify-between gap-3">
+            <a href="{{ route('asesi.assessment.ruang-uji', $assessment) }}" class="inline-flex items-center gap-1.5 text-xs font-bold text-brand-600 hover:text-brand-800 transition py-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                <span>Kembali ke Ruang Uji</span>
+            </a>
+            <div>
+                @if($isSubmitted)
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                        <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        <span>✓ Jawaban CBT Telah Terkirim</span>
+                    </span>
+                @else
+                    <div class="flex items-center gap-2 bg-slate-100 px-2.5 py-1 rounded-full border border-slate-200 text-xs font-medium" id="autosave-container">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" id="autosave-dot"></span>
+                        <span id="autosave-status" class="text-slate-700 text-[11px] font-semibold">Tersimpan</span>
+                    </div>
+                @endif
+            </div>
+        </div>
+        <div>
+            <h1 class="text-xl sm:text-2xl md:text-3xl font-black text-slate-900 tracking-tight leading-snug">
+                FR.IA.05. PERTANYAAN TERTULIS (CBT)
+            </h1>
+            <p class="text-xs sm:text-sm text-slate-500 mt-1 leading-relaxed">
+                Skema: <strong class="text-slate-800">{{ $assessment->schedule->scheme->name }}</strong> &bull; 
+                Kode Jadwal: <span class="font-mono font-bold">{{ $assessment->schedule->code }}</span>
+            </p>
+        </div>
+    </div>
+
     @if($assessment->schedule?->is_closed)
-        <div class="p-4 bg-emerald-50 border-2 border-emerald-300 rounded-xl text-emerald-900 flex items-center gap-3 shadow-xs">
-            <span class="text-xl">🔒</span>
+        <div class="p-4 bg-emerald-50 border-2 border-emerald-300 rounded-2xl text-emerald-900 flex flex-col sm:flex-row items-start sm:items-center gap-3 shadow-xs">
+            <span class="text-xl shrink-0">🔒</span>
             <div>
                 <div class="font-bold text-sm">Jadwal Asesmen Telah Resmi Ditutup &amp; Dikunci</div>
-                <p class="text-xs text-emerald-800 mt-0.5">Seluruh lembar ujian CBT berada dalam mode lihat (read-only). Jawaban telah tersimpan secara permanen.</p>
+                <p class="text-xs text-emerald-800 mt-0.5 leading-relaxed">Seluruh lembar ujian CBT berada dalam mode lihat (read-only). Jawaban telah tersimpan secara permanen.</p>
             </div>
         </div>
     @endif
-
-    {{-- Header --}}
-    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-            <a href="{{ route('asesi.assessment.ruang-uji', $assessment) }}" class="text-xs text-brand-600 hover:underline font-semibold block mb-1">
-                &larr; Kembali ke Ruang Uji
-            </a>
-            <h1 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">FR.IA.05. PERTANYAAN TERTULIS (CBT)</h1>
-            <p class="text-xs text-slate-500 mt-1">
-                Skema: <strong class="text-slate-800">{{ $assessment->schedule->scheme->name }}</strong> &bull; 
-                Kode Jadwal: <span class="font-mono">{{ $assessment->schedule->code }}</span>
-            </p>
-        </div>
-
-        <div class="flex items-center gap-3">
-            @if($isSubmitted)
-                <div class="text-right">
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-800 text-xs font-bold rounded-lg border border-emerald-300">
-                        <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                        <span>✓ Jawaban CBT Telah Terkirim</span>
-                    </span>
-                    <span class="text-[11px] text-slate-500 block mt-1">Terkirim pada {{ $existingResp?->asesi_signed_at ? \Carbon\Carbon::parse($existingResp->asesi_signed_at)->format('d/m/Y H:i') : '-' }} WIB</span>
-                </div>
-            @else
-                <div class="flex items-center gap-2 bg-slate-50 px-3.5 py-2 rounded-lg border border-slate-200 text-xs font-medium" id="autosave-container">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500" id="autosave-dot"></span>
-                    <span id="autosave-status" class="text-slate-600">Otomatis Tersimpan</span>
-                </div>
-            @endif
-        </div>
-    </div>
 
     @if($questions->isEmpty())
         <div class="bg-amber-50 border border-amber-200 rounded-xl p-8 text-center text-amber-900 text-sm">
@@ -62,7 +63,7 @@
                             $savedVal = $draftAnswers[$qId] ?? null;
                             $isDoubtful = in_array($qId, $draftDoubtful ?? [], true);
                         @endphp
-                        <div class="cbt-question-panel bg-white rounded-xl border border-slate-200 p-6 shadow-sm space-y-5 {{ $index === 0 ? '' : 'hidden' }}"
+                        <div class="cbt-question-panel bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm space-y-5 {{ $index === 0 ? '' : 'hidden' }}"
                              id="question-panel-{{ $index }}"
                              data-index="{{ $index }}"
                              data-qid="{{ $qId }}">
@@ -97,7 +98,7 @@
                                 {{-- Optional Question Image --}}
                                 @if($q->question_image)
                                     <div class="p-2 border border-slate-200 rounded-lg bg-slate-50 inline-block max-w-full">
-                                        <img src="{{ asset('storage/' . $q->question_image) }}"
+                                        <img src="{{ $q->image_url ?? asset('storage/' . $q->question_image) }}"
                                              alt="Gambar Soal No. {{ $index + 1 }}"
                                              class="max-h-72 rounded object-contain cursor-pointer"
                                              onclick="window.open(this.src, '_blank')">
@@ -161,7 +162,7 @@
 
                 {{-- Right Column: Question Palette Sidebar --}}
                 <div class="lg:col-span-4 space-y-4">
-                    <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm space-y-4 sticky top-6">
+                    <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-sm space-y-4 sticky top-6">
                         <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                             <h2 class="text-sm font-black text-slate-900 uppercase tracking-wider">
                                 Nomor Soal

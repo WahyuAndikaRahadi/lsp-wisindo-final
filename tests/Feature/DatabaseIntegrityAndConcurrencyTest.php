@@ -243,7 +243,7 @@ class DatabaseIntegrityAndConcurrencyTest extends TestCase
             'appeal_reasons' => 'Percobaan submit kedua yang cepat.',
         ]);
 
-        $response->assertRedirect(route('asesi.jadwal.index'));
+        $response->assertRedirect(route('asesi.dashboard'));
         $response->assertSessionHas('info');
         $this->assertCount(1, AssessmentAppeal::where('assessment_id', $this->assessment->id)->get());
     }

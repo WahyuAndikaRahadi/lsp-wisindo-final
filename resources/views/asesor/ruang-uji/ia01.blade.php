@@ -1,6 +1,6 @@
 @php
     $isCompleted = (bool) $response;
-    $isScheduleClosed = (bool) ($assessment->schedule?->is_closed);
+    $isScheduleClosed = (bool) ($assessment->schedule?->isClosedForAssessor());
 @endphp
 @extends('layouts.app', ['title' => 'FR.IA.01 - Ceklis Observasi'])
 
@@ -182,8 +182,13 @@
 
         {{-- Assessor Signature --}}
         <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 space-y-4">
-            <h2 class="text-base font-bold text-slate-900">Tanda Tangan Asesor</h2>
-            <x-signature-pad name="assessor_signature" :value="$savedSignature ?? null" label="Tanda Tangan Asesor" :required="! $isScheduleClosed" :disabled="$isScheduleClosed" />
+            <div>
+                <h2 class="text-base font-bold text-slate-900">Tanda Tangan Asesor</h2>
+                <p class="text-xs text-slate-500 mt-0.5">Pengesahan hasil observasi unjuk kerja praktik FR.IA.01</p>
+            </div>
+            <div class="max-w-[340px]">
+                <x-signature-pad name="assessor_signature" :value="$savedSignature ?? null" label="Tanda Tangan Asesor" :required="! $isScheduleClosed" :disabled="$isScheduleClosed" :height="140" />
+            </div>
         </div>
 
         <div class="flex items-center justify-end space-x-3">

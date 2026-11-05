@@ -32,6 +32,7 @@ class AutoGradeService
             $breakdown[$q->id] = [
                 'question_id' => $q->id,
                 'question' => $q->question_text,
+                'question_image' => $q->question_image,
                 'answer' => $ans,
                 'correct_answer' => $q->correct_answer,
                 'is_correct' => $isCorrect,

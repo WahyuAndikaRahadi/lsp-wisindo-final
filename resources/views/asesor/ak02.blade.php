@@ -137,7 +137,7 @@
                                     </label>
                                 </td>
                                 <td class="px-3 py-3 text-center">
-                                    <select name="units[{{ $unit->id }}][is_competent]" class="unit-result-select text-xs font-bold rounded border-slate-300 focus:ring-brand-500 py-1.5 px-2 w-full {{ $isCompetent ? 'text-emerald-700' : 'text-rose-700' }}">
+                                    <select name="units[{{ $unit->id }}][is_competent]" class="unit-result-select text-xs font-bold rounded-lg border border-slate-300 bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:outline-none py-1.5 px-2.5 w-full transition shadow-2xs {{ $isCompetent ? 'text-emerald-700' : 'text-rose-700' }}">
                                         <option value="1" {{ $isCompetent ? 'selected' : '' }}>Kompeten (K)</option>
                                         <option value="0" {{ !$isCompetent ? 'selected' : '' }}>Belum Kompeten (BK)</option>
                                     </select>
@@ -156,7 +156,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label class="block font-bold text-slate-700 mb-1">Rekomendasi Hasil Asesmen (*):</label>
-                    <select name="final_result" id="finalResultSelect" required @disabled($assessment->schedule?->is_closed) class="w-full text-xs font-bold rounded-lg border-slate-300 focus:ring-brand-500 {{ $assessment->schedule?->is_closed ? 'bg-slate-50 text-slate-700' : '' }}">
+                    <select name="final_result" id="finalResultSelect" required @disabled($assessment->schedule?->is_closed) class="w-full text-xs font-bold rounded-xl border border-slate-300 bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:outline-none px-3.5 py-2.5 transition shadow-2xs {{ $assessment->schedule?->is_closed ? 'bg-slate-50 text-slate-700' : '' }}">
                         <option value="" disabled {{ empty($assessment->final_result) ? 'selected' : '' }}>-- Pilih Rekomendasi Akhir (Wajib) --</option>
                         <option value="KOMPETEN" {{ in_array($assessment->final_result, ['KOMPETEN', 'K']) ? 'selected' : '' }}>KOMPETEN (K)</option>
                         <option value="BELUM_KOMPETEN" {{ in_array($assessment->final_result, ['BELUM_KOMPETEN', 'BK']) ? 'selected' : '' }}>BELUM KOMPETEN (BK)</option>
@@ -165,13 +165,13 @@
 
                 <div>
                     <label class="block font-bold text-slate-700 mb-1">Tindak Lanjut yang Dibutuhkan:</label>
-                    <input type="text" name="follow_up_action" value="{{ old('follow_up_action', $assessment->follow_up_action ?? '') }}" @disabled($assessment->schedule?->is_closed) class="w-full text-xs rounded-lg border-slate-300 focus:ring-brand-500 {{ $assessment->schedule?->is_closed ? 'bg-slate-50 text-slate-700' : '' }}" placeholder="Pekerjaan tambahan jika BK atau usulan sertifikat jika K">
+                    <input type="text" name="follow_up_action" value="{{ old('follow_up_action', $assessment->follow_up_action ?? '') }}" @disabled($assessment->schedule?->is_closed) class="w-full text-xs rounded-xl border border-slate-300 bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:outline-none px-3.5 py-2.5 transition shadow-2xs {{ $assessment->schedule?->is_closed ? 'bg-slate-50 text-slate-700' : '' }}" placeholder="Pekerjaan tambahan jika BK atau usulan sertifikat jika K">
                 </div>
             </div>
 
             <div>
                 <label class="block font-bold text-slate-700 mb-1">Komentar / Catatan Asesor:</label>
-                <textarea name="final_notes" rows="3" @disabled($assessment->schedule?->is_closed) class="w-full text-xs rounded-lg border-slate-300 focus:ring-brand-500 {{ $assessment->schedule?->is_closed ? 'bg-slate-50 text-slate-700' : '' }}" placeholder="Catatan objektif mengenai unjuk kerja asesi...">{{ old('final_notes', $assessment->final_notes ?? '') }}</textarea>
+                <textarea name="final_notes" rows="3" @disabled($assessment->schedule?->is_closed) class="w-full p-3 text-xs rounded-xl border border-slate-300 bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:outline-none transition shadow-2xs {{ $assessment->schedule?->is_closed ? 'bg-slate-50 text-slate-700' : '' }}" placeholder="Catatan objektif mengenai unjuk kerja asesi...">{{ old('final_notes', $assessment->final_notes ?? '') }}</textarea>
             </div>
 
             <div class="flex items-center justify-between pt-4 border-t border-slate-200">

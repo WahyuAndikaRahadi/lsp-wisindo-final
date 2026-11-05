@@ -312,6 +312,7 @@ Route::middleware(['auth', 'role:ASESOR'])->prefix('asesor')->name('asesor.')->g
 
     Route::get('/ruang-uji/{assessment}/ia02', fn (Assessment $assessment) => app()->call([app(Asesor\InstrumentController::class), 'instrumentShow'], ['assessment' => $assessment, 'code' => 'ia02']))->name('ruang-uji.ia02');
     Route::post('/ruang-uji/{assessment}/ia02', fn (Assessment $assessment, Request $req) => app(Asesor\InstrumentController::class)->instrumentStore($assessment, 'ia02', $req))->name('ruang-uji.ia02.store');
+    Route::post('/schedule/{schedule}/bulk-sign-ia02', [Asesor\InstrumentController::class, 'bulkSignIa02'])->name('schedule.ia02.bulk-sign');
 
     Route::get('/ruang-uji/{assessment}/ia03', fn (Assessment $assessment) => app()->call([app(Asesor\InstrumentController::class), 'instrumentShow'], ['assessment' => $assessment, 'code' => 'ia03']))->name('ruang-uji.ia03');
     Route::post('/ruang-uji/{assessment}/ia03', fn (Assessment $assessment, Request $req) => app(Asesor\InstrumentController::class)->instrumentStore($assessment, 'ia03', $req))->name('ruang-uji.ia03.store');
@@ -429,3 +430,13 @@ Route::middleware(['auth', 'role:SUPER_ADMIN,ADMIN_LSP,KOMITE_TEKNIS,TUK_ADMIN']
 Route::post('/admin/proxy/switch/{user}', [Admin\ProxyController::class, 'impersonate'])
     ->middleware(['auth', 'role:SUPER_ADMIN,ADMIN_LSP'])
     ->name('proxy.switch');
+
+// Fallback storage route for public uploads in case symlink is missing or bypassed
+Route::get('/storage/{path}', function (string $path) {
+    $disk = Storage::disk('public');
+    if (! $disk->exists($path)) {
+        abort(404);
+    }
+
+    return response()->file($disk->path($path));
+})->where('path', '.*')->name('storage.fallback');

@@ -73,6 +73,10 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
+        if ($request->session()->has('admin_impersonator_id')) {
+            return redirect()->back()->with('warning', 'Anda sedang dalam mode proxy. Silakan gunakan tombol Kembali ke sesi Admin terlebih dahulu.');
+        }
+
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();

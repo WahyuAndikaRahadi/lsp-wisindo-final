@@ -1168,12 +1168,14 @@ class MukDynamicDocumentService
      */
     public function getPythonExecutable(): string
     {
-        $venvPython = PHP_OS_FAMILY === 'Windows'
-            ? base_path('.venv/Scripts/python.exe')
-            : base_path('.venv/bin/python');
+        $venvCandidates = PHP_OS_FAMILY === 'Windows'
+            ? [base_path('.venv/Scripts/python.exe'), base_path('venv/Scripts/python.exe')]
+            : [base_path('.venv/bin/python'), base_path('venv/bin/python')];
 
-        if (File::isFile($venvPython)) {
-            return $venvPython;
+        foreach ($venvCandidates as $venvPython) {
+            if (File::isFile($venvPython)) {
+                return $venvPython;
+            }
         }
 
         if (PHP_OS_FAMILY === 'Windows') {

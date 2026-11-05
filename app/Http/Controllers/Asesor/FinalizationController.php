@@ -44,7 +44,9 @@ class FinalizationController extends Controller
         $user = auth()->user();
         $isSingleAssessor = $schedule->assessors->count() === 1 && $schedule->assessors->first()?->id === $user->id;
 
-        $asesiList = $schedule->assessments->map(function ($assessment) use ($user, $isSingleAssessor) {
+        $myAssessments = $schedule->assessorAssessments();
+
+        $asesiList = $myAssessments->map(function ($assessment) use ($user, $isSingleAssessor) {
             $isMyCandidate = (int) $assessment->assessor_id === (int) $user->id || (empty($assessment->assessor_id) && $isSingleAssessor);
 
             return (object) [
@@ -60,7 +62,7 @@ class FinalizationController extends Controller
                 'inspect_url' => route('asesor.assessment.ak02', $assessment->id),
                 'is_my_candidate' => $isMyCandidate,
             ];
-        });
+        })->values();
 
         $meta = [
             'code' => 'FR.AK.02',
@@ -90,7 +92,7 @@ class FinalizationController extends Controller
     {
         $this->authorizeAssessorSchedule($schedule);
 
-        if ($schedule->is_closed) {
+        if ($schedule->isClosedForAssessor()) {
             return back()->with('error', 'Jadwal asesmen sudah ditutup dan dikunci.');
         }
 
@@ -240,7 +242,7 @@ class FinalizationController extends Controller
     {
         $this->authorizeAssessorAssessment($assessment);
 
-        if ($assessment->schedule && $assessment->schedule->is_closed) {
+        if ($assessment->schedule && $assessment->schedule->isClosedForAssessor()) {
             return back()->with('error', 'Jadwal asesmen sudah ditutup dan dikunci.');
         }
 
@@ -322,8 +324,9 @@ class FinalizationController extends Controller
         }
 
         $schedule->load('scheme', 'assessors', 'assessments.asesi');
+        $myAssessments = $schedule->assessorAssessments();
 
-        return view('asesor.reports-ak05-ak06', compact('schedule'));
+        return view('asesor.reports-ak05-ak06', compact('schedule', 'myAssessments'));
     }
 
     /**
@@ -373,24 +376,30 @@ class FinalizationController extends Controller
             'catatan_peninjau' => $validated['ak06_catatan_peninjau'],
         ];
 
-        if ($schedule->is_closed) {
+        if ($schedule->isClosedForAssessor()) {
             return redirect()->route('asesor.jadwal.index')
                 ->with('info', 'Jadwal asesmen ini sudah resmi ditutup sebelumnya.');
         }
 
-        $readiness = $this->workflowService->isScheduleReadyForClosure($schedule);
+        $myPoolReadiness = $this->workflowService->isAssessorPoolReadyForReports($schedule, auth()->user());
+        $scheduleReadiness = $this->workflowService->isScheduleReadyForClosure($schedule);
 
-        DB::transaction(function () use ($schedule, $ak05, $ak06, $readiness) {
-            $this->workflowService->saveScheduleReports($schedule, $ak05, $ak06, $readiness['is_ready']);
+        DB::transaction(function () use ($schedule, $ak05, $ak06, $scheduleReadiness) {
+            $this->workflowService->saveScheduleReports($schedule, $ak05, $ak06, $scheduleReadiness['is_ready']);
         });
 
-        if (! $readiness['is_ready']) {
+        if (! $myPoolReadiness['is_ready']) {
             return redirect()->route('asesor.schedule.ruang-uji', $schedule->id)
-                ->with('warning', "Laporan tersimpan. Jadwal belum dapat ditutup: {$readiness['uncompleted_count']} asesi belum selesai.");
+                ->with('warning', "Laporan tersimpan. Jadwal belum dapat ditutup: Masih ada {$myPoolReadiness['uncompleted_count']} asesi binaan Anda yang belum selesai.");
+        }
+
+        if (! $scheduleReadiness['is_ready']) {
+            return redirect()->route('asesor.jadwal.index')
+                ->with('success', "FR.AK.05 & FR.AK.06 untuk asesi binaan Anda berhasil disimpan. Seluruh asesi binaan Anda ({$myPoolReadiness['my_total']} orang) telah selesai dinilai. Jadwal tetap aktif untuk asesor lain hingga seluruh asesi selesai.");
         }
 
         return redirect()->route('asesor.jadwal.index')
-            ->with('success', 'FR.AK.05 Laporan Asesmen dan FR.AK.06 Tinjauan Proses berhasil disimpan. Jadwal resmi ditutup.');
+            ->with('success', 'FR.AK.05 Laporan Asesmen dan FR.AK.06 Tinjauan Proses berhasil disimpan. Seluruh asesi telah selesai dan jadwal resmi ditutup.');
     }
 
     /**
@@ -400,7 +409,7 @@ class FinalizationController extends Controller
     {
         $this->authorizeAssessorAssessment($assessment);
 
-        if ($assessment->schedule && $assessment->schedule->is_closed) {
+        if ($assessment->schedule && $assessment->schedule->isClosedForAssessor()) {
             return back()->with('error', 'Jadwal asesmen sudah ditutup dan dikunci.');
         }
 
@@ -417,7 +426,7 @@ class FinalizationController extends Controller
     {
         $this->authorizeAssessorSchedule($schedule);
 
-        if ($schedule->is_closed) {
+        if ($schedule->isClosedForAssessor()) {
             return redirect()->route('asesor.jadwal.index')
                 ->with('info', 'Jadwal asesmen ini sudah resmi ditutup sebelumnya.');
         }

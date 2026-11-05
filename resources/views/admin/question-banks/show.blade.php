@@ -26,7 +26,7 @@
             <p class="text-base font-semibold text-slate-900 leading-relaxed">{{ $questionBank->question_text }}</p>
             @if($questionBank->question_image)
                 <div class="mt-4">
-                    <img src="{{ asset('storage/' . $questionBank->question_image) }}" alt="Gambar Soal" class="max-h-64 rounded-lg border border-slate-200 shadow-xs">
+                    <img src="{{ $questionBank->image_url ?? asset('storage/' . $questionBank->question_image) }}" alt="Gambar Soal" class="max-h-64 rounded-lg border border-slate-200 shadow-xs cursor-pointer" onclick="window.open(this.src, '_blank')">
                 </div>
             @endif
         </div>

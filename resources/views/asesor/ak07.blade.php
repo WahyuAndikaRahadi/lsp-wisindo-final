@@ -97,16 +97,20 @@
             this.selectedAsesi = null;
         }
      }">
+    @php
+        $isClosedForMe = $jadwal->isClosedForAssessor();
+    @endphp
+
     {{-- Unified Top Lifecycle Navigation --}}
     @include('asesor.partials.schedule-nav', ['schedule' => $jadwal, 'active' => 'ak07'])
 
-    @if($jadwal->is_closed)
+    @if($isClosedForMe)
         <div class="p-3.5 bg-emerald-50 border border-emerald-300 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-emerald-900">
             <div class="flex items-center space-x-2">
                 <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
-                <span><strong>Jadwal Telah Resmi Ditutup & Dikunci:</strong> Dokumen penyesuaian asesmen FR.AK.07 dalam mode lihat (read-only).</span>
+                <span><strong>{{ $jadwal->is_closed ? 'Jadwal Telah Resmi Ditutup & Dikunci:' : 'Asesmen Binaan Anda Telah Ditutup & Selesai:' }}</strong> Dokumen penyesuaian asesmen FR.AK.07 dalam mode lihat (read-only).</span>
             </div>
-            <span class="font-bold font-mono text-[11px] bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded border border-emerald-300 shrink-0">STATUS: FINISHED</span>
+            <span class="font-bold font-mono text-[11px] bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded border border-emerald-300 shrink-0">STATUS: {{ $jadwal->is_closed ? 'FINISHED' : 'BINAAN SELESAI' }}</span>
         </div>
     @endif
 
@@ -182,10 +186,10 @@
                                 @endphp
                                 <div class="p-3 rounded-xl border-2 transition shadow-2xs flex flex-col justify-between {{ $isAk07Approved ? 'bg-emerald-50/80 border-emerald-300 hover:border-emerald-400' : 'bg-amber-50/90 border-amber-300 hover:border-amber-400' }}">
                                     <div class="flex items-start justify-between gap-2">
-                                        <label class="flex items-start space-x-2.5 {{ $jadwal->is_closed ? 'cursor-default' : 'cursor-pointer' }} flex-1 min-w-0">
+                                        <label class="flex items-start space-x-2.5 {{ $isClosedForMe ? 'cursor-default' : 'cursor-pointer' }} flex-1 min-w-0">
                                             <input type="checkbox" name="assessment_ids[]" value="{{ $assessment->id }}"
                                                 class="rounded border-slate-400 text-brand-600 focus:ring-brand-500 w-4 h-4 mt-0.5 shrink-0"
-                                                @disabled($jadwal->is_closed)
+                                                @disabled($isClosedForMe)
                                                 {{ (empty(old('assessment_ids')) || in_array($assessment->id, old('assessment_ids', [])) || (string)$selectedAssessmentId === (string)$assessment->id) ? 'checked' : '' }}>
                                             <div class="truncate text-xs">
                                                 <div class="font-bold text-slate-900 truncate flex items-center gap-1.5">
@@ -266,8 +270,8 @@
                         ];
                     @endphp
                     @foreach($potensiList as $pIndex => $pText)
-                        <label class="flex items-start space-x-2.5 {{ $jadwal->is_closed ? 'cursor-default' : 'cursor-pointer' }}">
-                            <input type="checkbox" name="potensi[]" value="{{ $pText }}" @disabled($jadwal->is_closed) class="mt-0.5 rounded border-slate-400 text-brand-600 focus:ring-brand-500 w-4 h-4">
+                        <label class="flex items-start space-x-2.5 {{ $isClosedForMe ? 'cursor-default' : 'cursor-pointer' }}">
+                            <input type="checkbox" name="potensi[]" value="{{ $pText }}" @disabled($isClosedForMe) class="mt-0.5 rounded border-slate-400 text-brand-600 focus:ring-brand-500 w-4 h-4">
                             <span class="text-slate-800">{{ $pText }}</span>
                         </label>
                     @endforeach
@@ -306,12 +310,12 @@
                                 </td>
                                 <td class="px-4 py-4 border-r border-slate-200 text-center">
                                     <div class="flex items-center justify-center space-x-3">
-                                        <label class="inline-flex items-center space-x-1 {{ $jadwal->is_closed ? 'cursor-default' : 'cursor-pointer' }}">
-                                            <input type="radio" name="items[{{ $idx }}][needed]" value="YA" @disabled($jadwal->is_closed) class="text-emerald-600 focus:ring-emerald-500 w-4 h-4">
+                                        <label class="inline-flex items-center space-x-1 {{ $isClosedForMe ? 'cursor-default' : 'cursor-pointer' }}">
+                                            <input type="radio" name="items[{{ $idx }}][needed]" value="YA" @disabled($isClosedForMe) class="text-emerald-600 focus:ring-emerald-500 w-4 h-4">
                                             <span class="font-bold text-emerald-800">Ya</span>
                                         </label>
-                                        <label class="inline-flex items-center space-x-1 {{ $jadwal->is_closed ? 'cursor-default' : 'cursor-pointer' }}">
-                                            <input type="radio" name="items[{{ $idx }}][needed]" value="TIDAK" checked @disabled($jadwal->is_closed) class="text-slate-600 focus:ring-slate-500 w-4 h-4">
+                                        <label class="inline-flex items-center space-x-1 {{ $isClosedForMe ? 'cursor-default' : 'cursor-pointer' }}">
+                                            <input type="radio" name="items[{{ $idx }}][needed]" value="TIDAK" checked @disabled($isClosedForMe) class="text-slate-600 focus:ring-slate-500 w-4 h-4">
                                             <span class="text-slate-700">Tidak</span>
                                         </label>
                                     </div>
@@ -319,14 +323,14 @@
                                 <td class="px-4 py-4 space-y-2">
                                     <div class="space-y-1.5">
                                         @foreach($def['options'] as $opt)
-                                            <label class="flex items-start space-x-2 text-slate-700 {{ $jadwal->is_closed ? 'cursor-default' : 'cursor-pointer' }}">
-                                                <input type="checkbox" name="items[{{ $idx }}][options][]" value="{{ $opt }}" @disabled($jadwal->is_closed) class="mt-0.5 rounded border-slate-300 text-brand-600 focus:ring-brand-500 w-3.5 h-3.5">
+                                            <label class="flex items-start space-x-2 text-slate-700 {{ $isClosedForMe ? 'cursor-default' : 'cursor-pointer' }}">
+                                                <input type="checkbox" name="items[{{ $idx }}][options][]" value="{{ $opt }}" @disabled($isClosedForMe) class="mt-0.5 rounded border-slate-300 text-brand-600 focus:ring-brand-500 w-3.5 h-3.5">
                                                 <span>{{ $opt }}</span>
                                             </label>
                                         @endforeach
                                     </div>
                                     <div class="pt-1">
-                                        <input type="text" name="items[{{ $idx }}][custom_note]" placeholder="Keterangan lain / catatan penyesuaian spesifik..." @disabled($jadwal->is_closed) class="w-full text-xs px-2.5 py-1.5 rounded border border-slate-300 focus:ring-1 focus:ring-brand-500 focus:outline-none bg-white">
+                                        <input type="text" name="items[{{ $idx }}][custom_note]" placeholder="Keterangan lain / catatan penyesuaian spesifik..." @disabled($isClosedForMe) class="w-full text-xs px-2.5 py-1.5 rounded border border-slate-300 focus:ring-1 focus:ring-brand-500 focus:outline-none bg-white">
                                     </div>
                                 </td>
                             </tr>
@@ -347,12 +351,12 @@
 
             <div class="flex items-center space-x-6 text-xs pt-1">
                 <span class="font-bold text-slate-800">Status Kesepakatan Penyesuaian:</span>
-                <label class="inline-flex items-center space-x-1.5 {{ $jadwal->is_closed ? 'cursor-default' : 'cursor-pointer' }}">
-                    <input type="radio" name="agreement_status" value="YA" @disabled($jadwal->is_closed) class="text-emerald-600 focus:ring-emerald-500 w-4 h-4">
+                <label class="inline-flex items-center space-x-1.5 {{ $isClosedForMe ? 'cursor-default' : 'cursor-pointer' }}">
+                    <input type="radio" name="agreement_status" value="YA" @disabled($isClosedForMe) class="text-emerald-600 focus:ring-emerald-500 w-4 h-4">
                     <span class="font-bold text-emerald-800">Diperlukan Penyesuaian</span>
                 </label>
-                <label class="inline-flex items-center space-x-1.5 {{ $jadwal->is_closed ? 'cursor-default' : 'cursor-pointer' }}">
-                    <input type="radio" name="agreement_status" value="TIDAK" checked @disabled($jadwal->is_closed) class="text-slate-600 focus:ring-slate-500 w-4 h-4">
+                <label class="inline-flex items-center space-x-1.5 {{ $isClosedForMe ? 'cursor-default' : 'cursor-pointer' }}">
+                    <input type="radio" name="agreement_status" value="TIDAK" checked @disabled($isClosedForMe) class="text-slate-600 focus:ring-slate-500 w-4 h-4">
                     <span class="font-medium text-slate-700">Tidak Diperlukan Penyesuaian (Standar Baku)</span>
                 </label>
             </div>
@@ -360,21 +364,21 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs pt-2">
                 <div>
                     <label class="block font-semibold text-slate-700 mb-1">1) Acuan Pembanding Asesmen:</label>
-                    <input type="text" name="agreement_benchmark" placeholder="Contoh: SKKNI No. 097/2018..." @disabled($jadwal->is_closed) class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs focus:ring-1 focus:ring-brand-500 focus:outline-none bg-slate-50">
+                    <input type="text" name="agreement_benchmark" placeholder="Contoh: SKKNI No. 097/2018..." @disabled($isClosedForMe) class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs focus:ring-1 focus:ring-brand-500 focus:outline-none bg-slate-50">
                 </div>
                 <div>
                     <label class="block font-semibold text-slate-700 mb-1">2) Metode Asesmen yang Disepakati:</label>
-                    <input type="text" name="agreement_method" placeholder="Contoh: Observasi Demonstrasi & Wawancara..." @disabled($jadwal->is_closed) class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs focus:ring-1 focus:ring-brand-500 focus:outline-none bg-slate-50">
+                    <input type="text" name="agreement_method" placeholder="Contoh: Observasi Demonstrasi & Wawancara..." @disabled($isClosedForMe) class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs focus:ring-1 focus:ring-brand-500 focus:outline-none bg-slate-50">
                 </div>
                 <div>
                     <label class="block font-semibold text-slate-700 mb-1">3) Instrumen Asesmen Disepakati:</label>
-                    <input type="text" name="agreement_instrument" placeholder="Contoh: FR.IA.01, FR.IA.02..." @disabled($jadwal->is_closed) class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs focus:ring-1 focus:ring-brand-500 focus:outline-none bg-slate-50">
+                    <input type="text" name="agreement_instrument" placeholder="Contoh: FR.IA.01, FR.IA.02..." @disabled($isClosedForMe) class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs focus:ring-1 focus:ring-brand-500 focus:outline-none bg-slate-50">
                 </div>
             </div>
 
             <div class="pt-2 text-xs">
                 <label class="block font-semibold text-slate-700 mb-1">4) Catatan Tambahan / Uraian Penyesuaian:</label>
-                <textarea name="agreement_notes" rows="2" placeholder="Catatan kesepakatan penyesuaian khusus (jika ada)..." @disabled($jadwal->is_closed) class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs focus:ring-1 focus:ring-brand-500 focus:outline-none bg-slate-50"></textarea>
+                <textarea name="agreement_notes" rows="2" placeholder="Catatan kesepakatan penyesuaian khusus (jika ada)..." @disabled($isClosedForMe) class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs focus:ring-1 focus:ring-brand-500 focus:outline-none bg-slate-50"></textarea>
             </div>
         </div>
 
@@ -382,9 +386,9 @@
         <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
             <a href="{{ route('asesor.schedule.ak01', $jadwal->id) }}" class="px-5 py-2.5 text-xs font-bold text-slate-700 bg-white border-2 border-slate-300 rounded-lg hover:bg-slate-50 transition">Kembali ke FR.AK.01</a>
             <div class="flex items-center space-x-3 w-full sm:w-auto justify-end">
-                @if($jadwal->is_closed)
+                @if($isClosedForMe)
                     <button type="button" disabled class="px-6 py-2.5 text-xs font-black uppercase tracking-wider bg-slate-200 text-slate-500 rounded-lg cursor-not-allowed">
-                        Jadwal Telah Ditutup (Read-Only)
+                        {{ $jadwal->is_closed ? 'Jadwal Telah Ditutup (Read-Only)' : 'Asesmen Binaan Telah Selesai (Read-Only)' }}
                     </button>
                 @else
                     <button type="submit" class="px-6 py-2.5 text-xs font-black uppercase tracking-wider bg-brand-600 hover:bg-brand-700 text-white rounded-lg border-2 border-black shadow-[2px_2px_0_0_rgba(0,0,0,0.9)] transition">

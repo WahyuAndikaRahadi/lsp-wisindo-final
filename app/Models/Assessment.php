@@ -203,4 +203,16 @@ class Assessment extends Model
 
         return true;
     }
+
+    /**
+     * Determine if this assessment is closed / finished for the evaluating assessor.
+     */
+    public function isClosedForAssessor(?User $assessor = null): bool
+    {
+        if ($this->schedule && $this->schedule->isClosedForAssessor($assessor)) {
+            return true;
+        }
+
+        return false;
+    }
 }

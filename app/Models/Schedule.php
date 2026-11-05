@@ -140,84 +140,204 @@ class Schedule extends Model
     }
 
     /**
-     * Determine whether a lifecycle step in the assessment workflow is unlocked for this schedule.
+     * Get query for assessments assigned to the specified assessor (or logged-in assessor).
+     * If no assessor is specified and current user is not an assessor, returns all assessments.
      */
-    public function isStepUnlocked(string $step): bool
+    public function assessorAssessmentsQuery(?User $assessor = null)
+    {
+        $user = $assessor ?? (auth()->check() && auth()->user()->role === 'ASESOR' ? auth()->user() : null);
+        $query = $this->assessments();
+
+        if (! $user || $user->role !== 'ASESOR') {
+            return $query;
+        }
+
+        $isSingleAssessor = $this->relationLoaded('assessors')
+            ? ($this->assessors->count() === 1 && $this->assessors->first()?->id === $user->id)
+            : ($this->assessors()->count() === 1 && $this->assessors()->where('users.id', $user->id)->exists());
+
+        return $query->where(function ($q) use ($user, $isSingleAssessor) {
+            $q->where('assessor_id', $user->id);
+            if ($isSingleAssessor) {
+                $q->orWhereNull('assessor_id');
+            }
+        });
+    }
+
+    /**
+     * Get collection of assessments assigned to the specified assessor (or logged-in assessor).
+     */
+    public function assessorAssessments(?User $assessor = null)
+    {
+        $user = $assessor ?? (auth()->check() && auth()->user()->role === 'ASESOR' ? auth()->user() : null);
+
+        if (! $user || $user->role !== 'ASESOR') {
+            return $this->assessments;
+        }
+
+        $isSingleAssessor = $this->relationLoaded('assessors')
+            ? ($this->assessors->count() === 1 && $this->assessors->first()?->id === $user->id)
+            : ($this->assessors()->count() === 1 && $this->assessors()->where('users.id', $user->id)->exists());
+
+        return $this->assessments->filter(function ($a) use ($user, $isSingleAssessor) {
+            return (int) $a->assessor_id === (int) $user->id || (empty($a->assessor_id) && $isSingleAssessor);
+        })->values();
+    }
+
+    /**
+     * Determine if the schedule is closed / finished for a specific assessor.
+     * Returns true if the global schedule is closed, or if this assessor's candidate
+     * pool is completely finished and this assessor has submitted their closure reports (FR.AK.05 & FR.AK.06).
+     */
+    public function isClosedForAssessor(?User $assessor = null): bool
     {
         if ($this->is_closed) {
             return true;
         }
 
+        $assessor ??= (auth()->check() && auth()->user()->role === 'ASESOR' ? auth()->user() : null);
+        if (! $assessor || $assessor->role !== 'ASESOR') {
+            return (bool) $this->is_closed;
+        }
+
+        $ak05 = is_array($this->ak05_report) ? $this->ak05_report : (json_decode($this->ak05_report ?? '[]', true) ?: []);
+        $assessorId = $assessor->id;
+
+        $hasSubmitted = isset($ak05['by_assessor'][$assessorId])
+            || ((int) ($ak05['assessor_id'] ?? 0) === (int) $assessorId && ! empty($ak05['submitted_at']));
+
+        if (! $hasSubmitted) {
+            return false;
+        }
+
+        $myAssessments = $this->assessorAssessments($assessor);
+        if ($myAssessments->isEmpty()) {
+            return false;
+        }
+
+        $hasUncompleted = $myAssessments->contains(function ($a) {
+            return $a->status !== 'COMPLETED' && $a->final_result !== 'TIDAK_HADIR';
+        });
+
+        return ! $hasUncompleted;
+    }
+
+    /**
+     * Determine whether a lifecycle step in the assessment workflow is unlocked for this schedule (or assessor).
+     */
+    public function isStepUnlocked(string $step, ?User $assessor = null): bool
+    {
+        if ($this->is_closed || $this->isClosedForAssessor($assessor)) {
+            return true;
+        }
+
         return match ($step) {
             'apl' => true,
-            'ak01' => $this->isAk01Unlocked(),
-            'ak07' => $this->isAk07Unlocked(),
-            'ruang-uji' => $this->isRuangUjiUnlocked(),
-            'ak02' => $this->isAk02Unlocked(),
-            'reports' => $this->isReportsUnlocked(),
+            'ak01' => $this->isAk01Unlocked($assessor),
+            'ak07' => $this->isAk07Unlocked($assessor),
+            'ruang-uji' => $this->isRuangUjiUnlocked($assessor),
+            'ak02' => $this->isAk02Unlocked($assessor),
+            'reports' => $this->isReportsUnlocked($assessor),
             default => true,
         };
     }
 
-    public function isAk01Unlocked(): bool
+    public function isAk01Unlocked(?User $assessor = null): bool
     {
-        $hasAssessments = $this->assessments()->exists();
+        $assessor ??= auth()->user();
+        $query = $this->assessorAssessmentsQuery($assessor);
+
+        $hasAssessments = (clone $query)->exists();
         if (! $hasAssessments) {
             return false;
         }
 
-        $hasApproved = $this->assessments()->where('apl_status', 'APPROVED')->exists();
+        $hasApproved = (clone $query)->where('apl_status', 'APPROVED')->exists();
         if (! $hasApproved) {
             return false;
         }
 
-        // If AK.01 was already saved and there is at least one approved candidate, keep it accessible/editable
-        if (! empty($this->ak01_data) || $this->assessments()->whereNotNull('ak01_agreed_at')->exists()) {
+        $isAssessor = $assessor && $assessor->role === 'ASESOR';
+        $isSingleAssessor = $isAssessor && $this->assessors()->count() === 1 && $this->assessors()->first()?->id === $assessor->id;
+
+        // If AK.01 was already saved/signed for this assessor's pool, keep it accessible/editable
+        $hasSignedCandidate = (clone $query)->where(function ($q) {
+            $q->whereNotNull('ak01_agreed_at')->orWhereNotNull('assessor_signature');
+        })->exists();
+
+        if ($hasSignedCandidate || (! $isAssessor && ! empty($this->ak01_data)) || ($isSingleAssessor && ! empty($this->ak01_data))) {
             return true;
         }
 
-        // Otherwise, requires all submitted APLs to be reviewed (none pending in SUBMITTED status)
-        $hasPendingSubmitted = $this->assessments()->where('apl_status', 'SUBMITTED')->exists();
+        // Otherwise, requires all submitted APLs for this assessor's candidate pool to be reviewed (none pending in SUBMITTED status)
+        $hasPendingSubmitted = (clone $query)->where('apl_status', 'SUBMITTED')->exists();
 
         return ! $hasPendingSubmitted;
     }
 
-    public function isAk07Unlocked(): bool
+    public function isAk07Unlocked(?User $assessor = null): bool
     {
-        if (! $this->isAk01Unlocked()) {
+        $assessor ??= auth()->user();
+        if (! $this->isAk01Unlocked($assessor)) {
             return false;
         }
 
-        // Requires AK.01 to be completed and saved
-        return ! empty($this->ak01_data) || $this->assessments()->whereNotNull('ak01_agreed_at')->exists();
+        $query = $this->assessorAssessmentsQuery($assessor);
+        $isAssessor = $assessor && $assessor->role === 'ASESOR';
+        $isSingleAssessor = $isAssessor && $this->assessors()->count() === 1 && $this->assessors()->first()?->id === $assessor->id;
+
+        // Requires AK.01 to be completed and saved for this assessor's candidate(s)
+        if ($isAssessor && ! $isSingleAssessor) {
+            return (clone $query)->where(function ($q) {
+                $q->whereNotNull('ak01_agreed_at')->orWhereNotNull('assessor_signature');
+            })->exists();
+        }
+
+        return ! empty($this->ak01_data)
+            || (clone $query)->whereNotNull('ak01_agreed_at')->exists()
+            || (clone $query)->whereNotNull('assessor_signature')->exists();
     }
 
-    public function isRuangUjiUnlocked(): bool
+    public function isRuangUjiUnlocked(?User $assessor = null): bool
     {
-        if (! $this->isAk07Unlocked()) {
+        $assessor ??= auth()->user();
+        if (! $this->isAk07Unlocked($assessor)) {
             return false;
         }
 
-        return ! empty($this->ak07_data);
+        $query = $this->assessorAssessmentsQuery($assessor);
+        $candidateIds = (clone $query)->pluck('id');
+        $isAssessor = $assessor && $assessor->role === 'ASESOR';
+        $isSingleAssessor = $isAssessor && $this->assessors()->count() === 1 && $this->assessors()->first()?->id === $assessor->id;
+
+        if ($isAssessor && ! $isSingleAssessor) {
+            return AssessmentAk07Item::whereIn('assessment_id', $candidateIds)->exists();
+        }
+
+        return ! empty($this->ak07_data)
+            || AssessmentAk07Item::whereIn('assessment_id', $candidateIds)->exists();
     }
 
-    public function isAk02Unlocked(): bool
+    public function isAk02Unlocked(?User $assessor = null): bool
     {
-        if (! $this->isRuangUjiUnlocked()) {
-            return false;
-        }
+        $assessor ??= auth()->user();
+        $query = $this->assessorAssessmentsQuery($assessor);
 
         // If AK.02 recommendations are already recorded or schedule is closed, keep unlocked
-        if ($this->assessments()->whereIn('final_result', ['KOMPETEN', 'BELUM_KOMPETEN'])->exists()) {
+        if ((clone $query)->whereIn('final_result', ['KOMPETEN', 'BELUM_KOMPETEN'])->exists()) {
             return true;
         }
 
-        $approvedAssessments = $this->assessments()->where('apl_status', 'APPROVED')->get();
+        if (! $this->isRuangUjiUnlocked($assessor)) {
+            return false;
+        }
+
+        $approvedAssessments = (clone $query)->where('apl_status', 'APPROVED')->get();
         if ($approvedAssessments->isEmpty()) {
             return false;
         }
 
-        // AK.02 only unlocks when all approved candidates have completed all their assigned instruments in Ruang Uji
+        // AK.02 only unlocks when all approved candidates for this assessor have completed all their assigned instruments in Ruang Uji
         foreach ($approvedAssessments as $assessment) {
             if (! $assessment->hasCompletedAllAssignedInstruments()) {
                 return false;
@@ -227,22 +347,25 @@ class Schedule extends Model
         return true;
     }
 
-    public function isReportsUnlocked(): bool
+    public function isReportsUnlocked(?User $assessor = null): bool
     {
         if ($this->is_closed) {
             return true;
         }
 
-        if (! $this->isAk02Unlocked()) {
+        $assessor ??= auth()->user();
+        if (! $this->isAk02Unlocked($assessor)) {
             return false;
         }
 
-        // Requires all approved candidates to have AK.02 recommendations recorded
-        $approvedAssessments = $this->assessments()->where('apl_status', 'APPROVED');
-        if (! $approvedAssessments->exists()) {
+        $query = $this->assessorAssessmentsQuery($assessor);
+
+        // Requires all approved candidates for this assessor to have AK.02 recommendations recorded
+        $approvedAssessments = (clone $query)->where('apl_status', 'APPROVED');
+        if (! (clone $approvedAssessments)->exists()) {
             return false;
         }
 
-        return ! $approvedAssessments->whereNotIn('final_result', ['KOMPETEN', 'BELUM_KOMPETEN'])->exists();
+        return ! (clone $approvedAssessments)->whereNotIn('final_result', ['KOMPETEN', 'BELUM_KOMPETEN'])->exists();
     }
 }

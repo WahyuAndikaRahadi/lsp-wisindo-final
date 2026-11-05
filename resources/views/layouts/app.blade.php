@@ -261,7 +261,7 @@
                                 <span>Biodata & TTD Asesor</span>
                             </a>
 
-                        @elseif(auth()->user()->isAdmin() || in_array(auth()->user()->role, ['KOMITE_TEKNIS', 'TUK_ADMIN']))
+                        @elseif(auth()->user()->isAdmin() || in_array(auth()->user()->role, ['KOMITE_TEKNIS']))
                             <div class="px-3 pt-3 pb-1 text-[10px] font-extrabold text-lsp-muted uppercase tracking-wider">
                                 Manajemen Asesmen
                             </div>
@@ -305,7 +305,7 @@
                                 <svg class="w-4 h-4 text-lsp-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"/>
                                 </svg>
-                                <span>Banding Asesmen (AK.04)</span>
+                                <span>Pusat Umpan Asesi</span>
                             </a>
                             <a href="{{ route('admin.proxy.index') }}" 
                                class="flex items-center space-x-3 px-3 py-2.5 rounded text-xs font-semibold transition {{ request()->routeIs('admin.proxy.*') ? 'bg-lsp-input-bg text-lsp-navy border-l-4 border-lsp-navy font-bold' : 'text-slate-600 hover:text-lsp-navy hover:bg-slate-50' }}">
@@ -387,17 +387,30 @@
                             </div>
                         @endif
 
-                        <!-- Logout Form -->
-                        <form action="{{ route('logout') }}" method="POST">
-                            @csrf
-                            <button type="submit" 
-                                    title="Keluar" 
-                                    class="p-1.5 text-slate-400 hover:text-lsp-red hover:bg-red-50 rounded transition">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
-                                </svg>
-                            </button>
-                        </form>
+                        @if(session('admin_impersonator_id'))
+                            <!-- Switch Back Button (Logout is hidden in proxy mode) -->
+                            <form action="{{ route('proxy.switch-back') }}" method="POST">
+                                @csrf
+                                <button type="submit" 
+                                        title="Kembali ke Sesi Admin" 
+                                        class="px-2 py-1 text-[11px] font-bold bg-amber-600 hover:bg-amber-700 text-white rounded-md shadow-xs transition flex items-center gap-1">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/></svg>
+                                    <span>Kembali</span>
+                                </button>
+                            </form>
+                        @else
+                            <!-- Logout Form -->
+                            <form action="{{ route('logout') }}" method="POST">
+                                @csrf
+                                <button type="submit" 
+                                        title="Keluar" 
+                                        class="p-1.5 text-slate-400 hover:text-lsp-red hover:bg-red-50 rounded transition">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                                    </svg>
+                                </button>
+                            </form>
+                        @endif
                     </div>
                 </div>
 

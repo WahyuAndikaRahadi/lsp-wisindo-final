@@ -227,11 +227,18 @@ class ScheduleClosureAndAbsentCandidateTest extends TestCase
 
         // Test Berita Acara Export view rendering
         $responseBa = $this->actingAs($this->admin)->get(
-            route('admin.dokumen-muk.export-ba', $this->schedule)
+            route('admin.dokumen-muk.export', ['schedule' => $this->schedule->id, 'type' => 'ba'])
         );
         $responseBa->assertOk()
             ->assertSee('Tidak Hadir')
             ->assertSee('Asesi Belum Selesai');
+
+        // Test Berita Acara PDF endpoint
+        $responseBaPdf = $this->actingAs($this->admin)->get(
+            route('admin.dokumen-muk.export-ba', $this->schedule)
+        );
+        $responseBaPdf->assertOk();
+        $this->assertEquals('application/pdf', $responseBaPdf->headers->get('Content-Type'));
 
         // Test AK.05 Export view rendering
         $responseAk05 = $this->actingAs($this->admin)->get(

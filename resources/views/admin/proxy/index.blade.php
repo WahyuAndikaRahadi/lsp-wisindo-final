@@ -33,10 +33,6 @@
                    class="px-3.5 py-2 rounded-lg text-xs font-bold transition whitespace-nowrap {{ $currentRole === 'ADMIN_LSP' ? 'bg-brand-600 text-white shadow-xs' : 'bg-slate-100 text-slate-700 hover:bg-slate-200' }}">
                     Admin LSP
                 </a>
-                <a href="{{ route('admin.proxy.index', array_merge(request()->except('role', 'page'), ['role' => 'TUK_ADMIN'])) }}"
-                   class="px-3.5 py-2 rounded-lg text-xs font-bold transition whitespace-nowrap {{ $currentRole === 'TUK_ADMIN' ? 'bg-brand-600 text-white shadow-xs' : 'bg-slate-100 text-slate-700 hover:bg-slate-200' }}">
-                    Admin TUK
-                </a>
             </div>
 
             <div class="flex items-center gap-2 w-full md:w-auto">

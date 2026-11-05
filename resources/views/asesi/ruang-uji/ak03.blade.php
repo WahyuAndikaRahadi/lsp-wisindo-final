@@ -1,34 +1,44 @@
 @extends('layouts.app', ['title' => 'FR.AK.03 Umpan Balik dan Catatan Asesmen'])
 
 @section('content')
-<div class="max-w-4xl mx-auto space-y-6">
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-6">
+    {{-- Header & Navigasi Terstruktur --}}
+    <div class="space-y-3 pb-2 border-b border-slate-200/80">
+        <div class="flex items-center justify-between gap-3">
+            <a href="{{ route('asesi.dashboard') }}" class="inline-flex items-center gap-1.5 text-xs font-bold text-brand-600 hover:text-brand-800 transition py-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                <span>Kembali ke Dashboard</span>
+            </a>
+            @if($ak03)
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                    ✓ Selesai &amp; Terkunci
+                </span>
+            @endif
+        </div>
+        <div>
+            <h1 class="text-xl sm:text-2xl md:text-3xl font-black text-slate-900 tracking-tight leading-snug">
+                FR.AK.03 Umpan Balik dan Catatan Asesmen
+            </h1>
+            <p class="text-xs sm:text-sm text-slate-500 mt-1 leading-relaxed max-w-2xl">
+                Evaluasi pengalaman asesi terhadap transparansi dan kenyamanan pelaksanaan uji kompetensi
+            </p>
+        </div>
+    </div>
+
     @if($ak03)
-        <div class="p-4 bg-emerald-50 border-2 border-emerald-300 rounded-xl text-emerald-900 flex items-center justify-between gap-3 shadow-xs">
+        <div class="p-4 bg-emerald-50 border-2 border-emerald-300 rounded-2xl text-emerald-900 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
             <div class="flex items-center gap-2.5">
                 <span class="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-xs shrink-0">✓</span>
                 <div>
                     <span class="font-bold text-sm block">Formulir FR.AK.03 Umpan Balik Telah Terkirim (Terkunci)</span>
-                    <span class="text-xs text-emerald-800">Tersimpan pada {{ \Carbon\Carbon::parse($ak03->created_at)->isoFormat('D MMMM Y, HH:mm') }} WIB. Seluruh isian evaluasi telah tersimpan permanen dan tidak dapat diubah kembali.</span>
+                    <span class="text-xs text-emerald-800 mt-0.5 leading-relaxed">Tersimpan pada {{ \Carbon\Carbon::parse($ak03->created_at)->isoFormat('D MMMM Y, HH:mm') }} WIB. Seluruh isian evaluasi telah tersimpan permanen dan tidak dapat diubah kembali.</span>
                 </div>
             </div>
-            <a href="{{ route('asesi.dashboard') }}" class="shrink-0 px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-lg transition shadow-xs">
+            <a href="{{ route('asesi.dashboard') }}" class="w-full sm:w-auto shrink-0 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl transition shadow-xs text-center">
                 Ke Dashboard &rarr;
             </a>
         </div>
     @endif
-
-    <div class="flex items-center justify-between">
-        <div>
-            <a href="{{ route('asesi.dashboard') }}" class="text-xs text-brand-600 hover:text-brand-700 font-semibold">&larr; Kembali ke Dashboard</a>
-            <h1 class="text-2xl font-black text-slate-900 tracking-tight mt-1">FR.AK.03 Umpan Balik dan Catatan Asesmen</h1>
-            <p class="text-xs text-slate-500">Evaluasi pengalaman asesi terhadap transparansi dan kenyamanan pelaksanaan uji kompetensi</p>
-        </div>
-        @if($ak03)
-            <span class="px-3 py-1 rounded-lg text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
-                ✓ Selesai &amp; Terkunci
-            </span>
-        @endif
-    </div>
 
     {{-- Info Card --}}
     <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm text-xs">
@@ -71,14 +81,14 @@
     <form action="{{ route('asesi.assessment.ak03.submit', $assessment->id) }}" method="POST" class="space-y-6">
         @csrf
 
-        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-            <div class="px-6 py-4 bg-slate-50 border-b border-slate-200">
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="px-4 sm:px-6 py-4 bg-slate-50 border-b border-slate-200">
                 <h2 class="text-sm font-bold text-slate-900">Komponen Penilaian Pengalaman Asesmen</h2>
-                <p class="text-xs text-slate-500">Pilih YA jika pernyataan sesuai dengan apa yang Anda rasakan, atau TIDAK jika tidak terpenuhi</p>
+                <p class="text-xs text-slate-500 mt-0.5">Pilih YA jika pernyataan sesuai dengan apa yang Anda rasakan, atau TIDAK jika tidak terpenuhi</p>
             </div>
 
             <div class="overflow-x-auto">
-                <table class="w-full text-xs">
+                <table class="w-full min-w-[650px] text-xs">
                     <thead class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
                         <tr>
                             <th class="px-4 py-3 text-center w-12">No</th>
@@ -109,7 +119,7 @@
                                     </div>
                                 </td>
                                 <td class="px-4 py-3">
-                                    <input type="text" name="ratings[{{ $no }}][comment]" value="{{ $comment }}" @disabled((bool) $ak03) class="w-full text-xs rounded border-slate-300 focus:ring-brand-500 @if($ak03) bg-slate-50 text-slate-600 @endif" placeholder="Opsional">
+                                    <input type="text" name="ratings[{{ $no }}][comment]" value="{{ $comment }}" @disabled((bool) $ak03) class="w-full text-xs rounded-xl border border-slate-300 bg-white px-3.5 py-1.5 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:outline-none transition shadow-2xs @if($ak03) bg-slate-50 text-slate-600 @endif" placeholder="Opsional">
                                 </td>
                             </tr>
                         @endforeach
@@ -117,23 +127,23 @@
                 </table>
             </div>
 
-            <div class="p-6 border-t border-slate-200 bg-slate-50/50 space-y-2">
+            <div class="p-4 sm:p-6 border-t border-slate-200 bg-slate-50/50 space-y-2">
                 <label class="block text-xs font-bold text-slate-700">Catatan / Komentar Tambahan Lainnya (apabila ada):</label>
-                <textarea name="general_notes" rows="2" @disabled((bool) $ak03) class="w-full text-xs rounded-lg border-slate-300 focus:ring-brand-500 @if($ak03) bg-slate-50 text-slate-600 @endif" placeholder="Kesan, pesan, atau masukan untuk pelaksanaan asesmen...">{{ $ak03?->general_notes ?? '' }}</textarea>
+                <textarea name="general_notes" rows="2" @disabled((bool) $ak03) class="w-full p-3 text-xs rounded-xl border border-slate-300 bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:outline-none transition shadow-2xs @if($ak03) bg-slate-50 text-slate-600 @endif" placeholder="Kesan, pesan, atau masukan untuk pelaksanaan asesmen...">{{ $ak03?->general_notes ?? '' }}</textarea>
             </div>
         </div>
 
-        <div class="flex items-center justify-between">
-            <a href="{{ route('asesi.dashboard') }}" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-900">
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-1">
+            <a href="{{ route('asesi.dashboard') }}" class="w-full sm:w-auto px-4 py-2.5 text-xs font-semibold text-slate-600 hover:text-slate-900 border border-slate-200 rounded-xl bg-white text-center transition">
                 &larr; Kembali ke Dashboard
             </a>
             @if($ak03)
-                <button type="button" disabled class="px-6 py-2.5 text-xs font-bold text-slate-500 bg-slate-200 border border-slate-300 rounded-lg cursor-not-allowed flex items-center gap-1.5">
+                <button type="button" disabled class="w-full sm:w-auto px-6 py-2.5 text-xs font-bold text-slate-500 bg-slate-200 border border-slate-300 rounded-xl cursor-not-allowed flex items-center justify-center gap-1.5">
                     <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
                     <span>Umpan Balik Telah Terkirim (Terkunci)</span>
                 </button>
             @else
-                <button type="submit" class="px-6 py-2.5 text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 rounded-lg shadow-sm transition flex items-center gap-2">
+                <button type="submit" class="w-full sm:w-auto px-6 py-3 text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 rounded-xl shadow-sm transition flex items-center justify-center gap-2">
                     <span>Kirim Umpan Balik (FR.AK.03) &amp; Selesai</span>
                     <span>✓</span>
                 </button>

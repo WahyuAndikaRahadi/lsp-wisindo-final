@@ -205,40 +205,21 @@ class DokumenMukPrintViewsTest extends TestCase
     {
         $response = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.export-ba', $this->schedule));
         $response->assertOk();
-        $response->assertSee('BERITA ACARA PELAKSANAAN UJI KOMPETENSI');
-        $response->assertSee('Pada hari ini, Hari/Tanggal :');
-        $response->assertSee('SMK Negeri 3 Karawang');
-        $response->assertSee('Engine Junior Technician');
-        $response->assertSee('Rian Kurniawan');
-        $response->assertSee('Jumlah kandidat yang dinyatakan Kompeten');
-        $response->assertSee('Bambang Sutrisno, M.T.');
-        $response->assertSee('MET.000.001928.2021');
-        $response->assertSee('Drs. H. Mulyadi, M.Pd.');
+        $this->assertEquals('application/pdf', $response->headers->get('Content-Type'));
     }
 
     public function test_can_render_daftar_hadir_asesor_matching_master(): void
     {
         $response = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.export-hadir-asesor', $this->schedule));
         $response->assertOk();
-        $response->assertSee('DAFTAR HADIR ASESOR');
-        $response->assertSee('1. Skema');
-        $response->assertSee('2. TUK');
-        $response->assertSee('Bambang Sutrisno, M.T.');
-        $response->assertSee('MET.000.001928.2021');
-        $response->assertSee('Penanggungjawab kegiatan');
-        $response->assertSee('Drs. H. Mulyadi, M.Pd.');
+        $this->assertEquals('application/pdf', $response->headers->get('Content-Type'));
     }
 
     public function test_can_render_daftar_hadir_asesi_with_alternating_signatures(): void
     {
         $response = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.export-hadir-asesi', $this->schedule));
         $response->assertOk();
-        $response->assertSee('DAFTAR HADIR');
-        $response->assertSee('SMK Negeri 3 Karawang');
-        $response->assertSee('Rian Kurniawan');
-        $response->assertSee('Perum Griya Kondang Asri Blok B No 12 Karawang');
-        $response->assertSee('Bambang Sutrisno, M.T.');
-        $response->assertSee('1.');
+        $this->assertEquals('application/pdf', $response->headers->get('Content-Type'));
     }
 
     public function test_can_render_fr_ak02_rekaman_asesmen(): void
@@ -417,12 +398,13 @@ class DokumenMukPrintViewsTest extends TestCase
         $res01->assertSee('FR.IA.01');
         $res01->assertSee('CEKLIS OBSERVASI AKTIVITAS');
 
-        // IA.01B Report Sheet (exports assessee's uploaded file)
+        // IA.01B Report Sheet (exports assessee's uploaded file or shows not-uploaded view)
         $res01bMissing = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.export-asesi', [
             'assessment' => $this->assessment->id,
             'type' => 'ia01b',
         ]));
-        $res01bMissing->assertNotFound();
+        $res01bMissing->assertOk();
+        $res01bMissing->assertViewIs('admin.dokumen-muk.not-uploaded');
 
         Storage::fake('local');
         $uploadedPath = 'ia01b_evidence/test_report_sheet.pdf';

@@ -3,24 +3,45 @@
 @section('title', 'Tinjauan Instrumen FR.' . strtoupper($code))
 
 @section('content')
-<div class="max-w-4xl mx-auto py-6 space-y-6">
-    @if($assessment->schedule?->is_closed)
-        <div class="p-4 bg-emerald-50 border-2 border-emerald-300 rounded-xl text-emerald-900 flex items-center gap-3 shadow-xs">
-            <span class="text-xl">🔒</span>
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-6">
+    @php
+        $evidencePathHeader = $response?->data_json['evidence_image_path'] ?? null;
+        $hasEvaluatedHeader = (bool) $response?->assessor_signed_at || ! empty($response?->assessor_notes) || ! empty($response?->data_json['kuks']) || ! empty($response?->data_json['questions']);
+    @endphp
+
+    {{-- Header & Navigasi Terstruktur --}}
+    <div class="space-y-3 pb-2 border-b border-slate-200/80">
+        <div class="flex items-center justify-between gap-3">
+            <a href="{{ route('asesi.assessment.ruang-uji', $assessment) }}" class="inline-flex items-center gap-1.5 text-xs font-bold text-brand-600 hover:text-brand-800 transition py-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                <span>Kembali ke Ruang Uji</span>
+            </a>
             <div>
-                <div class="font-bold text-sm">Jadwal Asesmen Telah Resmi Ditutup &amp; Dikunci</div>
-                <p class="text-xs text-emerald-800 mt-0.5">Seluruh rangkaian uji telah selesai. Ruang uji ini sekarang dalam mode lihat (read-only).</p>
+                @if(strtoupper($code) === 'IA01B')
+                    @if($evidencePathHeader)
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                            ✓ Berkas Terunggah
+                        </span>
+                    @else
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-900 border border-amber-200">
+                            Wajib Unggah
+                        </span>
+                    @endif
+                @else
+                    @if($hasEvaluatedHeader)
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                            ✓ Diverifikasi Asesor
+                        </span>
+                    @else
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                            Menunggu Asesor
+                        </span>
+                    @endif
+                @endif
             </div>
         </div>
-    @endif
-
-    {{-- Header --}}
-    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-            <a href="{{ route('asesi.assessment.ruang-uji', $assessment) }}" class="text-xs text-brand-600 hover:underline font-semibold block mb-1">
-                &larr; Kembali ke Ruang Uji
-            </a>
-            <h1 class="text-xl font-bold text-slate-900">
+            <h1 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-snug">
                 @if(strtoupper($code) === 'IA01')
                     FR.IA.01. CEKLIS OBSERVASI AKTIVITAS PRAKTIK
                 @elseif(strtoupper($code) === 'IA01B')
@@ -33,40 +54,22 @@
                     FR.{{ strtoupper($code) }}
                 @endif
             </h1>
-            <p class="text-xs text-slate-500 mt-1">
-                Skema: {{ $assessment->schedule->scheme->name }} | 
-                Asesor: {{ $assessment->assessor?->full_name ?? 'Tim Asesor LSP' }}
+            <p class="text-xs sm:text-sm text-slate-500 mt-1 leading-relaxed">
+                Skema: <strong class="text-slate-800">{{ $assessment->schedule->scheme->name }}</strong> &bull; 
+                Asesor: <strong class="text-slate-800">{{ $assessment->assessor?->full_name ?? 'Tim Asesor LSP' }}</strong>
             </p>
         </div>
-
-        <div>
-            @php
-                $evidencePathHeader = $response?->data_json['evidence_image_path'] ?? null;
-                $hasEvaluatedHeader = (bool) $response?->assessor_signed_at || ! empty($response?->assessor_notes) || ! empty($response?->data_json['kuks']) || ! empty($response?->data_json['questions']);
-            @endphp
-            @if(strtoupper($code) === 'IA01B')
-                @if($evidencePathHeader)
-                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
-                        ✓ Berkas Fisik Terunggah
-                    </span>
-                @else
-                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-900 border border-amber-200">
-                        Wajib Unggah Berkas
-                    </span>
-                @endif
-            @else
-                @if($hasEvaluatedHeader)
-                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
-                        ✓ Telah Diverifikasi Asesor
-                    </span>
-                @else
-                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200">
-                        Menunggu Penilaian Asesor
-                    </span>
-                @endif
-            @endif
-        </div>
     </div>
+
+    @if($assessment->schedule?->is_closed)
+        <div class="p-4 bg-emerald-50 border-2 border-emerald-300 rounded-2xl text-emerald-900 flex flex-col sm:flex-row items-start sm:items-center gap-3 shadow-xs">
+            <span class="text-xl shrink-0">🔒</span>
+            <div>
+                <div class="font-bold text-sm">Jadwal Asesmen Telah Resmi Ditutup &amp; Dikunci</div>
+                <p class="text-xs text-emerald-800 mt-0.5 leading-relaxed">Seluruh rangkaian uji telah selesai. Ruang uji ini sekarang dalam mode lihat (read-only).</p>
+            </div>
+        </div>
+    @endif
 
     {{-- Ruang Unggah Khusus Lembar Kerja Fisik FR.IA.01B (Report Sheet) --}}
     @if(strtoupper($code) === 'IA01B')
@@ -76,24 +79,24 @@
             $evidenceName = $response?->data_json['evidence_original_name'] ?? 'Report_Sheet_Fisik.jpg';
             $evidenceUrl = ($response && $evidencePath) ? route('secure-file.evidence', $response) : '#';
         @endphp
-        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-            <div class="bg-slate-900 text-white px-6 py-3.5 border-b border-slate-800 flex items-center justify-between">
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="bg-slate-900 text-white px-4 sm:px-6 py-3.5 border-b border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div class="flex items-center space-x-2">
                     <span class="text-amber-400 font-bold text-xs uppercase tracking-wider font-mono">FR.IA.01B Report Sheet</span>
                     <span class="text-xs text-slate-300">— Ruang Unggah Lembar Pemeriksaan Teknis Fisik</span>
                 </div>
                 @if($evidencePath)
-                    <span class="px-2.5 py-0.5 text-[11px] font-bold bg-emerald-500 text-white rounded">
+                    <span class="self-start sm:self-auto px-2.5 py-0.5 text-[11px] font-bold bg-emerald-500 text-white rounded">
                         ✓ Lembar Fisik Terunggah
                     </span>
                 @else
-                    <span class="px-2.5 py-0.5 text-[11px] font-bold bg-amber-400 text-slate-950 rounded font-semibold">
+                    <span class="self-start sm:self-auto px-2.5 py-0.5 text-[11px] font-bold bg-amber-400 text-slate-950 rounded font-semibold">
                         Wajib Diunggah
                     </span>
                 @endif
             </div>
 
-            <div class="p-6 space-y-4">
+            <div class="p-4 sm:p-6 space-y-4">
                 <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 text-xs text-slate-700 leading-relaxed">
                     <strong>Petunjuk:</strong> Selesaikan pemeriksaan teknis pada unit kendaraan di bengkel TUK dan catat seluruh hasil pengukuran pada formulir Report Sheet fisik. Ambil foto atau pindai berkas fisik lembar Report Sheet tersebut secara jelas dan tegak lurus, kemudian unggah melalui tombol di bawah agar asesor dapat memverifikasi hasil pekerjaan Anda.
                 </div>
@@ -158,12 +161,12 @@
 
     {{-- Tinjauan Tugas Praktik Demonstrasi FR.IA.02 (Hanya Instruksi Praktik, Tanpa Form Upload) --}}
     @if(strtoupper($code) === 'IA02')
-        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 space-y-3">
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 sm:p-6 space-y-3">
             <div class="flex items-center space-x-2 border-b border-slate-100 pb-3">
                 <span class="text-amber-600 font-bold text-xs uppercase tracking-wider font-mono">FR.IA.02</span>
                 <h3 class="text-base font-bold text-slate-900">Tugas Praktik Demonstrasi</h3>
             </div>
-            <p class="text-xs text-slate-600 leading-relaxed">
+            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
                 Instrumen ini memuat skenario dan instruksi pelaksanaan tugas praktik demonstrasi di Tempat Uji Kompetensi (TUK). Pelaksanaan instruksi unjuk kerja diobservasi langsung oleh Asesor. Dokumen ini disahkan bersama oleh Asesor dan Asesi.
             </p>
         </div>
@@ -171,23 +174,23 @@
 
     {{-- Catatan & Penilaian Asesor (Hanya untuk instrumen selain IA.02) --}}
     @if(strtoupper($code) !== 'IA02')
-        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 space-y-4">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 sm:p-6 space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 pb-3 gap-2">
                 <div>
                     <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Evaluasi Asesor</span>
                     <h3 class="text-base font-bold text-slate-900">Catatan Rekomendasi & Hasil Asesmen</h3>
                 </div>
                 @if($response?->assessor_signed_at)
-                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-emerald-50 text-emerald-800 text-xs font-bold border border-emerald-200">
+                    <span class="self-start sm:self-auto inline-flex items-center gap-1 px-2.5 py-1 rounded bg-emerald-50 text-emerald-800 text-xs font-bold border border-emerald-200">
                         <span>✓</span> Telah Diverifikasi Asesor
                     </span>
                 @endif
             </div>
             
-            <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 text-xs leading-relaxed">
+            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs leading-relaxed">
                 @if($response?->assessor_notes)
                     <div class="text-slate-800 whitespace-pre-line text-sm">{{ $response->assessor_notes }}</div>
-                    <div class="mt-3 pt-2 border-t border-slate-200 text-[11px] text-slate-500 flex items-center justify-between">
+                    <div class="mt-3 pt-2 border-t border-slate-200 text-[11px] text-slate-500 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1">
                         <span>Asesor: <strong>{{ $assessment->assessor?->full_name ?? 'Asesor Kompetensi LSP' }}</strong></span>
                         <span>Waktu Penilaian: <strong>{{ \Carbon\Carbon::parse($response->assessor_signed_at)->isoFormat('D MMMM Y, HH:mm') }} WIB</strong></span>
                     </div>
@@ -200,7 +203,7 @@
 
     {{-- Tanda Tangan Asesor --}}
     @if($response?->assessor_signature)
-        <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm flex items-center justify-between">
+        <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div>
                 <span class="text-xs font-bold text-slate-500 uppercase tracking-wider block">Tanda Tangan Asesor</span>
                 <span class="text-xs text-slate-700 font-semibold">{{ $assessment->assessor?->full_name ?? 'Asesor Kompetensi LSP' }}</span>
@@ -208,8 +211,8 @@
                     <span class="text-[11px] text-slate-400 block mt-0.5">Tercatat: {{ \Carbon\Carbon::parse($response->assessor_signed_at)->isoFormat('D MMMM Y, HH:mm') }} WIB</span>
                 @endif
             </div>
-            <div class="border border-slate-200 rounded-lg p-2 bg-white shrink-0">
-                <img src="{{ $response->assessor_signature }}" alt="Tanda Tangan Asesor" class="max-h-14 object-contain">
+            <div class="w-48 h-20 border border-slate-200 rounded-xl p-2 bg-white shrink-0 flex items-center justify-center">
+                <img src="{{ $response->assessor_signature }}" alt="Tanda Tangan Asesor" class="w-full h-full object-contain">
             </div>
         </div>
     @endif
@@ -219,13 +222,13 @@
         $effectiveAsesiSig = $response?->asesi_signature ?? $assessment->asesi_signature ?? auth()->user()->profile?->signature_data;
     @endphp
     @if($effectiveAsesiSig)
-        <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm flex items-center justify-between">
+        <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div>
                 <span class="text-xs font-bold text-slate-500 uppercase tracking-wider block">Tanda Tangan Asesi</span>
                 <span class="text-xs text-slate-600">Disematkan dari data permohonan sertifikasi Anda</span>
             </div>
-            <div class="border border-slate-200 rounded-lg p-2 bg-slate-50 shrink-0">
-                <img src="{{ $effectiveAsesiSig }}" alt="Tanda Tangan Asesi" class="max-h-14 object-contain">
+            <div class="w-48 h-20 border border-slate-200 rounded-xl p-2 bg-slate-50 shrink-0 flex items-center justify-center">
+                <img src="{{ $effectiveAsesiSig }}" alt="Tanda Tangan Asesi" class="w-full h-full object-contain">
             </div>
         </div>
     @endif

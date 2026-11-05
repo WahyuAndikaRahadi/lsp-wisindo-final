@@ -156,7 +156,7 @@
                         </svg>
                     </div>
                     <input type="text" name="search" value="{{ $search ?? '' }}" placeholder="Cari asesi berdasarkan nama, email, atau NIK..."
-                        class="w-full pl-9 pr-3 py-2 text-xs rounded-lg border-slate-300 focus:ring-brand-500 focus:border-brand-500 text-slate-900 placeholder:text-slate-400">
+                        class="w-full pl-9 pr-3.5 py-2.5 text-xs rounded-xl border border-slate-300 bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:outline-none text-slate-900 placeholder:text-slate-400 transition shadow-2xs">
                 </div>
 
                 <div class="flex items-center gap-2">

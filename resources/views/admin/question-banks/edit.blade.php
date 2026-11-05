@@ -61,7 +61,7 @@
                 @if($questionBank->question_image)
                     <div class="mb-3 p-3 bg-slate-50 border border-slate-200 rounded-lg flex items-center justify-between gap-4">
                         <div class="flex items-center space-x-3">
-                            <img src="{{ asset('storage/' . $questionBank->question_image) }}" alt="Preview Soal" class="h-20 w-auto object-contain rounded border border-slate-300">
+                            <img src="{{ $questionBank->image_url ?? asset('storage/' . $questionBank->question_image) }}" alt="Preview Soal" class="h-20 w-auto object-contain rounded border border-slate-300">
                             <span class="text-xs text-slate-600 font-mono">{{ $questionBank->question_image }}</span>
                         </div>
                         <label class="inline-flex items-center space-x-1.5 text-xs font-semibold text-rose-700 cursor-pointer">

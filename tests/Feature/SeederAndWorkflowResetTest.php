@@ -52,7 +52,7 @@ class SeederAndWorkflowResetTest extends TestCase
         $this->assertNotNull(User::where('role', 'SUPER_ADMIN')->first());
         $this->assertNotNull(User::where('role', 'ADMIN_LSP')->first());
         $this->assertNotNull(User::where('role', 'KOMITE_TEKNIS')->first());
-        $this->assertNotNull(User::where('role', 'TUK_ADMIN')->first());
+        $this->assertNull(User::where('role', 'TUK_ADMIN')->first());
         $this->assertNotNull(User::where('role', 'ASESOR')->first());
         $this->assertNotNull(User::where('role', 'ASESI')->first());
 

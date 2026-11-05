@@ -3,30 +3,53 @@
 @section('title', 'FR.AK.01 - Persetujuan Asesmen dan Kerahasiaan')
 
 @section('content')
-<div class="max-w-4xl mx-auto py-6 space-y-6">
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-6">
+    {{-- Header & Navigasi Terstruktur --}}
+    <div class="space-y-3 pb-2 border-b border-slate-200/80">
+        <div class="flex items-center justify-between gap-3">
+            <a href="{{ route('asesi.assessment.ruang-uji', $assessment) }}" class="inline-flex items-center gap-1.5 text-xs font-bold text-brand-600 hover:text-brand-800 transition py-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                <span>Kembali ke Ruang Uji</span>
+            </a>
+            @if($assessment->ak01_agreed_at)
+                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                    ✓ Disetujui
+                </span>
+            @endif
+        </div>
+        <div>
+            <h1 class="text-xl sm:text-2xl md:text-3xl font-black text-slate-900 tracking-tight leading-snug">
+                FR.AK.01. Persetujuan Asesmen dan Kerahasiaan
+            </h1>
+            <p class="text-xs sm:text-sm text-slate-500 mt-1 leading-relaxed max-w-2xl">
+                Kesepakatan pelaksanaan asesmen dan perlindungan kerahasiaan materi uji
+            </p>
+        </div>
+    </div>
+
     @if($assessment->schedule?->is_closed)
-        <div class="p-4 bg-emerald-50 border-2 border-emerald-300 rounded-xl text-emerald-900 flex items-center gap-3 shadow-xs">
-            <span class="text-xl">🔒</span>
+        <div class="p-4 bg-emerald-50 border-2 border-emerald-300 rounded-xl text-emerald-900 flex flex-col sm:flex-row items-start sm:items-center gap-3 shadow-xs">
+            <span class="text-xl shrink-0">🔒</span>
             <div>
                 <div class="font-bold text-sm">Jadwal Asesmen Telah Resmi Ditutup &amp; Dikunci</div>
-                <p class="text-xs text-emerald-800 mt-0.5">Seluruh persetujuan FR.AK.01 dalam jadwal ini berada dalam mode lihat (read-only).</p>
+                <p class="text-xs text-emerald-800 mt-0.5 leading-relaxed">Seluruh persetujuan FR.AK.01 dalam jadwal ini berada dalam mode lihat (read-only).</p>
             </div>
         </div>
     @endif
 
     {{-- Form AK01 Card --}}
-    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-        <div class="bg-gradient-to-r from-slate-800 to-indigo-900 px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between text-white gap-3">
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="bg-gradient-to-r from-slate-800 to-indigo-900 px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between text-white gap-3">
             <div>
-                <h1 class="text-xl font-bold">FR.AK.01. PERSETUJUAN ASESMEN DAN KERAHASIAAN</h1>
-                <p class="text-xs text-slate-300 mt-1">Kesepakatan pelaksanaan asesmen dan perlindungan kerahasiaan materi uji</p>
+                <h2 class="text-base sm:text-lg font-bold">FR.AK.01. PERSETUJUAN ASESMEN DAN KERAHASIAAN</h2>
+                <p class="text-xs text-slate-300 mt-0.5">Kesepakatan pelaksanaan asesmen dan perlindungan kerahasiaan materi uji</p>
             </div>
-            <a href="{{ route('asesi.assessment.ruang-uji', $assessment) }}" class="shrink-0 px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white text-xs font-bold rounded border border-white/20 transition">
+            <a href="{{ route('asesi.assessment.ruang-uji', $assessment) }}" class="self-start sm:self-auto px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white text-xs font-bold rounded-lg border border-white/20 transition">
                 ← Ruang Uji
             </a>
         </div>
 
-        <form action="{{ route('asesi.assessment.ak01.sign', $assessment) }}" method="POST" class="p-6 space-y-6">
+        <form action="{{ route('asesi.assessment.ak01.sign', $assessment) }}" method="POST" class="p-4 sm:p-6 space-y-6">
             @csrf
 
             @if($assessment->ak01_agreed_at)
@@ -108,7 +131,7 @@
                     @if($effectiveAsesiSig)
                         <input type="hidden" name="signature_data" value="{{ $effectiveAsesiSig }}">
                         <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 flex items-center gap-3">
-                            <div class="w-20 h-12 bg-white border border-slate-200 rounded p-1 flex items-center justify-center shrink-0">
+                            <div class="w-32 h-14 bg-white border border-slate-200 rounded-lg p-1.5 flex items-center justify-center shrink-0">
                                 <img src="{{ $effectiveAsesiSig }}" alt="Tanda Tangan Asesi" class="max-h-full max-w-full object-contain">
                             </div>
                             <div>
@@ -125,18 +148,18 @@
                     @endif
                 </div>
 
-                <div class="w-full md:w-auto flex items-center gap-3">
-                    <a href="{{ route('asesi.assessment.ruang-uji', $assessment) }}" class="px-5 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs uppercase tracking-wider rounded-xl border border-slate-300 transition">
+                <div class="w-full md:w-auto flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                    <a href="{{ route('asesi.assessment.ruang-uji', $assessment) }}" class="w-full sm:w-auto px-5 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs uppercase tracking-wider rounded-xl border border-slate-300 transition text-center">
                         ← Kembali ke Ruang Uji
                     </a>
                     @if(!$assessment->ak01_agreed_at)
                         @if($assessment->schedule?->is_closed)
-                            <button type="button" disabled class="w-full md:w-auto px-6 py-3.5 bg-slate-200 text-slate-500 font-bold text-xs uppercase tracking-wider rounded-xl cursor-not-allowed border border-slate-300">
+                            <button type="button" disabled class="w-full sm:w-auto px-6 py-3.5 bg-slate-200 text-slate-500 font-bold text-xs uppercase tracking-wider rounded-xl cursor-not-allowed border border-slate-300 text-center">
                                 Jadwal Telah Ditutup (Read-Only)
                             </button>
                         @else
-                            <button type="submit" class="w-full md:w-auto px-8 py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-md transition flex items-center justify-center gap-2">
-                                <span>Setujui & Masuk Ruang Uji</span>
+                            <button type="submit" class="w-full sm:w-auto px-8 py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-md transition flex items-center justify-center gap-2">
+                                <span>Setujui &amp; Masuk Ruang Uji</span>
                                 <span>→</span>
                             </button>
                         @endif

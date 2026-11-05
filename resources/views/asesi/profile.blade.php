@@ -1,17 +1,26 @@
 @extends('layouts.app', ['title' => 'Biodata & Tanda Tangan Asesi'])
 
 @section('content')
-<div class="max-w-4xl mx-auto space-y-6">
-    <div class="flex items-center justify-between">
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-6">
+    {{-- Header & Navigasi Terstruktur --}}
+    <div class="space-y-3 pb-2 border-b border-slate-200/80">
+        <div class="flex items-center justify-between gap-3">
+            <a href="{{ route('asesi.dashboard') }}" class="inline-flex items-center gap-1.5 text-xs font-bold text-brand-600 hover:text-brand-800 transition py-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                <span>Kembali ke Dashboard</span>
+            </a>
+            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                Profil &amp; TTD
+            </span>
+        </div>
         <div>
-            <h1 class="text-2xl font-black text-slate-900 tracking-tight">Data Diri & Tanda Tangan</h1>
-            <p class="text-sm text-slate-500">
+            <h1 class="text-xl sm:text-2xl md:text-3xl font-black text-slate-900 tracking-tight leading-snug">
+                Data Diri &amp; Tanda Tangan
+            </h1>
+            <p class="text-xs sm:text-sm text-slate-500 mt-1 leading-relaxed max-w-2xl">
                 Informasi ini digunakan otomatis untuk pengisian formulir resmi FR.APL.01 Permohonan Sertifikasi Kompetensi
             </p>
         </div>
-        <a href="{{ route('asesi.dashboard') }}" class="text-xs font-semibold text-slate-600 hover:text-slate-900 flex items-center">
-            &larr; Kembali ke Dashboard
-        </a>
     </div>
 
     @php
@@ -23,10 +32,10 @@
         @csrf
 
         {{-- Section 1: Data Pribadi --}}
-        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 space-y-5">
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 sm:p-6 space-y-5">
             <div class="border-b border-slate-100 pb-3">
-                <h2 class="text-base font-bold text-slate-800">1. Data Pribadi Asesi</h2>
-                <p class="text-xs text-slate-400">Pastikan data sesuai dengan kartu identitas (KTP) yang sah</p>
+                <h2 class="text-sm sm:text-base font-bold text-slate-800">1. Data Pribadi Asesi</h2>
+                <p class="text-xs text-slate-400 mt-0.5">Pastikan data sesuai dengan kartu identitas (KTP) yang sah</p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -190,10 +199,10 @@
         </div>
 
         {{-- Section 2: Data Pekerjaan / Institusi --}}
-        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 space-y-5">
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 sm:p-6 space-y-5">
             <div class="border-b border-slate-100 pb-3">
-                <h2 class="text-base font-bold text-slate-800">2. Data Pekerjaan / Sekolah / Institusi</h2>
-                <p class="text-xs text-slate-400">Isi data sekolah SMK tempat belajar atau bengkel/perusahaan tempat bekerja</p>
+                <h2 class="text-sm sm:text-base font-bold text-slate-800">2. Data Pekerjaan / Sekolah / Institusi</h2>
+                <p class="text-xs text-slate-400 mt-0.5">Isi data sekolah SMK tempat belajar atau bengkel/perusahaan tempat bekerja</p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -253,27 +262,53 @@
         </div>
 
         {{-- Section 3: Tanda Tangan Digital --}}
-        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 space-y-4">
-            <div class="border-b border-slate-100 pb-3">
-                <h2 class="text-base font-bold text-slate-800">3. Tanda Tangan Digital Asesi</h2>
-                <p class="text-xs text-slate-400">
-                    Tanda tangan ini akan dicantumkan secara otomatis pada dokumen MUK (APL.01, APL.02, AK.01, dll)
-                </p>
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 sm:p-6 space-y-4">
+            <div class="border-b border-slate-100 pb-3 flex items-center justify-between flex-wrap gap-2">
+                <div>
+                    <h2 class="text-sm sm:text-base font-bold text-slate-800">3. Tanda Tangan Digital Asesi</h2>
+                    <p class="text-xs text-slate-400 mt-0.5">
+                        Tanda tangan ini akan dicantumkan secara otomatis pada dokumen MUK (APL.01, APL.02, AK.01, dll)
+                    </p>
+                </div>
+                @if($p->signature_data)
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        TTD Tersimpan
+                    </span>
+                @else
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-full bg-amber-50 text-amber-700 border border-amber-200">
+                        Belum Diatur
+                    </span>
+                @endif
             </div>
 
-            <x-signature-pad 
-                name="signature_data" 
-                :value="old('signature_data', $p->signature_data)"
-                :profileSignature="''"
-                label="Goreskan Tanda Tangan Anda"
-                :required="true"
-                height="180"
-            />
+            @if($p->signature_data)
+                <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl flex flex-col sm:flex-row items-center sm:items-start gap-4">
+                    <div class="w-[340px] max-w-full h-[140px] bg-white rounded-xl border border-slate-300 shadow-xs p-3 flex items-center justify-center shrink-0">
+                        <img src="{{ $p->signature_data }}" alt="Pratinjau Tanda Tangan Asesi" class="w-full h-full object-contain">
+                    </div>
+                    <div class="text-xs text-slate-600 space-y-1">
+                        <p class="font-bold text-slate-800 text-sm">Tanda Tangan Aktif Saat Ini</p>
+                        <p class="leading-relaxed">Tanda tangan master Anda telah tersimpan dan akan otomatis disematkan pada formulir APL dan instrumen uji. Anda dapat menggambar ulang di bawah jika ingin memperbaruinya.</p>
+                    </div>
+                </div>
+            @endif
+
+            <div class="max-w-[340px]">
+                <x-signature-pad 
+                    name="signature_data" 
+                    :value="old('signature_data', $p->signature_data)"
+                    :profileSignature="''"
+                    label="Goreskan Tanda Tangan Anda"
+                    :required="empty($p->signature_data)"
+                    :height="140"
+                />
+            </div>
         </div>
 
-        <div class="flex items-center justify-end space-x-3 pt-2">
-            <button type="submit" class="px-6 py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm rounded-lg shadow-sm transition">
-                Simpan Perubahan Biodata & TTD
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3 pt-2">
+            <button type="submit" class="w-full sm:w-auto px-7 py-3 bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm rounded-xl shadow-sm transition text-center">
+                Simpan Perubahan Biodata &amp; TTD
             </button>
         </div>
     </form>

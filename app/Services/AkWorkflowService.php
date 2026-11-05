@@ -8,6 +8,7 @@ use App\Models\AssessmentAk03Item;
 use App\Models\AssessmentAppeal;
 use App\Models\Schedule;
 use App\Models\Setting;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -264,22 +265,13 @@ class AkWorkflowService
             $lockedAssessment = Assessment::where('id', $assessment->id)->lockForUpdate()->first();
 
             $existingAppeal = AssessmentAppeal::where('assessment_id', $lockedAssessment->id)
-                ->whereIn('status', ['SUBMITTED', 'UNDER_REVIEW'])
                 ->lockForUpdate()
                 ->first();
 
             if ($existingAppeal) {
-                $existingAppeal->update([
-                    'appeal_date' => $date->toDateString(),
-                    'appeal_reasons' => $reasons,
-                    'contested_units' => $contestedUnits,
-                    'is_process_explained' => $isProcessExplained,
-                    'is_discussed_with_assessor' => $isDiscussedWithAssessor,
-                    'involves_other_person' => $involvesOtherPerson,
-                    'other_person_name' => $otherPersonName,
+                throw ValidationException::withMessages([
+                    'appeal_reasons' => 'Permohonan banding (FR.AK.04) sudah pernah diajukan dan tidak dapat diperbarui.',
                 ]);
-
-                return $existingAppeal;
             }
 
             return AssessmentAppeal::create([
@@ -297,13 +289,20 @@ class AkWorkflowService
     }
 
     /**
-     * Decide appeal by Admin LSP (optionally specifying Appeals Committee Chair).
+     * Decide appeal by Admin LSP (optionally specifying Appeals Committee Chair and Action Type).
      */
-    public function decideAppeal(AssessmentAppeal $appeal, string $decision, ?string $decisionNotes = null, ?int $adminId = null, ?string $committeeChair = null): AssessmentAppeal
-    {
+    public function decideAppeal(
+        AssessmentAppeal $appeal,
+        string $decision,
+        ?string $decisionNotes = null,
+        ?int $adminId = null,
+        ?string $committeeChair = null,
+        ?string $actionType = 'REASSESSMENT'
+    ): AssessmentAppeal {
         $status = strtoupper($decision) === 'ACCEPTED' ? 'ACCEPTED' : 'REJECTED';
+        $type = $actionType ?: 'REASSESSMENT';
 
-        DB::transaction(function () use ($appeal, $status, $decisionNotes, $adminId, $committeeChair) {
+        DB::transaction(function () use ($appeal, $status, $decisionNotes, $adminId, $committeeChair, $type) {
             $appeal->update([
                 'status' => $status,
                 'decision_notes' => $decisionNotes,
@@ -311,6 +310,31 @@ class AkWorkflowService
                 'decided_by' => $adminId ?? auth()->id(),
                 'appeals_committee_chair' => $committeeChair ?: $appeal->appeals_committee_chair,
             ]);
+
+            $assessment = $appeal->assessment;
+            if ($assessment) {
+                if ($status === 'ACCEPTED') {
+                    if ($type === 'OVERRIDE_KOMPETEN') {
+                        $assessment->update([
+                            'final_result' => 'KOMPETEN',
+                            'final_result_at' => now(),
+                            'follow_up_action' => 'Putusan Banding (FR.AK.04): Ditetapkan KOMPETEN oleh Komite Banding LSP. '.($decisionNotes ? "({$decisionNotes})" : ''),
+                        ]);
+                    } elseif ($type === 'REASSESSMENT') {
+                        $assessment->update([
+                            'follow_up_action' => 'Putusan Banding (FR.AK.04): Dijadwalkan Asesmen Ulang oleh Komite Banding LSP. '.($decisionNotes ? "({$decisionNotes})" : ''),
+                        ]);
+                    } else {
+                        $assessment->update([
+                            'follow_up_action' => 'Putusan Banding (FR.AK.04): Mediasi Administratif Komite Banding LSP. '.($decisionNotes ? "({$decisionNotes})" : ''),
+                        ]);
+                    }
+                } elseif ($status === 'REJECTED') {
+                    $assessment->update([
+                        'follow_up_action' => 'Putusan Banding (FR.AK.04): Sanggahan Banding Ditolak. Keputusan awal tetap berlaku. '.($decisionNotes ? "({$decisionNotes})" : ''),
+                    ]);
+                }
+            }
         });
 
         return $appeal;
@@ -342,14 +366,32 @@ class AkWorkflowService
         return DB::transaction(function () use ($schedule, $ak05Data, $ak06Data, $closeIfReady) {
             $lockedSchedule = Schedule::where('id', $schedule->id)->lockForUpdate()->first();
 
+            $existingAk05 = is_array($lockedSchedule->ak05_report) ? $lockedSchedule->ak05_report : [];
+            $existingAk06 = is_array($lockedSchedule->ak06_review) ? $lockedSchedule->ak06_review : [];
+
+            $reportsByAssessorAk05 = $existingAk05['by_assessor'] ?? [];
+            $reportsByAssessorAk06 = $existingAk06['by_assessor'] ?? [];
+
+            $assessorId = auth()->id() ?? 'system';
+            $reportsByAssessorAk05[$assessorId] = array_merge($ak05Data, [
+                'assessor_id' => $assessorId,
+                'submitted_at' => now()->toIso8601String(),
+            ]);
+            $reportsByAssessorAk06[$assessorId] = array_merge($ak06Data, [
+                'reviewer_id' => $assessorId,
+                'reviewed_at' => now()->toIso8601String(),
+            ]);
+
             $lockedSchedule->update([
                 'ak05_report' => array_merge($ak05Data, [
-                    'assessor_id' => auth()->id(),
+                    'assessor_id' => $assessorId,
                     'submitted_at' => now()->toIso8601String(),
+                    'by_assessor' => $reportsByAssessorAk05,
                 ]),
                 'ak06_review' => array_merge($ak06Data, [
-                    'reviewer_id' => auth()->id(),
+                    'reviewer_id' => $assessorId,
                     'reviewed_at' => now()->toIso8601String(),
+                    'by_assessor' => $reportsByAssessorAk06,
                 ]),
             ]);
 
@@ -378,6 +420,24 @@ class AkWorkflowService
         $this->saveScheduleReports($schedule, $ak05Data, $ak06Data, true);
 
         return $schedule->refresh();
+    }
+
+    /**
+     * Check if the specific assessor's candidate pool is ready for closure/reports.
+     */
+    public function isAssessorPoolReadyForReports(Schedule $schedule, ?User $assessor = null): array
+    {
+        $myAssessments = $schedule->assessorAssessments($assessor);
+        $uncompletedCount = $myAssessments->filter(function ($a) {
+            return $a->status !== 'COMPLETED' && $a->final_result !== 'TIDAK_HADIR';
+        })->count();
+
+        return [
+            'is_ready' => $uncompletedCount === 0,
+            'uncompleted_count' => $uncompletedCount,
+            'my_total' => $myAssessments->count(),
+            'my_completed' => $myAssessments->count() - $uncompletedCount,
+        ];
     }
 
     /**

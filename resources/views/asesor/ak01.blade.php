@@ -49,16 +49,20 @@
             this.selectedAsesi = null;
         }
      }">
+    @php
+        $isClosedForMe = $jadwal->isClosedForAssessor();
+    @endphp
+
     {{-- Unified Top Lifecycle Navigation --}}
     @include('asesor.partials.schedule-nav', ['schedule' => $jadwal, 'active' => 'ak01'])
 
-    @if($jadwal->is_closed)
+    @if($isClosedForMe)
         <div class="p-3.5 bg-emerald-50 border border-emerald-300 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-emerald-900">
             <div class="flex items-center space-x-2">
                 <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
-                <span><strong>Jadwal Telah Resmi Ditutup & Dikunci:</strong> Dokumen persetujuan asesmen FR.AK.01 dalam mode lihat (read-only).</span>
+                <span><strong>{{ $jadwal->is_closed ? 'Jadwal Telah Resmi Ditutup & Dikunci:' : 'Asesmen Binaan Anda Telah Ditutup & Selesai:' }}</strong> Dokumen persetujuan asesmen FR.AK.01 dalam mode lihat (read-only).</span>
             </div>
-            <span class="font-bold font-mono text-[11px] bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded border border-emerald-300 shrink-0">STATUS: FINISHED</span>
+            <span class="font-bold font-mono text-[11px] bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded border border-emerald-300 shrink-0">STATUS: {{ $jadwal->is_closed ? 'FINISHED' : 'BINAAN SELESAI' }}</span>
         </div>
     @endif
 
@@ -142,16 +146,16 @@
                             <span class="w-20 font-medium text-slate-500 shrink-0">Jenis TUK</span>
                             <span class="mr-2 text-slate-400">:</span>
                             <div class="inline-flex items-center bg-slate-100 p-1 rounded-lg border border-slate-200 gap-1">
-                                <label class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md {{ $jadwal->is_closed ? 'cursor-default' : 'cursor-pointer' }} transition {{ $savedTukType === 'Sewaktu' ? 'bg-white shadow-xs font-bold text-brand-700' : 'text-slate-600 hover:text-slate-900' }}">
-                                    <input type="radio" name="tuk_type" value="Sewaktu" {{ $savedTukType === 'Sewaktu' ? 'checked' : '' }} @disabled($jadwal->is_closed) class="text-brand-600 focus:ring-brand-500">
+                                <label class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md {{ $isClosedForMe ? 'cursor-default' : 'cursor-pointer' }} transition {{ $savedTukType === 'Sewaktu' ? 'bg-white shadow-xs font-bold text-brand-700' : 'text-slate-600 hover:text-slate-900' }}">
+                                    <input type="radio" name="tuk_type" value="Sewaktu" {{ $savedTukType === 'Sewaktu' ? 'checked' : '' }} @disabled($isClosedForMe) class="text-brand-600 focus:ring-brand-500">
                                     <span>Sewaktu</span>
                                 </label>
-                                <label class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md {{ $jadwal->is_closed ? 'cursor-default' : 'cursor-pointer' }} transition {{ $savedTukType === 'Tempat Kerja' ? 'bg-white shadow-xs font-bold text-brand-700' : 'text-slate-600 hover:text-slate-900' }}">
-                                    <input type="radio" name="tuk_type" value="Tempat Kerja" {{ $savedTukType === 'Tempat Kerja' ? 'checked' : '' }} @disabled($jadwal->is_closed) class="text-brand-600 focus:ring-brand-500">
+                                <label class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md {{ $isClosedForMe ? 'cursor-default' : 'cursor-pointer' }} transition {{ $savedTukType === 'Tempat Kerja' ? 'bg-white shadow-xs font-bold text-brand-700' : 'text-slate-600 hover:text-slate-900' }}">
+                                    <input type="radio" name="tuk_type" value="Tempat Kerja" {{ $savedTukType === 'Tempat Kerja' ? 'checked' : '' }} @disabled($isClosedForMe) class="text-brand-600 focus:ring-brand-500">
                                     <span>Tempat Kerja</span>
                                 </label>
-                                <label class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md {{ $jadwal->is_closed ? 'cursor-default' : 'cursor-pointer' }} transition {{ $savedTukType === 'Mandiri' ? 'bg-white shadow-xs font-bold text-brand-700' : 'text-slate-600 hover:text-slate-900' }}">
-                                    <input type="radio" name="tuk_type" value="Mandiri" {{ $savedTukType === 'Mandiri' ? 'checked' : '' }} @disabled($jadwal->is_closed) class="text-brand-600 focus:ring-brand-500">
+                                <label class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md {{ $isClosedForMe ? 'cursor-default' : 'cursor-pointer' }} transition {{ $savedTukType === 'Mandiri' ? 'bg-white shadow-xs font-bold text-brand-700' : 'text-slate-600 hover:text-slate-900' }}">
+                                    <input type="radio" name="tuk_type" value="Mandiri" {{ $savedTukType === 'Mandiri' ? 'checked' : '' }} @disabled($isClosedForMe) class="text-brand-600 focus:ring-brand-500">
                                     <span>Mandiri*</span>
                                 </label>
                             </div>
@@ -190,8 +194,8 @@
                     </div>
                     <div class="md:col-span-8 p-4 md:p-5 bg-white space-y-3">
                         <div class="flex items-center justify-between pb-2 border-b border-slate-200">
-                            <label class="inline-flex items-center gap-2 {{ $jadwal->is_closed ? 'cursor-default' : 'cursor-pointer' }} text-xs font-bold text-slate-800">
-                                <input type="checkbox" id="check-all-asesi" checked @disabled($jadwal->is_closed) class="rounded border-slate-300 text-brand-600 focus:ring-brand-500 w-4 h-4">
+                            <label class="inline-flex items-center gap-2 {{ $isClosedForMe ? 'cursor-default' : 'cursor-pointer' }} text-xs font-bold text-slate-800">
+                                <input type="checkbox" id="check-all-asesi" checked @disabled($isClosedForMe) class="rounded border-slate-300 text-brand-600 focus:ring-brand-500 w-4 h-4">
                                 <span>Pilih Semua Asesi Binaan ({{ $assessments->count() }} Orang)</span>
                             </label>
                             <span class="text-[11px] text-slate-400 italic">Centang asesi yang disetujui</span>
@@ -212,10 +216,10 @@
                                     @endphp
                                     <div class="p-3 rounded-xl border-2 transition shadow-2xs flex flex-col justify-between {{ $isAk01Approved ? 'bg-emerald-50/80 border-emerald-300 hover:border-emerald-400' : 'bg-amber-50/90 border-amber-300 hover:border-amber-400' }}">
                                         <div class="flex items-start justify-between gap-2">
-                                            <label class="flex items-start space-x-2.5 {{ $jadwal->is_closed ? 'cursor-default' : 'cursor-pointer' }} flex-1 min-w-0">
+                                             <label class="flex items-start space-x-2.5 {{ $isClosedForMe ? 'cursor-default' : 'cursor-pointer' }} flex-1 min-w-0">
                                                 <input type="checkbox" name="assessment_ids[]" value="{{ $assessment->id }}"
                                                     class="asesi-item-checkbox rounded border-slate-400 text-brand-600 focus:ring-brand-500 w-4 h-4 mt-0.5 shrink-0"
-                                                    @disabled($jadwal->is_closed)
+                                                    @disabled($isClosedForMe)
                                                     {{ (empty(old('assessment_ids')) || in_array($assessment->id, old('assessment_ids', [])) || (string)$selectedAssessmentId === (string)$assessment->id) ? 'checked' : '' }}>
                                                 <div class="truncate text-xs">
                                                     <div class="font-bold text-slate-900 truncate flex items-center gap-1.5">
@@ -298,56 +302,56 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             {{-- Column 1 --}}
                             <div class="space-y-2">
-                                <label class="flex items-center space-x-2.5 p-2.5 rounded-lg border border-slate-200 hover:bg-slate-50 {{ $jadwal->is_closed ? 'cursor-default' : 'cursor-pointer' }} transition">
+                                <label class="flex items-center space-x-2.5 p-2.5 rounded-lg border border-slate-200 hover:bg-slate-50 {{ $isClosedForMe ? 'cursor-default' : 'cursor-pointer' }} transition">
                                     <input type="checkbox" name="evidence[]" value="Hasil Verifikasi Portofolio"
                                         class="rounded border-slate-300 text-brand-600 focus:ring-brand-500 w-4 h-4"
-                                        @disabled($jadwal->is_closed)
+                                        @disabled($isClosedForMe)
                                         {{ in_array('Hasil Verifikasi Portofolio', $savedEvidence) ? 'checked' : '' }}>
                                     <span class="font-medium text-slate-800">Hasil Verifikasi Portofolio</span>
                                 </label>
 
-                                <label class="flex items-center justify-between p-2.5 rounded-lg border border-brand-200 bg-brand-50/30 hover:bg-brand-50/60 {{ $jadwal->is_closed ? 'cursor-default' : 'cursor-pointer' }} transition">
+                                <label class="flex items-center justify-between p-2.5 rounded-lg border border-brand-200 bg-brand-50/30 hover:bg-brand-50/60 {{ $isClosedForMe ? 'cursor-default' : 'cursor-pointer' }} transition">
                                     <div class="flex items-center space-x-2.5">
                                         <input type="checkbox" name="evidence[]" value="Hasil Observasi Langsung"
                                             class="rounded border-slate-300 text-brand-600 focus:ring-brand-500 w-4 h-4"
-                                            @disabled($jadwal->is_closed)
+                                            @disabled($isClosedForMe)
                                             {{ in_array('Hasil Observasi Langsung', $savedEvidence) ? 'checked' : '' }}>
                                         <span class="font-bold text-slate-900">Hasil Observasi Langsung</span>
                                     </div>
                                     <span class="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">Default</span>
                                 </label>
 
-                                <label class="flex items-center space-x-2.5 p-2.5 rounded-lg border border-slate-200 hover:bg-slate-50 {{ $jadwal->is_closed ? 'cursor-default' : 'cursor-pointer' }} transition">
+                                <label class="flex items-center space-x-2.5 p-2.5 rounded-lg border border-slate-200 hover:bg-slate-50 {{ $isClosedForMe ? 'cursor-default' : 'cursor-pointer' }} transition">
                                     <input type="checkbox" name="evidence[]" value="Hasil Pertanyaan Lisan"
                                         class="rounded border-slate-300 text-brand-600 focus:ring-brand-500 w-4 h-4"
-                                        @disabled($jadwal->is_closed)
+                                        @disabled($isClosedForMe)
                                         {{ in_array('Hasil Pertanyaan Lisan', $savedEvidence) ? 'checked' : '' }}>
                                     <span class="font-medium text-slate-800">Hasil Pertanyaan Lisan</span>
                                 </label>
 
                                 <div class="p-2.5 rounded-lg border border-slate-200 bg-slate-50/40 space-y-2">
-                                    <label class="flex items-center space-x-2.5 {{ $jadwal->is_closed ? 'cursor-default' : 'cursor-pointer' }}">
+                                    <label class="flex items-center space-x-2.5 {{ $isClosedForMe ? 'cursor-default' : 'cursor-pointer' }}">
                                         <input type="checkbox" name="evidence[]" value="Lainnya"
                                             id="checkbox-lainnya"
                                             class="rounded border-slate-300 text-brand-600 focus:ring-brand-500 w-4 h-4"
-                                            @disabled($jadwal->is_closed)
+                                            @disabled($isClosedForMe)
                                             {{ (in_array('Lainnya', $savedEvidence) || !empty($savedOtherEvidence)) ? 'checked' : '' }}>
                                         <span class="font-medium text-slate-800">Lainnya :</span>
                                     </label>
                                     <input type="text" name="other_evidence" value="{{ old('other_evidence', $savedOtherEvidence) }}"
                                         placeholder="Tuliskan bukti lainnya bila ada..."
-                                        @disabled($jadwal->is_closed)
-                                        class="w-full text-xs rounded-lg border-slate-300 focus:border-brand-500 focus:ring-brand-500 px-3 py-1.5 shadow-xs bg-white">
+                                        @disabled($isClosedForMe)
+                                        class="w-full text-xs rounded-xl border border-slate-300 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 focus:outline-none px-3.5 py-2 shadow-2xs bg-white text-slate-900 transition">
                                 </div>
                             </div>
 
                             {{-- Column 2 --}}
                             <div class="space-y-2">
-                                <label class="flex items-center justify-between p-2.5 rounded-lg border border-brand-200 bg-brand-50/30 hover:bg-brand-50/60 {{ $jadwal->is_closed ? 'cursor-default' : 'cursor-pointer' }} transition">
+                                <label class="flex items-center justify-between p-2.5 rounded-lg border border-brand-200 bg-brand-50/30 hover:bg-brand-50/60 {{ $isClosedForMe ? 'cursor-default' : 'cursor-pointer' }} transition">
                                     <div class="flex items-center space-x-2.5">
                                         <input type="checkbox" name="evidence[]" value="Hasil Pertanyaan Tertulis"
                                             class="rounded border-slate-300 text-brand-600 focus:ring-brand-500 w-4 h-4"
-                                            @disabled($jadwal->is_closed)
+                                            @disabled($isClosedForMe)
                                             {{ in_array('Hasil Pertanyaan Tertulis', $savedEvidence) ? 'checked' : '' }}>
                                         <span class="font-bold text-slate-900">Hasil Pertanyaan Tertulis (DPT)</span>
                                     </div>
@@ -405,10 +409,10 @@
                         @endphp
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             @foreach($availableIa as $iaCode => $iaMeta)
-                                <label class="flex items-start space-x-3 p-3 rounded-lg border border-slate-200 hover:border-brand-300 hover:bg-slate-50/70 {{ $jadwal->is_closed ? 'cursor-default' : 'cursor-pointer' }} transition bg-white shadow-xs">
+                                <label class="flex items-start space-x-3 p-3 rounded-lg border border-slate-200 hover:border-brand-300 hover:bg-slate-50/70 {{ $isClosedForMe ? 'cursor-default' : 'cursor-pointer' }} transition bg-white shadow-xs">
                                     <input type="checkbox" name="selected_instruments[]" value="{{ $iaCode }}"
                                         class="rounded border-slate-300 text-brand-600 focus:ring-brand-500 w-4 h-4 mt-0.5 shrink-0"
-                                        @disabled($jadwal->is_closed)
+                                        @disabled($isClosedForMe)
                                         {{ in_array($iaCode, $currentSelected) ? 'checked' : '' }}>
                                     <div>
                                         <div class="font-bold text-slate-900 text-xs">{{ $iaMeta['title'] }}</div>
@@ -481,9 +485,9 @@
                                 <span class="text-slate-500 text-[11px]">Tanggal: <strong>{{ \Carbon\Carbon::parse($jadwal->date)->isoFormat('D MMMM Y') }}</strong></span>
                             </div>
 
-                            <div class="mt-2.5 p-3 border border-slate-200 rounded-lg bg-slate-50/70 flex items-center justify-center min-h-[100px]">
+                            <div class="mt-2.5 w-[340px] max-w-full h-[140px] p-3 border border-slate-200 rounded-xl bg-slate-50/70 flex items-center justify-center mx-auto">
                                 @if(auth()->user()?->profile?->signature_data)
-                                    <img src="{{ auth()->user()->profile->signature_data }}" alt="TTD Asesor" class="max-h-20 object-contain">
+                                    <img src="{{ auth()->user()->profile->signature_data }}" alt="TTD Asesor" class="w-full h-full object-contain">
                                 @else
                                     <div class="text-center py-2 text-amber-700">
                                         <p class="text-[11px] font-semibold">Tanda tangan profil belum tersimpan.</p>
@@ -506,7 +510,7 @@
                                 <span class="text-slate-500 text-[11px]">Tanggal: <strong>{{ \Carbon\Carbon::parse($jadwal->date)->isoFormat('D MMMM Y') }}</strong></span>
                             </div>
 
-                            <div class="mt-2.5 p-3 border border-slate-200 rounded-lg bg-slate-50/70 flex flex-col items-center justify-center min-h-[100px] text-center text-slate-500">
+                            <div class="mt-2.5 w-[340px] max-w-full h-[140px] p-3 border border-slate-200 rounded-xl bg-slate-50/70 flex flex-col items-center justify-center mx-auto text-center text-slate-500">
                                 <div class="w-8 h-8 rounded-full bg-slate-200/80 text-slate-600 flex items-center justify-center mb-1.5">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
@@ -537,9 +541,9 @@
             </a>
 
             <div class="flex items-center space-x-3 w-full sm:w-auto">
-                @if($jadwal->is_closed)
+                @if($isClosedForMe)
                     <button type="button" disabled class="w-full sm:w-auto px-6 py-2.5 text-xs font-bold text-slate-500 bg-slate-200 rounded-lg cursor-not-allowed">
-                        Jadwal Telah Ditutup (Read-Only)
+                        {{ $jadwal->is_closed ? 'Jadwal Telah Ditutup (Read-Only)' : 'Asesmen Binaan Telah Selesai (Read-Only)' }}
                     </button>
                 @else
                     <button type="submit" class="w-full sm:w-auto px-6 py-2.5 text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 rounded-lg shadow-sm transition flex items-center justify-center space-x-2">

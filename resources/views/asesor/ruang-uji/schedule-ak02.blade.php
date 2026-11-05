@@ -5,13 +5,17 @@
     {{-- Unified Top Lifecycle Navigation --}}
     @include('asesor.partials.schedule-nav', ['schedule' => $schedule, 'active' => 'ak02'])
 
-    @if($schedule->is_closed)
+    @php
+        $isClosedForMe = $schedule->isClosedForAssessor();
+    @endphp
+
+    @if($isClosedForMe)
         <div class="p-3.5 bg-emerald-50 border border-emerald-300 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-emerald-900">
             <div class="flex items-center space-x-2">
                 <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
-                <span><strong>Jadwal Telah Resmi Ditutup & Dikunci:</strong> Seluruh rekaman dan rekomendasi FR.AK.02 dalam mode lihat (read-only).</span>
+                <span><strong>{{ $schedule->is_closed ? 'Jadwal Telah Resmi Ditutup & Dikunci:' : 'Penetapan Asesi Binaan Telah Selesai & Ditutup:' }}</strong> Seluruh rekaman dan rekomendasi FR.AK.02 dalam mode lihat (read-only).</span>
             </div>
-            <span class="font-bold font-mono text-[11px] bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded border border-emerald-300 shrink-0">STATUS: FINISHED</span>
+            <span class="font-bold font-mono text-[11px] bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded border border-emerald-300 shrink-0">STATUS: {{ $schedule->is_closed ? 'FINISHED' : 'BINAAN SELESAI' }}</span>
         </div>
     @endif
 
@@ -31,8 +35,13 @@
     {{-- Meta Stats Bar --}}
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
-            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Peserta Asesi</span>
-            <div class="text-2xl font-black text-slate-900 mt-0.5">{{ $asesiList->count() }} Orang</div>
+            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Asesi Binaan Anda</span>
+            <div class="text-2xl font-black text-slate-900 mt-0.5">
+                {{ $asesiList->count() }} Orang
+                @if($schedule->assessments->count() > $asesiList->count())
+                    <span class="text-xs text-slate-400 font-normal">({{ $schedule->assessments->count() }} total jadwal)</span>
+                @endif
+            </div>
         </div>
         <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
             <span class="text-xs font-bold text-emerald-600 uppercase tracking-wider">Sudah Ditetapkan</span>
@@ -124,7 +133,7 @@
                                 @endphp
                                 <tr class="hover:bg-slate-50/70 transition align-top">
                                     <td class="px-4 py-4 text-center">
-                                        @if($item->is_my_candidate && $asm->apl_status === 'APPROVED')
+                                        @if($asm->apl_status === 'APPROVED')
                                             <input type="checkbox" class="ak02-row-checkbox rounded border-slate-300 text-brand-600 focus:ring-brand-500 w-4 h-4 cursor-pointer mt-1" checked data-asm-id="{{ $asm->id }}">
                                         @else
                                             <span class="text-slate-300 text-xs">-</span>
@@ -144,19 +153,13 @@
                                                     Skor CBT: {{ $cbtResp->score }}%
                                                 </span>
                                             @endif
-                                            @if($item->is_my_candidate)
-                                                <span class="text-[10px] font-bold px-1.5 py-0.2 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                                    Plottingan Anda
-                                                </span>
-                                            @else
-                                                <span class="text-[10px] font-medium px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 border border-slate-200">
-                                                    Asesor: {{ $asm->assessor?->full_name ?? 'Lain' }}
-                                                </span>
-                                            @endif
+                                            <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                                ✓ Asesi Binaan Anda
+                                            </span>
                                         </div>
                                     </td>
                                     <td class="px-5 py-4 text-center">
-                                        @if($item->is_my_candidate && $asm->apl_status === 'APPROVED' && ! $schedule->is_closed)
+                                        @if($asm->apl_status === 'APPROVED' && ! $isClosedForMe)
                                             <div class="inline-flex rounded-lg border border-slate-300 p-1 bg-slate-100 gap-1 result-button-group" data-asm-id="{{ $asm->id }}">
                                                 <button type="button" 
                                                         class="px-3 py-1.5 rounded-md text-xs font-bold transition btn-k {{ $isK ? 'bg-emerald-600 text-white shadow-xs' : 'text-slate-700 hover:bg-slate-200' }}"
@@ -181,30 +184,26 @@
                                         @endif
                                     </td>
                                     <td class="px-5 py-4 space-y-2">
-                                        @if($item->is_my_candidate && $asm->apl_status === 'APPROVED')
+                                        @if($asm->apl_status === 'APPROVED')
                                             <div>
                                                 <label class="block text-[11px] font-bold text-slate-600 mb-0.5">Tindak Lanjut:</label>
-                                                <input type="text" name="results[{{ $asm->id }}][follow_up_action]" id="input_follow_up_{{ $asm->id }}" value="{{ $defaultFollowUp }}" @disabled($schedule->is_closed) class="w-full text-xs rounded border-slate-300 focus:ring-brand-500 py-1 px-2.5 {{ $schedule->is_closed ? 'bg-slate-50 text-slate-700' : '' }}">
+                                                <input type="text" name="results[{{ $asm->id }}][follow_up_action]" id="input_follow_up_{{ $asm->id }}" value="{{ $defaultFollowUp }}" @disabled($isClosedForMe) class="w-full text-xs rounded-lg border border-slate-300 bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:outline-none py-1.5 px-3 transition shadow-2xs {{ $isClosedForMe ? 'bg-slate-50 text-slate-700' : '' }}">
                                             </div>
                                             <div>
                                                 <label class="block text-[11px] font-bold text-slate-600 mb-0.5">Catatan Asesor:</label>
-                                                <input type="text" name="results[{{ $asm->id }}][final_notes]" id="input_notes_{{ $asm->id }}" value="{{ $defaultNotes }}" @disabled($schedule->is_closed) class="w-full text-xs rounded border-slate-300 focus:ring-brand-500 py-1 px-2.5 {{ $schedule->is_closed ? 'bg-slate-50 text-slate-700' : '' }}">
+                                                <input type="text" name="results[{{ $asm->id }}][final_notes]" id="input_notes_{{ $asm->id }}" value="{{ $defaultNotes }}" @disabled($isClosedForMe) class="w-full text-xs rounded-lg border border-slate-300 bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:outline-none py-1.5 px-3 transition shadow-2xs {{ $isClosedForMe ? 'bg-slate-50 text-slate-700' : '' }}">
                                             </div>
                                         @else
-                                            <div class="text-xs text-slate-500 italic">
-                                                {{ $asm->apl_status !== 'APPROVED' ? 'APL Belum Disetujui' : 'Dikelola oleh rekan asesor lain' }}
+                                            <div class="text-xs text-amber-600 italic">
+                                                APL Belum Disetujui
                                             </div>
                                         @endif
                                     </td>
                                     <td class="px-4 py-4 text-right">
-                                        @if($item->is_my_candidate)
-                                            <a href="{{ $item->inspect_url }}" target="_blank" class="inline-flex items-center px-2.5 py-1.5 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-300 rounded-lg shadow-xs transition" title="Buka formulir rincian unit per unit">
-                                                <span>Unit</span>
-                                                <svg class="w-3 h-3 ml-1 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-                                            </a>
-                                        @else
-                                            <span class="text-slate-300 text-xs">-</span>
-                                        @endif
+                                        <a href="{{ $item->inspect_url }}" target="_blank" class="inline-flex items-center px-2.5 py-1.5 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-300 rounded-lg shadow-xs transition" title="Buka formulir rincian unit per unit">
+                                            <span>Unit</span>
+                                            <svg class="w-3 h-3 ml-1 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                        </a>
                                     </td>
                                 </tr>
                             @endforeach
@@ -215,15 +214,15 @@
                 {{-- Action Bar at Bottom of Container --}}
                 <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <span class="text-xs text-slate-500">
-                        {{ $schedule->is_closed ? 'Jadwal telah ditutup. Seluruh data rekaman tersimpan permanen.' : 'Klik tombol simpan untuk merekam hasil FR.AK.02 seluruh asesi binaan Anda sekaligus.' }}
+                        {{ $isClosedForMe ? 'Asesmen telah ditutup. Seluruh data rekaman tersimpan permanen.' : 'Klik tombol simpan untuk merekam hasil FR.AK.02 seluruh asesi binaan Anda sekaligus.' }}
                     </span>
-                    @if($schedule->is_closed)
+                    @if($isClosedForMe)
                         <button type="button" disabled 
                                 class="px-6 py-3 bg-slate-200 text-slate-500 font-bold text-xs uppercase tracking-wider rounded-xl cursor-not-allowed">
-                            Jadwal Telah Ditutup (Read-Only)
+                            {{ $schedule->is_closed ? 'Jadwal Telah Ditutup (Read-Only)' : 'Asesmen Binaan Selesai (Read-Only)' }}
                         </button>
                     @else
-                        <button type="submit" onclick="return confirm('Apakah Anda yakin ingin menyimpan seluruh penetapan rekaman FR.AK.02 untuk jadwal ini?')" 
+                        <button type="submit" onclick="return confirm('Apakah Anda yakin ingin menyimpan seluruh penetapan rekaman FR.AK.02 untuk asesi binaan Anda?')" 
                                 class="px-6 py-3 bg-brand-600 hover:bg-brand-700 active:bg-brand-800 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-md transition flex items-center justify-center space-x-2">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
                             <span>Simpan Seluruh Rekaman FR.AK.02 (Bulk Save)</span>

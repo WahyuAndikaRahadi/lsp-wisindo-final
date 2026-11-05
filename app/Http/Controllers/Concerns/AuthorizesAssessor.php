@@ -42,15 +42,16 @@ trait AuthorizesAssessor
                 abort(404, 'Jadwal asesmen tidak ditemukan.');
             }
 
-            $isDirectAssessor = (int) $assessment->assessor_id === (int) $user->id;
             $isScheduleAssessor = $schedule->assessors()->where('users.id', $user->id)->exists();
-
-            if (! $isDirectAssessor && ! $isScheduleAssessor) {
+            if (! $isScheduleAssessor) {
                 abort(403, 'Anda tidak ditugaskan pada jadwal asesmen ini.');
             }
 
-            if ($assessment->assessor_id && (int) $assessment->assessor_id !== (int) $user->id) {
-                abort(403, 'Asesi ini telah ditugaskan kepada asesor lain.');
+            $isSingleAssessor = $schedule->assessors()->count() === 1;
+            $isDirectAssessor = (int) $assessment->assessor_id === (int) $user->id;
+
+            if (! $isDirectAssessor && (! $isSingleAssessor || ! empty($assessment->assessor_id))) {
+                abort(403, 'Asesi ini telah ditugaskan kepada asesor lain atau bukan merupakan asesi binaan plotting Anda.');
             }
         }
     }

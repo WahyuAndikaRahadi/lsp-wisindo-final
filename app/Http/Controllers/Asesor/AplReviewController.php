@@ -59,7 +59,7 @@ class AplReviewController extends Controller
             return back()->withErrors(['apl_status' => 'Status keputusan tidak valid.']);
         }
 
-        if ($assessment->schedule && $assessment->schedule->is_closed) {
+        if ($assessment->schedule && $assessment->schedule->isClosedForAssessor()) {
             return back()->with('error', 'Jadwal asesmen sudah ditutup dan dikunci.');
         }
 
@@ -100,7 +100,7 @@ class AplReviewController extends Controller
     {
         $this->authorizeAssessorSchedule($schedule);
 
-        if ($schedule->is_closed) {
+        if ($schedule->isClosedForAssessor()) {
             return back()->with('error', 'Jadwal asesmen sudah ditutup dan dikunci.');
         }
 

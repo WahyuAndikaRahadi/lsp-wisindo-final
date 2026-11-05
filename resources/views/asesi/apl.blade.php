@@ -3,30 +3,43 @@
 @section('title', 'FR.APL.01 & FR.APL.02 - Pendaftaran & Asesmen Mandiri')
 
 @section('content')
-<div class="max-w-5xl mx-auto space-y-6 py-6">
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 py-4 sm:py-6">
+    {{-- Header & Navigasi Terstruktur --}}
+    <div class="space-y-3 pb-2 border-b border-slate-200/80">
+        <div class="flex items-center justify-between gap-3">
+            <a href="{{ route('asesi.dashboard') }}" class="inline-flex items-center gap-1.5 text-xs font-bold text-brand-600 hover:text-brand-800 transition py-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                <span>Kembali ke Dashboard</span>
+            </a>
+            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                FR.APL.01 &amp; FR.APL.02
+            </span>
+        </div>
+    </div>
+
     @if($assessment->schedule?->is_closed)
-        <div class="p-4 bg-emerald-50 border-2 border-emerald-300 rounded-xl text-emerald-900 flex items-center gap-3 shadow-xs">
-            <span class="text-xl">🔒</span>
+        <div class="p-4 bg-emerald-50 border-2 border-emerald-300 rounded-xl text-emerald-900 flex flex-col sm:flex-row items-start sm:items-center gap-3 shadow-xs">
+            <span class="text-xl shrink-0">🔒</span>
             <div>
                 <div class="font-bold text-sm">Jadwal Asesmen Telah Resmi Ditutup &amp; Dikunci</div>
-                <p class="text-xs text-emerald-800 mt-0.5">Seluruh berkas permohonan APL dan asesmen mandiri dalam jadwal ini berada dalam mode lihat (read-only).</p>
+                <p class="text-xs text-emerald-800 mt-0.5 leading-relaxed">Seluruh berkas permohonan APL dan asesmen mandiri dalam jadwal ini berada dalam mode lihat (read-only).</p>
             </div>
         </div>
     @endif
 
-    {{-- Header --}}
-    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+    {{-- Info Header Card --}}
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
             <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">
                 Skema: {{ $assessment->schedule->scheme->code }}
             </span>
-            <h1 class="text-2xl font-bold text-slate-800 mt-2">{{ $assessment->schedule->scheme->name }}</h1>
-            <p class="text-sm text-slate-500 mt-1">
-                TUK: <span class="font-medium text-slate-700">{{ $assessment->schedule->tuk_name }}</span> | 
+            <h1 class="text-xl sm:text-2xl font-bold text-slate-800 mt-2 leading-snug">{{ $assessment->schedule->scheme->name }}</h1>
+            <p class="text-xs sm:text-sm text-slate-500 mt-1.5 leading-relaxed">
+                TUK: <span class="font-medium text-slate-700">{{ $assessment->schedule->tuk_name }}</span> &bull; 
                 Tanggal Uji: <span class="font-medium text-slate-700">{{ \Carbon\Carbon::parse($assessment->schedule->date)->translatedFormat('d F Y') }}</span>
             </p>
         </div>
-        <div>
+        <div class="shrink-0">
             @if($assessment->apl_status === 'APPROVED')
                 <div class="text-right">
                     <span class="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-semibold bg-emerald-500 text-white shadow-sm">
@@ -74,18 +87,18 @@
         @csrf
 
         {{-- BAGIAN 1: FR.APL.01 DATA PEMOHON --}}
-        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-            <div class="bg-gradient-to-r from-slate-800 to-slate-900 px-6 py-4 flex items-center justify-between text-white">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="bg-gradient-to-r from-slate-800 to-slate-900 px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between text-white gap-3">
                 <div>
-                    <h2 class="text-lg font-bold">FR.APL.01. PERMOHONAN SERTIFIKASI KOMPETENSI</h2>
-                    <p class="text-xs text-slate-300">Bagian 1: Rincian Data Pribadi & Administratif (Auto-fetch)</p>
+                    <h2 class="text-base sm:text-lg font-bold">FR.APL.01. PERMOHONAN SERTIFIKASI KOMPETENSI</h2>
+                    <p class="text-xs text-slate-300 mt-0.5">Bagian 1: Rincian Data Pribadi &amp; Administratif (Auto-fetch)</p>
                 </div>
-                <a href="{{ route('asesi.profile.edit') }}" class="text-xs bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded border border-white/20 transition">
-                    ✎ Edit Profil
+                <a href="{{ route('asesi.profile.edit') }}" class="self-start sm:self-auto text-xs bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-lg border border-white/20 transition flex items-center gap-1.5">
+                    <span>✎ Edit Profil</span>
                 </a>
             </div>
 
-            <div class="p-6">
+            <div class="p-4 sm:p-6">
                 @php
                     $isProfileComplete = $profile && !empty($profile->nik) && !empty($profile->tempat_lahir) && !empty($profile->tanggal_lahir) && !empty($profile->jenis_kelamin) && !empty($profile->alamat_rumah) && !empty($profile->kode_pos) && !empty($profile->pendidikan_terakhir) && !empty($profile->jabatan) && !empty(auth()->user()->phone);
                     $isAplLocked = $assessment->apl_status === 'SUBMITTED';
@@ -492,7 +505,7 @@
         </div>
 
         {{-- BAGIAN 2: FR.APL.02 ASESMEN MANDIRI --}}
-        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden" x-data="{
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden" x-data="{
             setAll(val) {
                 document.querySelectorAll('input.radio-kuk-' + val).forEach(el => el.checked = true);
             },
@@ -501,22 +514,22 @@
                 document.querySelectorAll('select.select-proof').forEach(el => el.value = val);
             }
         }">
-            <div class="bg-gradient-to-r from-indigo-700 to-indigo-900 px-6 py-4 flex flex-col md:flex-row md:items-center justify-between text-white gap-4">
+            <div class="bg-gradient-to-r from-indigo-700 to-indigo-900 px-4 sm:px-6 py-4 flex flex-col md:flex-row md:items-center justify-between text-white gap-4">
                 <div>
-                    <h2 class="text-lg font-bold">FR.APL.02. ASESMEN MANDIRI</h2>
-                    <p class="text-xs text-indigo-200">Panduan Asesmen Mandiri: Nilai kesiapan Anda pada setiap Kriteria Unjuk Kerja (KUK)</p>
+                    <h2 class="text-base sm:text-lg font-bold">FR.APL.02. ASESMEN MANDIRI</h2>
+                    <p class="text-xs text-indigo-200 mt-0.5">Panduan Asesmen Mandiri: Nilai kesiapan Anda pada setiap Kriteria Unjuk Kerja (KUK)</p>
                 </div>
 
                 @if($assessment->apl_status !== 'SUBMITTED')
                     {{-- Fast Actions --}}
                     <div class="flex items-center gap-2 flex-wrap">
-                        <button type="button" @click="setAll('K')" class="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded text-xs font-bold shadow-sm transition">
+                        <button type="button" @click="setAll('K')" class="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-xs font-bold shadow-sm transition">
                             ✓ Semua K (Kompeten)
                         </button>
-                        <button type="button" @click="setAll('BK')" class="px-3 py-1.5 bg-rose-500 hover:bg-rose-600 text-white rounded text-xs font-bold shadow-sm transition">
+                        <button type="button" @click="setAll('BK')" class="px-3 py-1.5 bg-rose-500 hover:bg-rose-600 text-white rounded-lg text-xs font-bold shadow-sm transition">
                             ✕ Semua BK
                         </button>
-                        <select @change="setDefaultProof($event.target.value)" class="px-2 py-1.5 bg-white text-slate-800 rounded text-xs font-medium border-0 focus:ring-2 focus:ring-indigo-300">
+                        <select @change="setDefaultProof($event.target.value)" class="px-3 py-1.5 bg-white text-slate-800 rounded-lg text-xs font-medium border border-indigo-200 shadow-2xs focus:ring-2 focus:ring-indigo-300 focus:outline-none cursor-pointer">
                             <option value="">-- Set Bukti Semua --</option>
                             <option value="IJAZAH_SMK">Ijazah SMK Otomotif</option>
                             <option value="SURAT_SISWA_AKTIF">Surat Keterangan Siswa Aktif</option>
@@ -526,20 +539,20 @@
                     </div>
                 @else
                     <div class="flex items-center gap-2">
-                        <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-white/20 text-white rounded text-xs font-semibold">
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-white/20 text-white rounded-lg text-xs font-semibold">
                             <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-                            Formulir Terkunci &amp; Sedang Diverifikasi Asesor
+                            Formulir Terkunci &amp; Terkirim (Sedang Diverifikasi Asesor)
                         </span>
                     </div>
                 @endif
             </div>
 
-            <div class="p-6 overflow-x-auto">
+            <div class="p-4 sm:p-6 overflow-x-auto">
                 @php
                     $existingApl02 = $assessment->apl02Items->keyBy('kuk_id');
                 @endphp
 
-                <table class="w-full text-left border-collapse text-xs">
+                <table class="w-full min-w-[700px] text-left border-collapse text-xs">
                     <thead>
                         <tr class="bg-slate-100 text-slate-700 border-b border-slate-200">
                             <th class="p-3 w-12 text-center">No</th>
@@ -583,7 +596,7 @@
                                             <input type="radio" name="kuks[{{ $kuk->id }}][value]" value="BK" class="radio-kuk-BK text-rose-600 focus:ring-rose-500 w-4 h-4 cursor-pointer" @checked($val === 'BK') @disabled($assessment->apl_status === 'SUBMITTED')>
                                         </td>
                                         <td class="p-3">
-                                            <select name="kuks[{{ $kuk->id }}][proof_type]" class="select-proof w-full text-xs border border-slate-200 rounded px-2 py-1 bg-white focus:ring-1 focus:ring-indigo-500" @disabled($assessment->apl_status === 'SUBMITTED')>
+                                            <select name="kuks[{{ $kuk->id }}][proof_type]" class="select-proof w-full text-xs border border-slate-300 rounded-lg px-2.5 py-1.5 bg-white text-slate-800 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:outline-none transition shadow-2xs" @disabled($assessment->apl_status === 'SUBMITTED')>
                                                 <option value="IJAZAH_SMK" @selected($proof === 'IJAZAH_SMK')>Ijazah SMK Otomotif</option>
                                                 <option value="SURAT_SISWA_AKTIF" @selected($proof === 'SURAT_SISWA_AKTIF')>Surat Keterangan Siswa Aktif</option>
                                                 <option value="IJAZAH_SMA_SERTIFIKAT" @selected($proof === 'IJAZAH_SMA_SERTIFIKAT')>Ijazah SMA + Sertifikat Pelatihan</option>
@@ -599,32 +612,32 @@
             </div>
 
             {{-- Signature Section & Save Button --}}
-            <div class="p-6 bg-slate-50 border-t border-slate-200 flex flex-col md:flex-row items-end justify-between gap-6">
-                <div class="w-full md:w-80">
+            <div class="p-4 sm:p-6 bg-slate-50 border-t border-slate-200 flex flex-col md:flex-row items-stretch md:items-end justify-between gap-6">
+                <div class="w-full max-w-[340px]">
                     <x-signature-pad 
                         name="signature_data" 
                         :value="$assessment->asesi_signature ?? $profile?->signature_data ?? old('signature_data')" 
                         :profileSignature="$profile?->signature_data"
                         label="Tanda Tangan Pemohon (Asesi)" 
                         :required="true"
-                        height="140" 
+                        :height="140" 
                         :disabled="$assessment->apl_status === 'SUBMITTED' || (bool) $assessment->schedule?->is_closed"
                     />
                 </div>
 
-                <div class="w-full md:w-auto flex flex-col items-end gap-2">
+                <div class="w-full md:w-auto flex flex-col items-stretch sm:items-end gap-2.5">
                     @if($assessment->schedule?->is_closed)
-                        <div class="flex items-center gap-3">
-                            <a href="{{ route('asesi.assessment.ruang-uji', $assessment) }}" class="px-5 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs uppercase tracking-wider rounded-xl border border-slate-300 transition">
+                        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full">
+                            <a href="{{ route('asesi.assessment.ruang-uji', $assessment) }}" class="px-5 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs uppercase tracking-wider rounded-xl border border-slate-300 transition text-center">
                                 Kembali ke Ruang Uji →
                             </a>
-                            <button type="button" disabled class="px-6 py-3.5 bg-slate-200 text-slate-500 font-bold text-xs uppercase tracking-wider rounded-xl cursor-not-allowed flex items-center gap-2 border border-slate-300 shadow-none">
+                            <button type="button" disabled class="px-6 py-3 bg-slate-200 text-slate-500 font-bold text-xs uppercase tracking-wider rounded-xl cursor-not-allowed flex items-center justify-center gap-2 border border-slate-300 shadow-none">
                                 <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
                                 <span>Jadwal Telah Ditutup (Read-Only)</span>
                             </button>
                         </div>
                     @elseif($assessment->apl_status === 'APPROVED')
-                        <div class="mb-2 p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-left w-full md:max-w-md">
+                        <div class="mb-2 p-3.5 bg-emerald-50 border border-emerald-200 rounded-xl text-left w-full md:max-w-md">
                             <label class="flex items-start gap-2.5 cursor-pointer">
                                 <input type="checkbox" name="statement_integrity" value="1" checked required class="mt-0.5 rounded border-emerald-300 text-emerald-600 focus:ring-emerald-500">
                                 <span class="text-xs text-emerald-950 leading-relaxed">
@@ -632,17 +645,17 @@
                                 </span>
                             </label>
                         </div>
-                        <div class="flex items-center gap-3">
-                            <a href="{{ route('asesi.assessment.ruang-uji', $assessment) }}" class="px-5 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs uppercase tracking-wider rounded-xl border border-slate-300 transition">
+                        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
+                            <a href="{{ route('asesi.assessment.ruang-uji', $assessment) }}" class="px-5 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs uppercase tracking-wider rounded-xl border border-slate-300 transition text-center">
                                 Kembali ke Ruang Uji →
                             </a>
-                            <button type="submit" class="px-7 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-md transition flex items-center gap-2">
+                            <button type="submit" class="px-7 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-md transition flex items-center justify-center gap-2">
                                 <span>Simpan Perubahan APL</span>
                                 <span>✓</span>
                             </button>
                         </div>
                     @elseif($assessment->apl_status === 'SUBMITTED')
-                        <button type="button" disabled class="px-6 py-3 bg-slate-400 text-white font-bold rounded-xl shadow-md cursor-not-allowed">
+                        <button type="button" disabled class="w-full sm:w-auto px-6 py-3 bg-slate-400 text-white font-bold text-xs rounded-xl shadow-md cursor-not-allowed text-center">
                             Menunggu Verifikasi Asesor
                         </button>
                     @else
@@ -650,15 +663,15 @@
                             <label class="flex items-start gap-2.5 cursor-pointer">
                                 <input type="checkbox" name="statement_integrity" value="1" required class="mt-0.5 rounded border-indigo-300 text-brand-600 focus:ring-brand-500 w-4 h-4 shrink-0">
                                 <span class="text-xs text-indigo-950 leading-relaxed">
-                                    <strong>Pernyataan Pemohon (Asesi):</strong>Saya berkomitmen untuk mematuhi seluruh tata tertib asesmen, menjaga kerahasiaan materi uji kompetensi, serta mematuhi seluruh ketentuan asesmen LSP PrO Indo.
+                                    <strong>Pernyataan Pemohon (Asesi):</strong> Saya berkomitmen untuk mematuhi seluruh tata tertib asesmen, menjaga kerahasiaan materi uji kompetensi, serta mematuhi seluruh ketentuan asesmen LSP PrO Indo.
                                 </span>
                             </label>
                         </div>
-                        <button type="submit" class="px-8 py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-md transition transform active:scale-95 flex items-center gap-2">
-                            <span>Simpan & Ajukan Permohonan</span>
+                        <button type="submit" class="w-full sm:w-auto px-8 py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-md transition transform active:scale-95 flex items-center justify-center gap-2">
+                            <span>Simpan &amp; Ajukan Permohonan</span>
                             <span>→</span>
                         </button>
-                        <p class="text-xs text-slate-400">Pastikan dokumen bukti telah dipilih dengan benar.</p>
+                        <p class="text-xs text-slate-400 text-center sm:text-right">Pastikan dokumen bukti telah dipilih dengan benar.</p>
                     @endif
                 </div>
             </div>

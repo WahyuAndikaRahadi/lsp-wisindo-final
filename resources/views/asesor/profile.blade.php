@@ -237,23 +237,25 @@
             </div>
 
             @if($p->signature_data)
-                <div class="p-4 bg-slate-50 border border-slate-200 rounded-lg flex flex-col sm:flex-row items-center gap-4">
-                    <div class="bg-white p-3 rounded-lg border border-slate-300 shadow-xs">
-                        <img src="{{ $p->signature_data }}" alt="Pratinjau Tanda Tangan Asesor" class="max-h-20 max-w-[200px] object-contain">
+                <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl flex flex-col sm:flex-row items-center sm:items-start gap-4">
+                    <div class="w-[340px] max-w-full h-[140px] bg-white rounded-xl border border-slate-300 shadow-xs p-3 flex items-center justify-center shrink-0">
+                        <img src="{{ $p->signature_data }}" alt="Pratinjau Tanda Tangan Asesor" class="w-full h-full object-contain">
                     </div>
                     <div class="text-xs text-slate-600 space-y-1">
-                        <p class="font-bold text-slate-800">Tanda Tangan Aktif Saat Ini</p>
-                        <p>Tanda tangan di atas tersimpan sebagai tanda tangan master Anda dan siap digunakan otomatis. Anda dapat menggambar ulang pada area di bawah jika ingin memperbaruinya.</p>
+                        <p class="font-bold text-slate-800 text-sm">Tanda Tangan Aktif Saat Ini</p>
+                        <p class="leading-relaxed">Tanda tangan di samping tersimpan sebagai tanda tangan master Anda dan siap digunakan otomatis saat menandatangani persetujuan AK.01, rubrik instrumen uji (IA.01, IA.01B, IA.02, IA.03), serta dokumen ekspor MUK.</p>
                     </div>
                 </div>
             @endif
 
-            <x-signature-pad 
-                name="signature_data" 
-                :value="old('signature_data', $p->signature_data)"
-                label="Goreskan Tanda Tangan Digital Baru / Perbarui"
-                height="180"
-            />
+            <div class="max-w-[340px]">
+                <x-signature-pad 
+                    name="signature_data" 
+                    :value="old('signature_data', $p->signature_data)"
+                    label="Goreskan Tanda Tangan Digital Baru / Perbarui"
+                    :height="140"
+                />
+            </div>
         </div>
 
         {{-- Submit Button --}}

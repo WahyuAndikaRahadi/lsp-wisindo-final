@@ -103,4 +103,38 @@ class AdminProxyFilterTest extends TestCase
         $response->assertDontSee('Siti Asesi Mandiri');
         $response->assertDontSee('Budi Santoso Asesor');
     }
+
+    public function test_proxy_mode_hides_logout_button_and_shows_kembali_button(): void
+    {
+        // 1. In normal session, logout form is visible
+        $normalResponse = $this->actingAs($this->admin)->get(route('admin.dashboard'));
+        $normalResponse->assertOk();
+        $normalResponse->assertSee(route('logout'));
+
+        // 2. Switch to proxy mode as asesor
+        $this->actingAs($this->admin)->post(route('proxy.switch', $this->asesor->id));
+
+        // 3. Now accessing any page with admin_impersonator_id session
+        $proxyResponse = $this->actingAs($this->asesor)
+            ->withSession(['admin_impersonator_id' => $this->admin->id])
+            ->get(route('asesor.jadwal.index'));
+
+        $proxyResponse->assertOk();
+        // Logout route should NOT be present in sidebar
+        $proxyResponse->assertDontSee(route('logout'));
+        // Switch back route should be present
+        $proxyResponse->assertSee(route('proxy.switch-back'));
+        $proxyResponse->assertSee('Kembali');
+    }
+
+    public function test_logout_is_prevented_while_in_proxy_mode(): void
+    {
+        $response = $this->actingAs($this->asesi)
+            ->withSession(['admin_impersonator_id' => $this->admin->id])
+            ->post(route('logout'));
+
+        $response->assertRedirect();
+        $response->assertSessionHas('warning');
+        $this->assertTrue(auth()->check());
+    }
 }

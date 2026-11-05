@@ -1,9 +1,9 @@
 @extends('layouts.app', ['title' => 'Dashboard Asesi'])
 
 @section('content')
-<div class="space-y-6">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-6">
     {{-- Header Banner --}}
-    <div class="bg-gradient-to-r from-lsp-navy to-lsp-navy-dark rounded-xl p-5 sm:p-6 md:p-8 text-white shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 border-t-4 border-lsp-red">
+    <div class="bg-gradient-to-r from-lsp-navy to-lsp-navy-dark rounded-2xl p-5 sm:p-6 md:p-8 text-white shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 border-t-4 border-lsp-red">
         <div>
             <span class="inline-block px-2.5 py-0.5 rounded-full bg-white/10 text-lsp-red border border-lsp-red/30 text-[10px] font-extrabold tracking-wider uppercase mb-2">
                 Peserta Asesmen Kompetensi
@@ -98,13 +98,13 @@
     </div>
 
     {{-- Enrolled Schedules Section --}}
-    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-        <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="px-4 sm:px-6 py-4 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
-                <h2 class="text-base font-bold text-slate-900">Jadwal Asesmen Terkini</h2>
-                <p class="text-xs text-slate-500">Daftar sertifikasi kompetensi yang sedang atau telah Anda ikuti</p>
+                <h2 class="text-sm sm:text-base font-bold text-slate-900">Jadwal Asesmen Terkini</h2>
+                <p class="text-xs text-slate-500 mt-0.5">Daftar sertifikasi kompetensi yang sedang atau telah Anda ikuti</p>
             </div>
-            <a href="{{ route('asesi.jadwal.index') }}" class="text-xs font-semibold text-brand-600 hover:text-brand-700">
+            <a href="{{ route('asesi.jadwal.index') }}" class="self-start sm:self-auto text-xs font-semibold text-brand-600 hover:text-brand-700">
                 Lihat Semua Jadwal &rarr;
             </a>
         </div>

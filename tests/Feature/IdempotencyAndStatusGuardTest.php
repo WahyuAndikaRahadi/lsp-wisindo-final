@@ -197,6 +197,11 @@ class IdempotencyAndStatusGuardTest extends TestCase
         $schedule = $f['schedule'];
         $assessment = $f['assessment'];
 
+        $assessment->update([
+            'ak01_agreed_at' => now(),
+            'assessor_signature' => 'data:image/png;base64,sampleSig',
+        ]);
+
         $payload = [
             'assessment_ids' => [$assessment->id],
             'items' => [
