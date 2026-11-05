@@ -221,17 +221,29 @@ class DokumenMukController extends Controller
 
     public function exportBa(Schedule $schedule)
     {
-        return $this->dynamicService->exportSchedule($schedule, 'ba', request()->boolean('download'));
+        if (request()->query('format') === 'pdf' || request()->query('source') === 'dynamic') {
+            return $this->dynamicService->exportSchedule($schedule, 'ba', request()->boolean('download'));
+        }
+
+        return $this->exportSchedule($schedule, 'ba');
     }
 
     public function exportHadirAsesor(Schedule $schedule)
     {
-        return $this->dynamicService->exportSchedule($schedule, 'hadir-asesor', request()->boolean('download'));
+        if (request()->query('format') === 'pdf' || request()->query('source') === 'dynamic') {
+            return $this->dynamicService->exportSchedule($schedule, 'hadir-asesor', request()->boolean('download'));
+        }
+
+        return $this->exportSchedule($schedule, 'hadir-asesor');
     }
 
     public function exportHadirAsesi(Schedule $schedule)
     {
-        return $this->dynamicService->exportSchedule($schedule, 'ba', request()->boolean('download'));
+        if (request()->query('format') === 'pdf' || request()->query('source') === 'dynamic') {
+            return $this->dynamicService->exportSchedule($schedule, 'ba', request()->boolean('download'));
+        }
+
+        return $this->exportSchedule($schedule, 'hadir-asesi');
     }
 
     public function exportExcelBiodata(Schedule $schedule)

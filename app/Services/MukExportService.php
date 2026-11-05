@@ -38,12 +38,63 @@ class MukExportService
             return in_array($a->final_result, ['BK', 'BELUM_KOMPETEN'], true);
         })->count();
 
+        $schedule->loadMissing(['assessors.profile', 'assessments.asesi.profile', 'assessments.assessor.profile']);
+
+        $assessments = $schedule->assessments;
+        $scheduleAssessors = $schedule->assessors;
+
+        $assessorMap = [];
+        foreach ($scheduleAssessors as $as) {
+            $assessorMap[$as->id] = [
+                'assessor' => $as,
+                'assessments' => collect(),
+            ];
+        }
+
+        $unassigned = collect();
+        foreach ($assessments as $ass) {
+            $assessorId = $ass->assessor_id;
+            if ($assessorId && isset($assessorMap[$assessorId])) {
+                $assessorMap[$assessorId]['assessments']->push($ass);
+            } elseif ($ass->assessor) {
+                if (! isset($assessorMap[$ass->assessor->id])) {
+                    $assessorMap[$ass->assessor->id] = [
+                        'assessor' => $ass->assessor,
+                        'assessments' => collect(),
+                    ];
+                }
+                $assessorMap[$ass->assessor->id]['assessments']->push($ass);
+            } else {
+                $unassigned->push($ass);
+            }
+        }
+
+        if ($unassigned->isNotEmpty()) {
+            if (! empty($assessorMap)) {
+                $firstKey = array_key_first($assessorMap);
+                $assessorMap[$firstKey]['assessments'] = $assessorMap[$firstKey]['assessments']->merge($unassigned);
+            } else {
+                $leadAssessor = $scheduleAssessors->first();
+                $assessorMap[0] = [
+                    'assessor' => $leadAssessor,
+                    'assessments' => $unassigned,
+                ];
+            }
+        }
+
+        $activeGroups = array_values(array_filter($assessorMap, fn ($g) => $g['assessments']->isNotEmpty()));
+        $sortedAssessments = collect();
+        foreach ($activeGroups as $g) {
+            $sortedAssessments = $sortedAssessments->merge($g['assessments']);
+        }
+
         return [
             'schedule' => $schedule,
             'scheme' => $schedule->scheme,
             'assessors' => $schedule->assessors,
             'leadAssessor' => $schedule->assessors->first(),
-            'assessments' => $schedule->assessments,
+            'assessments' => $sortedAssessments->isNotEmpty() ? $sortedAssessments : $schedule->assessments,
+            'assessorGroups' => $activeGroups,
             'total_asesi' => $totalAsesi,
             'total_asesi_terbilang' => self::terbilang($totalAsesi),
             'total_kompeten' => $totalKompeten,

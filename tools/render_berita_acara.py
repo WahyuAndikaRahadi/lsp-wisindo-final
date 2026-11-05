@@ -185,7 +185,7 @@ def to_words(n):
         return f"{kata[n // 10]} Puluh" + (f" {kata[rem]}" if rem else "")
     return str(n)
 
-def render_page_1(c, chunk, chunk_offset, batch_idx, total_batches):
+def render_page_1(c, chunk, chunk_offset, batch_idx, total_batches, assessor_info=None):
     PW, PH = 596.0, 842.0
     Y1 = lambda top: PH - top
 
@@ -246,8 +246,8 @@ def render_page_1(c, chunk, chunk_offset, batch_idx, total_batches):
     c.setFont("Lib", 8.5)
     for idx in range(n_rows):
         y_mid = top_tbl + hdr_h + idx * row_h + row_h / 2
-        cand_no = chunk_offset + idx + 1
         p_info = chunk[idx] if idx < len(chunk) else None
+        cand_no = (p_info.get("no") if p_info and p_info.get("no") is not None else (chunk_offset + idx + 1))
 
         c.drawCentredString((cols[0] + cols[1]) / 2, Y1(y_mid + 3.0), str(cand_no))
         if p_info:
@@ -265,18 +265,21 @@ def render_page_1(c, chunk, chunk_offset, batch_idx, total_batches):
     y_sig = bot_tbl + 52.0
     c.drawString(330.0, Y1(y_sig), f"{DATA.get('tuk_kota', 'Karawang')}, {DATA.get('tanggal_dokumen', '')}")
 
+    asesor_nama = (assessor_info.get("nama") if assessor_info else None) or DATA.get('asesor_nama', '')
+    asesor_no_reg = (assessor_info.get("no_met") or assessor_info.get("no_reg") if assessor_info else None) or DATA.get('asesor_no_reg', '')
+    sig_asesor = (assessor_info.get("signature") if assessor_info else None) or DATA.get("signature_asesor")
+
     c.setFont("Lib-B", 9.0)
     c.drawString(65.0, Y1(y_sig + 25.0), "Asesor")
     c.drawString(330.0, Y1(y_sig + 25.0), "Penanggungjawab kegiatan")
 
     c.setFont("Lib", 8.5)
     c.drawString(65.0, Y1(y_sig + 45.0), "Nama")
-    c.drawString(135.0, Y1(y_sig + 45.0), f": {DATA.get('asesor_nama', '')}")
+    c.drawString(135.0, Y1(y_sig + 45.0), f": {asesor_nama}")
     c.drawString(65.0, Y1(y_sig + 60.0), "No. Reg")
-    c.drawString(135.0, Y1(y_sig + 60.0), f": {DATA.get('asesor_no_reg', '')}")
+    c.drawString(135.0, Y1(y_sig + 60.0), f": {asesor_no_reg}")
     c.drawString(65.0, Y1(y_sig + 75.0), "Tanda tangan")
 
-    sig_asesor = DATA.get("signature_asesor")
     drawn_asesor = draw_signature(c, sig_asesor, x_left=135.0, y_bottom=Y1(y_sig + 106.0), max_w=120.0, max_h=34.0)
     if not drawn_asesor:
         c.drawString(135.0, Y1(y_sig + 75.0), ": [Ttd Digital]")
@@ -294,7 +297,7 @@ def render_page_1(c, chunk, chunk_offset, batch_idx, total_batches):
         c.drawString(405.0, Y1(y_sig + 75.0), ": [Ttd Digital]")
     c.drawString(330.0, Y1(y_sig + 115.0), "………………………………….")
 
-def render_page_2(c, chunk, chunk_offset, batch_idx, total_batches):
+def render_page_2(c, chunk, chunk_offset, batch_idx, total_batches, assessor_info=None):
     PW, PH = 842.0, 596.0
     Y2 = lambda top: PH - top
 
@@ -344,8 +347,8 @@ def render_page_2(c, chunk, chunk_offset, batch_idx, total_batches):
     c.setFont("Lib", 8.0)
     for idx in range(n_rows):
         y_mid = top_tbl + hdr_h + idx * row_h + row_h / 2
-        cand_no = chunk_offset + idx + 1
         p_info = chunk[idx] if idx < len(chunk) else None
+        cand_no = (p_info.get("no") if p_info and p_info.get("no") is not None else (chunk_offset + idx + 1))
 
         c.drawCentredString((cols[0] + cols[1]) / 2, Y2(y_mid + 3.0), str(cand_no))
         if p_info:
@@ -372,11 +375,15 @@ def render_page_2(c, chunk, chunk_offset, batch_idx, total_batches):
     c.setFont("Lib", 8.5)
     c.drawString(cols[0] + 30.0, Y2(y_sig2), f"{DATA.get('tuk_kota', 'Karawang')}, {DATA.get('tanggal_dokumen', '')}")
     c.drawString(cols[0] + 30.0, Y2(y_sig2 + 16.0), "Asesor :")
-    c.drawString(cols[0] + 30.0, Y2(y_sig2 + 32.0), f"Nama             :  {DATA.get('asesor_nama', '')}")
-    c.drawString(cols[0] + 30.0, Y2(y_sig2 + 48.0), f"No. Reg          :  {DATA.get('asesor_no_reg', '')}")
+
+    asesor_nama = (assessor_info.get("nama") if assessor_info else None) or DATA.get('asesor_nama', '')
+    asesor_no_reg = (assessor_info.get("no_met") or assessor_info.get("no_reg") if assessor_info else None) or DATA.get('asesor_no_reg', '')
+    sig_asesor = (assessor_info.get("signature") if assessor_info else None) or DATA.get("signature_asesor")
+
+    c.drawString(cols[0] + 30.0, Y2(y_sig2 + 32.0), f"Nama             :  {asesor_nama}")
+    c.drawString(cols[0] + 30.0, Y2(y_sig2 + 48.0), f"No. Reg          :  {asesor_no_reg}")
     c.drawString(cols[0] + 30.0, Y2(y_sig2 + 64.0), "Tanda tangan :")
 
-    sig_asesor = DATA.get("signature_asesor")
     drawn_asesor_p2 = draw_signature(c, sig_asesor, x_left=cols[0] + 95.0, y_bottom=Y2(y_sig2 + 95.0), max_w=120.0, max_h=34.0)
     if not drawn_asesor_p2:
         c.drawString(cols[0] + 95.0, Y2(y_sig2 + 64.0), "[Ttd Digital]")
@@ -385,21 +392,74 @@ def render_page_2(c, chunk, chunk_offset, batch_idx, total_batches):
 
 def render(dest_path):
     c = canvas.Canvas(dest_path, pagesize=(596.0, 842.0))
-    peserta_all = DATA.get("peserta", [])
     chunk_size = 10
-    chunks = [peserta_all[i:i + chunk_size] for i in range(0, len(peserta_all), chunk_size)]
-    if not chunks:
-        chunks = [[]]
-    total_batches = len(chunks)
+    batches = []
 
-    for idx, chunk in enumerate(chunks):
-        chunk_offset = idx * chunk_size
+    if "assessor_groups" in DATA and DATA["assessor_groups"]:
+        for grp in DATA["assessor_groups"]:
+            assessor_info = grp.get("assessor") or {}
+            grp_peserta = grp.get("peserta") or []
+            chunks = [grp_peserta[i:i + chunk_size] for i in range(0, len(grp_peserta), chunk_size)]
+            if not chunks:
+                chunks = [[]]
+            for ch_idx, chunk in enumerate(chunks):
+                batches.append({
+                    "assessor": assessor_info,
+                    "chunk": chunk,
+                    "chunk_offset": ch_idx * chunk_size,
+                })
+    else:
+        peserta_all = DATA.get("peserta", [])
+        has_assessor_in_peserta = any("asesor_nama" in p or "assessor_id" in p for p in peserta_all)
+        if has_assessor_in_peserta:
+            grouped = {}
+            for p in peserta_all:
+                key = p.get("assessor_id") or p.get("asesor_nama") or "default"
+                if key not in grouped:
+                    grouped[key] = {
+                        "assessor": {
+                            "nama": p.get("asesor_nama") or DATA.get("asesor_nama"),
+                            "no_met": p.get("asesor_no_reg") or DATA.get("asesor_no_reg"),
+                            "signature": p.get("signature_asesor") or DATA.get("signature_asesor"),
+                        },
+                        "peserta": [],
+                    }
+                grouped[key]["peserta"].append(p)
+            for grp in grouped.values():
+                assessor_info = grp["assessor"]
+                grp_peserta = grp["peserta"]
+                chunks = [grp_peserta[i:i + chunk_size] for i in range(0, len(grp_peserta), chunk_size)]
+                if not chunks:
+                    chunks = [[]]
+                for ch_idx, chunk in enumerate(chunks):
+                    batches.append({
+                        "assessor": assessor_info,
+                        "chunk": chunk,
+                        "chunk_offset": ch_idx * chunk_size,
+                    })
+        else:
+            chunks = [peserta_all[i:i + chunk_size] for i in range(0, len(peserta_all), chunk_size)]
+            if not chunks:
+                chunks = [[]]
+            for ch_idx, chunk in enumerate(chunks):
+                batches.append({
+                    "assessor": {
+                        "nama": DATA.get("asesor_nama"),
+                        "no_met": DATA.get("asesor_no_reg"),
+                        "signature": DATA.get("signature_asesor"),
+                    },
+                    "chunk": chunk,
+                    "chunk_offset": ch_idx * chunk_size,
+                })
+
+    total_batches = len(batches)
+    for idx, b in enumerate(batches):
         c.setPageSize((596.0, 842.0))
-        render_page_1(c, chunk, chunk_offset, idx, total_batches)
+        render_page_1(c, b["chunk"], b["chunk_offset"], idx, total_batches, b.get("assessor"))
         c.showPage()
 
         c.setPageSize((842.0, 596.0))
-        render_page_2(c, chunk, chunk_offset, idx, total_batches)
+        render_page_2(c, b["chunk"], b["chunk_offset"], idx, total_batches, b.get("assessor"))
         c.showPage()
 
     c.save()
