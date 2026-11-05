@@ -11,7 +11,9 @@ use App\Models\CompetencyUnit;
 use App\Models\Schedule;
 use App\Models\Scheme;
 use App\Models\User;
+use App\Services\MukDynamicDocumentService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -488,5 +490,77 @@ class DokumenMukPrintViewsTest extends TestCase
         $response->assertSee('Tujuan Asesmen');
         $response->assertSee('Bukti Persyaratan Dasar');
         $response->assertSee('Bukti Administratif');
+    }
+
+    public function test_ba_and_hadir_asesi_organized_by_assigned_assessors(): void
+    {
+        $asesor2 = User::create([
+            'full_name' => 'Dr. Hendra Gunawan, M.T.',
+            'email' => 'asesor.hendra@test.com',
+            'phone' => '081234567899',
+            'assessor_registration_number' => 'MET.000.009876.2023',
+            'role' => 'ASESOR',
+            'status' => 'ACTIVE',
+            'password' => Hash::make('password'),
+        ]);
+        $this->schedule->assessors()->attach($asesor2->id);
+
+        $asesi2 = User::create([
+            'full_name' => 'Dimas Pratama',
+            'email' => 'dimas.pratama@test.com',
+            'phone' => '081234567888',
+            'role' => 'ASESI',
+            'status' => 'ACTIVE',
+            'password' => Hash::make('password'),
+        ]);
+        $asesi2->profile()->create([
+            'nik' => '3215019999990002',
+            'nama_institusi_perusahaan' => 'SMK Negeri 1 Karawang',
+            'alamat_rumah' => 'Jl. Tuparev No 5 Karawang',
+        ]);
+
+        Assessment::create([
+            'asesi_id' => $asesi2->id,
+            'schedule_id' => $this->schedule->id,
+            'assessor_id' => $asesor2->id,
+            'admin_status' => 'APPROVED',
+            'apl_status' => 'APPROVED',
+            'status' => 'COMPLETED',
+            'final_result' => 'KOMPETEN',
+        ]);
+
+        $dynamicService = app(MukDynamicDocumentService::class);
+        $payload = $dynamicService->buildPayload($this->schedule);
+
+        $this->assertArrayHasKey('assessor_groups', $payload);
+        $this->assertCount(2, $payload['assessor_groups']);
+
+        $group1 = $payload['assessor_groups'][0];
+        $this->assertEquals($this->asesor->id, $group1['assessor']['id']);
+        $this->assertEquals('Rian Kurniawan', $group1['peserta'][0]['nama']);
+
+        $group2 = $payload['assessor_groups'][1];
+        $this->assertEquals($asesor2->id, $group2['assessor']['id']);
+        $this->assertEquals('Dimas Pratama', $group2['peserta'][0]['nama']);
+
+        // Test BA PDF generation with multiple assessors
+        $pdfRes = $dynamicService->exportSchedule($this->schedule, 'ba');
+        $this->assertFileExists($pdfRes->getFile()->getPathname());
+
+        // Test HTML view displays both assessor sections
+        $baHtml = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.export-ba', $this->schedule));
+        $baHtml->assertOk();
+        $baHtml->assertSee('Bambang Sutrisno, M.T.');
+        $baHtml->assertSee('Dr. Hendra Gunawan, M.T.');
+        $baHtml->assertSee('Rian Kurniawan');
+        $baHtml->assertSee('Dimas Pratama');
+
+        // Test Hadir Asesi HTML view displays both assessor sections
+        $hadirHtml = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.export-hadir-asesi', $this->schedule));
+        $hadirHtml->assertOk();
+        $hadirHtml->assertSee('Bambang Sutrisno, M.T.');
+        $hadirHtml->assertSee('Dr. Hendra Gunawan, M.T.');
+        $hadirHtml->assertSee('Rian Kurniawan');
+        $hadirHtml->assertSee('Dimas Pratama');
     }
 }

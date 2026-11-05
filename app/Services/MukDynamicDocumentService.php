@@ -279,27 +279,118 @@ class MukDynamicDocumentService
             $payload['signature_asesor'] = $assessment->assessor_signature ?? $leadAssessor?->profile?->signature_data;
         }
 
-        // Add participants list for Berita Acara
-        $pesertaList = [];
+        // Add participants list for Berita Acara organized by assigned assessors
+        $schedule->loadMissing([
+            'assessors.profile',
+            'assessments.asesi.profile',
+            'assessments.assessor.profile',
+        ]);
+
         $assessments = $schedule->assessments;
-        foreach ($assessments as $idx => $ass) {
-            $assProfile = $ass->asesi?->profile;
-            $assIsK = in_array($ass->final_result, ['K', 'KOMPETEN'], true);
-            $pesertaList[] = [
-                'no' => $idx + 1,
-                'nama' => $ass->asesi?->full_name ?? 'Peserta '.($idx + 1),
-                'institusi' => $assProfile?->nama_institusi_perusahaan ?? ($assProfile?->company_name ?? 'SMK Negeri'),
-                'alamat' => $assProfile?->alamat_rumah ?? ($assProfile?->address ?? 'Karawang'),
-                'pekerjaan' => $assProfile?->jabatan ?? ($assProfile?->job_title ?? 'Pelajar'),
-                'telp' => $ass->asesi?->phone ?? ($assProfile?->no_telepon_rumah ?? ($assProfile?->phone_number ?? '-')),
-                'hasil' => $assIsK ? 'K' : 'BK',
-                'rekomendasi' => $assIsK ? 'Diterbitkan Sertifikat' : 'Tidak Diterbitkan',
-                'ket' => $assIsK ? 'Lulus' : 'Belum Lulus',
-                'signature' => $ass->asesi_signature ?? $assProfile?->signature_data,
+        $scheduleAssessors = $schedule->assessors;
+
+        $assessorMap = [];
+        foreach ($scheduleAssessors as $as) {
+            $assessorMap[$as->id] = [
+                'id' => $as->id,
+                'nama' => $as->full_name,
+                'no_met' => $as->assessor_registration_number ?? $as->profile?->no_reg ?? 'MET.000.001234 2022',
+                'signature' => $as->profile?->signature_data,
+                'assessments' => collect(),
             ];
         }
+
+        $unassigned = collect();
+        foreach ($assessments as $ass) {
+            $assessorId = $ass->assessor_id;
+            if ($assessorId && isset($assessorMap[$assessorId])) {
+                $assessorMap[$assessorId]['assessments']->push($ass);
+                if (empty($assessorMap[$assessorId]['signature']) && ! empty($ass->assessor_signature)) {
+                    $assessorMap[$assessorId]['signature'] = $ass->assessor_signature;
+                }
+            } elseif ($ass->assessor) {
+                $assessorId = $ass->assessor->id;
+                if (! isset($assessorMap[$assessorId])) {
+                    $assessorMap[$assessorId] = [
+                        'id' => $ass->assessor->id,
+                        'nama' => $ass->assessor->full_name,
+                        'no_met' => $ass->assessor->assessor_registration_number ?? $ass->assessor->profile?->no_reg ?? 'MET.000.001234 2022',
+                        'signature' => $ass->assessor->profile?->signature_data ?? $ass->assessor_signature,
+                        'assessments' => collect(),
+                    ];
+                }
+                $assessorMap[$assessorId]['assessments']->push($ass);
+            } else {
+                $unassigned->push($ass);
+            }
+        }
+
+        if ($unassigned->isNotEmpty()) {
+            if (! empty($assessorMap)) {
+                $firstKey = array_key_first($assessorMap);
+                $assessorMap[$firstKey]['assessments'] = $assessorMap[$firstKey]['assessments']->merge($unassigned);
+            } else {
+                $defaultAssessor = $schedule->assessors->first() ?? $assessment?->assessor;
+                $assessorMap[0] = [
+                    'id' => $defaultAssessor?->id ?? 0,
+                    'nama' => $defaultAssessor?->full_name ?? 'Asesor LSP PrO Indo',
+                    'no_met' => $defaultAssessor?->assessor_registration_number ?? $defaultAssessor?->profile?->no_reg ?? 'MET.000.001234 2022',
+                    'signature' => $defaultAssessor?->profile?->signature_data,
+                    'assessments' => $unassigned,
+                ];
+            }
+        }
+
+        $activeGroups = array_filter($assessorMap, fn ($grp) => $grp['assessments']->isNotEmpty());
+        if (empty($activeGroups) && ! empty($assessorMap)) {
+            $activeGroups = [reset($assessorMap)];
+        }
+
+        $assessorGroups = [];
+        $pesertaList = [];
+        $overallIdx = 0;
+
+        foreach ($activeGroups as $grp) {
+            $groupPeserta = [];
+            foreach ($grp['assessments'] as $idx => $ass) {
+                $overallIdx++;
+                $assProfile = $ass->asesi?->profile;
+                $assIsK = in_array($ass->final_result, ['K', 'KOMPETEN'], true);
+                $pData = [
+                    'no' => $idx + 1,
+                    'global_no' => $overallIdx,
+                    'nama' => $ass->asesi?->full_name ?? 'Peserta '.$overallIdx,
+                    'institusi' => $assProfile?->nama_institusi_perusahaan ?? ($assProfile?->company_name ?? 'SMK Negeri'),
+                    'alamat' => $assProfile?->alamat_rumah ?? ($assProfile?->address ?? 'Karawang'),
+                    'pekerjaan' => $assProfile?->jabatan ?? ($assProfile?->job_title ?? 'Pelajar'),
+                    'telp' => $ass->asesi?->phone ?? ($assProfile?->no_telepon_rumah ?? ($assProfile?->phone_number ?? '-')),
+                    'hasil' => $assIsK ? 'K' : 'BK',
+                    'rekomendasi' => $assIsK ? 'Diterbitkan Sertifikat' : 'Tidak Diterbitkan',
+                    'ket' => $assIsK ? 'Lulus' : 'Belum Lulus',
+                    'signature' => $ass->asesi_signature ?? $assProfile?->signature_data,
+                    'assessor_id' => $grp['id'],
+                    'asesor_nama' => $grp['nama'],
+                    'asesor_no_reg' => $grp['no_met'],
+                    'signature_asesor' => $grp['signature'],
+                ];
+                $groupPeserta[] = $pData;
+                $pesertaList[] = $pData;
+            }
+
+            $assessorGroups[] = [
+                'assessor' => [
+                    'id' => $grp['id'],
+                    'nama' => $grp['nama'],
+                    'no_met' => $grp['no_met'],
+                    'signature' => $grp['signature'],
+                ],
+                'peserta' => $groupPeserta,
+            ];
+        }
+
         $totalAsesi = count($pesertaList);
         $payload['peserta'] = $pesertaList;
+        $payload['assessor_groups'] = $assessorGroups;
         $payload['jumlah_asesi'] = $totalAsesi.' ('.ucwords(MukExportService::terbilang($totalAsesi)).') orang';
         $payload['tanggal_uji'] = $formattedDate;
 
@@ -1535,11 +1626,7 @@ class MukDynamicDocumentService
     {
         $filePath = $this->getUploadedIa01bPath($assessment);
         if (! $filePath) {
-            return view('admin.dokumen-muk.not-uploaded', [
-                'assessment' => $assessment,
-                'documentCode' => 'FR.IA.01B',
-                'documentName' => 'FR.IA.01B (Report Sheet / Lembar Pemeriksaan Teknis)',
-            ]);
+            abort(404, 'Berkas FR.IA.01B (Report Sheet) belum diunggah oleh asesi.');
         }
         $asesiName = preg_replace('/[^A-Za-z0-9_-]/', '_', $assessment->asesi?->full_name ?? 'Asesi');
         $ext = pathinfo($filePath, PATHINFO_EXTENSION) ?: 'pdf';
