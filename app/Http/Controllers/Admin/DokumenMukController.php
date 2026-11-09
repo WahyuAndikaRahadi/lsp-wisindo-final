@@ -144,6 +144,11 @@ class DokumenMukController extends Controller
     public function exportAsesi(Assessment $assessment, string $type = 'all', ?Request $request = null)
     {
         $request = $request ?? request();
+        $user = $request->user();
+        if ($user && $user->role === 'ASESI' && $assessment->asesi_id !== $user->id) {
+            abort(403, 'Anda tidak memiliki hak akses ke dokumen asesi lain.');
+        }
+
         if ($request->query('format') === 'pdf' && $request->query('source') === 'fixed' || $request->boolean('fixed')) {
             return $this->exportAsesiFixed($assessment, $type, $request);
         }
@@ -186,7 +191,7 @@ class DokumenMukController extends Controller
             return $this->exporter->exportAssessmentAsesiXls($assessment);
         }
 
-        $dynamicTypes = ['apl01', 'apl02', 'ak01', 'ak02', 'ak03', 'ak04', 'ak07', 'ia01', 'ia01b', 'ia02', 'ia03', 'ia05c', 'pernyataan'];
+        $dynamicTypes = ['apl01', 'apl02', 'ak01', 'ak02', 'ak03', 'ak04', 'ak07', 'ia01', 'ia01b', 'ia02', 'ia03', 'ia05a', 'ia05c', 'pernyataan'];
         if ($targetType === 'ia01b' || $request->query('source') === 'dynamic' || ($request->query('format') === 'pdf' && in_array($targetType, $dynamicTypes, true))) {
             return $this->dynamicService->exportAssessment($assessment, $targetType, $request->boolean('download'));
         }
@@ -271,6 +276,11 @@ class DokumenMukController extends Controller
      */
     public function exportAsesiDynamic(Assessment $assessment, string $type, Request $request)
     {
+        $user = $request->user();
+        if ($user && $user->role === 'ASESI' && $assessment->asesi_id !== $user->id) {
+            abort(403, 'Anda tidak memiliki hak akses ke dokumen asesi lain.');
+        }
+
         $download = $request->boolean('download', false);
 
         return $this->dynamicService->exportAssessment($assessment, $type, $download);
@@ -282,6 +292,10 @@ class DokumenMukController extends Controller
     public function exportFixed(Schedule $schedule, string $type, Request $request)
     {
         $download = $request->boolean('download', false);
+        $normType = strtolower(str_replace(['_', ' ', '-', '.'], '', $type));
+        if (in_array($normType, ['ia05a', 'ia05', 'fria05a', 'ia05c', 'fria05c'], true)) {
+            return $this->dynamicService->exportSchedule($schedule, $normType, $download);
+        }
 
         return $this->fixedService->exportSchedule($schedule, $type, $download);
     }
@@ -291,7 +305,16 @@ class DokumenMukController extends Controller
      */
     public function exportAsesiFixed(Assessment $assessment, string $type, Request $request)
     {
+        $user = $request->user();
+        if ($user && $user->role === 'ASESI' && $assessment->asesi_id !== $user->id) {
+            abort(403, 'Anda tidak memiliki hak akses ke dokumen asesi lain.');
+        }
+
         $download = $request->boolean('download', false);
+        $normType = strtolower(str_replace(['_', ' ', '-', '.'], '', $type));
+        if (in_array($normType, ['ia05a', 'ia05', 'fria05a', 'ia05c', 'fria05c'], true)) {
+            return $this->dynamicService->exportAssessment($assessment, $normType, $download);
+        }
 
         return $this->fixedService->exportAssessment($assessment, $type, $download);
     }

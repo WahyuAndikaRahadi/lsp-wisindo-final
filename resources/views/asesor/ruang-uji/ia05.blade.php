@@ -2,10 +2,20 @@
 
 @section('content')
 <div class="space-y-6">
-    <div>
-        <a href="{{ route('asesor.schedule.instrument', ['schedule' => $assessment->schedule_id, 'code' => 'ia05']) }}" class="text-xs text-brand-600 hover:text-brand-700 font-bold">&larr; Kembali ke Daftar Asesi IA.05</a>
-        <h1 class="text-2xl font-black text-slate-900 tracking-tight mt-1">FR.IA.05 – Hasil Ujian Tertulis Pilihan Ganda (CBT)</h1>
-        <p class="text-sm text-slate-500">Asesi: <strong>{{ $assessment->asesi->full_name }}</strong> | Skema: <strong>{{ $assessment->schedule->scheme->name }}</strong></p>
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+            <a href="{{ route('asesor.schedule.instrument', ['schedule' => $assessment->schedule_id, 'code' => 'ia05']) }}" class="text-xs text-brand-600 hover:text-brand-700 font-bold">&larr; Kembali ke Daftar Asesi IA.05</a>
+            <h1 class="text-2xl font-black text-slate-900 tracking-tight mt-1">FR.IA.05 – Hasil Ujian Tertulis Pilihan Ganda (CBT)</h1>
+            <p class="text-sm text-slate-500">Asesi: <strong>{{ $assessment->asesi->full_name }}</strong> | Skema: <strong>{{ $assessment->schedule->scheme->name }}</strong></p>
+        </div>
+        <div class="flex items-center gap-2">
+            <a href="{{ route('admin.dokumen-muk.asesi-dynamic', ['assessment' => $assessment->id, 'type' => 'ia05c']) }}" target="_blank"
+               class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-cyan-50 text-cyan-800 border border-cyan-300 hover:bg-cyan-100 transition shadow-xs"
+               title="Lihat Lembar Jawaban FR.IA.05.C">
+                <svg class="w-4 h-4 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                <span>Dokumen FR.IA.05.C</span>
+            </a>
+        </div>
     </div>
 
     {{-- Score Overview Card --}}

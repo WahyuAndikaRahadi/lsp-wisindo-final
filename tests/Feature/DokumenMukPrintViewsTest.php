@@ -387,6 +387,21 @@ class DokumenMukPrintViewsTest extends TestCase
         $resC->assertOk();
         $resC->assertSee('FR.IA.05.C');
         $resC->assertSee('LEMBAR JAWABAN PILIHAN GANDA');
+
+        // Dynamic PDF export for IA.05.C
+        $resDynC = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.asesi-dynamic', [
+            'assessment' => $this->assessment->id,
+            'type' => 'ia05c',
+        ]));
+        $resDynC->assertOk();
+        $this->assertStringContainsString('application/pdf', (string) $resDynC->headers->get('Content-Type'));
+
+        // Candidate can view their own IA.05.C
+        $resAsesiC = $this->actingAs($this->asesi)->get(route('admin.dokumen-muk.asesi-dynamic', [
+            'assessment' => $this->assessment->id,
+            'type' => 'ia05c',
+        ]));
+        $resAsesiC->assertOk();
     }
 
     public function test_can_render_fr_ia01_ia01b_ia02_ia03(): void

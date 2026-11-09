@@ -384,22 +384,18 @@ Route::middleware(['auth', 'role:SUPER_ADMIN,ADMIN_LSP,KOMITE_TEKNIS,TUK_ADMIN']
 
     Route::get('/jadwal/{jadwal}', [Admin\JadwalController::class, 'show'])->name('jadwal.show');
 
-    // Dokumen MUK
+    // Dokumen MUK (Schedule level - Admin LSP & TUK Admin)
     Route::get('/dokumen-muk', [Admin\DokumenMukController::class, 'index'])->name('dokumen-muk.index');
     Route::get('/dokumen-muk/{schedule}', [Admin\DokumenMukController::class, 'show'])->name('dokumen-muk.show')->whereNumber('schedule');
     Route::get('/dokumen-muk/{schedule}/fixed/{type}', [Admin\DokumenMukController::class, 'exportFixed'])->name('dokumen-muk.fixed');
-    Route::get('/dokumen-muk/asesi/{assessment}/fixed/{type}', [Admin\DokumenMukController::class, 'exportAsesiFixed'])->name('dokumen-muk.asesi-fixed');
     Route::get('/dokumen-muk/{schedule}/dynamic/{type}', [Admin\DokumenMukController::class, 'exportDynamic'])->name('dokumen-muk.dynamic');
-    Route::get('/dokumen-muk/asesi/{assessment}/dynamic/{type}', [Admin\DokumenMukController::class, 'exportAsesiDynamic'])->name('dokumen-muk.asesi-dynamic');
     Route::get('/dokumen-muk/{schedule}/export/{type}', [Admin\DokumenMukController::class, 'exportSchedule'])->name('dokumen-muk.export');
-    Route::get('/dokumen-muk/asesi/{assessment}/export/{type}', [Admin\DokumenMukController::class, 'exportAsesi'])->name('dokumen-muk.export-asesi');
 
     Route::get('/dokumen-muk/{schedule}/export-sertifikat', [Admin\DokumenMukController::class, 'exportSertifikat'])->name('dokumen-muk.export-sertifikat');
     Route::get('/dokumen-muk/{schedule}/export-ba', [Admin\DokumenMukController::class, 'exportBa'])->name('dokumen-muk.export-ba');
     Route::get('/dokumen-muk/{schedule}/export-hadir-asesor', [Admin\DokumenMukController::class, 'exportHadirAsesor'])->name('dokumen-muk.export-hadir-asesor');
     Route::get('/dokumen-muk/{schedule}/export-hadir-asesi', [Admin\DokumenMukController::class, 'exportHadirAsesi'])->name('dokumen-muk.export-hadir-asesi');
     Route::get('/dokumen-muk/{schedule}/export-excel-biodata', [Admin\DokumenMukController::class, 'exportExcelBiodata'])->name('dokumen-muk.export-excel-biodata');
-    Route::get('/dokumen-muk/individual/{assessment}', [Admin\DokumenMukController::class, 'exportIndividual'])->name('dokumen-muk.export-individual');
 
     // Switch Role / Proxy
     Route::get('/proxy', [Admin\ProxyController::class, 'index'])->name('proxy.index');
@@ -424,6 +420,14 @@ Route::middleware(['auth', 'role:SUPER_ADMIN,ADMIN_LSP,KOMITE_TEKNIS,TUK_ADMIN']
         Route::put('/kuks/{kuk}', [Admin\SchemeController::class, 'updateKuk'])->name('schemes.kuks.update');
         Route::delete('/kuks/{kuk}', [Admin\SchemeController::class, 'destroyKuk'])->name('schemes.kuks.destroy');
     });
+});
+
+// Dokumen MUK Individual Assessment (Accessible by Admin, Asesor, and candidate Asesi for their own assessment)
+Route::middleware(['auth', 'role:SUPER_ADMIN,ADMIN_LSP,KOMITE_TEKNIS,TUK_ADMIN,ASESOR,ASESI'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/dokumen-muk/asesi/{assessment}/fixed/{type}', [Admin\DokumenMukController::class, 'exportAsesiFixed'])->name('dokumen-muk.asesi-fixed');
+    Route::get('/dokumen-muk/asesi/{assessment}/dynamic/{type}', [Admin\DokumenMukController::class, 'exportAsesiDynamic'])->name('dokumen-muk.asesi-dynamic');
+    Route::get('/dokumen-muk/asesi/{assessment}/export/{type}', [Admin\DokumenMukController::class, 'exportAsesi'])->name('dokumen-muk.export-asesi');
+    Route::get('/dokumen-muk/individual/{assessment}', [Admin\DokumenMukController::class, 'exportIndividual'])->name('dokumen-muk.export-individual');
 });
 
 // Global alias for proxy.switch so both route('proxy.switch') and route('admin.proxy.impersonate') work

@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Assessment;
 use App\Models\AssessmentIaResponse;
+use App\Models\QuestionBank;
 use App\Models\Schedule;
 use App\Models\Scheme;
 use App\Models\User;
@@ -1255,6 +1256,279 @@ class MukDynamicDocumentService
     }
 
     /**
+     * Build dynamic data payload for FR.IA.05.A (Pertanyaan Tertulis Pilihan Ganda - Lembar Soal).
+     *
+     * @return array<string, mixed>
+     */
+    public function buildIa05aData(Schedule $schedule, ?Assessment $assessment = null): array
+    {
+        $targetAssessment = $assessment ?? $schedule->assessments->first();
+        $asesi = $targetAssessment?->asesi;
+        $profile = $asesi?->profile;
+        $assessor = $targetAssessment?->assessor ?? $schedule->assessors->first();
+        $scheme = $targetAssessment?->schedule?->scheme ?? $schedule->scheme;
+
+        $tgl = $targetAssessment?->registered_at
+            ? Carbon::parse($targetAssessment->registered_at)->locale('id')->translatedFormat('d F Y')
+            : ($schedule->date ? Carbon::parse($schedule->date)->locale('id')->translatedFormat('d F Y') : Carbon::now()->locale('id')->translatedFormat('d F Y'));
+
+        $tukDisplay = $schedule->tuk_name ?? ($schedule->tuk?->name ?? 'Sewaktu/Tempat Kerja/Mandiri*');
+
+        if ($targetAssessment && ! $targetAssessment->relationLoaded('iaResponses')) {
+            $targetAssessment->load('iaResponses');
+        }
+
+        $ia05Response = $targetAssessment?->iaResponses?->first(fn ($r) => strtoupper((string) $r->instrument_code) === 'IA05')
+            ?? ($targetAssessment ? AssessmentIaResponse::where('assessment_id', $targetAssessment->id)->where('instrument_code', 'IA05')->first() : null);
+
+        $savedData = is_array($ia05Response?->data_json)
+            ? $ia05Response->data_json
+            : (json_decode($ia05Response?->data_json ?? '[]', true) ?: []);
+
+        $savedAnswers = $savedData['answers'] ?? [];
+        $savedBreakdown = $savedData['breakdown'] ?? [];
+
+        $questionIds = [];
+        if (! empty($savedBreakdown)) {
+            $questionIds = array_keys($savedBreakdown);
+        } elseif (! empty($savedAnswers)) {
+            $questionIds = array_keys($savedAnswers);
+        }
+
+        if (empty($questionIds)) {
+            $questionIds = $schedule->getCbtQuestionIds();
+        }
+
+        if (empty($questionIds) && $scheme) {
+            $questionIds = QuestionBank::where('scheme_id', $scheme->id)->limit(20)->pluck('id')->toArray();
+        }
+
+        $questionModels = ! empty($questionIds)
+            ? QuestionBank::whereIn('id', $questionIds)->get()->keyBy('id')
+            : collect();
+
+        $questionsList = [];
+        foreach ($questionIds as $qid) {
+            $q = $questionModels->get($qid);
+            if (! $q) {
+                continue;
+            }
+
+            $imgAbsPath = null;
+            if ($q->question_image) {
+                $possiblePaths = [
+                    storage_path('app/public/'.$q->question_image),
+                    public_path('storage/'.$q->question_image),
+                    public_path($q->question_image),
+                ];
+                foreach ($possiblePaths as $pp) {
+                    if (file_exists($pp)) {
+                        $imgAbsPath = $pp;
+                        break;
+                    }
+                }
+            }
+
+            $questionsList[] = [
+                'id' => $q->id,
+                'question_text' => $q->question_text,
+                'question_image' => $imgAbsPath,
+                'option_a' => $q->option_a,
+                'option_b' => $q->option_b,
+                'option_c' => $q->option_c,
+                'option_d' => $q->option_d,
+                'correct_answer' => $q->correct_answer,
+                'user_answer' => $savedAnswers[$q->id] ?? null,
+            ];
+        }
+
+        return [
+            'skema_nama' => $scheme?->name ?? 'Skema Sertifikasi',
+            'skema_nomor' => $scheme?->muk_code ?? ($scheme?->code ?? 'SKM/01/2026'),
+            'tuk_nama' => $tukDisplay,
+            'tuk_tipe' => 'Sewaktu/Tempat Kerja/Mandiri*',
+            'asesor_nama' => $assessor?->full_name ?? '-',
+            'asesor_no_reg' => $assessor?->profile?->met_reg_number ?? ($assessor?->profile?->no_reg ?? '-'),
+            'asesi_nama' => $asesi?->full_name ?? '-',
+            'asesi_nik' => $profile?->nik ?? '-',
+            'tanggal' => $tgl,
+            'waktu' => '60 Menit',
+            'questions' => $questionsList,
+        ];
+    }
+
+    /**
+     * Build dynamic data payload for FR.IA.05.C (DPT - Lembar Jawaban Pilihan Ganda).
+     *
+     * @return array<string, mixed>
+     */
+    public function buildIa05cData(Schedule $schedule, ?Assessment $assessment = null): array
+    {
+        $targetAssessment = $assessment ?? $schedule->assessments->first();
+        if ($targetAssessment) {
+            $targetAssessment->loadMissing(['iaResponses', 'asesi.profile', 'assessor.profile', 'schedule.scheme']);
+        }
+        $asesi = $targetAssessment?->asesi;
+        $profile = $asesi?->profile;
+        $assessor = $targetAssessment?->assessor ?? $schedule->assessors->first();
+        if ($assessor && ! $assessor->relationLoaded('profile')) {
+            $assessor->load('profile');
+        }
+        $scheme = $targetAssessment?->schedule?->scheme ?? $schedule->scheme;
+
+        $tgl = $targetAssessment?->registered_at
+            ? Carbon::parse($targetAssessment->registered_at)->locale('id')->translatedFormat('d F Y')
+            : ($schedule->date ? Carbon::parse($schedule->date)->locale('id')->translatedFormat('d F Y') : Carbon::now()->locale('id')->translatedFormat('d F Y'));
+
+        $tukDisplay = $schedule->tuk_name ?? ($schedule->tuk?->name ?? 'Sewaktu/Tempat Kerja/Mandiri*');
+
+        if ($targetAssessment && ! $targetAssessment->relationLoaded('iaResponses')) {
+            $targetAssessment->load('iaResponses');
+        }
+
+        $ia05Response = $targetAssessment?->iaResponses?->first(fn ($r) => strtoupper((string) $r->instrument_code) === 'IA05')
+            ?? ($targetAssessment ? AssessmentIaResponse::where('assessment_id', $targetAssessment->id)->where('instrument_code', 'IA05')->first() : null);
+
+        $savedData = is_array($ia05Response?->data_json)
+            ? $ia05Response->data_json
+            : (json_decode($ia05Response?->data_json ?? '[]', true) ?: []);
+
+        $savedAnswers = $savedData['answers'] ?? [];
+        $savedBreakdown = $savedData['breakdown'] ?? [];
+        $score = (float) ($ia05Response?->score ?? 0);
+        $passingGrade = (float) ($scheme?->passing_grade_theory ?? 70.0);
+        $isPassed = $score >= $passingGrade;
+
+        // Determine question IDs:
+        // Priority 1: From the assessment's IA05 submission breakdown or answers
+        // Priority 2: From the schedule's deterministic CBT question IDs (20 random questions)
+        $questionIds = [];
+        if (! empty($savedBreakdown)) {
+            $questionIds = array_keys($savedBreakdown);
+        } elseif (! empty($savedAnswers)) {
+            $questionIds = array_keys($savedAnswers);
+        }
+
+        if (empty($questionIds)) {
+            $questionIds = $schedule->getCbtQuestionIds();
+        }
+
+        if (empty($questionIds) && $scheme) {
+            $questionIds = QuestionBank::where('scheme_id', $scheme->id)->limit(30)->pluck('id')->toArray();
+        }
+
+        $questionModels = ! empty($questionIds)
+            ? QuestionBank::whereIn('id', $questionIds)->get()->keyBy('id')
+            : collect();
+
+        $answersDict = [];
+        $totalQuestions = count($questionIds);
+
+        for ($i = 0; $i < 30; $i++) {
+            $qNum = $i + 1;
+            if ($i < $totalQuestions) {
+                $qid = $questionIds[$i];
+                $bData = $savedBreakdown[$qid] ?? null;
+                $userAns = $bData['answer'] ?? ($savedAnswers[$qid] ?? null);
+                $userLetter = '';
+                if ($userAns !== null && $userAns !== '') {
+                    $cleaned = strtoupper(trim((string) $userAns));
+                    if (in_array($cleaned, ['A', 'B', 'C', 'D'], true)) {
+                        $userLetter = $cleaned;
+                    } elseif (strlen($cleaned) > 0 && in_array($cleaned[0], ['A', 'B', 'C', 'D'], true)) {
+                        $userLetter = $cleaned[0];
+                    }
+                }
+
+                $correctAns = $bData['correct_answer'] ?? ($questionModels->get($qid)?->correct_answer ?? null);
+                if ($correctAns !== null) {
+                    $correctAns = strtoupper(trim((string) $correctAns));
+                }
+
+                $isCorrect = null;
+                if (isset($bData['is_correct'])) {
+                    $isCorrect = (bool) $bData['is_correct'];
+                } elseif ($userLetter !== '' && $correctAns !== null) {
+                    $isCorrect = ($userLetter === $correctAns);
+                } elseif ($userLetter === '') {
+                    $isCorrect = false;
+                }
+
+                $answersDict[(string) $qNum] = [
+                    'answer' => $userLetter,
+                    'is_correct' => $isCorrect,
+                    'is_active' => true,
+                ];
+            } else {
+                $answersDict[(string) $qNum] = [
+                    'answer' => '',
+                    'is_correct' => null,
+                    'is_active' => false,
+                ];
+            }
+        }
+
+        $umpanBalik = $ia05Response?->assessor_notes
+            ?? ($targetAssessment?->final_notes ?? 'Aspek pengetahuan seluruh unit pada kelompok pekerjaan yang diujikan '.($isPassed ? '(tercapai)*' : '(belum tercapai)*'));
+
+        // Resolve candidate and assessor digital signatures with multiple fallbacks
+        $signatureAsesi = null;
+        if (! empty($ia05Response?->asesi_signature)) {
+            $signatureAsesi = $ia05Response->asesi_signature;
+        } elseif (! empty($targetAssessment?->asesi_signature)) {
+            $signatureAsesi = $targetAssessment->asesi_signature;
+        } elseif ($targetAssessment?->iaResponses) {
+            $signatureAsesi = $targetAssessment->iaResponses->pluck('asesi_signature')->filter()->first();
+        }
+        if (empty($signatureAsesi)) {
+            $signatureAsesi = $profile?->signature_data
+                ?: ($profile?->signature_path && file_exists(storage_path('app/public/'.$profile->signature_path))
+                    ? storage_path('app/public/'.$profile->signature_path)
+                    : null);
+        }
+
+        $signatureAssessor = null;
+        if (! empty($ia05Response?->assessor_signature)) {
+            $signatureAssessor = $ia05Response->assessor_signature;
+        } elseif (! empty($targetAssessment?->assessor_signature)) {
+            $signatureAssessor = $targetAssessment->assessor_signature;
+        } elseif ($targetAssessment?->iaResponses) {
+            $signatureAssessor = $targetAssessment->iaResponses->pluck('assessor_signature')->filter()->first();
+        }
+        if (empty($signatureAssessor)) {
+            $signatureAssessor = $assessor?->profile?->signature_data
+                ?: ($assessor?->profile?->signature_path && file_exists(storage_path('app/public/'.$assessor->profile->signature_path))
+                    ? storage_path('app/public/'.$assessor->profile->signature_path)
+                    : null);
+        }
+
+        $assessorReg = $assessor?->assessor_registration_number
+            ?: ($assessor?->profile?->met_reg_number
+                ?: ($assessor?->profile?->no_reg ?: '-'));
+
+        return [
+            'skema_nama' => $scheme?->name ?? 'Skema Sertifikasi',
+            'skema_nomor' => $scheme?->muk_code ?? ($scheme?->code ?? '02/LSP PrO Indo/I/2026'),
+            'tuk_nama' => $tukDisplay,
+            'tuk_tipe' => $tukDisplay,
+            'asesor_nama' => $assessor?->full_name ?? '-',
+            'asesor_no_reg' => $assessorReg,
+            'asesi_nama' => $asesi?->full_name ?? '-',
+            'asesi_nik' => $profile?->nik ?? '-',
+            'tanggal' => $tgl,
+            'tanggal_ttd' => $tgl,
+            'waktu' => '60 Menit',
+            'is_passed' => $isPassed,
+            'score' => $score,
+            'passing_grade' => $passingGrade,
+            'umpan_balik' => $umpanBalik,
+            'signature_asesi' => $signatureAsesi,
+            'signature_asesor' => $signatureAssessor,
+            'answers' => $answersDict,
+        ];
+    }
+
+    /**
      * Get working python executable for current platform.
      */
     public function getPythonExecutable(): string
@@ -1524,6 +1798,42 @@ class MukDynamicDocumentService
                 $script = base_path('tools/render_surat_pernyataan.py');
                 if (File::isFile($script)) {
                     shell_exec("{$pythonExec} ".escapeshellarg($script).' '.escapeshellarg($tempJson).' '.escapeshellarg($outputPath));
+                    if (File::isFile($outputPath) && filesize($outputPath) > 1000) {
+                        return $outputPath;
+                    }
+                }
+            }
+
+            if (in_array($normType, ['ia05c', 'fria05c'], true)) {
+                $script = base_path('tools/render_fr_ia_05_c.py');
+                if (File::isFile($script)) {
+                    $targetAssessment = $assessment ?? $schedule->assessments->first();
+                    $ia05cPayload = $this->buildIa05cData($schedule, $targetAssessment);
+                    $tempIa05cJson = $this->cacheDir.'/muk_ia05c_'.uniqid().'.json';
+                    File::put($tempIa05cJson, json_encode($ia05cPayload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+                    if (File::isFile($outputPath)) {
+                        @unlink($outputPath);
+                    }
+                    shell_exec("{$pythonExec} ".escapeshellarg($script).' '.escapeshellarg($tempIa05cJson).' '.escapeshellarg($outputPath).' 2>&1');
+                    @unlink($tempIa05cJson);
+                    if (File::isFile($outputPath) && filesize($outputPath) > 1000) {
+                        return $outputPath;
+                    }
+                }
+            }
+
+            if (in_array($normType, ['ia05a', 'fria05a', 'ia05'], true)) {
+                $script = base_path('tools/render_fr_ia_05_a.py');
+                if (File::isFile($script)) {
+                    $targetAssessment = $assessment ?? $schedule->assessments->first();
+                    $ia05aPayload = $this->buildIa05aData($schedule, $targetAssessment);
+                    $tempIa05aJson = $this->cacheDir.'/muk_ia05a_'.uniqid().'.json';
+                    File::put($tempIa05aJson, json_encode($ia05aPayload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+                    if (File::isFile($outputPath)) {
+                        @unlink($outputPath);
+                    }
+                    shell_exec("{$pythonExec} ".escapeshellarg($script).' '.escapeshellarg($tempIa05aJson).' '.escapeshellarg($outputPath).' 2>&1');
+                    @unlink($tempIa05aJson);
                     if (File::isFile($outputPath) && filesize($outputPath) > 1000) {
                         return $outputPath;
                     }
