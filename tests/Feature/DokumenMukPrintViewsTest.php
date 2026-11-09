@@ -530,7 +530,7 @@ class DokumenMukPrintViewsTest extends TestCase
         $this->assertFileExists($pdfRes->getFile()->getPathname());
 
         // Test HTML view displays both assessor sections
-        $baHtml = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.export-ba', $this->schedule));
+        $baHtml = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.export-ba', ['schedule' => $this->schedule, 'format' => 'html']));
         $baHtml->assertOk();
         $baHtml->assertSee('Bambang Sutrisno, M.T.');
         $baHtml->assertSee('Dr. Hendra Gunawan, M.T.');
@@ -538,7 +538,7 @@ class DokumenMukPrintViewsTest extends TestCase
         $baHtml->assertSee('Dimas Pratama');
 
         // Test Hadir Asesi HTML view displays both assessor sections
-        $hadirHtml = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.export-hadir-asesi', $this->schedule));
+        $hadirHtml = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.export-hadir-asesi', ['schedule' => $this->schedule, 'format' => 'html']));
         $hadirHtml->assertOk();
         $hadirHtml->assertSee('Bambang Sutrisno, M.T.');
         $hadirHtml->assertSee('Dr. Hendra Gunawan, M.T.');

@@ -123,8 +123,8 @@
     </div>
 
     {{-- Info Box (Pengisian Opsional) --}}
-    <div class="bg-blue-50 border-2 border-blue-400 rounded-xl p-4 text-xs text-blue-900 shadow-sm flex items-start gap-3">
-        <span class="text-base text-blue-600 font-black">ℹ</span>
+    <div class="bg-brand-50/60 border border-brand-200 rounded-xl p-4 text-xs text-brand-950 shadow-sm flex items-start gap-3">
+        <span class="text-base text-brand-600 font-black">ℹ</span>
         <div>
             <span class="font-bold">Formulir Bersifat Opsional:</span> Pengisian FR.AK07 hanya dilakukan apabila terdapat asesi yang membutuhkan penyesuaian wajar berdasarkan keterbatasan karakteristik atau kondisi khusus. Apabila tidak ada penyesuaian khusus, formulir dapat dibiarkan kosong (default) dan Anda dapat langsung klik tombol <strong>"Simpan Penyesuaian FR.AK.07"</strong>.
         </div>
@@ -134,8 +134,8 @@
         @csrf
 
         {{-- Meta Table --}}
-        <div class="bg-white rounded-xl border-2 border-black shadow-[2px_2px_0_0_rgba(0,0,0,0.9)] overflow-hidden">
-            <div class="bg-slate-900 text-white px-6 py-3 border-b-2 border-black flex items-center justify-between">
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="bg-slate-900 text-white px-6 py-3 border-b border-slate-800 flex items-center justify-between">
                 <span class="text-xs font-mono font-bold tracking-wider uppercase text-amber-300">Data Asesmen & Identifikasi Jadwal</span>
                 <span class="text-xs text-slate-300">{{ $jadwal->code }}</span>
             </div>
@@ -245,7 +245,7 @@
         </div>
 
         {{-- Panduan Bagi Asesor Box --}}
-        <div class="bg-white rounded-xl border-2 border-black shadow-[2px_2px_0_0_rgba(0,0,0,0.9)] p-6 space-y-3">
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 space-y-3">
             <h2 class="text-sm font-black text-slate-900 uppercase tracking-wide border-b border-slate-200 pb-2">
                 PANDUAN BAGI ASESOR
             </h2>
@@ -280,8 +280,8 @@
         </div>
 
         {{-- Tabel 8 Karakteristik Asesi Sesuai Dokumen MUK PDF --}}
-        <div class="bg-white rounded-xl border-2 border-black shadow-[2px_2px_0_0_rgba(0,0,0,0.9)] overflow-hidden">
-            <div class="bg-slate-900 text-white px-6 py-3 border-b-2 border-black flex items-center justify-between">
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="bg-slate-900 text-white px-6 py-3 border-b border-slate-800 flex items-center justify-between">
                 <h2 class="text-xs font-black uppercase tracking-wider text-amber-300">
                     Mengidentifikasi Persyaratan Modifikasi dan Kontekstualisasi (Karakteristik Asesi)
                 </h2>
@@ -290,15 +290,15 @@
 
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-xs border-collapse">
-                    <thead class="bg-slate-100 border-b-2 border-black text-slate-900 font-black uppercase tracking-wider">
+                    <thead class="bg-slate-50 border-b border-slate-200 text-slate-900 font-black uppercase tracking-wider">
                         <tr>
-                            <th class="px-4 py-3 w-12 text-center border-r border-slate-300">No</th>
-                            <th class="px-4 py-3 w-2/5 border-r border-slate-300">Mengidentifikasi Persyaratan Modifikasi & Kontekstualisasi</th>
-                            <th class="px-4 py-3 w-36 text-center border-r border-slate-300">Diperlukan Penyesuaian?</th>
+                            <th class="px-4 py-3 w-12 text-center border-r border-slate-200">No</th>
+                            <th class="px-4 py-3 w-2/5 border-r border-slate-200">Mengidentifikasi Persyaratan Modifikasi & Kontekstualisasi</th>
+                            <th class="px-4 py-3 w-36 text-center border-r border-slate-200">Diperlukan Penyesuaian?</th>
                             <th class="px-4 py-3">Keterangan & Bentuk Penyesuaian</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-200">
+                    <tbody class="divide-y divide-slate-100">
                         @foreach($itemsDef as $idx => $def)
                             <tr class="hover:bg-slate-50/70 transition align-top">
                                 <td class="px-4 py-4 text-center font-bold font-mono border-r border-slate-200 text-slate-700">
@@ -341,7 +341,7 @@
         </div>
 
         {{-- Hasil Kesepakatan Asesor dan Asesi --}}
-        <div class="bg-white rounded-xl border-2 border-black shadow-[2px_2px_0_0_rgba(0,0,0,0.9)] p-6 space-y-4">
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 space-y-4">
             <h2 class="text-sm font-black text-slate-900 uppercase tracking-wide border-b border-slate-200 pb-2">
                 HASIL KESEPAKATAN ANTARA ASESOR DAN ASESI
             </h2>
@@ -384,21 +384,19 @@
 
         {{-- Form Actions --}}
         <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
-            <a href="{{ route('asesor.schedule.ak01', $jadwal->id) }}" class="px-5 py-2.5 text-xs font-bold text-slate-700 bg-white border-2 border-slate-300 rounded-lg hover:bg-slate-50 transition">Kembali ke FR.AK.01</a>
+            <a href="{{ route('asesor.schedule.ak01', $jadwal->id) }}" class="px-5 py-2.5 text-xs font-bold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition min-h-[38px] inline-flex items-center">
+                Kembali ke FR.AK.01
+            </a>
             <div class="flex items-center space-x-3 w-full sm:w-auto justify-end">
                 @if($isClosedForMe)
-                    <button type="button" disabled class="px-6 py-2.5 text-xs font-black uppercase tracking-wider bg-slate-200 text-slate-500 rounded-lg cursor-not-allowed">
+                    <button type="button" disabled class="px-6 py-2.5 text-xs font-bold uppercase tracking-wider bg-slate-200 text-slate-500 rounded-lg cursor-not-allowed min-h-[38px]">
                         {{ $jadwal->is_closed ? 'Jadwal Telah Ditutup (Read-Only)' : 'Asesmen Binaan Telah Selesai (Read-Only)' }}
                     </button>
                 @else
-                    <button type="submit" class="px-6 py-2.5 text-xs font-black uppercase tracking-wider bg-brand-600 hover:bg-brand-700 text-white rounded-lg border-2 border-black shadow-[2px_2px_0_0_rgba(0,0,0,0.9)] transition">
+                    <button type="submit" class="px-6 py-2.5 text-xs font-bold uppercase tracking-wider bg-brand-600 hover:bg-brand-700 text-white rounded-lg shadow-sm transition min-h-[38px]">
                         Simpan Penyesuaian FR.AK.07
                     </button>
                 @endif
-            </div>
-        </div>
-                    Simpan Penyesuaian FR.AK.07
-                </button>
             </div>
         </div>
     </form>

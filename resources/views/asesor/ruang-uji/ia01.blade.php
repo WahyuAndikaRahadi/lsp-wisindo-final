@@ -99,18 +99,18 @@
                 <table class="w-full text-sm">
                     <thead class="bg-slate-100/70 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
                         <tr>
-                            <th class="px-6 py-3 w-20 text-center">Kode KUK</th>
-                            <th class="px-6 py-3">Elemen &amp; Kriteria Unjuk Kerja (KUK)</th>
-                            <th class="px-6 py-3 text-center w-36">Kompeten (K)</th>
-                            <th class="px-6 py-3 text-center w-36">Belum Kompeten (BK)</th>
-                            <th class="px-6 py-3 w-48">Penilaian / Catatan</th>
+                            <th class="px-4 py-3 w-16 text-center whitespace-nowrap">KUK</th>
+                            <th class="px-4 py-3 min-w-[200px]">Elemen &amp; Kriteria Unjuk Kerja (KUK)</th>
+                            <th class="px-3 py-3 text-center w-16 sm:w-20 whitespace-nowrap" title="Kompeten">K</th>
+                            <th class="px-3 py-3 text-center w-16 sm:w-20 whitespace-nowrap" title="Belum Kompeten">BK</th>
+                            <th class="px-4 py-3 w-44">Penilaian / Catatan</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100">
                         @forelse($units ?? [] as $uIdx => $unit)
                             {{-- Baris Pemisah Unit Kompetensi --}}
                             <tr class="bg-slate-100 border-t-2 border-b border-slate-200">
-                                <td colspan="5" class="px-6 py-3.5 bg-slate-100">
+                                <td colspan="5" class="px-4 py-3.5 bg-slate-100">
                                     <div class="flex items-center gap-2.5">
                                         <span class="text-xs font-bold text-brand-700 font-mono bg-brand-50 border border-brand-200 px-2.5 py-1 rounded shadow-2xs">
                                             {{ $unit->code }}
@@ -125,8 +125,8 @@
                             @foreach($unit->elements as $element)
                                 @if(!empty($element->title))
                                     <tr class="bg-slate-50/60 border-b border-slate-100">
-                                        <td class="px-6 py-2 text-center text-slate-400 font-mono text-xs">#</td>
-                                        <td colspan="4" class="px-6 py-2 text-xs font-bold text-slate-700">
+                                        <td class="px-4 py-2 text-center text-slate-400 font-mono text-xs">#</td>
+                                        <td colspan="4" class="px-4 py-2 text-xs font-bold text-slate-700">
                                             Elemen: {{ $element->title }}
                                         </td>
                                     </tr>
@@ -137,23 +137,23 @@
                                         $savedNote = $savedAnswers[$kuk->id]['note'] ?? old("kuks.{$kuk->id}.note");
                                     @endphp
                                     <tr class="hover:bg-slate-50/50">
-                                        <td class="px-6 py-3 text-slate-600 font-mono text-xs font-bold text-center">{{ $kuk->code_number }}</td>
-                                        <td class="px-6 py-3 text-slate-800">
+                                        <td class="px-4 py-3 text-slate-600 font-mono text-xs font-bold text-center whitespace-nowrap">{{ $kuk->code_number }}</td>
+                                        <td class="px-4 py-3 text-slate-800">
                                             <div class="text-sm leading-relaxed">{{ $kuk->statement }}</div>
                                         </td>
-                                        <td class="px-6 py-3 text-center">
+                                        <td class="px-3 py-3 text-center whitespace-nowrap">
                                             <label class="inline-flex items-center cursor-pointer">
                                                 <input type="radio" name="kuks[{{ $kuk->id }}][result]" value="K" data-unit-id="{{ $unit->id }}" required :disabled="!isEditing" class="kuk-radio kuk-radio-k text-emerald-600 focus:ring-emerald-500 w-4 h-4 cursor-pointer" {{ $savedValue === 'K' ? 'checked' : '' }}>
-                                                <span class="ml-1.5 text-xs font-semibold text-emerald-700">K</span>
+                                                <span class="ml-1 text-xs font-semibold text-emerald-700">K</span>
                                             </label>
                                         </td>
-                                        <td class="px-6 py-3 text-center">
+                                        <td class="px-3 py-3 text-center whitespace-nowrap">
                                             <label class="inline-flex items-center cursor-pointer">
                                                 <input type="radio" name="kuks[{{ $kuk->id }}][result]" value="BK" data-unit-id="{{ $unit->id }}" required :disabled="!isEditing" class="kuk-radio kuk-radio-bk text-rose-600 focus:ring-rose-500 w-4 h-4 cursor-pointer" {{ $savedValue === 'BK' ? 'checked' : '' }}>
-                                                <span class="ml-1.5 text-xs font-semibold text-rose-700">BK</span>
+                                                <span class="ml-1 text-xs font-semibold text-rose-700">BK</span>
                                             </label>
                                         </td>
-                                        <td class="px-6 py-3">
+                                        <td class="px-4 py-3">
                                             <input type="text" name="kuks[{{ $kuk->id }}][note]" value="{{ $savedNote }}" :disabled="!isEditing" placeholder="Catatan..." class="w-full px-2.5 py-1 text-xs rounded border border-slate-300 focus:ring-1 focus:ring-brand-500 focus:outline-none">
                                         </td>
                                     </tr>
@@ -186,23 +186,23 @@
                 <h2 class="text-base font-bold text-slate-900">Tanda Tangan Asesor</h2>
                 <p class="text-xs text-slate-500 mt-0.5">Pengesahan hasil observasi unjuk kerja praktik FR.IA.01</p>
             </div>
-            <div class="max-w-[340px]">
+            <div class="w-full max-w-full sm:max-w-[340px]">
                 <x-signature-pad name="assessor_signature" :value="$savedSignature ?? null" label="Tanda Tangan Asesor" :required="! $isScheduleClosed" :disabled="$isScheduleClosed" :height="140" />
             </div>
         </div>
 
-        <div class="flex items-center justify-end space-x-3">
-            <a href="{{ route('asesor.schedule.instrument', ['schedule' => $assessment->schedule_id, 'code' => 'ia01']) }}" class="px-5 py-2.5 text-sm font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition">Kembali</a>
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2.5">
+            <a href="{{ route('asesor.schedule.instrument', ['schedule' => $assessment->schedule_id, 'code' => 'ia01']) }}" class="px-5 py-2.5 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition min-h-[40px] inline-flex items-center justify-center">Kembali</a>
             @if($isScheduleClosed)
-                <button type="button" disabled class="px-6 py-2.5 text-sm font-bold bg-slate-200 text-slate-500 border border-slate-300 rounded-lg cursor-not-allowed flex items-center gap-2 shadow-none">
+                <button type="button" disabled class="px-6 py-2.5 text-xs font-bold bg-slate-200 text-slate-500 border border-slate-300 rounded-lg cursor-not-allowed flex items-center justify-center gap-2 shadow-none min-h-[40px]">
                     <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
                     <span>Jadwal Telah Ditutup (Read-Only)</span>
                 </button>
             @else
-                <button type="button" x-show="!isEditing" @click="isEditing = true" class="px-6 py-2.5 text-sm font-bold bg-amber-500 hover:bg-amber-600 text-white rounded-lg shadow-sm transition">
+                <button type="button" x-show="!isEditing" @click="isEditing = true" class="px-6 py-2.5 text-xs font-bold bg-amber-500 hover:bg-amber-600 text-white rounded-lg shadow-sm transition min-h-[40px] inline-flex items-center justify-center">
                     ✎ Edit Penilaian
                 </button>
-                <button type="submit" x-show="isEditing" class="px-6 py-2.5 text-sm font-bold bg-brand-600 hover:bg-brand-700 text-white rounded-lg shadow-sm transition">
+                <button type="submit" x-show="isEditing" class="px-6 py-2.5 text-xs font-bold bg-brand-600 hover:bg-brand-700 text-white rounded-lg shadow-sm transition min-h-[40px] inline-flex items-center justify-center">
                     {{ $isCompleted ? 'Simpan Perubahan Penilaian' : 'Simpan Penilaian IA01' }}
                 </button>
             @endif

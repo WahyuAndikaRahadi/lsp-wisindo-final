@@ -221,29 +221,29 @@ class DokumenMukController extends Controller
 
     public function exportBa(Schedule $schedule)
     {
-        if (request()->query('format') === 'pdf' || request()->query('source') === 'dynamic') {
-            return $this->dynamicService->exportSchedule($schedule, 'ba', request()->boolean('download'));
+        if (request()->query('format') === 'html' || request()->query('source') === 'html') {
+            return $this->exportSchedule($schedule, 'ba');
         }
 
-        return $this->exportSchedule($schedule, 'ba');
+        return $this->dynamicService->exportSchedule($schedule, 'ba', request()->boolean('download'));
     }
 
     public function exportHadirAsesor(Schedule $schedule)
     {
-        if (request()->query('format') === 'pdf' || request()->query('source') === 'dynamic') {
-            return $this->dynamicService->exportSchedule($schedule, 'hadir-asesor', request()->boolean('download'));
+        if (request()->query('format') === 'html' || request()->query('source') === 'html') {
+            return $this->exportSchedule($schedule, 'hadir-asesor');
         }
 
-        return $this->exportSchedule($schedule, 'hadir-asesor');
+        return $this->dynamicService->exportSchedule($schedule, 'hadir-asesor', request()->boolean('download'));
     }
 
     public function exportHadirAsesi(Schedule $schedule)
     {
-        if (request()->query('format') === 'pdf' || request()->query('source') === 'dynamic') {
-            return $this->dynamicService->exportSchedule($schedule, 'ba', request()->boolean('download'));
+        if (request()->query('format') === 'html' || request()->query('source') === 'html') {
+            return $this->exportSchedule($schedule, 'hadir-asesi');
         }
 
-        return $this->exportSchedule($schedule, 'hadir-asesi');
+        return $this->dynamicService->exportSchedule($schedule, 'hadir-asesi', request()->boolean('download'));
     }
 
     public function exportExcelBiodata(Schedule $schedule)

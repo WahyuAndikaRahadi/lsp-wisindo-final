@@ -115,12 +115,14 @@
 
                     <div class="mt-5 pt-4 border-t border-slate-100">
                         @if($isClosedForMe)
-                            <a href="{{ route('asesor.schedule.ruang-uji', $jadwal->id) }}" class="w-full inline-flex items-center justify-center px-4 py-2.5 text-xs font-bold uppercase tracking-wider bg-slate-800 hover:bg-slate-900 text-white rounded-lg shadow-sm transition">
-                                Lihat Rekaman / Ruang Uji (Selesai) &rarr;
+                            <a href="{{ route('asesor.schedule.ruang-uji', $jadwal->id) }}" class="w-full inline-flex items-center justify-center px-4 py-2.5 min-h-[42px] text-xs font-bold uppercase tracking-wider bg-slate-800 hover:bg-slate-900 text-white rounded-lg shadow-sm transition">
+                                <span>Lihat Ruang Uji</span>
+                                <svg class="w-4 h-4 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                             </a>
                         @else
-                            <a href="{{ route('asesor.schedule.ruang-uji', $jadwal->id) }}" class="w-full inline-flex items-center justify-center px-4 py-2.5 text-xs font-bold uppercase tracking-wider bg-brand-600 hover:bg-brand-700 text-white rounded-lg shadow-sm transition">
-                                Masuk Ruang Uji Jadwal &rarr;
+                            <a href="{{ route('asesor.schedule.ruang-uji', $jadwal->id) }}" class="w-full inline-flex items-center justify-center px-4 py-2.5 min-h-[42px] text-xs font-bold uppercase tracking-wider bg-brand-600 hover:bg-brand-700 text-white rounded-lg shadow-sm transition">
+                                <span>Masuk Ruang Uji</span>
+                                <svg class="w-4 h-4 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                             </a>
                         @endif
                     </div>

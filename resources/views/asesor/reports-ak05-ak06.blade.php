@@ -222,9 +222,9 @@
                     @endif
                 </div>
             @else
-                <button type="submit" class="px-6 py-2.5 text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 rounded-lg shadow-sm transition"
+                <button type="submit" class="px-6 py-2.5 min-h-[40px] text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 rounded-lg shadow-sm transition inline-flex items-center justify-center"
                         onclick="return confirm('PERINGATAN KONFIRMASI LAPORAN ASESMEN:\n\n1. Seluruh rekaman penilaian dan rekomendasi asesi binaan Anda akan disimpan.\n2. Jika seluruh asesi pada jadwal ini telah selesai, jadwal akan resmi ditutup (FINISHED).\n3. Berita Acara dan Dokumen MUK siap diverifikasi untuk audit BNSP.\n\nApakah Anda yakin ingin menyimpan laporan FR.AK.05 & FR.AK.06 ini?');">
-                    Simpan Laporan & Selesaikan Asesmen (Final)
+                    Simpan &amp; Selesaikan Asesmen
                 </button>
             @endif
         </div>

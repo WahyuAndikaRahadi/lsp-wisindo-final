@@ -1628,7 +1628,11 @@ class MukDynamicDocumentService
     {
         $filePath = $this->getUploadedIa01bPath($assessment);
         if (! $filePath) {
-            abort(404, 'Berkas FR.IA.01B (Report Sheet) belum diunggah oleh asesi.');
+            return view('admin.dokumen-muk.not-uploaded', [
+                'assessment' => $assessment,
+                'documentCode' => 'FR.IA.01B',
+                'documentName' => 'FR.IA.01B (Report Sheet / Lembar Pemeriksaan Teknis)',
+            ]);
         }
         $asesiName = preg_replace('/[^A-Za-z0-9_-]/', '_', $assessment->asesi?->full_name ?? 'Asesi');
         $ext = pathinfo($filePath, PATHINFO_EXTENSION) ?: 'pdf';
