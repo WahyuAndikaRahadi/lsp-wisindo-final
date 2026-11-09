@@ -356,13 +356,13 @@
                                             </div>
 
                                             <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2.5 pt-1">
-                                                <button type="submit" name="decision" value="ACCEPTED" class="px-5 py-2.5 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-xs transition flex items-center justify-center gap-1.5">
+                                                <button type="submit" name="decision" value="ACCEPTED" class="px-5 py-2.5 min-h-[40px] text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-xs transition flex items-center justify-center gap-1.5">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                                                    <span>Terima Banding (Sesuai Opsi Dipilih)</span>
+                                                    <span>Terima Banding</span>
                                                 </button>
-                                                <button type="submit" name="decision" value="REJECTED" class="px-5 py-2.5 text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 rounded-xl shadow-xs transition flex items-center justify-center gap-1.5">
+                                                <button type="submit" name="decision" value="REJECTED" class="px-5 py-2.5 min-h-[40px] text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 rounded-xl shadow-xs transition flex items-center justify-center gap-1.5">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                                                    <span>Tolak Banding (Hasil Awal Tetap Berlaku)</span>
+                                                    <span>Tolak Banding</span>
                                                 </button>
                                             </div>
                                         </form>

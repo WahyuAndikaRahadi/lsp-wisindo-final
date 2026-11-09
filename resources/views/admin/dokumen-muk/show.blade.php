@@ -71,75 +71,77 @@
         </div>
 
         <div class="flex flex-wrap items-center gap-2">
-            {{-- Berita Acara & Kehadiran --}}
+            {{-- Berita Acara & Kehadiran (Primary) --}}
             <a href="{{ route('admin.dokumen-muk.dynamic', ['schedule' => $schedule->id, 'type' => 'ba']) }}" target="_blank"
-               class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-sm transition">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+               class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold bg-brand-600 hover:bg-brand-700 text-white rounded-lg shadow-xs transition min-h-[38px]">
+                <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                 <span>Berita Acara (BA)</span>
             </a>
 
+            <a href="{{ route('admin.dokumen-muk.export-sertifikat', $schedule->id) }}" target="_blank"
+               class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg shadow-xs transition min-h-[38px]">
+                <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                <span>Sertifikat</span>
+            </a>
+
+            <a href="{{ route('admin.dokumen-muk.export-excel-biodata', $schedule->id) }}"
+               class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 rounded-lg shadow-2xs transition min-h-[38px]">
+                <svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                <span>Excel Biodata</span>
+            </a>
+
+            <div class="h-5 w-px bg-slate-200 hidden sm:block mx-1"></div>
+
+            {{-- Dokumen Laporan & Pelaksanaan --}}
             <a href="{{ route('admin.dokumen-muk.dynamic', ['schedule' => $schedule->id, 'type' => 'hadir-asesor']) }}" target="_blank"
-               class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-purple-50 text-purple-700 hover:bg-purple-100 rounded-lg border border-purple-200 transition">
+               class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 rounded-lg shadow-2xs transition min-h-[38px]">
                 <span>Hadir Asesor</span>
             </a>
 
             <a href="{{ route('admin.dokumen-muk.dynamic', ['schedule' => $schedule->id, 'type' => 'ba']) }}" target="_blank"
-               class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-amber-50 text-amber-700 hover:bg-amber-100 rounded-lg border border-amber-200 transition">
+               class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 rounded-lg shadow-2xs transition min-h-[38px]">
                 <span>Hadir Asesi</span>
             </a>
 
-            {{-- Laporan & Tinjauan --}}
             <a href="{{ route('admin.dokumen-muk.export', ['schedule' => $schedule->id, 'type' => 'ak05']) }}" target="_blank"
-               class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-rose-50 text-rose-700 hover:bg-rose-100 rounded-lg border border-rose-200 transition">
+               class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 rounded-lg shadow-2xs transition min-h-[38px]">
                 <span>FR.AK.05 (Laporan)</span>
             </a>
 
             <a href="{{ route('admin.dokumen-muk.export', ['schedule' => $schedule->id, 'type' => 'ak06']) }}" target="_blank"
-               class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-indigo-50 text-indigo-700 hover:bg-indigo-100 rounded-lg border border-indigo-200 transition">
+               class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 rounded-lg shadow-2xs transition min-h-[38px]">
                 <span>FR.AK.06 (Tinjauan)</span>
             </a>
 
             {{-- Fixed Master PDF --}}
             <a href="{{ route('admin.dokumen-muk.fixed', ['schedule' => $schedule->id, 'type' => 'cover']) }}" target="_blank"
-               class="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg border border-slate-300 transition" title="Fixed Master PDF: Cover MUK">
+               class="inline-flex items-center gap-1 px-2.5 py-2 text-xs font-medium bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-lg border border-slate-200 transition min-h-[38px]" title="Fixed Master PDF: Cover MUK">
                 <span>Cover</span>
             </a>
 
             <a href="{{ route('admin.dokumen-muk.fixed', ['schedule' => $schedule->id, 'type' => 'daftar-periksa']) }}" target="_blank"
-               class="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg border border-slate-300 transition" title="Fixed Master PDF: Daftar Periksa">
+               class="inline-flex items-center gap-1 px-2.5 py-2 text-xs font-medium bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-lg border border-slate-200 transition min-h-[38px]" title="Fixed Master PDF: Daftar Periksa">
                 <span>Periksa</span>
             </a>
 
             <a href="{{ route('admin.dokumen-muk.fixed', ['schedule' => $schedule->id, 'type' => 'mapa01']) }}" target="_blank"
-               class="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold bg-emerald-50 text-emerald-700 hover:bg-emerald-100 rounded-lg border border-emerald-200 transition" title="Fixed Master PDF: FR.MAPA.01">
+               class="inline-flex items-center gap-1 px-2.5 py-2 text-xs font-medium bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-lg border border-slate-200 transition min-h-[38px]" title="Fixed Master PDF: FR.MAPA.01">
                 <span>MAPA.01</span>
             </a>
 
             <a href="{{ route('admin.dokumen-muk.fixed', ['schedule' => $schedule->id, 'type' => 'mapa02']) }}" target="_blank"
-               class="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold bg-emerald-50 text-emerald-700 hover:bg-emerald-100 rounded-lg border border-emerald-200 transition" title="Fixed Master PDF: FR.MAPA.02">
+               class="inline-flex items-center gap-1 px-2.5 py-2 text-xs font-medium bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-lg border border-slate-200 transition min-h-[38px]" title="Fixed Master PDF: FR.MAPA.02">
                 <span>MAPA.02</span>
             </a>
 
             <a href="{{ route('admin.dokumen-muk.fixed', ['schedule' => $schedule->id, 'type' => 'ia02']) }}" target="_blank"
-               class="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold bg-indigo-50 text-indigo-700 hover:bg-indigo-100 rounded-lg border border-indigo-200 transition" title="Fixed Master PDF: FR.IA.02 Tugas Praktik Demonstrasi">
+               class="inline-flex items-center gap-1 px-2.5 py-2 text-xs font-medium bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-lg border border-slate-200 transition min-h-[38px]" title="Fixed Master PDF: FR.IA.02 Tugas Praktik Demonstrasi">
                 <span>IA.02</span>
             </a>
 
             <a href="{{ route('admin.dokumen-muk.fixed', ['schedule' => $schedule->id, 'type' => 'ia05b']) }}" target="_blank"
-               class="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold bg-cyan-50 text-cyan-700 hover:bg-cyan-100 rounded-lg border border-cyan-200 transition" title="Fixed Master PDF: FR.IA.05.B Kunci Jawaban">
+               class="inline-flex items-center gap-1 px-2.5 py-2 text-xs font-medium bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-lg border border-slate-200 transition min-h-[38px]" title="Fixed Master PDF: FR.IA.05.B Kunci Jawaban">
                 <span>IA.05.B Kunci</span>
-            </a>
-
-            {{-- Sertifikat & Excel --}}
-            <a href="{{ route('admin.dokumen-muk.export-sertifikat', $schedule->id) }}" target="_blank"
-               class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-emerald-50 text-emerald-700 hover:bg-emerald-100 rounded-lg border border-emerald-200 transition">
-                <span>Sertifikat</span>
-            </a>
-
-            <a href="{{ route('admin.dokumen-muk.export-excel-biodata', $schedule->id) }}"
-               class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-teal-50 text-teal-700 hover:bg-teal-100 rounded-lg border border-teal-200 transition">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                <span>Excel Biodata</span>
             </a>
         </div>
     </div>
@@ -160,15 +162,14 @@
                 </div>
 
                 <div class="flex items-center gap-2">
-                    <button type="submit" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-lg transition text-xs shadow-sm flex items-center justify-center gap-1.5 whitespace-nowrap">
+                    <button type="submit" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-lg transition text-xs shadow-sm flex items-center justify-center gap-1.5 whitespace-nowrap min-h-[38px]">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                         </svg>
                         <span>Cari Asesi</span>
                     </button>
-
                     @if(!empty($search))
-                        <a href="{{ route('admin.dokumen-muk.show', $schedule) }}" class="px-3 py-2 text-slate-600 hover:bg-slate-100 rounded-lg transition text-xs border border-slate-200 whitespace-nowrap">
+                        <a href="{{ route('admin.dokumen-muk.show', $schedule) }}" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 font-semibold rounded-lg transition text-xs flex items-center justify-center whitespace-nowrap min-h-[38px]">
                             Reset
                         </a>
                     @endif
@@ -176,28 +177,21 @@
             </form>
         </div>
 
-        {{-- Assessees Table --}}
-        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-            <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
-                <h3 class="text-sm font-bold text-slate-900">
-                    Daftar Dokumen MUK Individual Asesi ({{ $assessments->total() }})
-                </h3>
-                @if(!empty($search))
-                    <span class="text-xs text-slate-500">Hasil pencarian: <strong class="text-slate-800">"{{ $search }}"</strong></span>
-                @endif
-            </div>
-
+        {{-- Assessees Table Card --}}
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm">
             @if($assessments->isEmpty())
-                <div class="p-10 text-center">
-                    <svg class="w-10 h-10 mx-auto text-slate-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
-                    </svg>
-                    <div class="text-slate-600 font-semibold text-sm">Tidak ada asesi ditemukan</div>
-                    <p class="text-xs text-slate-400 mt-1">
+                <div class="p-8 text-center">
+                    <div class="w-12 h-12 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-sm font-bold text-slate-800">Tidak ada asesi ditemukan</h3>
+                    <p class="text-xs text-slate-500 mt-1">
                         @if(!empty($search))
-                            Tidak ada asesi yang cocok dengan kata kunci "{{ $search }}".
+                            Tidak ada data asesi yang cocok dengan kata kunci "{{ $search }}".
                         @else
-                            Belum ada asesi yang terdaftar pada jadwal ini.
+                            Belum ada asesi yang terdaftar pada jadwal asesmen ini.
                         @endif
                     </p>
                     @if(!empty($search))
@@ -207,21 +201,27 @@
                     @endif
                 </div>
             @else
-                <div class="overflow-x-auto">
+                <div class="overflow-x-auto min-h-[360px]">
                     <table class="w-full text-xs">
                         <thead class="bg-slate-50 text-left font-semibold text-slate-600 border-b border-slate-200">
                             <tr>
-                                <th class="px-4 py-3">No</th>
-                                <th class="px-4 py-3">Nama Asesi</th>
-                                <th class="px-4 py-3">Asesor</th>
-                                <th class="px-4 py-3">Hasil Akhir</th>
-                                <th class="px-4 py-3 text-right">Cetak Dokumen MUK Individual</th>
+                                <th class="px-4 py-3 whitespace-nowrap w-12">No</th>
+                                <th class="px-4 py-3 whitespace-nowrap">Nama Asesi</th>
+                                <th class="px-4 py-3 whitespace-nowrap">Asesor</th>
+                                <th class="px-4 py-3 whitespace-nowrap">Hasil Akhir</th>
+                                <th class="px-4 py-3 text-right whitespace-nowrap">Dokumen MUK</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100">
                             @foreach($assessments as $idx => $assessment)
-                                <tr class="hover:bg-slate-50/70">
-                                    <td class="px-4 py-3 text-slate-500 font-mono">
+                                @php
+                                    $ia01bResp = $assessment->iaResponses?->first(fn($r) => strtoupper((string)$r->instrument_code) === 'IA01B');
+                                    $ia01bData = is_array($ia01bResp?->data_json) ? $ia01bResp->data_json : (json_decode($ia01bResp?->data_json ?? '[]', true) ?: []);
+                                    $hasIa01b = !empty($ia01bData['evidence_image_path'] ?? $ia01bData['file_path'] ?? $ia01bData['uploaded_file'] ?? null);
+                                    $openUp = $assessments->count() > 3 && ($loop->last || $loop->iteration >= $assessments->count() - 1);
+                                @endphp
+                                <tr class="hover:bg-slate-50/70 transition">
+                                    <td class="px-4 py-3 text-slate-500 font-mono whitespace-nowrap">
                                         {{ $assessments->firstItem() ? $assessments->firstItem() + $idx : $idx + 1 }}
                                     </td>
                                     <td class="px-4 py-3">
@@ -230,10 +230,10 @@
                                             {{ $assessment->asesi?->email }} &bull; NIK: {{ $assessment->asesi?->profile?->nik ?? '-' }}
                                         </div>
                                     </td>
-                                    <td class="px-4 py-3 text-slate-600">
+                                    <td class="px-4 py-3 text-slate-600 whitespace-nowrap">
                                         {{ $assessment->assessor?->full_name ?? '-' }}
                                     </td>
-                                    <td class="px-4 py-3">
+                                    <td class="px-4 py-3 whitespace-nowrap">
                                         @if(in_array($assessment->final_result, ['K', 'KOMPETEN'], true))
                                             <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">KOMPETEN (K)</span>
                                         @elseif(in_array($assessment->final_result, ['BK', 'BELUM_KOMPETEN'], true))
@@ -244,55 +244,195 @@
                                             <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-700">{{ $assessment->status ?? 'PENDING' }}</span>
                                         @endif
                                     </td>
-                                    <td class="px-4 py-3 text-right">
-                                        <div class="flex items-center justify-end space-x-1 flex-wrap gap-y-1">
-                                            <a href="{{ route('admin.dokumen-muk.asesi-dynamic', ['assessment' => $assessment->id, 'type' => 'apl01']) }}" target="_blank" class="px-1.5 py-0.5 text-[10px] font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 rounded border border-slate-300" title="FR.APL.01 Permohonan Sertifikasi">
-                                                APL.01
-                                            </a>
-                                            <a href="{{ route('admin.dokumen-muk.asesi-dynamic', ['assessment' => $assessment->id, 'type' => 'apl02']) }}" target="_blank" class="px-1.5 py-0.5 text-[10px] font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 rounded border border-slate-300" title="FR.APL.02 Asesmen Mandiri">
-                                                APL.02
-                                            </a>
-                                            <a href="{{ route('admin.dokumen-muk.asesi-dynamic', ['assessment' => $assessment->id, 'type' => 'ak01']) }}" target="_blank" class="px-1.5 py-0.5 text-[10px] font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 rounded border border-slate-300" title="FR.AK.01 Persetujuan Asesmen">
-                                                AK.01
-                                            </a>
-                                            <a href="{{ route('admin.dokumen-muk.asesi-dynamic', ['assessment' => $assessment->id, 'type' => 'ak07']) }}" target="_blank" class="px-1.5 py-0.5 text-[10px] font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 rounded border border-slate-300" title="FR.AK.07 Penyesuaian Yang Wajar">
-                                                AK.07
-                                            </a>
-                                            <a href="{{ route('admin.dokumen-muk.asesi-dynamic', ['assessment' => $assessment->id, 'type' => 'ia01']) }}" target="_blank" class="px-1.5 py-0.5 text-[10px] font-medium bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded border border-indigo-200" title="FR.IA.01 Ceklis Observasi">
-                                                IA.01
-                                            </a>
-                                            @php
-                                                $ia01bResp = $assessment->iaResponses?->first(fn($r) => strtoupper((string)$r->instrument_code) === 'IA01B');
-                                                $ia01bData = is_array($ia01bResp?->data_json) ? $ia01bResp->data_json : (json_decode($ia01bResp?->data_json ?? '[]', true) ?: []);
-                                                $hasIa01b = !empty($ia01bData['evidence_image_path'] ?? $ia01bData['file_path'] ?? $ia01bData['uploaded_file'] ?? null);
-                                            @endphp
-                                            <a href="{{ route('admin.dokumen-muk.asesi-dynamic', ['assessment' => $assessment->id, 'type' => 'ia01b']) }}" target="_blank" class="px-1.5 py-0.5 text-[10px] font-medium rounded border {{ $hasIa01b ? 'bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border-indigo-200' : 'bg-slate-100 hover:bg-slate-200 text-slate-400 border-slate-200' }}" title="{{ $hasIa01b ? 'FR.IA.01B Report Sheet (Sudah Diunggah)' : 'FR.IA.01B Report Sheet (Belum Diunggah Asesi)' }}">
-                                                IA.01B
-                                            </a>
-                                            <a href="{{ route('admin.dokumen-muk.asesi-dynamic', ['assessment' => $assessment->id, 'type' => 'ia02']) }}" target="_blank" class="px-1.5 py-0.5 text-[10px] font-medium bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded border border-indigo-200" title="FR.IA.02 Tugas Praktik Demonstrasi">
-                                                IA.02
-                                            </a>
-                                            <a href="{{ route('admin.dokumen-muk.asesi-dynamic', ['assessment' => $assessment->id, 'type' => 'ia03']) }}" target="_blank" class="px-1.5 py-0.5 text-[10px] font-medium bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded border border-indigo-200" title="FR.IA.03 Pertanyaan Lisan">
-                                                IA.03
-                                            </a>
-                                            <a href="{{ route('admin.dokumen-muk.asesi-fixed', ['assessment' => $assessment->id, 'type' => 'ia05a']) }}" target="_blank" class="px-1.5 py-0.5 text-[10px] font-medium bg-cyan-50 hover:bg-cyan-100 text-cyan-700 rounded border border-cyan-200" title="Fixed Master PDF: FR.IA.05.A Lembar Soal">
-                                                IA.05A
-                                            </a>
-                                            <a href="{{ route('admin.dokumen-muk.asesi-dynamic', ['assessment' => $assessment->id, 'type' => 'ia05c']) }}" target="_blank" class="px-1.5 py-0.5 text-[10px] font-medium bg-cyan-50 hover:bg-cyan-100 text-cyan-700 rounded border border-cyan-200" title="FR.IA.05.C LJK Asesi">
-                                                IA.05C
-                                            </a>
-                                            <a href="{{ route('admin.dokumen-muk.asesi-dynamic', ['assessment' => $assessment->id, 'type' => 'ak02']) }}" target="_blank" class="px-2 py-0.5 text-[10px] font-bold bg-brand-50 hover:bg-brand-100 text-brand-700 rounded border border-brand-200" title="FR.AK.02 Rekaman Asesmen">
+                                    <td class="px-4 py-3 text-right whitespace-nowrap">
+                                        <div class="flex items-center justify-end gap-1.5">
+                                            <a href="{{ route('admin.dokumen-muk.asesi-dynamic', ['assessment' => $assessment->id, 'type' => 'ak02']) }}" 
+                                               target="_blank" 
+                                               class="inline-flex items-center px-2.5 py-1 text-xs font-semibold rounded-md bg-brand-50 hover:bg-brand-100 text-brand-700 border border-brand-200 transition min-h-[32px]" 
+                                               title="Lihat FR.AK.02 Rekaman Asesmen Langsung">
                                                 AK.02
                                             </a>
-                                            <a href="{{ route('admin.dokumen-muk.asesi-dynamic', ['assessment' => $assessment->id, 'type' => 'ak03']) }}" target="_blank" class="px-2 py-0.5 text-[10px] font-medium bg-amber-50 hover:bg-amber-100 text-amber-700 rounded border border-amber-200" title="FR.AK.03 Umpan Balik">
-                                                AK.03
-                                            </a>
-                                            <a href="{{ route('admin.dokumen-muk.asesi-dynamic', ['assessment' => $assessment->id, 'type' => 'ak04']) }}" target="_blank" class="px-2 py-0.5 text-[10px] font-medium bg-purple-50 hover:bg-purple-100 text-purple-700 rounded border border-purple-200" title="FR.AK.04 Banding">
-                                                AK.04
-                                            </a>
-                                            <a href="{{ route('admin.dokumen-muk.asesi-dynamic', ['assessment' => $assessment->id, 'type' => 'pernyataan']) }}" target="_blank" class="px-2 py-0.5 text-[10px] font-medium bg-teal-50 hover:bg-teal-100 text-teal-700 rounded border border-teal-200" title="Surat Pernyataan">
-                                                Pernyataan
-                                            </a>
+
+                                            <div class="relative inline-block text-left" x-data="{ open: false }">
+                                                <button type="button" 
+                                                        @click="open = !open" 
+                                                        @click.outside="open = false"
+                                                        @keydown.escape.stop="open = false"
+                                                        class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-md bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 shadow-2xs transition min-h-[32px]"
+                                                        :class="{ 'bg-slate-100 ring-2 ring-brand-500/20 border-brand-500 text-brand-700': open }">
+                                                    <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                                    </svg>
+                                                    <span>Semua Dokumen</span>
+                                                    <svg class="w-3.5 h-3.5 text-slate-400 transition-transform duration-200" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                                    </svg>
+                                                </button>
+
+                                                {{-- Dropdown Menu --}}
+                                                <div x-show="open" 
+                                                     x-cloak
+                                                     x-transition:enter="transition ease-out duration-150"
+                                                     x-transition:enter-start="transform opacity-0 scale-95"
+                                                     x-transition:enter-end="transform opacity-100 scale-100"
+                                                     x-transition:leave="transition ease-in duration-100"
+                                                     x-transition:leave-start="transform opacity-100 scale-100"
+                                                     x-transition:leave-end="transform opacity-0 scale-95"
+                                                     class="absolute right-0 {{ $openUp ? 'bottom-full mb-1.5' : 'top-full mt-1.5' }} w-72 sm:w-80 rounded-xl bg-white shadow-xl border border-slate-200 z-50 divide-y divide-slate-100 text-left focus:outline-none"
+                                                     style="display: none;">
+                                                    
+                                                    {{-- Dropdown Header --}}
+                                                    <div class="px-3.5 py-2.5 bg-slate-50 {{ $openUp ? 'rounded-b-xl border-t order-last' : 'rounded-t-xl border-b' }} border-slate-100">
+                                                        <div class="font-bold text-slate-800 text-xs truncate">{{ $assessment->asesi?->full_name }}</div>
+                                                        <div class="text-[11px] text-slate-500">Pilih dokumen MUK untuk dibuka / dicetak:</div>
+                                                    </div>
+
+                                                    {{-- Scrollable List of Groups --}}
+                                                    <div class="p-2 space-y-3 max-h-[290px] overflow-y-auto">
+                                                        {{-- Group 1: Permohonan & Persetujuan --}}
+                                                        <div>
+                                                            <div class="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                                                                Permohonan & Persetujuan
+                                                            </div>
+                                                            <div class="space-y-0.5">
+                                                                <a href="{{ route('admin.dokumen-muk.asesi-dynamic', ['assessment' => $assessment->id, 'type' => 'apl01']) }}" target="_blank"
+                                                                   class="flex items-center justify-between px-2.5 py-1.5 rounded-lg hover:bg-brand-50 text-slate-700 hover:text-brand-700 transition group text-xs">
+                                                                    <div class="flex items-center gap-2 overflow-hidden">
+                                                                        <span class="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 group-hover:bg-brand-100 group-hover:text-brand-700 text-slate-600 shrink-0">FR.APL.01</span>
+                                                                        <span class="truncate">Permohonan Sertifikasi</span>
+                                                                    </div>
+                                                                    <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-brand-600 shrink-0 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                                                </a>
+                                                                <a href="{{ route('admin.dokumen-muk.asesi-dynamic', ['assessment' => $assessment->id, 'type' => 'apl02']) }}" target="_blank"
+                                                                   class="flex items-center justify-between px-2.5 py-1.5 rounded-lg hover:bg-brand-50 text-slate-700 hover:text-brand-700 transition group text-xs">
+                                                                    <div class="flex items-center gap-2 overflow-hidden">
+                                                                        <span class="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 group-hover:bg-brand-100 group-hover:text-brand-700 text-slate-600 shrink-0">FR.APL.02</span>
+                                                                        <span class="truncate">Asesmen Mandiri</span>
+                                                                    </div>
+                                                                    <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-brand-600 shrink-0 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                                                </a>
+                                                                <a href="{{ route('admin.dokumen-muk.asesi-dynamic', ['assessment' => $assessment->id, 'type' => 'ak01']) }}" target="_blank"
+                                                                   class="flex items-center justify-between px-2.5 py-1.5 rounded-lg hover:bg-brand-50 text-slate-700 hover:text-brand-700 transition group text-xs">
+                                                                    <div class="flex items-center gap-2 overflow-hidden">
+                                                                        <span class="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 group-hover:bg-brand-100 group-hover:text-brand-700 text-slate-600 shrink-0">FR.AK.01</span>
+                                                                        <span class="truncate">Persetujuan Asesmen</span>
+                                                                    </div>
+                                                                    <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-brand-600 shrink-0 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                                                </a>
+                                                                <a href="{{ route('admin.dokumen-muk.asesi-dynamic', ['assessment' => $assessment->id, 'type' => 'ak07']) }}" target="_blank"
+                                                                   class="flex items-center justify-between px-2.5 py-1.5 rounded-lg hover:bg-brand-50 text-slate-700 hover:text-brand-700 transition group text-xs">
+                                                                    <div class="flex items-center gap-2 overflow-hidden">
+                                                                        <span class="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 group-hover:bg-brand-100 group-hover:text-brand-700 text-slate-600 shrink-0">FR.AK.07</span>
+                                                                        <span class="truncate">Penyesuaian Yang Wajar</span>
+                                                                    </div>
+                                                                    <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-brand-600 shrink-0 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                                                </a>
+                                                            </div>
+                                                        </div>
+
+                                                        {{-- Group 2: Instrumen Asesmen (IA) --}}
+                                                        <div class="pt-1 border-t border-slate-100">
+                                                            <div class="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                                                                Instrumen Asesmen (IA)
+                                                            </div>
+                                                            <div class="space-y-0.5">
+                                                                <a href="{{ route('admin.dokumen-muk.asesi-dynamic', ['assessment' => $assessment->id, 'type' => 'ia01']) }}" target="_blank"
+                                                                   class="flex items-center justify-between px-2.5 py-1.5 rounded-lg hover:bg-brand-50 text-slate-700 hover:text-brand-700 transition group text-xs">
+                                                                    <div class="flex items-center gap-2 overflow-hidden">
+                                                                        <span class="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 group-hover:bg-brand-100 group-hover:text-brand-700 text-slate-600 shrink-0">FR.IA.01</span>
+                                                                        <span class="truncate">Ceklis Observasi</span>
+                                                                    </div>
+                                                                    <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-brand-600 shrink-0 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                                                </a>
+                                                                <a href="{{ route('admin.dokumen-muk.asesi-dynamic', ['assessment' => $assessment->id, 'type' => 'ia01b']) }}" target="_blank"
+                                                                   class="flex items-center justify-between px-2.5 py-1.5 rounded-lg hover:bg-brand-50 text-slate-700 hover:text-brand-700 transition group text-xs">
+                                                                    <div class="flex items-center gap-2 overflow-hidden">
+                                                                        <span class="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 group-hover:bg-brand-100 group-hover:text-brand-700 text-slate-600 shrink-0">FR.IA.01B</span>
+                                                                        <span class="truncate">Report Sheet</span>
+                                                                        @if($hasIa01b)
+                                                                            <span class="px-1.5 py-0.2 rounded text-[9px] font-semibold bg-emerald-100 text-emerald-700">Bukti Ada</span>
+                                                                        @endif
+                                                                    </div>
+                                                                    <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-brand-600 shrink-0 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                                                </a>
+                                                                <a href="{{ route('admin.dokumen-muk.asesi-dynamic', ['assessment' => $assessment->id, 'type' => 'ia02']) }}" target="_blank"
+                                                                   class="flex items-center justify-between px-2.5 py-1.5 rounded-lg hover:bg-brand-50 text-slate-700 hover:text-brand-700 transition group text-xs">
+                                                                    <div class="flex items-center gap-2 overflow-hidden">
+                                                                        <span class="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 group-hover:bg-brand-100 group-hover:text-brand-700 text-slate-600 shrink-0">FR.IA.02</span>
+                                                                        <span class="truncate">Tugas Praktik Demonstrasi</span>
+                                                                    </div>
+                                                                    <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-brand-600 shrink-0 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                                                </a>
+                                                                <a href="{{ route('admin.dokumen-muk.asesi-dynamic', ['assessment' => $assessment->id, 'type' => 'ia03']) }}" target="_blank"
+                                                                   class="flex items-center justify-between px-2.5 py-1.5 rounded-lg hover:bg-brand-50 text-slate-700 hover:text-brand-700 transition group text-xs">
+                                                                    <div class="flex items-center gap-2 overflow-hidden">
+                                                                        <span class="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 group-hover:bg-brand-100 group-hover:text-brand-700 text-slate-600 shrink-0">FR.IA.03</span>
+                                                                        <span class="truncate">Pertanyaan Lisan</span>
+                                                                    </div>
+                                                                    <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-brand-600 shrink-0 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                                                </a>
+                                                                <a href="{{ route('admin.dokumen-muk.asesi-fixed', ['assessment' => $assessment->id, 'type' => 'ia05a']) }}" target="_blank"
+                                                                   class="flex items-center justify-between px-2.5 py-1.5 rounded-lg hover:bg-brand-50 text-slate-700 hover:text-brand-700 transition group text-xs">
+                                                                    <div class="flex items-center gap-2 overflow-hidden">
+                                                                        <span class="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-cyan-50 text-cyan-700 border border-cyan-200 shrink-0">FR.IA.05.A</span>
+                                                                        <span class="truncate">Lembar Soal (Master PDF)</span>
+                                                                    </div>
+                                                                    <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-brand-600 shrink-0 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                                                </a>
+                                                                <a href="{{ route('admin.dokumen-muk.asesi-dynamic', ['assessment' => $assessment->id, 'type' => 'ia05c']) }}" target="_blank"
+                                                                   class="flex items-center justify-between px-2.5 py-1.5 rounded-lg hover:bg-brand-50 text-slate-700 hover:text-brand-700 transition group text-xs">
+                                                                    <div class="flex items-center gap-2 overflow-hidden">
+                                                                        <span class="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-cyan-50 text-cyan-700 border border-cyan-200 shrink-0">FR.IA.05.C</span>
+                                                                        <span class="truncate">Lembar Jawaban Asesi</span>
+                                                                    </div>
+                                                                    <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-brand-600 shrink-0 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                                                </a>
+                                                            </div>
+                                                        </div>
+
+                                                        {{-- Group 3: Rekaman, Evaluasi & Banding --}}
+                                                        <div class="pt-1 border-t border-slate-100">
+                                                            <div class="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                                                                Rekaman, Evaluasi & Banding
+                                                            </div>
+                                                            <div class="space-y-0.5">
+                                                                <a href="{{ route('admin.dokumen-muk.asesi-dynamic', ['assessment' => $assessment->id, 'type' => 'ak02']) }}" target="_blank"
+                                                                   class="flex items-center justify-between px-2.5 py-1.5 rounded-lg hover:bg-brand-50 text-slate-700 hover:text-brand-700 transition group text-xs">
+                                                                    <div class="flex items-center gap-2 overflow-hidden">
+                                                                        <span class="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-brand-50 text-brand-700 border border-brand-200 shrink-0">FR.AK.02</span>
+                                                                        <span class="truncate">Rekaman Asesmen</span>
+                                                                    </div>
+                                                                    <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-brand-600 shrink-0 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                                                </a>
+                                                                <a href="{{ route('admin.dokumen-muk.asesi-dynamic', ['assessment' => $assessment->id, 'type' => 'ak03']) }}" target="_blank"
+                                                                   class="flex items-center justify-between px-2.5 py-1.5 rounded-lg hover:bg-brand-50 text-slate-700 hover:text-brand-700 transition group text-xs">
+                                                                    <div class="flex items-center gap-2 overflow-hidden">
+                                                                        <span class="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 group-hover:bg-brand-100 group-hover:text-brand-700 text-slate-600 shrink-0">FR.AK.03</span>
+                                                                        <span class="truncate">Umpan Balik Asesi</span>
+                                                                    </div>
+                                                                    <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-brand-600 shrink-0 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                                                </a>
+                                                                <a href="{{ route('admin.dokumen-muk.asesi-dynamic', ['assessment' => $assessment->id, 'type' => 'ak04']) }}" target="_blank"
+                                                                   class="flex items-center justify-between px-2.5 py-1.5 rounded-lg hover:bg-brand-50 text-slate-700 hover:text-brand-700 transition group text-xs">
+                                                                    <div class="flex items-center gap-2 overflow-hidden">
+                                                                        <span class="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 group-hover:bg-brand-100 group-hover:text-brand-700 text-slate-600 shrink-0">FR.AK.04</span>
+                                                                        <span class="truncate">Banding Asesmen</span>
+                                                                    </div>
+                                                                    <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-brand-600 shrink-0 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                                                </a>
+                                                                <a href="{{ route('admin.dokumen-muk.asesi-dynamic', ['assessment' => $assessment->id, 'type' => 'pernyataan']) }}" target="_blank"
+                                                                   class="flex items-center justify-between px-2.5 py-1.5 rounded-lg hover:bg-brand-50 text-slate-700 hover:text-brand-700 transition group text-xs">
+                                                                    <div class="flex items-center gap-2 overflow-hidden">
+                                                                        <span class="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 group-hover:bg-brand-100 group-hover:text-brand-700 text-slate-600 shrink-0">PERNYATAAN</span>
+                                                                        <span class="truncate">Surat Pernyataan Asesi</span>
+                                                                    </div>
+                                                                    <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-brand-600 shrink-0 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </td>
                                 </tr>

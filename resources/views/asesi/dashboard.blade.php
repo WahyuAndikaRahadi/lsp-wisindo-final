@@ -214,28 +214,28 @@
                         </div>
 
                         {{-- Action Buttons --}}
-                        <div class="flex items-center space-x-2 shrink-0 w-full sm:w-auto flex-wrap gap-y-2">
+                        <div class="flex items-center gap-2 shrink-0 w-full sm:w-auto flex-wrap">
                             @if($hasFinalDecision)
-                                <a href="{{ route('asesi.assessment.ruang-uji', $item->id) }}" class="px-3 py-2 text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 border border-slate-300 rounded-lg shadow-xs transition">
-                                    Lihat Rekap Hasil
+                                <a href="{{ route('asesi.assessment.ruang-uji', $item->id) }}" class="flex-1 sm:flex-initial text-center px-3 py-2 min-h-[38px] inline-flex items-center justify-center text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 border border-slate-300 rounded-lg shadow-xs transition">
+                                    Rekap Hasil
                                 </a>
-                                <a href="{{ route('asesi.assessment.ak03', $item->id) }}" class="px-3 py-2 text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 rounded-lg shadow-xs transition" title="FR.AK.03 Umpan Balik Asesmen">
-                                    Umpan Balik (AK.03)
+                                <a href="{{ route('asesi.assessment.ak03', $item->id) }}" class="flex-1 sm:flex-initial text-center px-3 py-2 min-h-[38px] inline-flex items-center justify-center text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 rounded-lg shadow-xs transition" title="FR.AK.03 Umpan Balik Asesmen">
+                                    Umpan Balik
                                 </a>
-                                <a href="{{ route('asesi.assessment.appeal', $item->id) }}" class="px-3 py-2 text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 border border-slate-300 rounded-lg shadow-xs transition" title="FR.AK.04 Banding Asesmen">
-                                    Banding (AK.04)
+                                <a href="{{ route('asesi.assessment.appeal', $item->id) }}" class="flex-1 sm:flex-initial text-center px-3 py-2 min-h-[38px] inline-flex items-center justify-center text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 border border-slate-300 rounded-lg shadow-xs transition" title="FR.AK.04 Banding Asesmen">
+                                    Banding
                                 </a>
                             @elseif($item->apl_status === 'REVISION_REQUESTED')
-                                <a href="{{ route('asesi.assessment.apl', $item->id) }}" class="w-full sm:w-auto text-center justify-center px-5 py-2.5 text-xs font-bold bg-amber-500 hover:bg-amber-600 text-white rounded-lg shadow-sm transition">
-                                    Perbaiki Formulir APL &rarr;
+                                <a href="{{ route('asesi.assessment.apl', $item->id) }}" class="w-full sm:w-auto text-center justify-center px-5 py-2.5 min-h-[40px] text-xs font-bold bg-amber-500 hover:bg-amber-600 text-white rounded-lg shadow-sm transition inline-flex items-center">
+                                    Perbaiki APL &rarr;
                                 </a>
                             @elseif($item->apl_status === 'APPROVED')
-                                <a href="{{ route('asesi.assessment.ruang-uji', $item->id) }}" class="w-full sm:w-auto text-center justify-center px-5 py-2.5 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg shadow-sm transition">
+                                <a href="{{ route('asesi.assessment.ruang-uji', $item->id) }}" class="w-full sm:w-auto text-center justify-center px-5 py-2.5 min-h-[40px] text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg shadow-sm transition inline-flex items-center">
                                     Masuk Ruang Uji &rarr;
                                 </a>
                             @else
-                                <a href="{{ route('asesi.assessment.apl', $item->id) }}" class="w-full sm:w-auto text-center justify-center px-5 py-2.5 text-xs font-bold bg-brand-600 hover:bg-brand-700 text-white rounded-lg shadow-sm transition">
-                                    Lengkapi APL (01 & 02) &rarr;
+                                <a href="{{ route('asesi.assessment.apl', $item->id) }}" class="w-full sm:w-auto text-center justify-center px-5 py-2.5 min-h-[40px] text-xs font-bold bg-brand-600 hover:bg-brand-700 text-white rounded-lg shadow-sm transition inline-flex items-center">
+                                    Lengkapi APL &rarr;
                                 </a>
                             @endif
                         </div>

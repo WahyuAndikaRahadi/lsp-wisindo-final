@@ -175,16 +175,16 @@
             </div>
 
             <div class="flex items-center justify-between pt-4 border-t border-slate-200">
-                <a href="{{ route('asesor.schedule.ak02', $assessment->schedule_id) }}" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-900">
+                <a href="{{ route('asesor.schedule.ak02', $assessment->schedule_id) }}" class="px-4 py-2 min-h-[40px] inline-flex items-center text-xs font-semibold text-slate-600 hover:text-slate-900">
                     Kembali
                 </a>
                 @if($assessment->schedule?->is_closed)
-                    <button type="button" disabled class="px-6 py-2.5 text-xs font-bold text-slate-500 bg-slate-200 rounded-lg cursor-not-allowed">
+                    <button type="button" disabled class="px-6 py-2.5 min-h-[40px] text-xs font-bold text-slate-500 bg-slate-200 rounded-lg cursor-not-allowed">
                         Jadwal Telah Ditutup (Read-Only)
                     </button>
                 @else
-                    <button type="submit" class="px-6 py-2.5 text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 rounded-lg shadow-sm transition">
-                        Simpan FR.AK.02 Rekaman Asesmen
+                    <button type="submit" class="px-6 py-2.5 min-h-[40px] text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 rounded-lg shadow-sm transition">
+                        Simpan Rekaman FR.AK.02
                     </button>
                 @endif
             </div>

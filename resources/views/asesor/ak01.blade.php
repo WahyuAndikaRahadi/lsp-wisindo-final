@@ -542,11 +542,11 @@
 
             <div class="flex items-center space-x-3 w-full sm:w-auto">
                 @if($isClosedForMe)
-                    <button type="button" disabled class="w-full sm:w-auto px-6 py-2.5 text-xs font-bold text-slate-500 bg-slate-200 rounded-lg cursor-not-allowed">
+                    <button type="button" disabled class="w-full sm:w-auto px-6 py-2.5 min-h-[40px] text-xs font-bold text-slate-500 bg-slate-200 rounded-lg cursor-not-allowed">
                         {{ $jadwal->is_closed ? 'Jadwal Telah Ditutup (Read-Only)' : 'Asesmen Binaan Telah Selesai (Read-Only)' }}
                     </button>
                 @else
-                    <button type="submit" class="w-full sm:w-auto px-6 py-2.5 text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 rounded-lg shadow-sm transition flex items-center justify-center space-x-2">
+                    <button type="submit" class="w-full sm:w-auto px-6 py-2.5 min-h-[40px] text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 rounded-lg shadow-sm transition flex items-center justify-center space-x-2">
                         <span>Simpan Persetujuan FR.AK.01</span>
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>

@@ -613,7 +613,7 @@
 
             {{-- Signature Section & Save Button --}}
             <div class="p-4 sm:p-6 bg-slate-50 border-t border-slate-200 flex flex-col md:flex-row items-stretch md:items-end justify-between gap-6">
-                <div class="w-full max-w-[340px]">
+                <div class="w-full max-w-full sm:max-w-[340px]">
                     <x-signature-pad 
                         name="signature_data" 
                         :value="$assessment->asesi_signature ?? $profile?->signature_data ?? old('signature_data')" 
@@ -667,7 +667,7 @@
                                 </span>
                             </label>
                         </div>
-                        <button type="submit" class="w-full sm:w-auto px-8 py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-md transition transform active:scale-95 flex items-center justify-center gap-2">
+                        <button type="submit" class="w-full sm:w-auto px-8 py-3.5 min-h-[44px] bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-md transition transform active:scale-95 flex items-center justify-center gap-2">
                             <span>Simpan &amp; Ajukan Permohonan</span>
                             <span>→</span>
                         </button>

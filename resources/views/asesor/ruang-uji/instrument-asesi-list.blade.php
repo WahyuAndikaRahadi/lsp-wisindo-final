@@ -27,7 +27,7 @@
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
             <div class="flex items-center space-x-3 mt-1">
-                <span class="font-mono text-xs font-black px-2.5 py-1 rounded border-2 border-black {{ $meta['badge_color'] }}">
+                <span class="font-mono text-xs font-bold px-2.5 py-1 rounded border border-slate-300 {{ $meta['badge_color'] }}">
                     {{ $meta['code'] }}
                 </span>
                 <h1 class="text-2xl font-black text-slate-900 tracking-tight">{{ $meta['title'] }}</h1>
@@ -115,9 +115,9 @@
                             </div>
                             <div class="flex items-center space-x-2 shrink-0">
                                 <button type="submit" onclick="return confirm('Apakah Anda yakin ingin menyetujui seluruh APL asesi yang dipilih?')" 
-                                        class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold rounded-lg shadow-sm transition inline-flex items-center space-x-1.5 cursor-pointer">
+                                        class="px-4 py-2 min-h-[38px] bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold rounded-lg shadow-sm transition inline-flex items-center space-x-1.5 cursor-pointer">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                                    <span>Setujui APL Terpilih (Bulk Approve)</span>
+                                    <span>Setujui APL Terpilih</span>
                                 </button>
                             </div>
                         </div>
@@ -137,9 +137,9 @@
                                     </span>
                                 @endif
                                 <button type="button" @click="submitBulkIa02()" 
-                                        class="px-4 py-2 bg-brand-600 hover:bg-brand-700 active:bg-brand-800 text-white font-bold rounded-lg shadow-sm transition inline-flex items-center space-x-1.5 cursor-pointer">
+                                        class="px-4 py-2 min-h-[38px] bg-brand-600 hover:bg-brand-700 active:bg-brand-800 text-white font-bold rounded-lg shadow-sm transition inline-flex items-center space-x-1.5 cursor-pointer">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
-                                    <span>Tanda Tangani Terpilih (Bulk Sign)</span>
+                                    <span><span class="hidden sm:inline">Tanda Tangani Terpilih (Bulk Sign)</span><span class="sm:hidden">TTD Terpilih</span></span>
                                 </button>
                             </div>
                         </div>
@@ -183,23 +183,23 @@
 
             <div class="overflow-x-auto">
                 <table class="w-full text-sm">
-                    <thead class="bg-slate-100 text-left text-xs font-bold text-slate-700 uppercase tracking-wider border-b-2 border-black">
+                    <thead class="bg-slate-50 text-left text-xs font-bold text-slate-700 uppercase tracking-wider border-b border-slate-200">
                         <tr>
                             @if($isBulk)
                                 <th class="px-4 py-3 w-10 text-center">
                                     <input type="checkbox" id="checkAllItems" checked class="rounded border-slate-300 text-brand-600 focus:ring-brand-500 w-4 h-4 cursor-pointer" title="Pilih Semua">
                                 </th>
                             @endif
-                            <th class="px-6 py-3 w-16 text-center">No</th>
-                            <th class="px-6 py-3">Data Peserta Asesi</th>
+                            <th class="px-6 py-3 w-16 text-center whitespace-nowrap">No</th>
+                            <th class="px-6 py-3 whitespace-nowrap">Data Peserta Asesi</th>
                             @if(! $isApl)
-                                <th class="px-6 py-3 text-center">Status APL</th>
+                                <th class="px-6 py-3 text-center whitespace-nowrap">Status APL</th>
                             @endif
-                            <th class="px-6 py-3 text-center">{{ $isApl ? 'Status Verifikasi APL' : 'Status ' . $meta['code'] }}</th>
-                            <th class="px-6 py-3 text-right">{{ $isApl ? 'Aksi Verifikasi' : 'Aksi' }}</th>
+                            <th class="px-6 py-3 text-center whitespace-nowrap">{{ $isApl ? 'Status Verifikasi APL' : 'Status ' . $meta['code'] }}</th>
+                            <th class="px-6 py-3 text-right whitespace-nowrap">{{ $isApl ? 'Aksi Verifikasi' : 'Aksi' }}</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y-2 divide-slate-200">
+                    <tbody class="divide-y divide-slate-100">
                         @foreach($asesiList as $idx => $item)
                             <tr class="hover:bg-slate-50/80 transition">
                                 @if($isBulk)
@@ -213,12 +213,12 @@
                                         @endif
                                     </td>
                                 @endif
-                                <td class="px-6 py-4 text-center font-mono font-bold text-xs text-slate-600">
+                                <td class="px-6 py-4 text-center font-mono font-bold text-xs text-slate-600 whitespace-nowrap">
                                     {{ $idx + 1 }}
                                 </td>
                                 <td class="px-6 py-4">
                                     <div class="flex items-center space-x-3">
-                                        <div class="w-9 h-9 rounded-full bg-slate-900 text-white font-bold flex items-center justify-center text-xs shrink-0 border border-black">
+                                        <div class="w-9 h-9 rounded-full bg-slate-800 text-white font-bold flex items-center justify-center text-xs shrink-0 border border-slate-600">
                                             {{ strtoupper(substr($item->asesi->full_name, 0, 2)) }}
                                         </div>
                                         <div>
@@ -236,13 +236,13 @@
                                     </div>
                                 </td>
                                 @if(! $isApl)
-                                    <td class="px-6 py-4 text-center">
+                                    <td class="px-6 py-4 text-center whitespace-nowrap">
                                         <span class="px-2.5 py-1 rounded text-xs font-bold border border-slate-300 {{ $item->assessment->apl_status === 'APPROVED' ? 'bg-emerald-50 text-emerald-700 border-emerald-300' : 'bg-slate-100 text-slate-600' }}">
                                             {{ str_replace('_', ' ', $item->assessment->apl_status) }}
                                         </span>
                                     </td>
                                 @endif
-                                <td class="px-6 py-4 text-center">
+                                <td class="px-6 py-4 text-center whitespace-nowrap">
                                     <div class="inline-flex flex-col items-center space-y-1">
                                         <span class="px-3 py-1 rounded-full text-xs font-bold border {{ $item->status_class }}">
                                             {{ $item->status_label }}
@@ -265,18 +265,18 @@
                                         @endif
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 text-right">
+                                <td class="px-6 py-4 text-right whitespace-nowrap">
                                     <a href="{{ $item->inspect_url }}"
-                                       class="inline-flex items-center space-x-1.5 px-4 py-2 text-xs font-bold {{ $item->is_completed || $isClosedForMe ? 'bg-slate-900 hover:bg-slate-800 text-white' : 'bg-brand-600 hover:bg-brand-700 text-white' }} rounded-lg shadow-sm transition">
+                                       class="inline-flex items-center space-x-1.5 px-3.5 py-2 text-xs font-bold {{ $item->is_completed || $isClosedForMe ? 'bg-slate-800 hover:bg-slate-900 text-white' : 'bg-brand-600 hover:bg-brand-700 text-white' }} rounded-lg shadow-sm transition min-h-[36px]">
                                         <span>
                                             @if($isClosedForMe)
                                                 {{ $isApl ? 'Lihat Berkas APL' : 'Lihat Dokumen' }}
                                             @elseif($isApl)
-                                                {{ $item->is_completed ? 'Tinjau Verifikasi APL' : 'Verifikasi APL' }}
+                                                {{ $item->is_completed ? 'Tinjau APL' : 'Verifikasi APL' }}
                                             @elseif($isIa02)
-                                                {{ $item->is_completed ? 'Tinjau / Ubah TTD' : 'Tanda Tangani FR.IA.02' }}
+                                                {{ $item->is_completed ? 'Tinjau TTD' : 'TTD FR.IA.02' }}
                                             @else
-                                                {{ $item->is_completed ? 'Tinjau / Ubah Penilaian' : 'Periksa Hasil Asesi' }}
+                                                {{ $item->is_completed ? 'Tinjau' : 'Periksa' }}
                                             @endif
                                         </span>
                                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

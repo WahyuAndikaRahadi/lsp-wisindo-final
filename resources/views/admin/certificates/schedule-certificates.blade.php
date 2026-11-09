@@ -101,13 +101,13 @@
             <table class="w-full text-xs">
                 <thead class="bg-slate-100 text-left text-slate-600 font-bold uppercase tracking-wider">
                     <tr>
-                        <th class="px-4 py-3 text-center w-12">No</th>
+                        <th class="px-4 py-3 text-center w-12 whitespace-nowrap">No</th>
                         <th class="px-4 py-3">Nama Asesi &amp; NIK</th>
-                        <th class="px-4 py-3 text-center">Keputusan</th>
-                        <th class="px-4 py-3">Status Sertifikat</th>
+                        <th class="px-4 py-3 text-center whitespace-nowrap">Keputusan</th>
+                        <th class="px-4 py-3 whitespace-nowrap">Status Sertifikat</th>
                         <th class="px-4 py-3">No. Sertifikat &amp; Blanko</th>
-                        <th class="px-4 py-3">Masa Berlaku</th>
-                        <th class="px-4 py-3 text-right">Aksi</th>
+                        <th class="px-4 py-3 whitespace-nowrap">Masa Berlaku</th>
+                        <th class="px-4 py-3 text-right whitespace-nowrap">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">
@@ -119,17 +119,17 @@
                         <tr class="hover:bg-slate-50/70 transition">
                             <td class="px-4 py-3 text-center font-mono text-slate-400">{{ $index + 1 }}</td>
                             <td class="px-4 py-3">
-                                <div class="font-bold text-slate-900">{{ $asesi?->full_name ?? '-' }}</div>
+                                <div class="font-bold text-slate-900 leading-snug">{{ $asesi?->full_name ?? '-' }}</div>
                                 <div class="text-[11px] text-slate-500 font-mono">
                                     NIK: {{ $asesi?->profile?->nik ?? '-' }} &bull; {{ $asesi?->email }}
                                 </div>
                             </td>
-                            <td class="px-4 py-3 text-center">
-                                <span class="px-2 py-0.5 rounded font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                            <td class="px-4 py-3 text-center whitespace-nowrap">
+                                <span class="px-2.5 py-0.5 rounded-full font-bold bg-emerald-50 text-emerald-800 border border-emerald-300">
                                     ✓ KOMPETEN
                                 </span>
                             </td>
-                            <td class="px-4 py-3">
+                            <td class="px-4 py-3 whitespace-nowrap">
                                 @if($cert)
                                     <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full font-bold bg-emerald-50 text-emerald-700 border border-emerald-300">
                                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
@@ -149,7 +149,7 @@
                                     <span class="text-slate-400 italic">-</span>
                                 @endif
                             </td>
-                            <td class="px-4 py-3">
+                            <td class="px-4 py-3 whitespace-nowrap">
                                 @if($cert)
                                     <div class="text-slate-800">Dibuat: {{ \Carbon\Carbon::parse($cert->issued_date)->isoFormat('D MMM Y') }}</div>
                                     <div class="text-[11px] text-slate-500">Berlaku s/d: {{ \Carbon\Carbon::parse($cert->valid_until)->isoFormat('D MMM Y') }}</div>
@@ -157,36 +157,36 @@
                                     <span class="text-slate-400 italic">-</span>
                                 @endif
                             </td>
-                            <td class="px-4 py-3 text-right">
-                                <div class="flex items-center justify-end space-x-1.5">
+                            <td class="px-4 py-3 text-right whitespace-nowrap">
+                                <div class="flex items-center justify-end gap-1.5 whitespace-nowrap">
                                     @if($cert)
                                         <button type="button" 
                                             @click="openPreview('{{ route('admin.certificates.preview', $cert->id) }}', 'Sertifikat - {{ addslashes($asesi?->full_name) }}')"
-                                            class="px-2 py-1 text-slate-700 bg-slate-100 hover:bg-slate-200 rounded font-semibold transition" title="Preview PDF">
+                                            class="px-2.5 py-1.5 text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-md font-semibold text-xs transition inline-flex items-center justify-center min-h-[32px]" title="Preview PDF">
                                             Preview
                                         </button>
                                         <a href="{{ route('admin.certificates.download', $cert->id) }}" 
-                                            class="px-2 py-1 text-brand-700 bg-brand-50 hover:bg-brand-100 rounded font-semibold transition" title="Unduh PDF">
+                                            class="px-2.5 py-1.5 text-brand-700 bg-brand-50 hover:bg-brand-100 rounded-md font-semibold text-xs transition inline-flex items-center justify-center min-h-[32px]" title="Unduh PDF">
                                             Unduh
                                         </a>
                                         <button type="button" 
                                             @click="openUpload({{ json_encode($asm) }}, {{ json_encode($cert) }})"
-                                            class="px-2 py-1 text-amber-700 bg-amber-50 hover:bg-amber-100 rounded font-semibold transition">
+                                            class="px-2.5 py-1.5 text-amber-700 bg-amber-50 hover:bg-amber-100 rounded-md font-semibold text-xs transition inline-flex items-center justify-center min-h-[32px]">
                                             Edit
                                         </button>
                                         <form action="{{ route('admin.certificates.destroy', $cert->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus sertifikat ini?');" class="inline">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="px-2 py-1 text-rose-600 bg-rose-50 hover:bg-rose-100 rounded font-semibold transition">
+                                            <button type="submit" class="px-2.5 py-1.5 text-rose-600 bg-rose-50 hover:bg-rose-100 rounded-md font-semibold text-xs transition inline-flex items-center justify-center min-h-[32px]">
                                                 Hapus
                                             </button>
                                         </form>
                                     @else
                                         <button type="button" 
                                             @click="openUpload({{ json_encode($asm) }})"
-                                            class="px-3 py-1.5 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg shadow-sm transition flex items-center gap-1">
-                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-                                            <span>Unggah Sertifikat (PDF)</span>
+                                            class="px-3 py-1.5 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg shadow-xs transition inline-flex items-center gap-1.5 whitespace-nowrap min-h-[36px]">
+                                            <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                                            <span><span class="hidden sm:inline">Unggah </span>Sertifikat</span>
                                         </button>
                                     @endif
                                 </div>

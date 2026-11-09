@@ -24,9 +24,9 @@
     profileSignature: @js($userProfileSignature),
     disabled: @js($isDisabled),
     required: @js((bool) $required)
-})" x-init="initPad()" class="w-full max-w-[340px]">
+})" x-init="initPad()" class="w-full max-w-full sm:max-w-[340px]">
     @if($label)
-        <div class="flex items-center justify-between mb-1.5 max-w-[340px]">
+        <div class="flex items-center justify-between mb-1.5 w-full max-w-full sm:max-w-[340px]">
             <label class="block text-xs sm:text-sm font-semibold text-slate-700">
                 {{ $label }} @if($required && ! $isDisabled)<span class="text-rose-500">*</span>@endif
             </label>
@@ -39,7 +39,7 @@
         </div>
     @endif
 
-    <div class="relative border-2 rounded-xl overflow-hidden transition w-full max-w-[340px] bg-white shadow-2xs"
+    <div class="relative border-2 rounded-xl overflow-hidden transition w-full max-w-full sm:max-w-[340px] bg-white shadow-2xs"
          style="height: {{ $canvasHeight }}px;"
          :class="hasError ? 'border-rose-500 ring-2 ring-rose-200' : (@js($isDisabled) ? 'border-slate-200 bg-slate-50' : 'border-dashed border-slate-300 hover:border-slate-400')">
         <canvas 
@@ -75,7 +75,7 @@
     </template>
 
     @if(! $isDisabled && $userProfileSignature)
-        <div class="mt-2 flex items-center max-w-[340px]">
+        <div class="mt-2 flex items-center w-full max-w-full sm:max-w-[340px]">
             <label class="inline-flex items-center text-xs font-semibold text-slate-700 cursor-pointer select-none">
                 <input 
                     type="checkbox" 

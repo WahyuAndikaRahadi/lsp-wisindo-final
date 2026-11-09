@@ -33,16 +33,16 @@
                 </select>
             </div>
 
-            <div class="flex items-center gap-2">
-                <button type="submit" class="px-4 py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl transition shadow-xs flex items-center justify-center gap-1.5 whitespace-nowrap">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="flex items-center gap-2 w-full sm:w-auto">
+                <button type="submit" class="flex-1 sm:flex-initial px-4 py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl transition shadow-xs flex items-center justify-center gap-1.5 whitespace-nowrap min-h-[40px]">
+                    <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
                     </svg>
-                    <span>Filter Jadwal</span>
+                    <span>Filter</span>
                 </button>
 
                 @if($search || $schemeId)
-                    <a href="{{ route('admin.certificates.index') }}" class="px-3.5 py-2.5 text-slate-600 hover:bg-slate-100 rounded-xl border border-slate-200 transition font-medium whitespace-nowrap">
+                    <a href="{{ route('admin.certificates.index') }}" class="px-3.5 py-2.5 text-slate-600 hover:bg-slate-100 rounded-xl border border-slate-200 transition font-medium whitespace-nowrap min-h-[40px] inline-flex items-center justify-center">
                         Reset
                     </a>
                 @endif
@@ -56,12 +56,12 @@
             <table class="w-full text-sm">
                 <thead class="bg-slate-50 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
                     <tr>
-                        <th class="px-6 py-3">Jadwal Asesmen</th>
-                        <th class="px-6 py-3">Skema Sertifikasi</th>
-                        <th class="px-6 py-3">TUK / Tanggal</th>
-                        <th class="px-6 py-3 text-center">Asesi Kompeten (K)</th>
-                        <th class="px-6 py-3 text-center">Sertifikat Terunggah</th>
-                        <th class="px-6 py-3 text-right">Aksi</th>
+                        <th class="px-5 py-3">Jadwal Asesmen</th>
+                        <th class="px-5 py-3">Skema Sertifikasi</th>
+                        <th class="px-5 py-3">TUK / Tanggal</th>
+                        <th class="px-5 py-3 text-center whitespace-nowrap">Asesi Kompeten (K)</th>
+                        <th class="px-5 py-3 text-center whitespace-nowrap">Sertifikat Terunggah</th>
+                        <th class="px-5 py-3 text-right">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">
@@ -70,41 +70,41 @@
                             $isComplete = ($sch->competent_candidates > 0 && $sch->uploaded_certificates_count >= $sch->competent_candidates);
                         @endphp
                         <tr class="hover:bg-slate-50/60 transition">
-                            <td class="px-6 py-4">
-                                <div class="font-bold text-slate-900">{{ $sch->name }}</div>
+                            <td class="px-5 py-4">
+                                <div class="font-bold text-slate-900 leading-snug">{{ $sch->name }}</div>
                                 <span class="font-mono text-xs text-brand-700">{{ $sch->code }}</span>
                             </td>
-                            <td class="px-6 py-4 text-xs text-slate-700">
-                                <div class="font-semibold">{{ $sch->scheme->name ?? '-' }}</div>
+                            <td class="px-5 py-4 text-xs text-slate-700">
+                                <div class="font-semibold leading-snug">{{ $sch->scheme->name ?? '-' }}</div>
                                 <span class="text-slate-400 font-mono text-[11px]">{{ $sch->scheme->code ?? '' }}</span>
                             </td>
-                            <td class="px-6 py-4 text-xs text-slate-600">
+                            <td class="px-5 py-4 text-xs text-slate-600 whitespace-nowrap">
                                 <div>{{ $sch->tuk_name ?? ($sch->tuk->name ?? '-') }}</div>
                                 <span class="text-slate-400">{{ \Carbon\Carbon::parse($sch->date)->isoFormat('D MMMM Y') }}</span>
                             </td>
-                            <td class="px-6 py-4 text-center">
-                                <span class="px-2.5 py-1 rounded text-xs font-bold {{ $sch->competent_candidates > 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-600' }}">
+                            <td class="px-5 py-4 text-center whitespace-nowrap">
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold whitespace-nowrap {{ $sch->competent_candidates > 0 ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' : 'bg-slate-100 text-slate-600' }}">
                                     {{ $sch->competent_candidates }} Asesi (K)
                                 </span>
                             </td>
-                            <td class="px-6 py-4 text-center">
+                            <td class="px-5 py-4 text-center whitespace-nowrap">
                                 @if($sch->competent_candidates == 0)
                                     <span class="text-xs text-slate-400">Belum ada asesi K</span>
                                 @elseif($isComplete)
-                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-300">
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-300 whitespace-nowrap">
                                         ✓ Lengkap ({{ $sch->uploaded_certificates_count }}/{{ $sch->competent_candidates }})
                                     </span>
                                 @else
-                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-300">
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-300 whitespace-nowrap">
                                         {{ $sch->uploaded_certificates_count }} / {{ $sch->competent_candidates }} Terbit
                                     </span>
                                 @endif
                             </td>
-                            <td class="px-6 py-4 text-right">
+                            <td class="px-5 py-4 text-right whitespace-nowrap">
                                 <a href="{{ route('admin.certificates.schedule', $sch->id) }}" 
-                                   class="px-3.5 py-1.5 text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 rounded-lg shadow-sm transition inline-flex items-center gap-1.5">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
-                                    <span>Upload &amp; Kelola Sertifikat</span>
+                                   class="px-3 py-1.5 text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 rounded-lg shadow-xs transition inline-flex items-center gap-1.5 whitespace-nowrap min-h-[36px]">
+                                    <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                                    <span><span class="hidden md:inline">Upload &amp; </span>Kelola Sertifikat</span>
                                 </a>
                             </td>
                         </tr>

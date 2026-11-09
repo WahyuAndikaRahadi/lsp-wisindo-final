@@ -108,7 +108,7 @@
                 {{-- Action Buttons --}}
                 <div class="pt-5 mt-4 border-t border-slate-100 flex items-center">
                     <a href="{{ $inst['action_url'] }}"
-                       class="w-full flex items-center justify-center space-x-2 px-4 py-2.5 text-xs font-bold {{ $inst['action_button_class'] }} rounded-lg shadow-sm transition">
+                       class="w-full flex items-center justify-center space-x-2 px-4 py-2.5 min-h-[40px] text-xs font-bold {{ $inst['action_button_class'] }} rounded-lg shadow-sm transition">
                         <span>{{ $inst['action_label'] }}</span>
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
@@ -131,14 +131,15 @@
                 <h4 class="text-base font-bold text-slate-900 mt-0.5">Rangkaian Asesmen Selesai ({{ $assessment->final_result ?? 'KOMPETEN' }})</h4>
                 <p class="text-xs text-slate-500 mt-1 leading-relaxed">Silakan lengkapi formulir umpan balik proses asesmen (FR.AK.03) atau ajukan banding (FR.AK.04) jika terdapat sanggahan hasil atau ketidaksesuaian prosedur uji.</p>
             </div>
-            <div class="flex items-center space-x-2 shrink-0 flex-wrap gap-y-2">
-                <a href="{{ route('asesi.assessment.ak03', $assessment) }}" class="w-full sm:w-auto px-4 py-2.5 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold rounded-xl shadow-sm transition text-center">
-                    FR.AK.03 Umpan Balik &rarr;
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 shrink-0">
+                <a href="{{ route('asesi.assessment.ak03', $assessment) }}" class="px-4 py-2.5 min-h-[40px] inline-flex items-center justify-center bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold rounded-xl shadow-sm transition text-center">
+                    <span>FR.AK.03 Umpan Balik</span>
+                    <span class="ml-1">&rarr;</span>
                 </a>
-                <a href="{{ route('asesi.assessment.appeal', $assessment) }}" class="w-full sm:w-auto px-4 py-2.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 text-xs font-bold rounded-xl shadow-sm transition flex items-center justify-center gap-1.5">
+                <a href="{{ route('asesi.assessment.appeal', $assessment) }}" class="px-4 py-2.5 min-h-[40px] inline-flex items-center justify-center bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 text-xs font-bold rounded-xl shadow-sm transition gap-1.5">
                     <span>FR.AK.04 Banding</span>
                     @if($assessment->appeals->isNotEmpty())
-                        <span class="px-1.5 py-0.2 bg-amber-100 text-amber-800 text-[10px] rounded font-mono font-semibold">Tercatat</span>
+                        <span class="px-1.5 py-0.5 bg-amber-100 text-amber-800 text-[10px] rounded font-mono font-semibold">Tercatat</span>
                     @endif
                 </a>
             </div>
