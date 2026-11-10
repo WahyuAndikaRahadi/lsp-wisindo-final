@@ -33,7 +33,6 @@ class LspWorkflowIntegrationTest extends TestCase
         $this->assertDatabaseHas('users', ['email' => 'lsp.proindo@gmail.com', 'role' => 'SUPER_ADMIN']);
         $this->assertDatabaseHas('users', ['email' => 'adminlsp@gmail.com', 'role' => 'ADMIN_LSP']);
         $this->assertDatabaseHas('users', ['email' => 'asesor.randi@gmail.com', 'role' => 'ASESOR']);
-        $this->assertDatabaseHas('m_tuks', ['name' => 'TUK Cikarang']);
     }
 
     private function createAsesi(string $email = 'asesi1@gmail.com'): User

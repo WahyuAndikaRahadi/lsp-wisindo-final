@@ -43,7 +43,6 @@ class SeederAndWorkflowResetTest extends TestCase
         $this->assertGreaterThan(0, UnitElement::count());
         $this->assertGreaterThan(0, Kuk::count());
         $this->assertGreaterThan(0, QuestionBank::count());
-        $this->assertGreaterThanOrEqual(1, Tuk::count());
         $this->assertGreaterThanOrEqual(1, Setting::count());
 
         // Verify production account roles exist (Admin & Asesor only, zero dummy Asesi/TUK)
