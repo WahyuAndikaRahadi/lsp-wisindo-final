@@ -174,7 +174,11 @@
                                             class="px-2.5 py-1.5 text-amber-700 bg-amber-50 hover:bg-amber-100 rounded-md font-semibold text-xs transition inline-flex items-center justify-center min-h-[32px]">
                                             Edit
                                         </button>
-                                        <form action="{{ route('admin.certificates.destroy', $cert->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus sertifikat ini?');" class="inline">
+                                        <form action="{{ route('admin.certificates.destroy', $cert->id) }}" method="POST"
+                                              data-confirm="Apakah Anda yakin ingin menghapus sertifikat ini?"
+                                              data-confirm-title="Hapus Sertifikat"
+                                              data-confirm-danger="true"
+                                              class="inline">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="px-2.5 py-1.5 text-rose-600 bg-rose-50 hover:bg-rose-100 rounded-md font-semibold text-xs transition inline-flex items-center justify-center min-h-[32px]">

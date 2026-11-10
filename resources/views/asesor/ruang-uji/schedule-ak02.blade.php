@@ -222,7 +222,11 @@
                             {{ $schedule->is_closed ? 'Jadwal Telah Ditutup (Read-Only)' : 'Asesmen Binaan Selesai (Read-Only)' }}
                         </button>
                     @else
-                        <button type="submit" onclick="return confirm('Apakah Anda yakin ingin menyimpan seluruh penetapan rekaman FR.AK.02 untuk asesi binaan Anda?')" 
+                        <button type="submit" 
+                                data-confirm="Apakah Anda yakin ingin menyimpan seluruh penetapan rekaman FR.AK.02 untuk asesi binaan Anda?"
+                                data-confirm-title="Konfirmasi Rekaman FR.AK.02"
+                                data-confirm-ok="Ya, Simpan Seluruhnya"
+                                data-loading-text="Menyimpan seluruh penetapan FR.AK.02..."
                                 class="px-6 py-2.5 min-h-[40px] bg-brand-600 hover:bg-brand-700 active:bg-brand-800 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-md transition flex items-center justify-center space-x-2">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
                             <span><span class="hidden sm:inline">Simpan Seluruh Rekaman FR.AK.02 (Bulk Save)</span><span class="sm:hidden">Simpan FR.AK.02</span></span>

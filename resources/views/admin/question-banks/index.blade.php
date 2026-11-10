@@ -197,7 +197,11 @@
                                         <a href="{{ route('admin.question-banks.edit', $q->id) }}" class="px-2 py-1 text-brand-700 hover:text-brand-900 bg-brand-50 rounded hover:bg-brand-100">
                                             Edit
                                         </a>
-                                        <form action="{{ route('admin.question-banks.destroy', $q->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus butir soal ini?');" class="inline">
+                                        <form action="{{ route('admin.question-banks.destroy', $q->id) }}" method="POST"
+                                              data-confirm="Apakah Anda yakin ingin menghapus butir soal ini?"
+                                              data-confirm-title="Hapus Butir Soal"
+                                              data-confirm-danger="true"
+                                              class="inline">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="px-2 py-1 text-rose-600 hover:text-rose-800 bg-rose-50 rounded hover:bg-rose-100">

@@ -92,12 +92,33 @@
                     submitBulkIa02() {
                         const count = this.getSelectedCount();
                         if (count === 0) {
-                            alert('Silakan pilih setidaknya satu asesi terlebih dahulu.');
+                            if (window.Notiflix && Notiflix.Report) {
+                                Notiflix.Report.warning('Pemberitahuan', 'Silakan pilih setidaknya satu asesi terlebih dahulu.', 'Mengerti');
+                            } else {
+                                alert('Silakan pilih setidaknya satu asesi terlebih dahulu.');
+                            }
                             return;
                         }
                         if (this.hasProfileSig) {
-                            if (confirm('Apakah Anda yakin ingin menandatangani dokumen FR.IA.02 untuk ' + count + ' asesi binaan yang dipilih menggunakan tanda tangan profil Anda?')) {
+                            const submitAction = () => {
+                                if (window.Notiflix && Notiflix.Loading) {
+                                    Notiflix.Loading.pulse('Menandatangani FR.IA.02 untuk ' + count + ' asesi...');
+                                }
                                 document.getElementById('bulkActionForm').submit();
+                            };
+
+                            if (window.notiflixConfirm) {
+                                window.notiflixConfirm(
+                                    'Konfirmasi Tanda Tangan Massal',
+                                    'Apakah Anda yakin ingin menandatangani dokumen FR.IA.02 untuk ' + count + ' asesi binaan yang dipilih menggunakan tanda tangan profil Anda?',
+                                    'Ya, Tanda Tangani',
+                                    'Batal',
+                                    submitAction,
+                                    function () {},
+                                    { okButtonBackground: '#1E2B6E' }
+                                );
+                            } else if (confirm('Apakah Anda yakin ingin menandatangani dokumen FR.IA.02 untuk ' + count + ' asesi binaan yang dipilih menggunakan tanda tangan profil Anda?')) {
+                                submitAction();
                             }
                         } else {
                             this.showSignModal = true;
@@ -114,7 +135,11 @@
                                 <span class="text-amber-800">Centang asesi yang memenuhi syarat untuk langsung disetujui sekaligus.</span>
                             </div>
                             <div class="flex items-center space-x-2 shrink-0">
-                                <button type="submit" onclick="return confirm('Apakah Anda yakin ingin menyetujui seluruh APL asesi yang dipilih?')" 
+                                <button type="submit" 
+                                        data-confirm="Apakah Anda yakin ingin menyetujui seluruh APL asesi yang dipilih?"
+                                        data-confirm-title="Konfirmasi Persetujuan Massal APL"
+                                        data-confirm-ok="Ya, Setujui Semua"
+                                        data-loading-text="Menyetujui seluruh APL asesi yang dipilih..."
                                         class="px-4 py-2 min-h-[38px] bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold rounded-lg shadow-sm transition inline-flex items-center space-x-1.5 cursor-pointer">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                                     <span>Setujui APL Terpilih</span>

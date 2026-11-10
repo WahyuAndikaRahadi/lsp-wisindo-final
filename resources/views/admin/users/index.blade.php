@@ -67,7 +67,14 @@
                                     </a>
                                     @if($user->id !== auth()->id())
                                         <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" class="inline"
-                                              onsubmit="return confirm('PERINGATAN KONSEKUENSI PENGHAPUSAN PENGGUNA:\n\nJika pengguna ini memiliki riwayat asesmen atau jadwal, status akun akan dinonaktifkan (INACTIVE) untuk menjaga integritas data audit BNSP. Jika tidak ada riwayat, data akan dihapus permanen.\n\nApakah Anda yakin ingin melanjutkan?');">
+                                              data-confirm="PERINGATAN KONSEKUENSI PENGHAPUSAN PENGGUNA:
+
+Jika pengguna ini memiliki riwayat asesmen atau jadwal, status akun akan dinonaktifkan (INACTIVE) untuk menjaga integritas data audit BNSP. Jika tidak ada riwayat, data akan dihapus permanen.
+
+Apakah Anda yakin ingin melanjutkan?"
+                                              data-confirm-title="Konfirmasi Penghapusan Pengguna"
+                                              data-confirm-ok="Ya, Lanjutkan Hapus"
+                                              data-confirm-danger="true">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="px-2.5 py-1 text-xs font-semibold text-rose-600 hover:text-rose-800 bg-rose-50 rounded">

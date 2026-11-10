@@ -104,7 +104,11 @@
                             <button type="button" @click="openEditUnit({ id: {{ $unit->id }}, code: '{{ addslashes($unit->code) }}', title: '{{ addslashes($unit->title) }}', standard_reference: '{{ addslashes($unit->standard_reference ?? 'SKKNI') }}' })" class="px-2 py-1 text-[11px] font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded transition">
                                 Edit Unit
                             </button>
-                            <form action="{{ route('admin.schemes.units.destroy', $unit->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus unit kompetensi ini berserta seluruh elemen dan KUK-nya?');" class="inline">
+                            <form action="{{ route('admin.schemes.units.destroy', $unit->id) }}" method="POST"
+                                  data-confirm="Apakah Anda yakin ingin menghapus unit kompetensi ini berserta seluruh elemen dan KUK-nya?"
+                                  data-confirm-title="Hapus Unit Kompetensi"
+                                  data-confirm-danger="true"
+                                  class="inline">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="px-2 py-1 text-[11px] font-semibold text-rose-600 bg-rose-50 hover:bg-rose-100 rounded border border-rose-200 transition">
@@ -133,7 +137,11 @@
                                         <button type="button" @click="openEditElement({ id: {{ $element->id }}, title: '{{ addslashes($element->title) }}' })" class="px-2 py-0.5 text-[10px] font-semibold text-slate-600 bg-white border border-slate-300 rounded hover:bg-slate-100">
                                             Edit
                                         </button>
-                                        <form action="{{ route('admin.schemes.elements.destroy', $element->id) }}" method="POST" onsubmit="return confirm('Hapus elemen kompetensi ini?');" class="inline">
+                                        <form action="{{ route('admin.schemes.elements.destroy', $element->id) }}" method="POST"
+                                              data-confirm="Hapus elemen kompetensi ini?"
+                                              data-confirm-title="Hapus Elemen Kompetensi"
+                                              data-confirm-danger="true"
+                                              class="inline">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="px-2 py-0.5 text-[10px] font-semibold text-rose-600 bg-white border border-rose-200 rounded hover:bg-rose-50">
@@ -157,7 +165,11 @@
                                                     Edit
                                                 </button>
                                                 <span class="text-slate-300">&bull;</span>
-                                                <form action="{{ route('admin.schemes.kuks.destroy', $kuk->id) }}" method="POST" onsubmit="return confirm('Hapus KUK {{ $kuk->code_number }}?');" class="inline">
+                                                <form action="{{ route('admin.schemes.kuks.destroy', $kuk->id) }}" method="POST"
+                                                      data-confirm="Hapus KUK {{ $kuk->code_number }}?"
+                                                      data-confirm-title="Hapus Kriteria Unjuk Kerja (KUK)"
+                                                      data-confirm-danger="true"
+                                                      class="inline">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="text-[10px] font-semibold text-rose-500 hover:text-rose-700">

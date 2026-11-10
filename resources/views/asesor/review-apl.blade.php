@@ -636,7 +636,10 @@
                     </button>
                 @else
                     <button type="submit" class="w-full sm:w-auto px-8 py-3 bg-lsp-navy hover:bg-lsp-navy-dark text-white rounded-xl font-bold text-sm shadow-md transition transform active:scale-95 flex items-center justify-center gap-2"
-                            onclick="return confirm('Apakah Anda yakin ingin menyimpan keputusan review APL ini?')">
+                            data-confirm="Apakah Anda yakin ingin menyimpan keputusan review APL ini?"
+                            data-confirm-title="Konfirmasi Review APL"
+                            data-confirm-ok="Ya, Simpan Keputusan"
+                            data-loading-text="Menyimpan keputusan verifikasi APL...">
                         <span>Simpan & Tetapkan Keputusan</span>
                         <span>→</span>
                     </button>

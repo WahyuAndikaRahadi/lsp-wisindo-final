@@ -53,6 +53,10 @@
     <!-- Alpine.js CDN -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
+    <!-- Notiflix CDN (v3.3.0) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notiflix@3.3.0/src/notiflix.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/notiflix@3.3.0/dist/notiflix-aio-3.3.0.min.js"></script>
+
     <style>
         [x-cloak] { display: none !important; }
 
@@ -529,7 +533,282 @@
     @endguest
 
     <script>
+        // Configure Notiflix Modules
+        if (typeof window !== 'undefined' && window.Notiflix) {
+            Notiflix.Confirm.init({
+                className: 'notiflix-confirm',
+                width: '420px',
+                zindex: 99998,
+                position: 'center',
+                distance: '10px',
+                backgroundColor: '#ffffff',
+                borderRadius: '16px',
+                backOverlay: true,
+                backOverlayColor: 'rgba(15, 23, 42, 0.65)',
+                rtl: false,
+                fontFamily: '"Plus Jakarta Sans", "Inter", system-ui, -apple-system, sans-serif',
+                cssAnimation: true,
+                cssAnimationDuration: 250,
+                cssAnimationStyle: 'fade',
+                plainText: false,
+
+                titleColor: '#0F172A',
+                titleFontSize: '17px',
+                titleMaxLength: 100,
+
+                messageColor: '#475569',
+                messageFontSize: '13px',
+                messageMaxLength: 1500,
+
+                buttonsFontSize: '13px',
+                buttonsMaxLength: 40,
+                okButtonColor: '#ffffff',
+                okButtonBackground: '#1E2B6E',
+                cancelButtonColor: '#475569',
+                cancelButtonBackground: '#F1F5F9',
+            });
+
+            Notiflix.Loading.init({
+                className: 'notiflix-loading',
+                zindex: 99999,
+                backgroundColor: 'rgba(15, 23, 42, 0.78)',
+                fontFamily: '"Plus Jakarta Sans", "Inter", system-ui, -apple-system, sans-serif',
+                cssAnimation: true,
+                cssAnimationDuration: 300,
+                clickToClose: false,
+                svgSize: '85px',
+                svgColor: '#CE181E',
+                messageFontSize: '15px',
+                messageMaxLength: 200,
+                messageColor: '#ffffff',
+            });
+
+            Notiflix.Report.init({
+                className: 'notiflix-report',
+                width: '420px',
+                backgroundColor: '#ffffff',
+                borderRadius: '16px',
+                rtl: false,
+                zindex: 99998,
+                backOverlay: true,
+                backOverlayColor: 'rgba(15, 23, 42, 0.65)',
+                backOverlayClickToClose: false,
+                fontFamily: '"Plus Jakarta Sans", "Inter", system-ui, -apple-system, sans-serif',
+                svgSize: '72px',
+                plainText: false,
+                titleFontSize: '17px',
+                titleMaxLength: 100,
+                messageFontSize: '13px',
+                messageMaxLength: 1500,
+                buttonFontSize: '13px',
+                buttonMaxLength: 40,
+                cssAnimation: true,
+                cssAnimationDuration: 250,
+                cssAnimationStyle: 'fade',
+
+                success: {
+                    svgColor: '#10b981',
+                    titleColor: '#0F172A',
+                    messageColor: '#475569',
+                    buttonBackground: '#1E2B6E',
+                    buttonColor: '#ffffff',
+                    backOverlayColor: 'rgba(15, 23, 42, 0.65)',
+                },
+                failure: {
+                    svgColor: '#CE181E',
+                    titleColor: '#0F172A',
+                    messageColor: '#475569',
+                    buttonBackground: '#CE181E',
+                    buttonColor: '#ffffff',
+                    backOverlayColor: 'rgba(15, 23, 42, 0.65)',
+                },
+                warning: {
+                    svgColor: '#f59e0b',
+                    titleColor: '#0F172A',
+                    messageColor: '#475569',
+                    buttonBackground: '#1E2B6E',
+                    buttonColor: '#ffffff',
+                    backOverlayColor: 'rgba(15, 23, 42, 0.65)',
+                },
+                info: {
+                    svgColor: '#1E2B6E',
+                    titleColor: '#0F172A',
+                    messageColor: '#475569',
+                    buttonBackground: '#1E2B6E',
+                    buttonColor: '#ffffff',
+                    backOverlayColor: 'rgba(15, 23, 42, 0.65)',
+                },
+            });
+
+            Notiflix.Notify.init({
+                width: '320px',
+                position: 'right-top',
+                distance: '16px',
+                opacity: 1,
+                borderRadius: '12px',
+                rtl: false,
+                timeout: 4000,
+                messageMaxLength: 300,
+                plainText: false,
+                showOnlyTheLastOne: false,
+                clickToClose: true,
+                pauseOnHover: true,
+                fontFamily: '"Plus Jakarta Sans", "Inter", system-ui, -apple-system, sans-serif',
+                fontSize: '13px',
+                cssAnimation: true,
+                cssAnimationDuration: 300,
+                cssAnimationStyle: 'from-right',
+                closeButton: true,
+                useIcon: true,
+                success: {
+                    background: '#059669',
+                    textColor: '#ffffff',
+                    notiflixIconColor: 'rgba(255,255,255,0.9)',
+                },
+                failure: {
+                    background: '#CE181E',
+                    textColor: '#ffffff',
+                    notiflixIconColor: 'rgba(255,255,255,0.9)',
+                },
+                warning: {
+                    background: '#d97706',
+                    textColor: '#ffffff',
+                    notiflixIconColor: 'rgba(255,255,255,0.9)',
+                },
+                info: {
+                    background: '#1E2B6E',
+                    textColor: '#ffffff',
+                    notiflixIconColor: 'rgba(255,255,255,0.9)',
+                },
+            });
+        }
+
+        // Global Alert Override using Notiflix Report
+        if (typeof window !== 'undefined') {
+            window.__nativeAlert = window.alert;
+            window.alert = function (message) {
+                if (window.Notiflix && Notiflix.Report) {
+                    var formatted = String(message || '').replace(/\n/g, '<br>');
+                    Notiflix.Report.warning('Perhatian', formatted, 'Mengerti');
+                } else if (window.__nativeAlert) {
+                    window.__nativeAlert(message);
+                }
+            };
+        }
+
+        // Global Pulse Helpers
+        window.showPulseLoading = function (message) {
+            if (window.Notiflix && Notiflix.Loading) {
+                Notiflix.Loading.pulse(message || 'Memproses data, mohon tunggu...');
+            }
+        };
+
+        window.hidePulseLoading = function (delay) {
+            if (window.Notiflix && Notiflix.Loading) {
+                Notiflix.Loading.remove(delay || 0);
+            }
+        };
+
+        // Global Notiflix Confirm Helper
+        window.notiflixConfirm = function (title, message, okText, cancelText, onOk, onCancel, customOptions) {
+            if (!window.Notiflix || !Notiflix.Confirm) {
+                if (confirm(message)) {
+                    if (typeof onOk === 'function') onOk();
+                } else {
+                    if (typeof onCancel === 'function') onCancel();
+                }
+                return;
+            }
+
+            var formatted = String(message || '').replace(/\n/g, '<br>');
+            var isDanger = /hapus|delete|batal|permanen|nonaktifkan/i.test((message || '') + ' ' + (title || ''));
+            var defaultOpts = isDanger ? { okButtonBackground: '#CE181E' } : { okButtonBackground: '#1E2B6E' };
+            var opts = Object.assign({}, defaultOpts, customOptions || {});
+
+            Notiflix.Confirm.show(
+                title || 'Konfirmasi Tindakan',
+                formatted,
+                okText || 'Ya, Lanjutkan',
+                cancelText || 'Batal',
+                function () {
+                    if (typeof onOk === 'function') onOk();
+                },
+                function () {
+                    if (typeof onCancel === 'function') onCancel();
+                },
+                opts
+            );
+        };
+
         document.addEventListener('DOMContentLoaded', function () {
+            // Auto-convert legacy inline confirm(...) handlers to data-confirm
+            document.querySelectorAll('form[onsubmit*="confirm("], button[onclick*="confirm("], a[onclick*="confirm("]').forEach(function (el) {
+                var attr = el.hasAttribute('onsubmit') ? 'onsubmit' : 'onclick';
+                var rawCode = el.getAttribute(attr);
+                var match = rawCode.match(/confirm\(\s*(['"`])([\s\S]*?)\1\s*\)/);
+                if (match && match[2]) {
+                    var msg = match[2].replace(/\\n/g, '\n').replace(/\\'/g, "'").replace(/\\"/g, '"');
+                    el.removeAttribute(attr);
+                    el.setAttribute('data-confirm', msg);
+                }
+            });
+
+            // Universal data-confirm click interceptor for buttons and links
+            document.addEventListener('click', function (e) {
+                var trigger = e.target.closest('[data-confirm]');
+                if (!trigger) return;
+
+                if (trigger.dataset.confirmed === 'true') {
+                    delete trigger.dataset.confirmed;
+                    return;
+                }
+
+                e.preventDefault();
+                e.stopImmediatePropagation();
+
+                var message = trigger.getAttribute('data-confirm');
+                var title = trigger.getAttribute('data-confirm-title') || 'Konfirmasi Tindakan';
+                var okText = trigger.getAttribute('data-confirm-ok') || 'Ya, Lanjutkan';
+                var cancelText = trigger.getAttribute('data-confirm-cancel') || 'Batal';
+                var isDanger = trigger.getAttribute('data-confirm-danger') === 'true' || /hapus|delete|batal|permanen|nonaktifkan/i.test(message + ' ' + title);
+
+                window.notiflixConfirm(
+                    title,
+                    message,
+                    okText,
+                    cancelText,
+                    function () {
+                        trigger.dataset.confirmed = 'true';
+                        if (trigger.tagName === 'A' && trigger.href) {
+                            window.location.href = trigger.href;
+                        } else if (trigger.tagName === 'BUTTON' || trigger.tagName === 'INPUT') {
+                            var form = trigger.closest('form');
+                            if (form) {
+                                form.dataset.confirmed = 'true';
+                                if (trigger.name && trigger.value) {
+                                    var hidden = document.createElement('input');
+                                    hidden.type = 'hidden';
+                                    hidden.name = trigger.name;
+                                    hidden.value = trigger.value;
+                                    form.appendChild(hidden);
+                                }
+                                if (typeof form.requestSubmit === 'function') {
+                                    form.requestSubmit(trigger);
+                                } else {
+                                    form.submit();
+                                }
+                            } else {
+                                trigger.click();
+                            }
+                        } else {
+                            trigger.click();
+                        }
+                    },
+                    function () {},
+                    isDanger ? { okButtonBackground: '#CE181E' } : {}
+                );
+            }, true);
+
             // Strict numeric-only input restriction for integer fields (kode pos, nik, phone, etc.)
             document.addEventListener('keydown', function (e) {
                 const el = e.target;
@@ -552,7 +831,7 @@
                 }
             });
 
-            // Anti-double-click & loading spinner protection for forms
+            // Form submission interceptor: Confirmation + Loading Pulse + Anti-double-click
             document.addEventListener('submit', function (e) {
                 const form = e.target;
                 if (!form || form.tagName !== 'FORM') return;
@@ -560,12 +839,76 @@
                 if (form.hasAttribute('data-no-disable')) return;
                 if (typeof form.checkValidity === 'function' && !form.checkValidity()) return;
 
+                // Form-level confirmation check
+                if (form.hasAttribute('data-confirm') && form.dataset.confirmed !== 'true') {
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+
+                    const message = form.getAttribute('data-confirm');
+                    const title = form.getAttribute('data-confirm-title') || 'Konfirmasi Tindakan';
+                    const okText = form.getAttribute('data-confirm-ok') || 'Ya, Lanjutkan';
+                    const cancelText = form.getAttribute('data-confirm-cancel') || 'Batal';
+                    const isDanger = form.getAttribute('data-confirm-danger') === 'true' || /hapus|delete|batal|permanen|nonaktifkan/i.test(message + ' ' + title);
+
+                    window.notiflixConfirm(
+                        title,
+                        message,
+                        okText,
+                        cancelText,
+                        function () {
+                            form.dataset.confirmed = 'true';
+                            if (typeof form.requestSubmit === 'function') {
+                                form.requestSubmit(e.submitter);
+                            } else {
+                                form.submit();
+                            }
+                        },
+                        function () {},
+                        isDanger ? { okButtonBackground: '#CE181E' } : {}
+                    );
+                    return false;
+                }
+
                 if (form.dataset.submitting === 'true') {
                     e.preventDefault();
                     return false;
                 }
 
                 form.dataset.submitting = 'true';
+
+                // Contextual Loading Pulse
+                if (!form.hasAttribute('data-no-loading')) {
+                    var loadingText = form.getAttribute('data-loading-text') ||
+                        (e.submitter && e.submitter.getAttribute('data-loading-text'));
+
+                    if (!loadingText) {
+                        var formId = form.id || '';
+                        var action = (form.getAttribute('action') || '').toLowerCase();
+                        var isDelete = form.querySelector('input[name="_method"][value="DELETE"]') !== null || (form.getAttribute('method') || '').toUpperCase() === 'DELETE';
+
+                        if (formId === 'aplForm' || action.indexOf('/apl') !== -1) {
+                            loadingText = 'Mengunggah berkas portofolio & memproses data APL 01...';
+                        } else if (formId === 'cbtForm' || action.indexOf('ia-05') !== -1 || action.indexOf('cbt') !== -1) {
+                            loadingText = 'Menyimpan jawaban ujian CBT & memproses hasil...';
+                        } else if (action.indexOf('/login') !== -1) {
+                            loadingText = 'Memverifikasi akun & masuk ke sistem...';
+                        } else if (action.indexOf('/register') !== -1) {
+                            loadingText = 'Mendaftarkan akun Anda...';
+                        } else if (action.indexOf('/logout') !== -1) {
+                            loadingText = 'Keluar dari sistem...';
+                        } else if (action.indexOf('/certificate') !== -1 || action.indexOf('/sertifikat') !== -1) {
+                            loadingText = 'Memproses berkas sertifikat...';
+                        } else if (isDelete) {
+                            loadingText = 'Menghapus data dari sistem...';
+                        } else {
+                            loadingText = 'Memproses data, mohon tunggu sebentar...';
+                        }
+                    }
+
+                    if (window.Notiflix && Notiflix.Loading) {
+                        Notiflix.Loading.pulse(loadingText);
+                    }
+                }
 
                 const submitButtons = form.querySelectorAll('button[type="submit"], input[type="submit"]');
                 submitButtons.forEach(function (btn) {
@@ -594,10 +937,14 @@
                 });
             });
 
-            // Restore buttons on pageshow (e.g. browser back button from bfcache)
+            // Restore buttons & remove loading on pageshow (e.g. browser back button from bfcache)
             window.addEventListener('pageshow', function () {
+                if (window.Notiflix && Notiflix.Loading) {
+                    Notiflix.Loading.remove();
+                }
                 document.querySelectorAll('form').forEach(function (form) {
                     delete form.dataset.submitting;
+                    delete form.dataset.confirmed;
                     const buttons = form.querySelectorAll('button[type="submit"], input[type="submit"]');
                     buttons.forEach(function (btn) {
                         btn.disabled = false;
@@ -610,6 +957,34 @@
             });
         });
     </script>
+
+    @if(session('success'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                if (window.Notiflix && Notiflix.Notify) {
+                    Notiflix.Notify.success(@js(session('success')));
+                }
+            });
+        </script>
+    @endif
+    @if(session('warning'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                if (window.Notiflix && Notiflix.Notify) {
+                    Notiflix.Notify.warning(@js(session('warning')));
+                }
+            });
+        </script>
+    @endif
+    @if(session('error'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                if (window.Notiflix && Notiflix.Notify) {
+                    Notiflix.Notify.failure(@js(session('error')));
+                }
+            });
+        </script>
+    @endif
 
     @stack('scripts')
 </body>

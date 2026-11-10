@@ -83,7 +83,7 @@
         </div>
     @endif
 
-    <form action="{{ route('asesi.assessment.apl.store', $assessment) }}" method="POST" enctype="multipart/form-data" class="space-y-8" id="aplForm">
+    <form action="{{ route('asesi.assessment.apl.store', $assessment) }}" method="POST" enctype="multipart/form-data" data-loading-text="Mengunggah berkas portofolio & menyimpan data APL 01..." class="space-y-8" id="aplForm">
         @csrf
 
         {{-- BAGIAN 1: FR.APL.01 DATA PEMOHON --}}

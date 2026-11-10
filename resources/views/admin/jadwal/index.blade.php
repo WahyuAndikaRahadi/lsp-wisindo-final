@@ -135,7 +135,14 @@
                                             Edit
                                         </a>
                                         <form action="{{ route('admin.jadwal.destroy', $sch->id) }}" method="POST" class="inline"
-                                              onsubmit="return confirm('PERINGATAN KONSEKUENSI PENGHAPUSAN JADWAL:\n\nJika jadwal memiliki peserta atau riwayat asesmen aktif, status jadwal akan dinonaktifkan (FINISHED) untuk melindungi data audit BNSP. Jika kosong, jadwal akan dihapus.\n\nApakah Anda yakin ingin melanjutkan?');">
+                                              data-confirm="PERINGATAN KONSEKUENSI PENGHAPUSAN JADWAL:
+
+Jika jadwal memiliki peserta atau riwayat asesmen aktif, status jadwal akan dinonaktifkan (FINISHED) untuk melindungi data audit BNSP. Jika kosong, jadwal akan dihapus.
+
+Apakah Anda yakin ingin melanjutkan?"
+                                              data-confirm-title="Konfirmasi Penghapusan Jadwal"
+                                              data-confirm-ok="Ya, Lanjutkan Hapus"
+                                              data-confirm-danger="true">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="px-3 py-1 text-xs font-semibold text-rose-600 hover:text-rose-800 bg-rose-50 rounded">
