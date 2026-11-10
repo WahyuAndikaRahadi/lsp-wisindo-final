@@ -454,55 +454,40 @@
 
             if (answeredCount < totalQuestions) {
                 e.preventDefault();
-                if (window.Notiflix && Notiflix.Report) {
-                    Notiflix.Report.warning(
-                        'Soal Belum Lengkap',
-                        'Anda belum menjawab seluruh soal (' + answeredCount + ' dari ' + totalQuestions + ' butir soal). Harap lengkapi semua soal sebelum mengirim.',
-                        'Mengerti'
-                    );
-                } else {
-                    alert('Anda belum menjawab seluruh soal. Harap lengkapi semua soal sebelum mengirim.');
-                }
+                Notiflix.Report.warning(
+                    'Soal Belum Lengkap',
+                    'Anda belum menjawab seluruh soal (' + answeredCount + ' dari ' + totalQuestions + ' butir soal). Harap lengkapi semua soal sebelum mengirim.',
+                    'Mengerti'
+                );
                 return false;
             }
 
             if (doubtfulList.length > 0) {
                 e.preventDefault();
-                if (window.Notiflix && Notiflix.Report) {
-                    Notiflix.Report.warning(
-                        'Soal Masih Ragu-ragu',
-                        'Terdapat ' + doubtfulList.length + ' butir soal bertanda ragu-ragu. Harap periksa dan hilangkan tanda ragu-ragu sebelum menyelesaikan ujian.',
-                        'Mengerti'
-                    );
-                } else {
-                    alert('Terdapat ' + doubtfulList.length + ' soal bertanda ragu-ragu. Harap pastikan seluruh jawaban sebelum menyelesaikan ujian.');
-                }
+                Notiflix.Report.warning(
+                    'Soal Masih Ragu-ragu',
+                    'Terdapat ' + doubtfulList.length + ' butir soal bertanda ragu-ragu. Harap periksa dan hilangkan tanda ragu-ragu sebelum menyelesaikan ujian.',
+                    'Mengerti'
+                );
                 return false;
             }
 
             if (this.dataset.confirmed !== 'true') {
                 e.preventDefault();
                 const formEl = this;
-                if (window.notiflixConfirm) {
-                    window.notiflixConfirm(
-                        'Konfirmasi Selesai Ujian CBT',
-                        'Apakah Anda yakin ingin menyelesaikan dan mengirim jawaban ujian CBT ini?<br><br><strong>Catatan:</strong> Jawaban yang sudah dikirim tidak dapat diubah kembali.',
-                        'Ya, Kirim Jawaban',
-                        'Periksa Kembali',
-                        function() {
-                            formEl.dataset.confirmed = 'true';
-                            if (window.Notiflix && Notiflix.Loading) {
-                                Notiflix.Loading.pulse('Menyimpan jawaban ujian CBT & memproses penilaian...');
-                            }
-                            formEl.submit();
-                        },
-                        function() {},
-                        { okButtonBackground: '#1E2B6E' }
-                    );
-                } else if (confirm('Apakah Anda yakin ingin menyelesaikan dan mengirim jawaban ujian CBT ini? Jawaban yang sudah dikirim tidak dapat diubah kembali.')) {
-                    formEl.dataset.confirmed = 'true';
-                    formEl.submit();
-                }
+                window.notiflixConfirm(
+                    'Konfirmasi Selesai Ujian CBT',
+                    'Apakah Anda yakin ingin menyelesaikan dan mengirim jawaban ujian CBT ini?<br><br><strong>Catatan:</strong> Jawaban yang sudah dikirim tidak dapat diubah kembali.',
+                    'Ya, Kirim Jawaban',
+                    'Periksa Kembali',
+                    function() {
+                        formEl.dataset.confirmed = 'true';
+                        Notiflix.Loading.pulse('Menyimpan jawaban ujian CBT & memproses penilaian...');
+                        formEl.submit();
+                    },
+                    function() {},
+                    { okButtonBackground: '#1E2B6E' }
+                );
                 return false;
             }
         });

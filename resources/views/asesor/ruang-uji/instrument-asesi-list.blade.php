@@ -92,34 +92,22 @@
                     submitBulkIa02() {
                         const count = this.getSelectedCount();
                         if (count === 0) {
-                            if (window.Notiflix && Notiflix.Report) {
-                                Notiflix.Report.warning('Pemberitahuan', 'Silakan pilih setidaknya satu asesi terlebih dahulu.', 'Mengerti');
-                            } else {
-                                alert('Silakan pilih setidaknya satu asesi terlebih dahulu.');
-                            }
+                            Notiflix.Report.warning('Pemberitahuan', 'Silakan pilih setidaknya satu asesi terlebih dahulu.', 'Mengerti');
                             return;
                         }
                         if (this.hasProfileSig) {
-                            const submitAction = () => {
-                                if (window.Notiflix && Notiflix.Loading) {
+                            window.notiflixConfirm(
+                                'Konfirmasi Tanda Tangan Massal',
+                                'Apakah Anda yakin ingin menandatangani dokumen FR.IA.02 untuk ' + count + ' asesi binaan yang dipilih menggunakan tanda tangan profil Anda?',
+                                'Ya, Tanda Tangani',
+                                'Batal',
+                                function () {
                                     Notiflix.Loading.pulse('Menandatangani FR.IA.02 untuk ' + count + ' asesi...');
-                                }
-                                document.getElementById('bulkActionForm').submit();
-                            };
-
-                            if (window.notiflixConfirm) {
-                                window.notiflixConfirm(
-                                    'Konfirmasi Tanda Tangan Massal',
-                                    'Apakah Anda yakin ingin menandatangani dokumen FR.IA.02 untuk ' + count + ' asesi binaan yang dipilih menggunakan tanda tangan profil Anda?',
-                                    'Ya, Tanda Tangani',
-                                    'Batal',
-                                    submitAction,
-                                    function () {},
-                                    { okButtonBackground: '#1E2B6E' }
-                                );
-                            } else if (confirm('Apakah Anda yakin ingin menandatangani dokumen FR.IA.02 untuk ' + count + ' asesi binaan yang dipilih menggunakan tanda tangan profil Anda?')) {
-                                submitAction();
-                            }
+                                    document.getElementById('bulkActionForm').submit();
+                                },
+                                function () {},
+                                { okButtonBackground: '#1E2B6E' }
+                            );
                         } else {
                             this.showSignModal = true;
                         }

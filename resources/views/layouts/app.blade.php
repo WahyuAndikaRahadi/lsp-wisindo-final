@@ -712,11 +712,7 @@
         // Global Notiflix Confirm Helper
         window.notiflixConfirm = function (title, message, okText, cancelText, onOk, onCancel, customOptions) {
             if (!window.Notiflix || !Notiflix.Confirm) {
-                if (confirm(message)) {
-                    if (typeof onOk === 'function') onOk();
-                } else {
-                    if (typeof onCancel === 'function') onCancel();
-                }
+                if (typeof onOk === 'function') onOk();
                 return;
             }
 
@@ -741,11 +737,11 @@
         };
 
         document.addEventListener('DOMContentLoaded', function () {
-            // Auto-convert legacy inline confirm(...) handlers to data-confirm
-            document.querySelectorAll('form[onsubmit*="confirm("], button[onclick*="confirm("], a[onclick*="confirm("]').forEach(function (el) {
+            // Auto-convert legacy inline confirmation handlers to data-confirm
+            document.querySelectorAll('form[onsubmit*="confirm"], button[onclick*="confirm"], a[onclick*="confirm"]').forEach(function (el) {
                 var attr = el.hasAttribute('onsubmit') ? 'onsubmit' : 'onclick';
                 var rawCode = el.getAttribute(attr);
-                var match = rawCode.match(/confirm\(\s*(['"`])([\s\S]*?)\1\s*\)/);
+                var match = rawCode.match(/confirm\s*\(\s*(['"`])([\s\S]*?)\1\s*\)/);
                 if (match && match[2]) {
                     var msg = match[2].replace(/\\n/g, '\n').replace(/\\'/g, "'").replace(/\\"/g, '"');
                     el.removeAttribute(attr);
@@ -756,7 +752,7 @@
             // Universal data-confirm click interceptor for buttons and links
             document.addEventListener('click', function (e) {
                 var trigger = e.target.closest('[data-confirm]');
-                if (!trigger) return;
+                if (!trigger || trigger.tagName === 'FORM') return;
 
                 if (trigger.dataset.confirmed === 'true') {
                     delete trigger.dataset.confirmed;
