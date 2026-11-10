@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\Tuk;
 use App\Models\User;
 use App\Models\UserProfile;
 use Illuminate\Database\Seeder;
@@ -15,8 +14,6 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        $tuk = Tuk::where('name', 'TUK Cikarang')->first();
-
         $seedPassword = env('SEED_PASSWORD', app()->isProduction() ? null : '@Kompeten86');
 
         if (app()->isProduction()) {
@@ -46,17 +43,7 @@ class UserSeeder extends Seeder
                 'status' => 'ACTIVE',
                 'password' => $password,
             ],
-            // 3. Ketua Komite Teknis
-            [
-                'full_name' => 'Ketua Komite Teknis',
-                'email' => 'komite@gmail.com',
-                'phone' => '08333333333',
-                'role' => 'KOMITE_TEKNIS',
-                'is_committee_head' => true,
-                'status' => 'ACTIVE',
-                'password' => $password,
-            ],
-            // 4-16. 13 Asesors
+            // 3-16. 14 Asesors
             [
                 'full_name' => 'Randi Ardiansyah',
                 'email' => 'asesor.randi@gmail.com',
@@ -174,7 +161,6 @@ class UserSeeder extends Seeder
                 'status' => 'ACTIVE',
                 'password' => $password,
             ],
-            // 17. Asesor Alfian
             [
                 'full_name' => 'Alfian',
                 'email' => 'asesor.alfian@gmail.com',
@@ -184,89 +170,45 @@ class UserSeeder extends Seeder
                 'status' => 'ACTIVE',
                 'password' => $password,
             ],
-            // 18. Anggota Komite - Dedi Kurniawan
-            [
-                'full_name' => 'Anggota Komite - Dedi Kurniawan',
-                'email' => 'komite2@gmail.com',
-                'phone' => '08777777771',
-                'role' => 'KOMITE_TEKNIS',
-                'is_committee_head' => false,
-                'status' => 'ACTIVE',
-                'password' => $password,
-            ],
-            // 19. Anggota Komite - Siti Aminah
-            [
-                'full_name' => 'Anggota Komite - Siti Aminah',
-                'email' => 'komite3@gmail.com',
-                'phone' => '08777777772',
-                'role' => 'KOMITE_TEKNIS',
-                'is_committee_head' => false,
-                'status' => 'ACTIVE',
-                'password' => $password,
-            ],
-            // 20. Asesi Ani Rahayu
-            [
-                'full_name' => 'Asesi Ani Rahayu',
-                'email' => 'asesi1@gmail.com',
-                'phone' => '08555555555',
-                'role' => 'ASESI',
-                'status' => 'ACTIVE',
-                'password' => $password,
-            ],
-            // 21. Asesi Budi Pratama
-            [
-                'full_name' => 'Asesi Budi Pratama',
-                'email' => 'asesi2@gmail.com',
-                'phone' => '08555555554',
-                'role' => 'ASESI',
-                'status' => 'ACTIVE',
-                'password' => $password,
-            ],
-            // 22. Asesi Cahya Ningrum
-            [
-                'full_name' => 'Asesi Cahya Ningrum',
-                'email' => 'asesi3@gmail.com',
-                'phone' => '08555555553',
-                'role' => 'ASESI',
-                'status' => 'ACTIVE',
-                'password' => $password,
-            ],
-            // 23. Asesi Wahyu Andika Rahadi
-            [
-                'full_name' => 'Wahyu Andika Rahadi',
-                'email' => 'wahyu@gmail.com',
-                'phone' => '083816927804',
-                'role' => 'ASESI',
-                'status' => 'ACTIVE',
-                'password' => $password,
-            ],
         ];
 
         foreach ($users as $userData) {
-            $user = User::updateOrCreate(
+            User::updateOrCreate(
                 ['email' => $userData['email']],
                 $userData
             );
+        }
 
-            if ($user->role === 'ASESI') {
-                UserProfile::firstOrCreate(
-                    ['user_id' => $user->id],
-                    [
-                        'nik' => '321601'.str_pad((string) $user->id, 10, '0', STR_PAD_LEFT),
-                        'tempat_lahir' => 'Bekasi',
-                        'tanggal_lahir' => '2000-01-01',
-                        'jenis_kelamin' => 'L',
-                        'kebangsaan' => 'Indonesia',
-                        'alamat_rumah' => 'Jl. Industri No. 1, Cikarang',
-                        'kode_pos' => '17530',
-                        'no_telepon_rumah' => $user->phone,
-                        'pendidikan_terakhir' => 'SMK Otomotif',
-                        'nama_institusi_perusahaan' => 'SMK Negeri 1 Cikarang',
-                        'jabatan' => 'Siswa / Teknisi Junior',
-                        'signature_data' => 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
-                    ]
-                );
-            }
+        // Test environment helper: seed a sample asesi for automated integration/feature tests
+        if (app()->environment('testing')) {
+            $testAsesi = User::updateOrCreate(
+                ['email' => 'asesi1@gmail.com'],
+                [
+                    'full_name' => 'Asesi Test',
+                    'phone' => '08555555555',
+                    'role' => 'ASESI',
+                    'status' => 'ACTIVE',
+                    'password' => $password,
+                ]
+            );
+
+            UserProfile::firstOrCreate(
+                ['user_id' => $testAsesi->id],
+                [
+                    'nik' => '3216010000000001',
+                    'tempat_lahir' => 'Bekasi',
+                    'tanggal_lahir' => '2000-01-01',
+                    'jenis_kelamin' => 'L',
+                    'kebangsaan' => 'Indonesia',
+                    'alamat_rumah' => 'Jl. Industri No. 1, Cikarang',
+                    'kode_pos' => '17530',
+                    'no_telepon_rumah' => '08555555555',
+                    'pendidikan_terakhir' => 'SMK Otomotif',
+                    'nama_institusi_perusahaan' => 'SMK Negeri 1 Cikarang',
+                    'jabatan' => 'Siswa / Teknisi Junior',
+                    'signature_data' => 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+                ]
+            );
         }
     }
 }

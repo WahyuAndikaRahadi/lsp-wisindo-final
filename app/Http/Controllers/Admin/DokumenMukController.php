@@ -293,7 +293,7 @@ class DokumenMukController extends Controller
     {
         $download = $request->boolean('download', false);
         $normType = strtolower(str_replace(['_', ' ', '-', '.'], '', $type));
-        if (in_array($normType, ['ia05a', 'ia05', 'fria05a', 'ia05c', 'fria05c'], true)) {
+        if (in_array($normType, ['ia05c', 'fria05c'], true)) {
             return $this->dynamicService->exportSchedule($schedule, $normType, $download);
         }
 
@@ -312,7 +312,7 @@ class DokumenMukController extends Controller
 
         $download = $request->boolean('download', false);
         $normType = strtolower(str_replace(['_', ' ', '-', '.'], '', $type));
-        if (in_array($normType, ['ia05a', 'ia05', 'fria05a', 'ia05c', 'fria05c'], true)) {
+        if (in_array($normType, ['ia05c', 'fria05c'], true)) {
             return $this->dynamicService->exportAssessment($assessment, $normType, $download);
         }
 

@@ -12,7 +12,6 @@ use App\Models\Setting;
 use App\Models\Tuk;
 use App\Models\UnitElement;
 use App\Models\User;
-use App\Models\UserProfile;
 use Database\Seeders\UserSeeder;
 use Illuminate\Console\Command;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -38,8 +37,7 @@ class SeederAndWorkflowResetTest extends TestCase
         Artisan::call('db:seed');
 
         // 1. Verify Master & Account Data Exists
-        $this->assertGreaterThanOrEqual(23, User::count());
-        $this->assertGreaterThanOrEqual(3, UserProfile::count());
+        $this->assertGreaterThanOrEqual(16, User::count());
         $this->assertGreaterThanOrEqual(7, Scheme::count());
         $this->assertGreaterThan(0, CompetencyUnit::count());
         $this->assertGreaterThan(0, UnitElement::count());
@@ -48,13 +46,11 @@ class SeederAndWorkflowResetTest extends TestCase
         $this->assertGreaterThanOrEqual(1, Tuk::count());
         $this->assertGreaterThanOrEqual(1, Setting::count());
 
-        // Verify account roles exist
+        // Verify production account roles exist (Admin & Asesor only, zero dummy Asesi/TUK)
         $this->assertNotNull(User::where('role', 'SUPER_ADMIN')->first());
         $this->assertNotNull(User::where('role', 'ADMIN_LSP')->first());
-        $this->assertNotNull(User::where('role', 'KOMITE_TEKNIS')->first());
-        $this->assertNull(User::where('role', 'TUK_ADMIN')->first());
         $this->assertNotNull(User::where('role', 'ASESOR')->first());
-        $this->assertNotNull(User::where('role', 'ASESI')->first());
+        $this->assertNull(User::where('role', 'TUK_ADMIN')->first());
 
         // 2. Verify ALL Workflow Tables are Exactly EMPTY (0 rows)
         $workflowTables = [
@@ -85,7 +81,14 @@ class SeederAndWorkflowResetTest extends TestCase
 
         $admin = User::where('role', 'ADMIN_LSP')->first();
         $asesor = User::where('role', 'ASESOR')->first();
-        $asesi = User::where('role', 'ASESI')->first();
+        $asesi = User::where('role', 'ASESI')->first() ?? User::create([
+            'full_name' => 'Asesi Test',
+            'email' => 'asesi.test@example.com',
+            'phone' => '08999999999',
+            'role' => 'ASESI',
+            'status' => 'ACTIVE',
+            'password' => bcrypt('password'),
+        ]);
         $scheme = Scheme::first();
 
         // Create dummy workflow transactional data

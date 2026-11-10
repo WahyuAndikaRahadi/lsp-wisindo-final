@@ -33,8 +33,37 @@ class LspWorkflowIntegrationTest extends TestCase
         $this->assertDatabaseHas('users', ['email' => 'lsp.proindo@gmail.com', 'role' => 'SUPER_ADMIN']);
         $this->assertDatabaseHas('users', ['email' => 'adminlsp@gmail.com', 'role' => 'ADMIN_LSP']);
         $this->assertDatabaseHas('users', ['email' => 'asesor.randi@gmail.com', 'role' => 'ASESOR']);
-        $this->assertDatabaseHas('users', ['email' => 'asesi1@gmail.com', 'role' => 'ASESI']);
         $this->assertDatabaseHas('m_tuks', ['name' => 'TUK Cikarang']);
+    }
+
+    private function createAsesi(string $email = 'asesi1@gmail.com'): User
+    {
+        $asesi = User::firstOrCreate(
+            ['email' => $email],
+            [
+                'full_name' => 'Asesi Test',
+                'phone' => '08555555555',
+                'role' => 'ASESI',
+                'status' => 'ACTIVE',
+                'password' => bcrypt('@Kompeten86'),
+            ]
+        );
+        $asesi->profile()->firstOrCreate([], [
+            'nik' => '3216010000000001',
+            'tempat_lahir' => 'Bekasi',
+            'tanggal_lahir' => '2000-01-01',
+            'jenis_kelamin' => 'L',
+            'kebangsaan' => 'Indonesia',
+            'alamat_rumah' => 'Jl. Industri No. 1, Cikarang',
+            'kode_pos' => '17530',
+            'no_telepon_rumah' => '08555555555',
+            'pendidikan_terakhir' => 'SMK Otomotif',
+            'nama_institusi_perusahaan' => 'SMK Negeri 1 Cikarang',
+            'jabatan' => 'Siswa / Teknisi Junior',
+            'signature_data' => 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+        ]);
+
+        return $asesi;
     }
 
     public function test_auth_login_and_admin_proxy_impersonation(): void
@@ -101,7 +130,7 @@ class LspWorkflowIntegrationTest extends TestCase
         $admin = User::where('role', 'ADMIN_LSP')->first();
         $scheme = Scheme::where('code', 'SKM-01-2026')->first();
         $asesor = User::where('email', 'asesor.randi@gmail.com')->first();
-        $asesi = User::where('email', 'asesi1@gmail.com')->first();
+        $asesi = $this->createAsesi();
 
         $schedule = Schedule::create([
             'code' => 'LSP-BATCH-01',
@@ -591,7 +620,7 @@ class LspWorkflowIntegrationTest extends TestCase
         $admin = User::where('role', 'ADMIN_LSP')->first();
         $scheme = Scheme::where('code', 'SKM-01-2026')->first();
         $asesor = User::where('email', 'asesor.randi@gmail.com')->first();
-        $asesi1 = User::where('email', 'asesi1@gmail.com')->first();
+        $asesi1 = $this->createAsesi('asesibatch1@test.local');
 
         $schedule = Schedule::create([
             'code' => 'LSP-BATCH-TEST',
