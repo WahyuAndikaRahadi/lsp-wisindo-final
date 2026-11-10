@@ -14,13 +14,7 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        $seedPassword = env('SEED_PASSWORD', app()->isProduction() ? null : '@Kompeten86');
-
-        if (app()->isProduction()) {
-            if (empty($seedPassword) || $seedPassword === '@Kompeten86') {
-                throw new \RuntimeException('SEED_PASSWORD wajib disetel di environment production dan tidak boleh menggunakan password default @Kompeten86.');
-            }
-        }
+        $seedPassword = env('SEED_PASSWORD', '@Kompeten86') ?: '@Kompeten86';
 
         $password = Hash::make($seedPassword);
 

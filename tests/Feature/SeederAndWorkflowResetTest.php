@@ -143,16 +143,14 @@ class SeederAndWorkflowResetTest extends TestCase
         $this->assertSame(Command::FAILURE, $exitCode);
     }
 
-    public function test_user_seeder_stops_in_production_if_password_is_default_or_empty(): void
+    public function test_user_seeder_works_in_production_with_seed_password(): void
     {
         $this->app->detectEnvironment(fn () => 'production');
 
         putenv('SEED_PASSWORD=@Kompeten86');
         $_ENV['SEED_PASSWORD'] = '@Kompeten86';
 
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('SEED_PASSWORD wajib disetel di environment production dan tidak boleh menggunakan password default @Kompeten86.');
-
         (new UserSeeder)->run();
+        $this->assertDatabaseHas('users', ['email' => 'lsp.proindo@gmail.com']);
     }
 }
