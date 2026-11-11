@@ -68,37 +68,6 @@
         </div>
     </div>
 
-    @if(! $ak01Agreed)
-        <div class="bg-amber-50 border-2 border-amber-300 rounded-2xl p-5 sm:p-6 shadow-sm">
-            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div class="space-y-1">
-                    <div class="flex items-center gap-2">
-                        <span class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
-                        <span class="text-xs font-bold uppercase tracking-wider text-amber-800">Tahap Wajib BNSP</span>
-                    </div>
-                    <h3 class="text-base sm:text-lg font-black text-amber-950">
-                        Persetujuan Asesmen dan Kerahasiaan (FR.AK.01) Belum Disetujui
-                    </h3>
-                    <p class="text-xs text-amber-900 leading-relaxed max-w-2xl">
-                        Sesuai standar operasional BNSP, sebelum Anda dapat melihat dan mengerjakan instrumen asesmen (IA.01, IA.01B, IA.02, IA.03, CBT IA.05), Anda wajib menyetujui kesepakatan dan penetapan instrumen pada formulir FR.AK.01 terlebih dahulu.
-                    </p>
-                </div>
-                <div class="shrink-0 w-full sm:w-auto">
-                    @if($hasAk07)
-                        <a href="{{ route('asesi.assessment.ak01', $assessment) }}" class="w-full sm:w-auto px-5 py-3 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-md transition inline-flex items-center justify-center gap-2">
-                            <span>Buka &amp; Setujui FR.AK.01</span>
-                            <span>&rarr;</span>
-                        </a>
-                    @else
-                        <div class="px-4 py-2.5 bg-amber-100 text-amber-900 rounded-xl text-xs font-medium border border-amber-200 text-center">
-                            Menunggu asesor menetapkan rencana asesmen (FR.AK.07)
-                        </div>
-                    @endif
-                </div>
-            </div>
-        </div>
-    @endif
-
     {{-- Selected Instruments Heading --}}
     <div>
         <h2 class="text-lg font-black text-slate-900 tracking-tight">Instrumen Asesmen Terpilih</h2>
@@ -148,28 +117,8 @@
                 </div>
             </div>
         @empty
-            <div class="col-span-full bg-white rounded-2xl border border-slate-200 p-8 sm:p-12 text-center shadow-sm space-y-3">
-                <div class="w-14 h-14 mx-auto rounded-full bg-slate-100 text-slate-400 flex items-center justify-center text-2xl font-bold">
-                    📋
-                </div>
-                <div>
-                    <h4 class="text-sm font-bold text-slate-800">Ruang Uji Masih Kosong</h4>
-                    <p class="text-xs text-slate-500 mt-1 max-w-md mx-auto leading-relaxed">
-                        @if(! $ak01Agreed)
-                            Instrumen asesmen belum aktif karena Anda belum menyetujui kesepakatan FR.AK.01. Silakan setujui formulir FR.AK.01 di atas untuk mengaktifkan instrumen uji.
-                        @else
-                            Belum ada instrumen uji yang ditetapkan untuk asesmen ini.
-                        @endif
-                    </p>
-                </div>
-                @if(! $ak01Agreed && $hasAk07)
-                    <div class="pt-2">
-                        <a href="{{ route('asesi.assessment.ak01', $assessment) }}" class="inline-flex items-center gap-1.5 px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold rounded-lg shadow-xs transition">
-                            <span>Buka Formulir FR.AK.01</span>
-                            <span>&rarr;</span>
-                        </a>
-                    </div>
-                @endif
+            <div class="col-span-full bg-white rounded-xl border border-slate-200 p-8 text-center shadow-sm">
+                <p class="text-sm text-slate-500">Tidak ada instrumen yang terdaftar untuk asesmen ini.</p>
             </div>
         @endforelse
     </div>
