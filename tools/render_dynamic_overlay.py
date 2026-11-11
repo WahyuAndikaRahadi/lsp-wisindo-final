@@ -11,7 +11,10 @@ import json
 import io
 import base64
 from PIL import Image
-import pymupdf as fitz
+try:
+    import pymupdf as fitz
+except ImportError:
+    import fitz
 
 def get_clean_sig_bytes(sig_data):
     if not sig_data:

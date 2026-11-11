@@ -12,32 +12,13 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
 # Setup fonts
-def find_font(name):
-    paths = [
-        f"/usr/share/fonts/{name}",
-        f"/usr/share/fonts/truetype/{name}",
-        f"/usr/share/fonts/TTF/{name}",
-        f"/usr/share/fonts/carlito/{name}",
-        f"/usr/share/fonts/liberation/{name}",
-    ]
-    for p in paths:
-        if os.path.exists(p):
-            return p
-    return None
+try:
+    from font_helper import draw_checkmark, register_reportlab_fonts
+except ImportError:
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    from font_helper import draw_checkmark, register_reportlab_fonts
 
-carlito_reg = find_font("Carlito-Regular.ttf") or "/usr/share/fonts/carlito/Carlito-Regular.ttf"
-carlito_bold = find_font("Carlito-Bold.ttf") or "/usr/share/fonts/carlito/Carlito-Bold.ttf"
-carlito_italic = find_font("Carlito-Italic.ttf") or "/usr/share/fonts/carlito/Carlito-Italic.ttf"
-dejavu_reg = find_font("DejaVuSans.ttf") or "/usr/share/fonts/TTF/DejaVuSans.ttf"
-
-if os.path.exists(carlito_reg):
-    pdfmetrics.registerFont(TTFont("Cal", carlito_reg))
-if os.path.exists(carlito_bold):
-    pdfmetrics.registerFont(TTFont("Cal-B", carlito_bold))
-if os.path.exists(carlito_italic):
-    pdfmetrics.registerFont(TTFont("Cal-I", carlito_italic))
-if os.path.exists(dejavu_reg):
-    pdfmetrics.registerFont(TTFont("DJ", dejavu_reg))
+register_reportlab_fonts(["Cal", "Cal-B", "Cal-I", "DJ"])
 
 PAGE_W, PAGE_H = 595.5, 842.5
 
@@ -125,8 +106,7 @@ def render(dest_path):
         c.setLineWidth(0.8)
         c.rect(bx, by, size, size)
         if checked:
-            c.setFont("DJ", 10)
-            c.drawCentredString(x_center, by + 1.5, "✓")
+            draw_checkmark(c, x_center, by + 1.5, size=10.0, font_name="DJ")
             
     # Content: R4 (Pertanyaan 1)
     c.setFont("Cal", 11)

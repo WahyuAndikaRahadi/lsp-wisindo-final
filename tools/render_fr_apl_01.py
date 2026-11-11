@@ -23,70 +23,13 @@ S = 0.72  # 1 px @100dpi = 0.72 pt
 X = lambda px: px * S
 Y = lambda py: H - py * S
 
-# Register fonts dengan fallback deteksi lokasi OS (Arch/Debian/Ubuntu)
-def find_font(filename):
-    win_fonts = os.path.join(os.environ.get('WINDIR', 'C:\\Windows'), 'Fonts')
-    win_map = {
-        'Carlito-Regular.ttf': ['calibri.ttf', 'arial.ttf'],
-        'Carlito-Bold.ttf': ['calibrib.ttf', 'arialbd.ttf'],
-        'Carlito-Italic.ttf': ['calibrii.ttf', 'ariali.ttf'],
-        'LiberationSans-Regular.ttf': ['arial.ttf', 'calibri.ttf'],
-        'LiberationSans-Bold.ttf': ['arialbd.ttf', 'calibrib.ttf'],
-        'DejaVuSans.ttf': ['segoeui.ttf', 'arial.ttf'],
-        'DejaVuSansCondensed.ttf': ['arial.ttf'],
-        'DejaVuSansCondensed-Bold.ttf': ['arialbd.ttf'],
-    }
-    if os.path.isdir(win_fonts):
-        if filename in win_map:
-            for cand in win_map[filename]:
-                p = os.path.join(win_fonts, cand)
-                if os.path.isfile(p):
-                    return p
-        p = os.path.join(win_fonts, filename)
-        if os.path.isfile(p):
-            return p
+try:
+    from font_helper import register_reportlab_fonts
+except ImportError:
+    sys.path.insert(0, BASE)
+    from font_helper import register_reportlab_fonts
 
-    candidates = [
-        "/usr/share/fonts/carlito",
-        "/usr/share/fonts/liberation",
-        "/usr/share/fonts/TTF",
-        "/usr/share/fonts/truetype/crosextra",
-        "/usr/share/fonts/truetype/liberation",
-        "/usr/share/fonts/truetype/dejavu",
-        "/Library/Fonts",
-        "/System/Library/Fonts",
-    ]
-    for d in candidates:
-        p = os.path.join(d, filename)
-        if os.path.isfile(p):
-            return p
-    for d in candidates:
-        if os.path.isdir(d):
-            for root, _, files in os.walk(d):
-                if filename in files:
-                    return os.path.join(root, filename)
-
-    fallbacks = {
-        "Carlito-Regular.ttf": "LiberationSans-Regular.ttf",
-        "Carlito-Bold.ttf": "LiberationSans-Bold.ttf",
-        "Carlito-Italic.ttf": "LiberationSans-Italic.ttf",
-    }
-    if filename in fallbacks:
-        return find_font(fallbacks[filename])
-    return filename
-
-font_map = {
-    "Cal": "Carlito-Regular.ttf",
-    "Cal-B": "Carlito-Bold.ttf",
-    "Cal-I": "Carlito-Italic.ttf",
-    "Lib": "LiberationSans-Regular.ttf",
-    "Lib-B": "LiberationSans-Bold.ttf",
-    "DJ": "DejaVuSans.ttf",
-    "DJC": "DejaVuSansCondensed.ttf",
-    "DJC-B": "DejaVuSansCondensed-Bold.ttf",
-}
-for name, ffile in font_map.items():
-    pdfmetrics.registerFont(TTFont(name, find_font(ffile)))
+register_reportlab_fonts(["Cal", "Cal-B", "Cal-I", "Lib", "Lib-B", "DJ", "DJC", "DJC-B"])
 
 sw = pdfmetrics.stringWidth
 BLUE = Color(0.27, 0.45, 0.77)

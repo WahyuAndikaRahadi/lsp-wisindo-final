@@ -25,39 +25,13 @@ ASSETS_DIR = os.path.join(PROJECT_ROOT, "tests", "Fixtures", "muk", "assets")
 LOGO_PATH = os.path.join(ASSETS_DIR, "logo.png")
 
 # ----------------- FONT REGISTRATION -----------------
-def register_fonts():
-    try:
-        from font_helper import find_font
-    except ImportError:
-        sys.path.insert(0, os.path.dirname(__file__))
-        from font_helper import find_font
+try:
+    from font_helper import register_reportlab_fonts
+except ImportError:
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    from font_helper import register_reportlab_fonts
 
-    reg = find_font("Carlito-Regular.ttf", fallback="LiberationSans-Regular.ttf")
-    bold = find_font("Carlito-Bold.ttf", fallback="LiberationSans-Bold.ttf")
-    italic = find_font("Carlito-Italic.ttf", fallback="LiberationSans-Italic.ttf")
-
-    if os.path.isfile(reg):
-        pdfmetrics.registerFont(TTFont("Lib", reg))
-        pdfmetrics.registerFont(TTFont("Cal", reg))
-    else:
-        pdfmetrics.registerFont(TTFont("Lib", "Helvetica"))
-        pdfmetrics.registerFont(TTFont("Cal", "Helvetica"))
-
-    if os.path.isfile(bold):
-        pdfmetrics.registerFont(TTFont("Lib-B", bold))
-        pdfmetrics.registerFont(TTFont("Cal-B", bold))
-    else:
-        pdfmetrics.registerFont(TTFont("Lib-B", "Helvetica-Bold"))
-        pdfmetrics.registerFont(TTFont("Cal-B", "Helvetica-Bold"))
-
-    if os.path.isfile(italic):
-        pdfmetrics.registerFont(TTFont("Lib-I", italic))
-        pdfmetrics.registerFont(TTFont("Cal-I", italic))
-    else:
-        pdfmetrics.registerFont(TTFont("Lib-I", "Helvetica-Oblique"))
-        pdfmetrics.registerFont(TTFont("Cal-I", "Helvetica-Oblique"))
-
-register_fonts()
+register_reportlab_fonts(["Lib", "Lib-B", "Lib-I", "Cal", "Cal-B", "Cal-I"])
 
 PAGE_W, PAGE_H = 596.0, 843.0
 Y = lambda top: PAGE_H - top

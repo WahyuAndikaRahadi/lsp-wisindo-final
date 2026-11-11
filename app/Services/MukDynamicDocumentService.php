@@ -10,6 +10,7 @@ use App\Models\Scheme;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -19,6 +20,8 @@ class MukDynamicDocumentService
     protected string $baseDir;
 
     protected string $cacheDir;
+
+    protected ?string $resolvedPythonExecutable = null;
 
     public function __construct()
     {
@@ -1533,26 +1536,286 @@ class MukDynamicDocumentService
      */
     public function getPythonExecutable(): string
     {
-        $venvCandidates = PHP_OS_FAMILY === 'Windows'
-            ? [base_path('.venv/Scripts/python.exe'), base_path('venv/Scripts/python.exe')]
-            : [base_path('.venv/bin/python'), base_path('venv/bin/python')];
-
-        foreach ($venvCandidates as $venvPython) {
-            if (File::isFile($venvPython)) {
-                return $venvPython;
+        $configured = trim((string) (config('services.python.binary') ?? ''));
+        if ($configured !== '') {
+            if (! str_contains($configured, '/') && ! str_contains($configured, '\\')) {
+                return $configured;
             }
+            if (File::isFile($configured)) {
+                return $configured;
+            }
+            Log::warning('Configured PYTHON_BINARY path does not exist.', ['configured' => $configured]);
         }
+
+        if ($this->resolvedPythonExecutable !== null) {
+            return $this->resolvedPythonExecutable;
+        }
+
+        $candidates = [];
 
         if (PHP_OS_FAMILY === 'Windows') {
-            $laragonPython = 'C:\\laragon\\bin\\python\\python-3.10\\python.exe';
-            if (File::isFile($laragonPython)) {
-                return $laragonPython;
+            $candidates = [
+                base_path('.venv/Scripts/python.exe'),
+                base_path('venv/Scripts/python.exe'),
+                'C:\\laragon\\bin\\python\\python-3.10\\python.exe',
+                'python',
+            ];
+        } else {
+            $candidates = [
+                base_path('.venv/bin/python'),
+                base_path('.venv/bin/python3'),
+                base_path('venv/bin/python'),
+                base_path('venv/bin/python3'),
+            ];
+
+            // Discover user virtualenvs (e.g. Hostinger / cPanel Setup Python App)
+            $homeDir = $this->resolveLinuxHomeDirectory();
+            if ($homeDir !== null) {
+                $sharedVenvs = array_merge(
+                    glob($homeDir.'/virtualenv/*/bin/python*') ?: [],
+                    glob($homeDir.'/virtualenv/*/*/bin/python*') ?: [],
+                    glob($homeDir.'/virtualenv/*/*/*/bin/python*') ?: [],
+                );
+                foreach ($sharedVenvs as $venvBin) {
+                    if (File::isFile($venvBin) && preg_match('/\/python(?:\d+(?:\.\d+)*)?$/', $venvBin)) {
+                        $candidates[] = $venvBin;
+                    }
+                }
+                $candidates[] = $homeDir.'/.venv/bin/python';
+                $candidates[] = $homeDir.'/venv/bin/python';
             }
 
-            return 'python';
+            foreach ([
+                '/opt/alt/python312/bin/python3.12',
+                '/opt/alt/python311/bin/python3.11',
+                '/opt/alt/python310/bin/python3.10',
+                '/opt/alt/python39/bin/python3.9',
+                '/usr/local/bin/python3',
+                '/usr/bin/python3',
+                'python3',
+                'python',
+            ] as $sysBin) {
+                $candidates[] = $sysBin;
+            }
         }
 
-        return 'python3';
+        $candidates = array_values(array_unique($candidates));
+        $firstExisting = null;
+
+        foreach ($candidates as $candidate) {
+            $isPath = str_contains($candidate, '/') || str_contains($candidate, '\\');
+            if ($isPath && ! File::isFile($candidate)) {
+                continue;
+            }
+
+            if ($firstExisting === null && $isPath) {
+                $firstExisting = $candidate;
+            }
+
+            if ($this->probePythonHasDependencies($candidate)) {
+                return $this->resolvedPythonExecutable = $candidate;
+            }
+        }
+
+        return $this->resolvedPythonExecutable = ($firstExisting ?? (PHP_OS_FAMILY === 'Windows' ? 'python' : 'python3'));
+    }
+
+    /**
+     * Determine the account home directory on Linux/shared hosting even when LiteSpeed/PHP runs with empty or /tmp HOME.
+     */
+    protected function resolveLinuxHomeDirectory(): ?string
+    {
+        $envHome = getenv('HOME') ?: ($_SERVER['HOME'] ?? '');
+        if (is_string($envHome) && $envHome !== '' && $envHome !== '/' && $envHome !== '/tmp' && File::isDirectory($envHome)) {
+            return rtrim($envHome, '/');
+        }
+
+        if (preg_match('#^(/home/[^/]+)#', base_path(), $matches) && File::isDirectory($matches[1])) {
+            return $matches[1];
+        }
+
+        return null;
+    }
+
+    /**
+     * Check whether a PHP process function is available and not blocked by disable_functions.
+     */
+    protected function isPhpFunctionAvailable(string $functionName): bool
+    {
+        if (! function_exists($functionName)) {
+            return false;
+        }
+
+        $disabled = array_map(
+            static fn (string $fn): string => strtolower(trim($fn)),
+            explode(',', (string) ini_get('disable_functions'))
+        );
+
+        return ! in_array(strtolower($functionName), $disabled, true);
+    }
+
+    /**
+     * Execute an external command using proc_open, exec, or shell_exec fallback.
+     *
+     * @return array{ok: bool, exit_code: int|null, output: string}
+     */
+    protected function executeCommand(string $command): array
+    {
+        $env = null;
+        if (PHP_OS_FAMILY !== 'Windows') {
+            $baseEnv = getenv();
+            if (is_array($baseEnv)) {
+                $homeDir = $this->resolveLinuxHomeDirectory();
+                if ($homeDir !== null) {
+                    $baseEnv['HOME'] = $homeDir;
+                    $userSiteBase = $homeDir.'/.local';
+                    if (File::isDirectory($userSiteBase) && empty($baseEnv['PYTHONUSERBASE'])) {
+                        $baseEnv['PYTHONUSERBASE'] = $userSiteBase;
+                    }
+                }
+                $env = $baseEnv;
+            }
+        }
+
+        if ($this->isPhpFunctionAvailable('proc_open')) {
+            $descriptors = [
+                0 => ['pipe', 'r'],
+                1 => ['pipe', 'w'],
+                2 => ['pipe', 'w'],
+            ];
+
+            $process = @proc_open($command, $descriptors, $pipes, base_path(), $env);
+            if (is_resource($process)) {
+                @fclose($pipes[0]);
+                $stdout = stream_get_contents($pipes[1]) ?: '';
+                $stderr = stream_get_contents($pipes[2]) ?: '';
+                @fclose($pipes[1]);
+                @fclose($pipes[2]);
+                $exitCode = proc_close($process);
+                $combined = trim($stdout."\n".$stderr);
+
+                return [
+                    'ok' => $exitCode === 0,
+                    'exit_code' => $exitCode,
+                    'output' => $combined,
+                ];
+            }
+        }
+
+        $prefix = '';
+        if (PHP_OS_FAMILY !== 'Windows') {
+            $homeDir = $this->resolveLinuxHomeDirectory();
+            if ($homeDir !== null) {
+                $prefix = 'HOME='.escapeshellarg($homeDir).' ';
+                if (File::isDirectory($homeDir.'/.local')) {
+                    $prefix .= 'PYTHONUSERBASE='.escapeshellarg($homeDir.'/.local').' ';
+                }
+            }
+        }
+
+        if ($this->isPhpFunctionAvailable('exec')) {
+            $lines = [];
+            $exitCode = 1;
+            @exec($prefix.$command.' 2>&1', $lines, $exitCode);
+
+            return [
+                'ok' => $exitCode === 0,
+                'exit_code' => $exitCode,
+                'output' => trim(implode("\n", $lines)),
+            ];
+        }
+
+        if ($this->isPhpFunctionAvailable('shell_exec')) {
+            $rawOutput = @shell_exec($prefix.$command.' 2>&1');
+
+            return [
+                'ok' => $rawOutput !== null,
+                'exit_code' => null,
+                'output' => trim((string) ($rawOutput ?? '')),
+            ];
+        }
+
+        return [
+            'ok' => false,
+            'exit_code' => -1,
+            'output' => 'Tidak ada fungsi eksekusi proses PHP yang aktif (proc_open, exec, dan shell_exec dinonaktifkan oleh disable_functions di php.ini).',
+        ];
+    }
+
+    /**
+     * Verify whether a Python binary can import required PDF libraries.
+     */
+    protected function probePythonHasDependencies(string $python): bool
+    {
+        $cmd = escapeshellarg($python).' -c '.escapeshellarg('import fitz, reportlab, PIL');
+        $res = $this->executeCommand($cmd);
+
+        return $res['ok'];
+    }
+
+    /**
+     * Execute a Python script and verify it generates a valid PDF file.
+     *
+     * @param  array<int, string>  $args
+     */
+    protected function runPythonScript(string $python, string $scriptPath, array $args, string $outputPath, string $docType): bool
+    {
+        if (File::isFile($outputPath)) {
+            @unlink($outputPath);
+        }
+
+        $escapedArgs = array_map(static fn (string $arg): string => escapeshellarg($arg), $args);
+        $command = escapeshellarg($python).' '.escapeshellarg($scriptPath).' '.implode(' ', $escapedArgs);
+        $result = $this->executeCommand($command);
+
+        $fileReady = File::isFile($outputPath) && filesize($outputPath) > 1000;
+        $exitOk = $result['exit_code'] === 0 || ($result['exit_code'] === null && $fileReady);
+
+        if ($fileReady && $exitOk) {
+            return true;
+        }
+
+        Log::error("Dynamic MUK Python generator failed [{$docType}]", [
+            'python' => $python,
+            'script' => $scriptPath,
+            'exit_code' => $result['exit_code'],
+            'file_exists' => File::isFile($outputPath),
+            'file_size' => File::isFile($outputPath) ? filesize($outputPath) : 0,
+            'output' => mb_substr($result['output'], 0, 2000),
+        ]);
+
+        return false;
+    }
+
+    /**
+     * Write temporary JSON payload, run generator script, and clean up the temporary JSON.
+     *
+     * @param  array<string, mixed>  $payloadData
+     */
+    protected function runGeneratorWithPayload(
+        string $python,
+        string $scriptPath,
+        array $payloadData,
+        string $prefix,
+        string $outputPath,
+        string $docType,
+        ?string $masterPdf = null,
+    ): bool {
+        $tempJsonPath = $this->cacheDir.'/'.$prefix.'_'.uniqid().'.json';
+        File::put($tempJsonPath, json_encode($payloadData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+
+        try {
+            $args = [$tempJsonPath, $outputPath];
+            if ($masterPdf !== null && File::isFile($masterPdf)) {
+                $args[] = $masterPdf;
+            }
+
+            return $this->runPythonScript($python, $scriptPath, $args, $outputPath, $docType);
+        } finally {
+            if (File::isFile($tempJsonPath)) {
+                @unlink($tempJsonPath);
+            }
+        }
     }
 
     /**
@@ -1575,28 +1838,20 @@ class MukDynamicDocumentService
 
         // Python executable finder
         $python = $this->getPythonExecutable();
-        $pythonExec = escapeshellarg($python);
 
         $payload = $this->buildPayload($schedule, $assessment);
         $tempJson = $this->cacheDir.'/muk_json_'.uniqid().'.json';
         File::put($tempJson, json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
 
         try {
-            // 1. Operational generators (ReportLab)
+            // 1. Operational generators (ReportLab & PyMuPDF)
             if ($normType === 'apl01') {
                 $script = base_path('tools/render_fr_apl_01.py');
                 if (File::isFile($script)) {
                     $aplPayload = $assessment
                         ? $this->buildApl01Data($schedule, $assessment)
                         : $this->buildPayload($schedule, null);
-                    $tempAplJson = $this->cacheDir.'/muk_apl01_'.uniqid().'.json';
-                    File::put($tempAplJson, json_encode($aplPayload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
-                    if (File::isFile($outputPath)) {
-                        @unlink($outputPath);
-                    }
-                    shell_exec("{$pythonExec} ".escapeshellarg($script).' '.escapeshellarg($tempAplJson).' '.escapeshellarg($outputPath).' 2>&1');
-                    @unlink($tempAplJson);
-                    if (File::isFile($outputPath) && filesize($outputPath) > 1000) {
+                    if ($this->runGeneratorWithPayload($python, $script, $aplPayload, 'muk_apl01', $outputPath, $normType)) {
                         return $outputPath;
                     }
                 }
@@ -1608,14 +1863,7 @@ class MukDynamicDocumentService
                     $apl02Payload = $assessment
                         ? $this->buildApl02Data($schedule, $assessment)
                         : $this->buildPayload($schedule, null);
-                    $tempAplJson = $this->cacheDir.'/muk_apl02_'.uniqid().'.json';
-                    File::put($tempAplJson, json_encode($apl02Payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
-                    if (File::isFile($outputPath)) {
-                        @unlink($outputPath);
-                    }
-                    shell_exec("{$pythonExec} ".escapeshellarg($script).' '.escapeshellarg($tempAplJson).' '.escapeshellarg($outputPath).' 2>&1');
-                    @unlink($tempAplJson);
-                    if (File::isFile($outputPath) && filesize($outputPath) > 1000) {
+                    if ($this->runGeneratorWithPayload($python, $script, $apl02Payload, 'muk_apl02', $outputPath, $normType)) {
                         return $outputPath;
                     }
                 }
@@ -1627,14 +1875,7 @@ class MukDynamicDocumentService
                     $ak01Payload = $assessment
                         ? $this->buildAk01Data($schedule, $assessment)
                         : $this->buildPayload($schedule, null);
-                    $tempAkJson = $this->cacheDir.'/muk_ak01_'.uniqid().'.json';
-                    File::put($tempAkJson, json_encode($ak01Payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
-                    if (File::isFile($outputPath)) {
-                        @unlink($outputPath);
-                    }
-                    shell_exec("{$pythonExec} ".escapeshellarg($script).' '.escapeshellarg($tempAkJson).' '.escapeshellarg($outputPath).' 2>&1');
-                    @unlink($tempAkJson);
-                    if (File::isFile($outputPath) && filesize($outputPath) > 1000) {
+                    if ($this->runGeneratorWithPayload($python, $script, $ak01Payload, 'muk_ak01', $outputPath, $normType)) {
                         return $outputPath;
                     }
                 }
@@ -1647,16 +1888,8 @@ class MukDynamicDocumentService
                     $ak02Payload = $targetAssessment
                         ? $this->buildAk02Data($schedule, $targetAssessment)
                         : $this->buildPayload($schedule, null);
-                    $tempAk02Json = $this->cacheDir.'/muk_ak02_'.uniqid().'.json';
-                    File::put($tempAk02Json, json_encode($ak02Payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
-                    if (File::isFile($outputPath)) {
-                        @unlink($outputPath);
-                    }
                     $masterPdf = $this->getDynamicFilePath($schedule->scheme, 'ak02');
-                    $masterArg = ($masterPdf && File::isFile($masterPdf)) ? ' '.escapeshellarg($masterPdf) : '';
-                    shell_exec("{$pythonExec} ".escapeshellarg($script).' '.escapeshellarg($tempAk02Json).' '.escapeshellarg($outputPath).$masterArg.' 2>&1');
-                    @unlink($tempAk02Json);
-                    if (File::isFile($outputPath) && filesize($outputPath) > 1000) {
+                    if ($this->runGeneratorWithPayload($python, $script, $ak02Payload, 'muk_ak02', $outputPath, $normType, $masterPdf)) {
                         return $outputPath;
                     }
                 }
@@ -1669,16 +1902,8 @@ class MukDynamicDocumentService
                     $ak03Payload = $targetAssessment
                         ? $this->buildAk03Data($schedule, $targetAssessment)
                         : $this->buildPayload($schedule, null);
-                    $tempAk03Json = $this->cacheDir.'/muk_ak03_'.uniqid().'.json';
-                    File::put($tempAk03Json, json_encode($ak03Payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
-                    if (File::isFile($outputPath)) {
-                        @unlink($outputPath);
-                    }
                     $masterPdf = $this->getDynamicFilePath($schedule->scheme, 'ak03');
-                    $masterArg = ($masterPdf && File::isFile($masterPdf)) ? ' '.escapeshellarg($masterPdf) : '';
-                    shell_exec("{$pythonExec} ".escapeshellarg($script).' '.escapeshellarg($tempAk03Json).' '.escapeshellarg($outputPath).$masterArg.' 2>&1');
-                    @unlink($tempAk03Json);
-                    if (File::isFile($outputPath) && filesize($outputPath) > 1000) {
+                    if ($this->runGeneratorWithPayload($python, $script, $ak03Payload, 'muk_ak03', $outputPath, $normType, $masterPdf)) {
                         return $outputPath;
                     }
                 }
@@ -1690,14 +1915,7 @@ class MukDynamicDocumentService
                     $ak07Payload = $assessment
                         ? $this->buildAk07Data($schedule, $assessment)
                         : $this->buildPayload($schedule, null);
-                    $tempAk07Json = $this->cacheDir.'/muk_ak07_'.uniqid().'.json';
-                    File::put($tempAk07Json, json_encode($ak07Payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
-                    if (File::isFile($outputPath)) {
-                        @unlink($outputPath);
-                    }
-                    shell_exec("{$pythonExec} ".escapeshellarg($script).' '.escapeshellarg($tempAk07Json).' '.escapeshellarg($outputPath).' 2>&1');
-                    @unlink($tempAk07Json);
-                    if (File::isFile($outputPath) && filesize($outputPath) > 1000) {
+                    if ($this->runGeneratorWithPayload($python, $script, $ak07Payload, 'muk_ak07', $outputPath, $normType)) {
                         return $outputPath;
                     }
                 }
@@ -1710,16 +1928,8 @@ class MukDynamicDocumentService
                     $ia01Payload = $targetAssessment
                         ? $this->buildIa01Data($schedule, $targetAssessment)
                         : $this->buildPayload($schedule, null);
-                    $tempIa01Json = $this->cacheDir.'/muk_ia01_'.uniqid().'.json';
-                    File::put($tempIa01Json, json_encode($ia01Payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
-                    if (File::isFile($outputPath)) {
-                        @unlink($outputPath);
-                    }
                     $masterPdf = $this->getDynamicFilePath($schedule->scheme, 'ia01');
-                    $masterArg = ($masterPdf && File::isFile($masterPdf)) ? ' '.escapeshellarg($masterPdf) : '';
-                    shell_exec("{$pythonExec} ".escapeshellarg($script).' '.escapeshellarg($tempIa01Json).' '.escapeshellarg($outputPath).$masterArg.' 2>&1');
-                    @unlink($tempIa01Json);
-                    if (File::isFile($outputPath) && filesize($outputPath) > 1000) {
+                    if ($this->runGeneratorWithPayload($python, $script, $ia01Payload, 'muk_ia01', $outputPath, $normType, $masterPdf)) {
                         return $outputPath;
                     }
                 }
@@ -1732,16 +1942,8 @@ class MukDynamicDocumentService
                     $ia02Payload = $targetAssessment
                         ? $this->buildIa02Data($schedule, $targetAssessment)
                         : $this->buildPayload($schedule, null);
-                    $tempIa02Json = $this->cacheDir.'/muk_ia02_'.uniqid().'.json';
-                    File::put($tempIa02Json, json_encode($ia02Payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
-                    if (File::isFile($outputPath)) {
-                        @unlink($outputPath);
-                    }
                     $masterPdf = $this->getDynamicFilePath($schedule->scheme, 'ia02');
-                    $masterArg = ($masterPdf && File::isFile($masterPdf)) ? ' '.escapeshellarg($masterPdf) : '';
-                    shell_exec("{$pythonExec} ".escapeshellarg($script).' '.escapeshellarg($tempIa02Json).' '.escapeshellarg($outputPath).$masterArg.' 2>&1');
-                    @unlink($tempIa02Json);
-                    if (File::isFile($outputPath) && filesize($outputPath) > 1000) {
+                    if ($this->runGeneratorWithPayload($python, $script, $ia02Payload, 'muk_ia02', $outputPath, $normType, $masterPdf)) {
                         return $outputPath;
                     }
                 }
@@ -1754,53 +1956,31 @@ class MukDynamicDocumentService
                     $ia03Payload = $targetAssessment
                         ? $this->buildIa03Data($schedule, $targetAssessment)
                         : $this->buildPayload($schedule, null);
-                    $tempIa03Json = $this->cacheDir.'/muk_ia03_'.uniqid().'.json';
-                    File::put($tempIa03Json, json_encode($ia03Payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
-                    if (File::isFile($outputPath)) {
-                        @unlink($outputPath);
-                    }
                     $masterPdf = $this->getDynamicFilePath($schedule->scheme, 'ia03');
-                    $masterArg = ($masterPdf && File::isFile($masterPdf)) ? ' '.escapeshellarg($masterPdf) : '';
-                    shell_exec("{$pythonExec} ".escapeshellarg($script).' '.escapeshellarg($tempIa03Json).' '.escapeshellarg($outputPath).$masterArg.' 2>&1');
-                    @unlink($tempIa03Json);
-                    if (File::isFile($outputPath) && filesize($outputPath) > 1000) {
+                    if ($this->runGeneratorWithPayload($python, $script, $ia03Payload, 'muk_ia03', $outputPath, $normType, $masterPdf)) {
                         return $outputPath;
                     }
                 }
             }
+
             if (in_array($normType, ['ba', 'beritaacara', 'beritaacaradanpeserta', 'hadirasesi', 'daftarhadirasesi'], true)) {
                 $script = base_path('tools/render_berita_acara.py');
-                if (File::isFile($script)) {
-                    if (File::isFile($outputPath)) {
-                        @unlink($outputPath);
-                    }
-                    shell_exec("{$pythonExec} ".escapeshellarg($script).' '.escapeshellarg($tempJson).' '.escapeshellarg($outputPath).' 2>&1');
-                    if (File::isFile($outputPath) && filesize($outputPath) > 1000) {
-                        return $outputPath;
-                    }
+                if (File::isFile($script) && $this->runPythonScript($python, $script, [$tempJson, $outputPath], $outputPath, $normType)) {
+                    return $outputPath;
                 }
             }
 
             if (in_array($normType, ['hadirasesor', 'daftarhadirasesor'], true)) {
                 $script = base_path('tools/render_daftar_hadir_asesor.py');
-                if (File::isFile($script)) {
-                    if (File::isFile($outputPath)) {
-                        @unlink($outputPath);
-                    }
-                    shell_exec("{$pythonExec} ".escapeshellarg($script).' '.escapeshellarg($tempJson).' '.escapeshellarg($outputPath).' 2>&1');
-                    if (File::isFile($outputPath) && filesize($outputPath) > 1000) {
-                        return $outputPath;
-                    }
+                if (File::isFile($script) && $this->runPythonScript($python, $script, [$tempJson, $outputPath], $outputPath, $normType)) {
+                    return $outputPath;
                 }
             }
 
             if ($normType === 'pernyataan') {
                 $script = base_path('tools/render_surat_pernyataan.py');
-                if (File::isFile($script)) {
-                    shell_exec("{$pythonExec} ".escapeshellarg($script).' '.escapeshellarg($tempJson).' '.escapeshellarg($outputPath));
-                    if (File::isFile($outputPath) && filesize($outputPath) > 1000) {
-                        return $outputPath;
-                    }
+                if (File::isFile($script) && $this->runPythonScript($python, $script, [$tempJson, $outputPath], $outputPath, $normType)) {
+                    return $outputPath;
                 }
             }
 
@@ -1809,14 +1989,7 @@ class MukDynamicDocumentService
                 if (File::isFile($script)) {
                     $targetAssessment = $assessment ?? $schedule->assessments->first();
                     $ia05cPayload = $this->buildIa05cData($schedule, $targetAssessment);
-                    $tempIa05cJson = $this->cacheDir.'/muk_ia05c_'.uniqid().'.json';
-                    File::put($tempIa05cJson, json_encode($ia05cPayload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
-                    if (File::isFile($outputPath)) {
-                        @unlink($outputPath);
-                    }
-                    shell_exec("{$pythonExec} ".escapeshellarg($script).' '.escapeshellarg($tempIa05cJson).' '.escapeshellarg($outputPath).' 2>&1');
-                    @unlink($tempIa05cJson);
-                    if (File::isFile($outputPath) && filesize($outputPath) > 1000) {
+                    if ($this->runGeneratorWithPayload($python, $script, $ia05cPayload, 'muk_ia05c', $outputPath, $normType)) {
                         return $outputPath;
                     }
                 }
@@ -1827,14 +2000,7 @@ class MukDynamicDocumentService
                 if (File::isFile($script)) {
                     $targetAssessment = $assessment ?? $schedule->assessments->first();
                     $ia05aPayload = $this->buildIa05aData($schedule, $targetAssessment);
-                    $tempIa05aJson = $this->cacheDir.'/muk_ia05a_'.uniqid().'.json';
-                    File::put($tempIa05aJson, json_encode($ia05aPayload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
-                    if (File::isFile($outputPath)) {
-                        @unlink($outputPath);
-                    }
-                    shell_exec("{$pythonExec} ".escapeshellarg($script).' '.escapeshellarg($tempIa05aJson).' '.escapeshellarg($outputPath).' 2>&1');
-                    @unlink($tempIa05aJson);
-                    if (File::isFile($outputPath) && filesize($outputPath) > 1000) {
+                    if ($this->runGeneratorWithPayload($python, $script, $ia05aPayload, 'muk_ia05a', $outputPath, $normType)) {
                         return $outputPath;
                     }
                 }
@@ -1850,17 +2016,24 @@ class MukDynamicDocumentService
                         : $payload;
                     $tempOverlayJson = $this->cacheDir.'/muk_ov_'.uniqid().'.json';
                     File::put($tempOverlayJson, json_encode($overlayPayload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
-                    if (File::isFile($outputPath)) {
-                        @unlink($outputPath);
-                    }
-                    shell_exec("{$pythonExec} ".escapeshellarg($overlayScript).' '.escapeshellarg($masterPdf).' '.escapeshellarg($tempOverlayJson).' '.escapeshellarg($outputPath).' 2>&1');
-                    @unlink($tempOverlayJson);
-                    if (File::isFile($outputPath) && filesize($outputPath) > 1000) {
-                        return $outputPath;
+
+                    try {
+                        if ($this->runPythonScript($python, $overlayScript, [$masterPdf, $tempOverlayJson, $outputPath], $outputPath, "{$normType}:overlay")) {
+                            return $outputPath;
+                        }
+                    } finally {
+                        if (File::isFile($tempOverlayJson)) {
+                            @unlink($tempOverlayJson);
+                        }
                     }
                 }
 
-                // If python overlay execution failed, return clean master copy
+                // If python overlay execution failed, log warning and return clean master copy
+                Log::warning("Falling back to blank master PDF [{$normType}] because Python generators failed.", [
+                    'python' => $python,
+                    'master_pdf' => $masterPdf,
+                ]);
+
                 return $masterPdf;
             }
 
@@ -1880,6 +2053,11 @@ class MukDynamicDocumentService
             ];
 
             if (isset($fixtureMap[$normType]) && File::isFile(base_path($fixtureMap[$normType]))) {
+                Log::warning("Falling back to static fixture PDF [{$normType}] because Python generators failed.", [
+                    'python' => $python,
+                    'fixture_pdf' => $fixtureMap[$normType],
+                ]);
+
                 return base_path($fixtureMap[$normType]);
             }
         } finally {

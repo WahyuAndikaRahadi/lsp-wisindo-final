@@ -21,79 +21,13 @@ PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 ASSETS = os.path.join(PROJECT_ROOT, "tests", "Fixtures", "muk", "assets")
 OUT_FILE = os.path.join(PROJECT_ROOT, "tests", "Fixtures", "muk", "FR_AK_07_generated.pdf")
 
-def register_fonts():
-    font_candidates = {
-        "Lib": [
-            "C:/Windows/Fonts/arial.ttf",
-            "C:/Windows/Fonts/calibri.ttf",
-            "/usr/share/fonts/liberation/LiberationSans-Regular.ttf",
-            "/usr/share/fonts/TTF/DejaVuSans.ttf",
-            "LiberationSans-Regular.ttf"
-        ],
-        "Lib-B": [
-            "C:/Windows/Fonts/arialbd.ttf",
-            "C:/Windows/Fonts/calibrib.ttf",
-            "/usr/share/fonts/liberation/LiberationSans-Bold.ttf",
-            "/usr/share/fonts/TTF/DejaVuSans-Bold.ttf",
-            "LiberationSans-Bold.ttf"
-        ],
-        "Lib-I": [
-            "C:/Windows/Fonts/ariali.ttf",
-            "C:/Windows/Fonts/calibrii.ttf",
-            "/usr/share/fonts/liberation/LiberationSans-Italic.ttf",
-            "/usr/share/fonts/TTF/DejaVuSans-Oblique.ttf",
-            "LiberationSans-Italic.ttf"
-        ],
-        "Cal": [
-            "C:/Windows/Fonts/calibri.ttf",
-            "C:/Windows/Fonts/arial.ttf",
-            "/usr/share/fonts/liberation/LiberationSans-Regular.ttf",
-            "Carlito-Regular.ttf"
-        ],
-        "Cal-B": [
-            "C:/Windows/Fonts/calibrib.ttf",
-            "C:/Windows/Fonts/arialbd.ttf",
-            "/usr/share/fonts/liberation/LiberationSans-Bold.ttf",
-            "Carlito-Bold.ttf"
-        ],
-        "Cal-I": [
-            "C:/Windows/Fonts/calibrii.ttf",
-            "C:/Windows/Fonts/ariali.ttf",
-            "/usr/share/fonts/liberation/LiberationSans-Italic.ttf",
-            "Carlito-Italic.ttf"
-        ],
-        "Tah": [
-            "C:/Windows/Fonts/tahoma.ttf",
-            "C:/Windows/Fonts/arial.ttf",
-            "/usr/share/fonts/liberation/LiberationSans-Regular.ttf",
-        ],
-        "Tah-B": [
-            "C:/Windows/Fonts/tahomabd.ttf",
-            "C:/Windows/Fonts/arialbd.ttf",
-            "/usr/share/fonts/liberation/LiberationSans-Bold.ttf",
-        ],
-        "DJ": [
-            "C:/Windows/Fonts/arial.ttf",
-            "/usr/share/fonts/TTF/DejaVuSans.ttf",
-            "DejaVuSans.ttf"
-        ],
-        "Times": [
-            "C:/Windows/Fonts/times.ttf",
-            "C:/Windows/Fonts/arial.ttf",
-            "/usr/share/fonts/liberation/LiberationSerif-Regular.ttf",
-            "LiberationSerif-Regular.ttf"
-        ]
-    }
-    for name, paths in font_candidates.items():
-        for p in paths:
-            if os.path.exists(p):
-                try:
-                    pdfmetrics.registerFont(TTFont(name, p))
-                    break
-                except Exception:
-                    pass
+try:
+    from font_helper import register_reportlab_fonts
+except ImportError:
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    from font_helper import register_reportlab_fonts
 
-register_fonts()
+register_reportlab_fonts(["Lib", "Lib-B", "Lib-I", "Cal", "Cal-B", "Cal-I", "Tah", "Tah-B", "DJ", "Times"])
 
 PAGE_W, PAGE_H = 595.56, 842.52
 Y = lambda top: PAGE_H - top

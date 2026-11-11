@@ -11,32 +11,13 @@ from reportlab.lib.colors import black
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
-def find_font(name):
-    paths = [
-        f"/usr/share/fonts/{name}",
-        f"/usr/share/fonts/truetype/{name}",
-        f"/usr/share/fonts/TTF/{name}",
-        f"/usr/share/fonts/carlito/{name}",
-        f"/usr/share/fonts/liberation/{name}",
-    ]
-    for p in paths:
-        if os.path.exists(p):
-            return p
-    return None
+try:
+    from font_helper import draw_checkmark, register_reportlab_fonts
+except ImportError:
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    from font_helper import draw_checkmark, register_reportlab_fonts
 
-carlito_reg = find_font("Carlito-Regular.ttf") or "/usr/share/fonts/carlito/Carlito-Regular.ttf"
-carlito_bold = find_font("Carlito-Bold.ttf") or "/usr/share/fonts/carlito/Carlito-Bold.ttf"
-carlito_italic = find_font("Carlito-Italic.ttf") or "/usr/share/fonts/carlito/Carlito-Italic.ttf"
-dejavu_reg = find_font("DejaVuSans.ttf") or "/usr/share/fonts/TTF/DejaVuSans.ttf"
-
-if os.path.exists(carlito_reg):
-    pdfmetrics.registerFont(TTFont("Cal", carlito_reg))
-if os.path.exists(carlito_bold):
-    pdfmetrics.registerFont(TTFont("Cal-B", carlito_bold))
-if os.path.exists(carlito_italic):
-    pdfmetrics.registerFont(TTFont("Cal-I", carlito_italic))
-if os.path.exists(dejavu_reg):
-    pdfmetrics.registerFont(TTFont("DJ", dejavu_reg))
+register_reportlab_fonts(["Cal", "Cal-B", "Cal-I", "DJ"])
 
 PAGE_W, PAGE_H = 612.0, 792.0
 
@@ -158,15 +139,13 @@ def render(dest_path):
             bx_a = (x2 + x_mid) / 2 - sz / 2
             c.rect(bx_a, mid_y - sz / 2, sz, sz)
             if item.get("ada"):
-                c.setFont("DJ", 7)
-                c.drawCentredString(bx_a + sz / 2, mid_y - sz / 2 + 0.5, "✓")
+                draw_checkmark(c, bx_a + sz / 2, mid_y - sz / 2 + 0.5, size=7.0, font_name="DJ")
                 
             # Tidak
             bx_t = (x_mid + x3) / 2 - sz / 2
             c.rect(bx_t, mid_y - sz / 2, sz, sz)
             if not item.get("ada"):
-                c.setFont("DJ", 7)
-                c.drawCentredString(bx_t + sz / 2, mid_y - sz / 2 + 0.5, "✓")
+                draw_checkmark(c, bx_t + sz / 2, mid_y - sz / 2 + 0.5, size=7.0, font_name="DJ")
                 
         curr_y = next_y
         

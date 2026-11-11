@@ -13,26 +13,13 @@ from reportlab.pdfbase.ttfonts import TTFont
 
 ASSETS = os.path.join(os.path.dirname(__file__), "..", "tests", "Fixtures", "muk", "assets")
 
-def find_font(name):
-    paths = [
-        f"/usr/share/fonts/{name}",
-        f"/usr/share/fonts/truetype/{name}",
-        f"/usr/share/fonts/TTF/{name}",
-        f"/usr/share/fonts/carlito/{name}",
-        f"/usr/share/fonts/liberation/{name}",
-    ]
-    for p in paths:
-        if os.path.exists(p):
-            return p
-    return None
+try:
+    from font_helper import register_reportlab_fonts
+except ImportError:
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    from font_helper import register_reportlab_fonts
 
-liberation_reg = find_font("LiberationSans-Regular.ttf") or "/usr/share/fonts/liberation/LiberationSans-Regular.ttf"
-liberation_bold = find_font("LiberationSans-Bold.ttf") or "/usr/share/fonts/liberation/LiberationSans-Bold.ttf"
-
-if os.path.exists(liberation_reg):
-    pdfmetrics.registerFont(TTFont("Lib", liberation_reg))
-if os.path.exists(liberation_bold):
-    pdfmetrics.registerFont(TTFont("Lib-B", liberation_bold))
+register_reportlab_fonts(["Lib", "Lib-B"])
 
 PAGE_W, PAGE_H = 595.3, 841.9
 

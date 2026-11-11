@@ -17,12 +17,21 @@ import io
 import base64
 import re
 from PIL import Image
-import pymupdf as fitz
+try:
+    import pymupdf as fitz
+except ImportError:
+    import fitz
+
+try:
+    from font_helper import find_font
+except ImportError:
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    from font_helper import find_font
 
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
-CALIBRI_REG = "C:/Windows/Fonts/calibri.ttf"
-CALIBRI_BOLD = "C:/Windows/Fonts/calibrib.ttf"
+CALIBRI_REG = find_font("Carlito-Regular.ttf", fallback="LiberationSans-Regular.ttf")
+CALIBRI_BOLD = find_font("Carlito-Bold.ttf", fallback="LiberationSans-Bold.ttf")
 
 def clean_watermark(doc):
     """Strip Word header artifact vector curves from all pages."""
@@ -137,6 +146,7 @@ def render_master_overlay(master_pdf_path, data, dest_path):
     page1 = doc[0]
     if font_reg == "calibri":
         page1.insert_font(fontname="calibri", fontfile=CALIBRI_REG)
+    if font_bold == "calibri-bold":
         page1.insert_font(fontname="calibri-bold", fontfile=CALIBRI_BOLD)
 
     # Extract dynamic data fields
@@ -195,6 +205,10 @@ def render_master_overlay(master_pdf_path, data, dest_path):
         if font_reg == "calibri":
             try:
                 page.insert_font(fontname="calibri", fontfile=CALIBRI_REG)
+            except Exception:
+                pass
+        if font_bold == "calibri-bold":
+            try:
                 page.insert_font(fontname="calibri-bold", fontfile=CALIBRI_BOLD)
             except Exception:
                 pass

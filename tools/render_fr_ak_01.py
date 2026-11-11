@@ -18,67 +18,13 @@ from reportlab.lib.utils import ImageReader
 
 ASSETS = os.path.join(os.path.dirname(__file__), "..", "tests", "Fixtures", "muk", "assets")
 
-def register_fonts():
-    # Register Windows fonts with cross-platform fallbacks
-    font_candidates = {
-        "Cal": [
-            "C:/Windows/Fonts/calibri.ttf",
-            "C:/Windows/Fonts/arial.ttf",
-            "/usr/share/fonts/liberation/LiberationSans-Regular.ttf",
-            "/usr/share/fonts/TTF/DejaVuSans.ttf",
-            "/usr/share/fonts/truetype/carlito/Carlito-Regular.ttf",
-            "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
-            "LiberationSans-Regular.ttf"
-        ],
-        "Cal-B": [
-            "C:/Windows/Fonts/calibrib.ttf",
-            "C:/Windows/Fonts/arialbd.ttf",
-            "/usr/share/fonts/liberation/LiberationSans-Bold.ttf",
-            "/usr/share/fonts/TTF/DejaVuSans-Bold.ttf",
-            "/usr/share/fonts/truetype/carlito/Carlito-Bold.ttf",
-            "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf",
-            "LiberationSans-Bold.ttf"
-        ],
-        "Cal-I": [
-            "C:/Windows/Fonts/calibrii.ttf",
-            "C:/Windows/Fonts/ariali.ttf",
-            "/usr/share/fonts/liberation/LiberationSans-Italic.ttf",
-            "/usr/share/fonts/TTF/DejaVuSans-Oblique.ttf",
-            "/usr/share/fonts/truetype/carlito/Carlito-Italic.ttf",
-            "/usr/share/fonts/truetype/liberation/LiberationSans-Italic.ttf",
-            "LiberationSans-Italic.ttf"
-        ],
-        "Tah": [
-            "C:/Windows/Fonts/tahoma.ttf",
-            "C:/Windows/Fonts/arial.ttf",
-            "/usr/share/fonts/liberation/LiberationSans-Regular.ttf",
-            "/usr/share/fonts/TTF/DejaVuSans.ttf",
-            "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
-            "DejaVuSans.ttf"
-        ],
-        "Tah-B": [
-            "C:/Windows/Fonts/tahomabd.ttf",
-            "C:/Windows/Fonts/arialbd.ttf",
-            "/usr/share/fonts/liberation/LiberationSans-Bold.ttf",
-            "/usr/share/fonts/TTF/DejaVuSans-Bold.ttf",
-            "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
-            "DejaVuSans-Bold.ttf"
-        ],
-    }
-    for name, paths in font_candidates.items():
-        registered = False
-        for p in paths:
-            if os.path.exists(p):
-                try:
-                    pdfmetrics.registerFont(TTFont(name, p))
-                    registered = True
-                    break
-                except Exception:
-                    pass
-        if not registered:
-            pass
+try:
+    from font_helper import register_reportlab_fonts
+except ImportError:
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    from font_helper import register_reportlab_fonts
 
-register_fonts()
+register_reportlab_fonts(["Cal", "Cal-B", "Cal-I", "Tah", "Tah-B"])
 
 PAGE_W, PAGE_H = 595.56, 842.52
 Y = lambda top: PAGE_H - top

@@ -29,7 +29,16 @@ import json
 import io
 import re
 from PIL import Image
-import pymupdf as fitz
+try:
+    import pymupdf as fitz
+except ImportError:
+    import fitz
+
+try:
+    from font_helper import find_font
+except ImportError:
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    from font_helper import find_font
 
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 DEFAULT_REF_PDF = os.path.join(
@@ -40,9 +49,9 @@ DEFAULT_REF_PDF = os.path.join(
 )
 OUT_FILE = os.path.join(PROJECT_ROOT, "tests", "Fixtures", "muk", "FR_AK_03_generated.pdf")
 
-CALIBRI_REG = "C:/Windows/Fonts/calibri.ttf"
-CALIBRI_BOLD = "C:/Windows/Fonts/calibrib.ttf"
-CALIBRI_ITALIC = "C:/Windows/Fonts/calibrii.ttf"
+CALIBRI_REG = find_font("Carlito-Regular.ttf", fallback="LiberationSans-Regular.ttf")
+CALIBRI_BOLD = find_font("Carlito-Bold.ttf", fallback="LiberationSans-Bold.ttf")
+CALIBRI_ITALIC = find_font("Carlito-Italic.ttf", fallback="LiberationSans-Italic.ttf")
 
 def clean_watermark(doc):
     """Strip all background watermarks (Word artifact header bezier curves, vector rg, and large images)."""

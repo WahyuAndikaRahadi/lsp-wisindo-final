@@ -20,50 +20,13 @@ from reportlab.lib.utils import ImageReader
 
 ASSETS = os.path.join(os.path.dirname(__file__), "..", "tests", "Fixtures", "muk", "assets")
 
-def register_fonts():
-    font_candidates = {
-        "Lib": [
-            "C:/Windows/Fonts/arial.ttf",
-            "C:/Windows/Fonts/calibri.ttf",
-            "/usr/share/fonts/liberation/LiberationSans-Regular.ttf",
-            "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
-            "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
-            "LiberationSans-Regular.ttf",
-        ],
-        "Lib-B": [
-            "C:/Windows/Fonts/arialbd.ttf",
-            "C:/Windows/Fonts/calibrib.ttf",
-            "/usr/share/fonts/liberation/LiberationSans-Bold.ttf",
-            "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf",
-            "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
-            "LiberationSans-Bold.ttf",
-        ],
-        "Lib-I": [
-            "C:/Windows/Fonts/ariali.ttf",
-            "C:/Windows/Fonts/calibrii.ttf",
-            "/usr/share/fonts/liberation/LiberationSans-Italic.ttf",
-            "/usr/share/fonts/truetype/liberation/LiberationSans-Italic.ttf",
-            "/usr/share/fonts/truetype/dejavu/DejaVuSans-Oblique.ttf",
-            "LiberationSans-Italic.ttf",
-        ],
-    }
-    for name, cands in font_candidates.items():
-        registered = False
-        for p in cands:
-            if os.path.isfile(p):
-                try:
-                    pdfmetrics.registerFont(TTFont(name, p))
-                    registered = True
-                    break
-                except Exception:
-                    pass
-        if not registered:
-            try:
-                pdfmetrics.registerFont(TTFont(name, cands[-1]))
-            except Exception:
-                pass
+try:
+    from font_helper import register_reportlab_fonts
+except ImportError:
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    from font_helper import register_reportlab_fonts
 
-register_fonts()
+register_reportlab_fonts(["Lib", "Lib-B", "Lib-I"])
 
 def clean_signature_image(raw_bytes_or_path):
     try:
