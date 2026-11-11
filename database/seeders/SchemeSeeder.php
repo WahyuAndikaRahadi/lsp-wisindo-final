@@ -56,6 +56,15 @@ class SchemeSeeder extends Seeder
                 );
                 $unitModels[$uData['code']] = $unit;
 
+                // Remove legacy placeholder elements if updating an existing unit
+                if (! empty($uData['elements'])) {
+                    $existingElements = $unit->elements()->where('title', 'like', '%Unit Kompetensi%')->get();
+                    foreach ($existingElements as $ee) {
+                        $ee->kuks()->delete();
+                        $ee->delete();
+                    }
+                }
+
                 // Elements
                 foreach ($uData['elements'] ?? [] as $eData) {
                     $element = UnitElement::updateOrCreate(

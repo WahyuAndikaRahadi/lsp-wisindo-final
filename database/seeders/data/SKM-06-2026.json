@@ -12,8 +12,8 @@
   "units": [
     {
       "code": "C.29SEV01.005.1",
-      "title": "Membaca Electrical Wiring Diagram (EWD) dan Repair Manual",
-      "standard_reference": "SKKNI Terkait",
+      "title": "Membaca Electrical Wiring Diagram (EWD) dan Repair Manual untuk Electrified Vehicles",
+      "standard_reference": "SKKNI No. 008 Tahun 2024",
       "sequence": 1,
       "elements": [
         {
@@ -27,32 +27,32 @@
             },
             {
               "code_number": "1.2",
-              "statement": "Jenis dan fungsi komponen-komponen",
+              "statement": "Jenis dan fungsi komponen-komponen EV diidentifikasi.",
               "sequence": 2
             },
             {
               "code_number": "1.3",
-              "statement": "Jenis gambar teknik pada EV",
+              "statement": "Jenis gambar teknik pada EV diidentifikasi.",
               "sequence": 3
             },
             {
               "code_number": "1.4",
-              "statement": "Jenis dan simbol komponen pada",
+              "statement": "Jenis dan simbol komponen pada gambar teknik diidentifikasi.",
               "sequence": 4
             },
             {
               "code_number": "1.5",
-              "statement": "Prosedur Keselamatan dan Kesehatan",
+              "statement": "Prosedur Keselamatan dan Kesehatan Kerja (K3), serta Ringkas, Rapi, Resik, Rawat, dan Rajin (5R) diterapkan dalam kegiatan ini.",
               "sequence": 5
             },
             {
               "code_number": "1.6",
-              "statement": "Repair Manual/wiring diagram disiapkan",
+              "statement": "Repair Manual/wiring diagram disiapkan sesuai prosedur berdasarkan tahun dan jenis kendaraan.",
               "sequence": 6
             },
             {
               "code_number": "1.7",
-              "statement": "Indikator abnormality pada kendaraan",
+              "statement": "Indikator abnormality pada kendaraan diidentifikasi sesuai prosedur.",
               "sequence": 7
             }
           ]
@@ -63,22 +63,22 @@
           "kuks": [
             {
               "code_number": "2.1",
-              "statement": "Gambar teknik bagian-bagian sistem EV",
+              "statement": "Gambar teknik bagian-bagian sistem EV diidentifikasi sesuai prosedur.",
               "sequence": 1
             },
             {
               "code_number": "2.2",
-              "statement": "Cara kerja sistem fluida diidentifikasi",
+              "statement": "Cara kerja sistem fluida diidentifikasi sesuai prosedur.",
               "sequence": 2
             },
             {
               "code_number": "2.3",
-              "statement": "Posisi komponen pada gambar teknik",
+              "statement": "Posisi komponen pada gambar teknik Repair Manual diidentifikasi sesuai prosedur.",
               "sequence": 3
             },
             {
               "code_number": "2.4",
-              "statement": "Prosedur pelepasan, pembongkaran, dan",
+              "statement": "Prosedur pelepasan, pembongkaran, dan pemasangan diidentifikasi berdasarkan gambar teknik pada Repair Manual.",
               "sequence": 4
             }
           ]
@@ -89,27 +89,27 @@
           "kuks": [
             {
               "code_number": "3.1",
-              "statement": "Cara kerja sistem kelistrikan pada EWD",
+              "statement": "Cara kerja sistem kelistrikan pada EWD diidentifikasi sesuai prosedur.",
               "sequence": 1
             },
             {
               "code_number": "3.2",
-              "statement": "Wiring diagram High Voltage dan Low",
+              "statement": "Wiring diagram High Voltage dan Low Voltage pada electrified vehicle diidentifikasi sesuai prosedur.",
               "sequence": 2
             },
             {
               "code_number": "3.3",
-              "statement": "Controller Area Network (CAN) system",
+              "statement": "Controller Area Network (CAN) system diidentifikasi sesuai prosedur.",
               "sequence": 3
             },
             {
               "code_number": "3.4",
-              "statement": "Posisi komponen kelistrikan pada",
+              "statement": "Posisi komponen kelistrikan pada gambar teknik EWD diidentifikasi sesuai prosedur.",
               "sequence": 4
             },
             {
               "code_number": "3.5",
-              "statement": "Prosedur pelepasan dan pemasangan",
+              "statement": "Prosedur pelepasan dan pemasangan komponen kelistrikan diidentifikasi berdasarkan gambar teknik pada EWD.Prosedur pelepasan, Unit Kompetensi 2",
               "sequence": 5
             }
           ]
@@ -119,7 +119,7 @@
     {
       "code": "C.27BAT00.005.1",
       "title": "Melaksanakan Pengujian Spesifikasi Teknis Pak Baterai",
-      "standard_reference": "SKKNI Terkait",
+      "standard_reference": "SKKNI No. 242 Tahun 2022",
       "sequence": 2,
       "elements": [
         {
@@ -128,22 +128,22 @@
           "kuks": [
             {
               "code_number": "1.1",
-              "statement": "Peralatan diidentifikasi sesuai",
+              "statement": "Peralatan diidentifikasi sesuai dengan kebutuhan.",
               "sequence": 1
             },
             {
               "code_number": "1.2",
-              "statement": "Pak Baterai diidentifikasi sesuai",
+              "statement": "Pak Baterai diidentifikasi sesuai dengan spesifikasi teknis.",
               "sequence": 2
             },
             {
               "code_number": "1.3",
-              "statement": "Metode pengujian diidentifikasi",
+              "statement": "Metode pengujian diidentifikasi sesuai dengan standar.",
               "sequence": 3
             },
             {
               "code_number": "1.4",
-              "statement": "Parameter pengujian disesuaikan",
+              "statement": "Parameter pengujian disesuaikan dengan kebutuhan.",
               "sequence": 4
             }
           ]
@@ -154,22 +154,22 @@
           "kuks": [
             {
               "code_number": "2.1",
-              "statement": "Pengosongan dan pengisian muatan",
+              "statement": "Pengosongan dan pengisian muatan dilakukan sesuai dengan laju pengisian yang ditentukan.",
               "sequence": 1
             },
             {
               "code_number": "2.2",
-              "statement": "Pengujian dilakukan sesuai dengan",
+              "statement": "Pengujian dilakukan sesuai dengan batasan tegangan yang ditentukan.",
               "sequence": 2
             },
             {
               "code_number": "2.3",
-              "statement": "Pengujian dilakukan sesuai dengan",
+              "statement": "Pengujian dilakukan sesuai dengan rentang waktu yang ditentukan.",
               "sequence": 3
             },
             {
               "code_number": "2.4",
-              "statement": "Hasil pengujian Pak Baterai",
+              "statement": "Hasil pengujian Pak Baterai dilaporkan kepada atasan langsung. Unit Kompetensi 3",
               "sequence": 4
             }
           ]
@@ -179,7 +179,7 @@
     {
       "code": "C.27BAT00.006.1",
       "title": "Melaksanakan Komisioning Pak Baterai pada Sistem",
-      "standard_reference": "SKKNI Terkait",
+      "standard_reference": "SKKNI No. 242 Tahun 2022",
       "sequence": 3,
       "elements": [
         {
@@ -188,52 +188,52 @@
           "kuks": [
             {
               "code_number": "1.1",
-              "statement": "Spesifikasi Teknis diidentifikasi",
+              "statement": "Spesifikasi Teknis diidentifikasi seusai kebutuhan.",
               "sequence": 1
             },
             {
               "code_number": "1.2",
-              "statement": "Pak Baterai dipastikan berfungsi",
+              "statement": "Pak Baterai dipastikan berfungsi sesuai dengan peruntukkannya.",
               "sequence": 2
             },
             {
               "code_number": "1.3",
-              "statement": "Kapasitas pak baterai dipastikan",
+              "statement": "Kapasitas pak baterai dipastikan dalam keadaan terisi.",
               "sequence": 3
             },
             {
               "code_number": "1.4",
-              "statement": "Pak Baterai dipasang (install) ke",
+              "statement": "Pak Baterai dipasang (install) ke sistem sesuai dengan prosedur.",
               "sequence": 4
             },
             {
               "code_number": "1.5",
-              "statement": "Instalasi perangkat yang akan",
+              "statement": "Instalasi perangkat yang akan dipasang Pak Baterai diperiksa agar berfungsi sesuai dengan peruntukkannya.",
               "sequence": 5
             },
             {
               "code_number": "1.6",
-              "statement": "Fungsi sistem komunikasi antara",
+              "statement": "Fungsi sistem komunikasi antara baterai dan perangkat diperiksa sesuai dengan peruntukkannya.",
               "sequence": 6
             },
             {
               "code_number": "1.7",
-              "statement": "Indikator sistem perangkat",
+              "statement": "Indikator sistem perangkat dinyalakan agar berfungsi sesuai dengan peruntukkannya.",
               "sequence": 7
             },
             {
               "code_number": "1.8",
-              "statement": "Seluruh koneksi dan pentanahan",
+              "statement": "Seluruh koneksi dan pentanahan pada rangkaian dihubungkan sesuai dengan standar.",
               "sequence": 8
             },
             {
               "code_number": "1.9",
-              "statement": "Sistem keamanan dipastikan memiliki",
+              "statement": "Sistem keamanan dipastikan memiliki pemutus arus utama sesuai dengan standar.",
               "sequence": 9
             },
             {
               "code_number": "1.10",
-              "statement": "Gejala ketidaksesuaian dilaporkan",
+              "statement": "Gejala ketidaksesuaian dilaporkan kepada atasan langsung.",
               "sequence": 10
             }
           ]
@@ -244,22 +244,22 @@
           "kuks": [
             {
               "code_number": "2.1",
-              "statement": "Sistem pengisian daya diidentifikasi",
+              "statement": "Sistem pengisian daya diidentifikasi sesuai dengan spesifikasi teknis pak baterai.",
               "sequence": 1
             },
             {
               "code_number": "2.2",
-              "statement": "Konektor pengisi daya perangkat",
+              "statement": "Konektor pengisi daya perangkat yang digunakan dipastikan sesuai dengan kebutuhan.",
               "sequence": 2
             },
             {
               "code_number": "2.3",
-              "statement": "Sistem komunikasi pengisian daya",
+              "statement": "Sistem komunikasi pengisian daya dengan perangkat dipastikan sesuai dan berfungsi.",
               "sequence": 3
             },
             {
               "code_number": "2.4",
-              "statement": "Hasil uji komisioning dilaporkan",
+              "statement": "Hasil uji komisioning dilaporkan kepada atasan langsung. Unit Kompetensi 4",
               "sequence": 4
             }
           ]
@@ -268,8 +268,8 @@
     },
     {
       "code": "C.27BAT00.007.1",
-      "title": "Melaksanakan Monitoring Kondisi Mekanik,Elektrik, dan Indikator",
-      "standard_reference": "SKKNI Terkait",
+      "title": "Melaksanakan Monitoring Kondisi Mekanik, Elektrik, dan Indikator Pak Baterai agar Berfungsi Optimal",
+      "standard_reference": "SKKNI No. 242 Tahun 2022",
       "sequence": 4,
       "elements": [
         {
@@ -278,53 +278,53 @@
           "kuks": [
             {
               "code_number": "1.1",
-              "statement": "Sistem keselamatan dan Kesehatan",
+              "statement": "Sistem keselamatan dan Kesehatan kerja diidentifikasi sesuai kebutuhan di tempat kerja.",
               "sequence": 1
             },
             {
               "code_number": "1.2",
-              "statement": "Sistem perangkat yang akan",
+              "statement": "Sistem perangkat yang akan dimonitor diidentifikasi sesuai dengan buku manual.",
               "sequence": 2
             },
             {
               "code_number": "1.3",
-              "statement": "Peralatan monitoring disiapkan",
+              "statement": "Peralatan monitoring disiapkan sesuai kebutuhan.",
               "sequence": 3
             },
             {
               "code_number": "1.4",
-              "statement": "Daftar periksa monitoring disiapkan",
+              "statement": "Daftar periksa monitoring disiapkan sesuai prosedur.",
               "sequence": 4
             }
           ]
         },
         {
-          "title": "Melakukan monitoring kondisi mekanik,",
+          "title": "Melakukan monitoring kondisi mekanik",
           "sequence": 2,
           "kuks": [
             {
               "code_number": "2.1",
-              "statement": "Parameter Pak Baterai dipastikan",
+              "statement": "Parameter Pak Baterai dipastikan sesuai dengan spesifikasi teknis melalui perangkat lunak.",
               "sequence": 1
             },
             {
               "code_number": "2.2",
-              "statement": "Kondisi fisik Pak Baterai diperiksa",
+              "statement": "Kondisi fisik Pak Baterai diperiksa sesuai dengan ketentuan.",
               "sequence": 2
             },
             {
               "code_number": "2.3",
-              "statement": "Indikator sistem perangkat dipastikan",
+              "statement": "Indikator sistem perangkat dipastikan berfungsi sesuai peruntukannya.",
               "sequence": 3
             },
             {
               "code_number": "2.4",
-              "statement": "Ketidaksesuaian fungsi keamanan",
+              "statement": "Ketidaksesuaian fungsi keamanan baterai diidentifikasi sesuai hasil monitoring.",
               "sequence": 4
             },
             {
               "code_number": "2.5",
-              "statement": "Hasil monitoring dilaporkan kepada",
+              "statement": "Hasil monitoring dilaporkan kepada atasan langsung. Unit Kompetensi 5",
               "sequence": 5
             }
           ]
@@ -333,7 +333,7 @@
     },
     {
       "code": "G45TSM01.040.2",
-      "title": "Melakukan perawatan instrumen kelistrikan (sistem sinyal dan",
+      "title": "Melakukan Perawatan Instrumen Kelistrikan (Sistem Sinyal dan Penerangan)",
       "standard_reference": "SKKNI No. 147 Tahun 2019",
       "sequence": 5,
       "elements": [
@@ -343,27 +343,27 @@
           "kuks": [
             {
               "code_number": "1.1",
-              "statement": "Fungsi, jenis, spesifikasi, wiring,",
+              "statement": "Fungsi, jenis, spesifikasi, wiring, dan cara kerja dari komponen pada instrumen kelistrikan (sistem sinyal dan penerangan) diidentifikasi.",
               "sequence": 1
             },
             {
               "code_number": "1.2",
-              "statement": "Kondisi normal dan tidak normal",
+              "statement": "Kondisi normal dan tidak normal dari komponen-komponen pada istrumen kelistrikan (sistem sinyal dan penerangan) diidentifikasi.",
               "sequence": 2
             },
             {
               "code_number": "1.3",
-              "statement": "Standar kinerja dari setiap",
+              "statement": "Standar kinerja dari setiap komponen instrumen kelistrikan (sistem sinyal dan penerangan) diidentifikasi.",
               "sequence": 3
             },
             {
               "code_number": "1.4",
-              "statement": "Prosedur bongkar pasang",
+              "statement": "Prosedur bongkar pasang instrumen kelistrikan diidentifikasi.",
               "sequence": 4
             },
             {
               "code_number": "1.5",
-              "statement": "Prosedur               pemeriksaan",
+              "statement": "Prosedur pemeriksaan sistem kelistrikan diidentifikasi.",
               "sequence": 5
             },
             {
@@ -373,12 +373,12 @@
             },
             {
               "code_number": "1.7",
-              "statement": "General tools, alat ukur, dan",
+              "statement": "General tools, alat ukur, dan alat pembersih diidentifikasi dan disiapkan.",
               "sequence": 7
             },
             {
               "code_number": "1.8",
-              "statement": "Prosedur K3 diterapkan",
+              "statement": "Prosedur K3 diterapkan pada pelaksanaan proses kerja.",
               "sequence": 8
             }
           ]
@@ -389,7 +389,7 @@
           "kuks": [
             {
               "code_number": "2.1",
-              "statement": "Fungsi instrumen kelistrikan (sistem",
+              "statement": "Fungsi instrumen kelistrikan (sistem sinyal dan penerangan) diperiksa sesuai prosedur.",
               "sequence": 1
             },
             {
@@ -399,7 +399,7 @@
             },
             {
               "code_number": "2.3",
-              "statement": "Kondisi dan kelengkapan instrumen",
+              "statement": "Kondisi dan kelengkapan instrumen kelistrikan sistem sinyal dan penerangan) diperiksa sesuai standar.",
               "sequence": 3
             }
           ]
@@ -410,12 +410,12 @@
           "kuks": [
             {
               "code_number": "3.1",
-              "statement": "Komponen-komponen Instrumen",
+              "statement": "Komponen-komponen Instrumen kelistrikan (sistem sinyal dan (penerangan) dirakit dan dipasang sesuai prosedur.",
               "sequence": 1
             },
             {
               "code_number": "3.2",
-              "statement": "Instrumen kelistrikan (sistem sinyal",
+              "statement": "Instrumen kelistrikan (sistem sinyal dan penerangan) dipastikan berfungsi sesuai standar. Unit Kompetensi 6",
               "sequence": 2
             }
           ]
@@ -424,7 +424,7 @@
     },
     {
       "code": "G.45TSM01.021.2",
-      "title": "Melakukan perawatan free play throttle gas",
+      "title": "Melakukan Perawatan Free Play Throttle Gas",
       "standard_reference": "SKKNI No. 147 Tahun 2019",
       "sequence": 6,
       "elements": [
@@ -434,22 +434,22 @@
           "kuks": [
             {
               "code_number": "1.1",
-              "statement": "Fungsi, jenis, spesifikasi, dan cara",
+              "statement": "Fungsi, jenis, spesifikasi, dan cara kerja komponen pada sistem throttle gas diidentifikasi.",
               "sequence": 1
             },
             {
               "code_number": "1.2",
-              "statement": "Fungsi, jenis, spesifikasi, dan cara",
+              "statement": "Fungsi, jenis, spesifikasi, dan cara kerja bagian-bagian sistem throttle gas diidentifikasi.",
               "sequence": 2
             },
             {
               "code_number": "1.3",
-              "statement": "Fungsi, kondisi, dan cara kerja",
+              "statement": "Fungsi, kondisi, dan cara kerja bagian-bagian throttle gas diidentifikasi.",
               "sequence": 3
             },
             {
               "code_number": "1.4",
-              "statement": "Kondisi dan free play throttle gas",
+              "statement": "Kondisi dan free play throttle gas diidentifikasi sesuai standar.",
               "sequence": 4
             },
             {
@@ -459,12 +459,12 @@
             },
             {
               "code_number": "1.6",
-              "statement": "General tools dan bahan pembersih",
+              "statement": "General tools dan bahan pembersih disiapkan.",
               "sequence": 6
             },
             {
               "code_number": "1.7",
-              "statement": "Prosedur K3 diterapkan dalam",
+              "statement": "Prosedur K3 diterapkan dalam melaksanakan unit kompetensi ini.",
               "sequence": 7
             }
           ]
@@ -475,22 +475,22 @@
           "kuks": [
             {
               "code_number": "2.1",
-              "statement": "Kelancaran buka dan tutup throttle",
+              "statement": "Kelancaran buka dan tutup throttle gas diperiksa sesuai prosedur.",
               "sequence": 1
             },
             {
               "code_number": "2.2",
-              "statement": "Kondisi dan kelengkapan sistem",
+              "statement": "Kondisi dan kelengkapan sistem throttle gas diperiksa sesuai standar.",
               "sequence": 2
             },
             {
               "code_number": "2.3",
-              "statement": "Jalur/routing kabel gas diperiksa",
+              "statement": "Jalur/routing kabel gas diperiksa sesuai prosedur.",
               "sequence": 3
             },
             {
               "code_number": "2.4",
-              "statement": "Kondisi kabel gas diperiksa sesuai",
+              "statement": "Kondisi kabel gas diperiksa sesuai prosedur.",
               "sequence": 4
             }
           ]
@@ -501,22 +501,22 @@
           "kuks": [
             {
               "code_number": "3.1",
-              "statement": "Sistem throttle gas dilumasi sesuai",
+              "statement": "Sistem throttle gas dilumasi sesuai prosedur.",
               "sequence": 1
             },
             {
               "code_number": "3.2",
-              "statement": "Komponen-komponen throttle gas",
+              "statement": "Komponen-komponen throttle gas dirakit sesuai prosedur.",
               "sequence": 2
             },
             {
               "code_number": "3.3",
-              "statement": "Mur penyetelan free play kabel gas",
+              "statement": "Mur penyetelan free play kabel gas disetel sesuai standar.",
               "sequence": 3
             },
             {
               "code_number": "3.4",
-              "statement": "Throttle gas dipastikan berfungsi",
+              "statement": "Throttle gas dipastikan berfungsi dengan normal. Unit Kompetensi 7",
               "sequence": 4
             }
           ]
@@ -525,7 +525,7 @@
     },
     {
       "code": "G45TSM01.031.2",
-      "title": "Melakukan perawatan sistem pengereman",
+      "title": "Melakukan Perawatan Sistem Pengereman",
       "standard_reference": "SKKNI No. 147 Tahun 2019",
       "sequence": 7,
       "elements": [
@@ -535,27 +535,27 @@
           "kuks": [
             {
               "code_number": "1.1",
-              "statement": "Fungsi, jenis, dan spesifikasi sistem",
+              "statement": "Fungsi, jenis, dan spesifikasi sistem pengereman diidentifikasi.",
               "sequence": 1
             },
             {
               "code_number": "1.2",
-              "statement": "Fungsi, jenis, spesifikasi, dan cara",
+              "statement": "Fungsi, jenis, spesifikasi, dan cara kerja komponen dari sistem pengereman diidentifikasi.",
               "sequence": 2
             },
             {
               "code_number": "1.3",
-              "statement": "Fungsi, kondisi dan cara kerja",
+              "statement": "Fungsi, kondisi dan cara kerja bagianbagian komponen sistem pengereman diidentifikasi.",
               "sequence": 3
             },
             {
               "code_number": "1.4",
-              "statement": "Kondisi normal atau tidak normal",
+              "statement": "Kondisi normal atau tidak normal diidentifikasi.",
               "sequence": 4
             },
             {
               "code_number": "1.5",
-              "statement": "Service limit dari setiap komponen",
+              "statement": "Service limit dari setiap komponen bagian sistem pengereman diidentifikasi.",
               "sequence": 5
             },
             {
@@ -575,22 +575,22 @@
             },
             {
               "code_number": "1.9",
-              "statement": "Prosedur bongkar pasang komponen",
+              "statement": "Prosedur bongkar pasang komponen pengereman diidentifikasi.",
               "sequence": 9
             },
             {
               "code_number": "1.10",
-              "statement": "Prosedur bongkar pasang bagian-",
+              "statement": "Prosedur bongkar pasang bagian- bagian komponen pengereman diidentifikasi.",
               "sequence": 10
             },
             {
               "code_number": "1.11",
-              "statement": "Tools, alat ukur, special service",
+              "statement": "Tools, alat ukur, special service tools/special tools, alat dan bahan pembersih kampas rem diidentifikasi dan disiapkan.",
               "sequence": 11
             },
             {
               "code_number": "1.12",
-              "statement": "Prosedur K3 diterapkan pada",
+              "statement": "Prosedur K3 diterapkan pada pelaksanaan proses kerja.",
               "sequence": 12
             }
           ]
@@ -601,22 +601,22 @@
           "kuks": [
             {
               "code_number": "2.1",
-              "statement": "Sistem pengereman diperiksa sesuai",
+              "statement": "Sistem pengereman diperiksa sesuai standar.",
               "sequence": 1
             },
             {
               "code_number": "2.2",
-              "statement": "Komponen sistem pengereman",
+              "statement": "Komponen sistem pengereman diperiksa sesuai standar.",
               "sequence": 2
             },
             {
               "code_number": "2.3",
-              "statement": "Bagian-bagian komponen sistem",
+              "statement": "Bagian-bagian komponen sistem pengereman diperiksa sesuai standar.",
               "sequence": 3
             },
             {
               "code_number": "2.4",
-              "statement": "Kondisi minyak rem dipastikan sesuai",
+              "statement": "Kondisi minyak rem dipastikan sesuai standar.",
               "sequence": 4
             }
           ]
@@ -627,27 +627,27 @@
           "kuks": [
             {
               "code_number": "3.1",
-              "statement": "Komponen sistem pengereman",
+              "statement": "Komponen sistem pengereman dibongkar pasang sesuai prosedur.",
               "sequence": 1
             },
             {
               "code_number": "3.2",
-              "statement": "Bagian komponen sistem",
+              "statement": "Bagian komponen sistem pengereman dibongkar pasang sesuai prosedur.",
               "sequence": 2
             },
             {
               "code_number": "3.3",
-              "statement": "Bagian-bagian sistem pengereman",
+              "statement": "Bagian-bagian sistem pengereman dilumasi sesuai prosedur.",
               "sequence": 3
             },
             {
               "code_number": "3.4",
-              "statement": "Free play tuas atau pedal rem disetel",
+              "statement": "Free play tuas atau pedal rem disetel sesuai standar.",
               "sequence": 4
             },
             {
               "code_number": "3.5",
-              "statement": "Kinerja sistem pengereman",
+              "statement": "Kinerja sistem pengereman dipastikan berfungsi sesuai prosedur. Unit Kompetensi 8",
               "sequence": 5
             }
           ]
@@ -656,7 +656,7 @@
     },
     {
       "code": "G45TSM01.032.2",
-      "title": "Melakukan perawatan sistem kemudi",
+      "title": "Melakukan Perawatan Sistem Kemudi",
       "standard_reference": "SKKNI No. 147 Tahun 2019",
       "sequence": 8,
       "elements": [
@@ -666,47 +666,47 @@
           "kuks": [
             {
               "code_number": "1.1",
-              "statement": "Fungsi dan cara kerja sistem kemudi",
+              "statement": "Fungsi dan cara kerja sistem kemudi diidentifikasi.",
               "sequence": 1
             },
             {
               "code_number": "1.2",
-              "statement": "Kondisi normal dan ketidaknormalan",
+              "statement": "Kondisi normal dan ketidaknormalan sistem kemudi diidentifikasi.",
               "sequence": 2
             },
             {
               "code_number": "1.3",
-              "statement": "Fungsi, kondisi standar dan cara",
+              "statement": "Fungsi, kondisi standar dan cara kerja bagian-bagian sistem kemudi diidentifikasi.",
               "sequence": 3
             },
             {
               "code_number": "1.4",
-              "statement": "Prosedur bongkar pasang headlight",
+              "statement": "Prosedur bongkar pasang headlight assy, cover body dan cowl diidentifikasi.",
               "sequence": 4
             },
             {
               "code_number": "1.5",
-              "statement": "Prosedur bongkar pasang sistem",
+              "statement": "Prosedur bongkar pasang sistem kemudi diidentifikasi.",
               "sequence": 5
             },
             {
               "code_number": "1.6",
-              "statement": "Prosedur deteksi ketidaknormalan",
+              "statement": "Prosedur deteksi ketidaknormalan setiap bagian dari sistem kemudi sepeda motor diidentifikasi.",
               "sequence": 6
             },
             {
               "code_number": "1.7",
-              "statement": "Prosedur penyetelan setiap bagian",
+              "statement": "Prosedur penyetelan setiap bagian dari sistem kemudi diidentifikasi.",
               "sequence": 7
             },
             {
               "code_number": "1.8",
-              "statement": "General tools, kunci torsi, service",
+              "statement": "General tools, kunci torsi, service special tools/special tools diidentifikasi dan disiapkan.",
               "sequence": 8
             },
             {
               "code_number": "1.9",
-              "statement": "Prosedur K3 diterapkan pada",
+              "statement": "Prosedur K3 diterapkan pada pelaksanaan proses kerja.",
               "sequence": 9
             }
           ]
@@ -717,22 +717,22 @@
           "kuks": [
             {
               "code_number": "2.1",
-              "statement": "Identifikasi kenormalan dan",
+              "statement": "Identifikasi kenormalan dan ketidaknormalan fungsi sistem kemudi dilakukan.",
               "sequence": 1
             },
             {
               "code_number": "2.2",
-              "statement": "Pembongkaran sistem kemudi",
+              "statement": "Pembongkaran sistem kemudi dilakukan sesuai prosedur.",
               "sequence": 2
             },
             {
               "code_number": "2.3",
-              "statement": "Bagian-bagian sistem kemudi",
+              "statement": "Bagian-bagian sistem kemudi dilakukan penggantian sesuai prosedur.",
               "sequence": 3
             },
             {
               "code_number": "2.4",
-              "statement": "Bagian-bagian dari sistem kemudi",
+              "statement": "Bagian-bagian dari sistem kemudi dirakit sesuai prosedur. Unit Kompetensi 9",
               "sequence": 4
             }
           ]
@@ -741,7 +741,7 @@
     },
     {
       "code": "G45TSM01.033.2",
-      "title": "Melakukan perawatan sistem suspensi",
+      "title": "Melakukan Perawatan Sistem Suspensi",
       "standard_reference": "SKKNI No. 147 Tahun 2019",
       "sequence": 9,
       "elements": [
@@ -751,32 +751,32 @@
           "kuks": [
             {
               "code_number": "1.1",
-              "statement": "Fungsi, jenis, spesifikasi, dan cara",
+              "statement": "Fungsi, jenis, spesifikasi, dan cara kerja dari komponen pada sistem suspense diidentifikasi.",
               "sequence": 1
             },
             {
               "code_number": "1.2",
-              "statement": "Fungsi, jenis, spesifikasi, dan cara",
+              "statement": "Fungsi, jenis, spesifikasi, dan cara kerja bagian bagian dari sistem suspensi diidentifikasi.",
               "sequence": 2
             },
             {
               "code_number": "1.3",
-              "statement": "Kondisi normal dan tidak normal dari",
+              "statement": "Kondisi normal dan tidak normal dari komponen-komponen pada sistem suspensi diidentifikasi.",
               "sequence": 3
             },
             {
               "code_number": "1.4",
-              "statement": "Kondisi dari bagian suspense",
+              "statement": "Kondisi dari bagian suspense diidentifikasi sesuai standar.",
               "sequence": 4
             },
             {
               "code_number": "1.5",
-              "statement": "Prosedur bongkar pasang roda",
+              "statement": "Prosedur bongkar pasang roda diidentifikasi.",
               "sequence": 5
             },
             {
               "code_number": "1.6",
-              "statement": "Prosedur bongkar pasang sistem",
+              "statement": "Prosedur bongkar pasang sistem suspensi diidentifikasi.",
               "sequence": 6
             },
             {
@@ -786,12 +786,12 @@
             },
             {
               "code_number": "1.8",
-              "statement": "General tools, alat ukur, service",
+              "statement": "General tools, alat ukur, service special tools/special tools, dan bahan pembersih diidentifikasi dan disiapkan.",
               "sequence": 8
             },
             {
               "code_number": "1.9",
-              "statement": "Prosedur K3 diterapkan pada",
+              "statement": "Prosedur K3 diterapkan pada pelaksanaan proses kerja.",
               "sequence": 9
             }
           ]
@@ -802,37 +802,37 @@
           "kuks": [
             {
               "code_number": "2.1",
-              "statement": "Fungsi suspensi diperiksa sesuai",
+              "statement": "Fungsi suspensi diperiksa sesuai prosedur.",
               "sequence": 1
             },
             {
               "code_number": "2.2",
-              "statement": "Kondisi dan kelengkapan suspense",
+              "statement": "Kondisi dan kelengkapan suspense diperiksa sesuai standar.",
               "sequence": 2
             },
             {
               "code_number": "2.3",
-              "statement": "Kondisi oil seal/seal shock diperiksa",
+              "statement": "Kondisi oil seal/seal shock diperiksa sesuai prosedur.",
               "sequence": 3
             },
             {
               "code_number": "2.4",
-              "statement": "Kondisi oli shock diperiksa sesuai",
+              "statement": "Kondisi oli shock diperiksa sesuai prosedur.",
               "sequence": 4
             },
             {
               "code_number": "2.5",
-              "statement": "Kondisi inner tube diperiksa sesuai",
+              "statement": "Kondisi inner tube diperiksa sesuai prosedur.",
               "sequence": 5
             },
             {
               "code_number": "2.6",
-              "statement": "Kondisi spring diperiksa sesuai",
+              "statement": "Kondisi spring diperiksa sesuai prosedur.",
               "sequence": 6
             },
             {
               "code_number": "2.7",
-              "statement": "Kondisi bushing diperiksa sesuai",
+              "statement": "Kondisi bushing diperiksa sesuai prosedur.",
               "sequence": 7
             }
           ]
@@ -843,22 +843,22 @@
           "kuks": [
             {
               "code_number": "3.1",
-              "statement": "Bagian bagian sistem suspense",
+              "statement": "Bagian bagian sistem suspense dibongkar sesuai prosedur.",
               "sequence": 1
             },
             {
               "code_number": "3.2",
-              "statement": "Oil seal/seal shock, oli shock,",
+              "statement": "Oil seal/seal shock, oli shock, bushing diganti sesuai prosedur.",
               "sequence": 2
             },
             {
               "code_number": "3.3",
-              "statement": "Komponen-komponen suspense",
+              "statement": "Komponen-komponen suspense dibersihkan dan dirakit sesuai prosedur.",
               "sequence": 3
             },
             {
               "code_number": "3.4",
-              "statement": "Baut dan mur pada sistem suspense",
+              "statement": "Baut dan mur pada sistem suspense dipastikan terpasang sesuai prosedur.",
               "sequence": 4
             }
           ]
@@ -867,7 +867,7 @@
     },
     {
       "code": "G45TSM01.034.2",
-      "title": "Unit Kompetensi",
+      "title": "Melakukan Bongkar Pasang Cover Body",
       "standard_reference": "SKKNI No. 147 Tahun 2019",
       "sequence": 10,
       "elements": [
@@ -877,22 +877,22 @@
           "kuks": [
             {
               "code_number": "1.1",
-              "statement": "Fungsi, jenis, dan spesifikasi material",
+              "statement": "Fungsi, jenis, dan spesifikasi material dari komponen pada cover body diidentifikasi.",
               "sequence": 1
             },
             {
               "code_number": "1.2",
-              "statement": "Fungsi dan kondisi dari komponen",
+              "statement": "Fungsi dan kondisi dari komponen pada cover body diidentifikasi.",
               "sequence": 2
             },
             {
               "code_number": "1.3",
-              "statement": "Bentuk dan ukuran dari bagian cover",
+              "statement": "Bentuk dan ukuran dari bagian cover body diidentifikasi.",
               "sequence": 3
             },
             {
               "code_number": "1.4",
-              "statement": "Prosedur bongkar pasang cover",
+              "statement": "Prosedur bongkar pasang cover body diidentifikasi.",
               "sequence": 4
             },
             {
@@ -902,22 +902,22 @@
             },
             {
               "code_number": "1.6",
-              "statement": "Perlalatan yang sesuai diidentifikasi",
+              "statement": "Perlalatan yang sesuai diidentifikasi dan disiapkan.",
               "sequence": 6
             },
             {
               "code_number": "1.7",
-              "statement": "Supporting tools dipastikan",
+              "statement": "Supporting tools dipastikan ketersediaannya.",
               "sequence": 7
             },
             {
               "code_number": "1.8",
-              "statement": "Pit area dan tempat peletakan cover",
+              "statement": "Pit area dan tempat peletakan cover body dipastikan kesiapannya.",
               "sequence": 8
             },
             {
               "code_number": "1.9",
-              "statement": "Prosedur K3 diterapkan pada",
+              "statement": "Prosedur K3 diterapkan pada pelaksanaan proses kerja.",
               "sequence": 9
             }
           ]
@@ -933,22 +933,22 @@
             },
             {
               "code_number": "2.2",
-              "statement": "Ukuran, tipe baut, ring, bushing dan",
+              "statement": "Ukuran, tipe baut, ring, bushing dan damper cover body diperiksa sesuai standar.",
               "sequence": 2
             },
             {
               "code_number": "2.3",
-              "statement": "Pengait cover body diperiksa sesuai",
+              "statement": "Pengait cover body diperiksa sesuai prosedur.",
               "sequence": 3
             },
             {
               "code_number": "2.4",
-              "statement": "komponen penerangan dilepas",
+              "statement": "komponen penerangan dilepas sesuai prosedur.",
               "sequence": 4
             },
             {
               "code_number": "2.5",
-              "statement": "Komponen spidometer dilepas",
+              "statement": "Komponen spidometer dilepas sesuai prosedur.",
               "sequence": 5
             }
           ]
@@ -959,17 +959,17 @@
           "kuks": [
             {
               "code_number": "3.1",
-              "statement": "Komponen penerangan dipasang",
+              "statement": "Komponen penerangan dipasang sesuai prosedur.",
               "sequence": 1
             },
             {
               "code_number": "3.2",
-              "statement": "Komponen spidometer dipasang",
+              "statement": "Komponen spidometer dipasang sesuai prosedur.",
               "sequence": 2
             },
             {
               "code_number": "3.3",
-              "statement": "Komponen-komponen cover body",
+              "statement": "Komponen-komponen cover body dipasang sesuai prosedur. Asesmen dapat / tidak dapat dilanjutkan Nama Tanda tangan/ Tanggal Ditinjau Oleh Asesor : Nama : No. Reg: Tanda tangan/ Tanggal",
               "sequence": 3
             }
           ]

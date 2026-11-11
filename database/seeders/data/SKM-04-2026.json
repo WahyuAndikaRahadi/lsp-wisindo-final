@@ -12,7 +12,7 @@
   "units": [
     {
       "code": "G.45OTO01.001.2",
-      "title": "Unit Kompetensi",
+      "title": "Melaksanakan Keselamatan dan Kesehatan Kerja",
       "standard_reference": "SKKNI No. 097 Tahun 2018",
       "sequence": 1,
       "elements": [
@@ -22,7 +22,7 @@
           "kuks": [
             {
               "code_number": "1.1",
-              "statement": "Potensi bahaya pada area kerja",
+              "statement": "Potensi bahaya pada area kerja diidentifikasi.",
               "sequence": 1
             },
             {
@@ -43,12 +43,12 @@
             },
             {
               "code_number": "2.2",
-              "statement": "Prosedur kesehatan dan keselamatan kerja",
+              "statement": "Prosedur kesehatan dan keselamatan kerja dilaksanakan di tempat kerja.",
               "sequence": 2
             },
             {
               "code_number": "2.3",
-              "statement": "Pencegahan bahaya Keselamatan dan",
+              "statement": "Pencegahan bahaya Keselamatan dan Kesehatan Kerja dilakukan",
               "sequence": 3
             }
           ]
@@ -57,7 +57,7 @@
     },
     {
       "code": "G.45OTO01.002.2",
-      "title": "Unit Kompetensi",
+      "title": "Menggunakan Peralatan dan Perlengkapan Tempat Kerja",
       "standard_reference": "SKKNI No. 097 Tahun 2018",
       "sequence": 2,
       "elements": [
@@ -67,12 +67,12 @@
           "kuks": [
             {
               "code_number": "1.1",
-              "statement": "Peralatan dan perlengkapan tempat kerja",
+              "statement": "Peralatan dan perlengkapan tempat kerja diidentifikasi.",
               "sequence": 1
             },
             {
               "code_number": "1.2",
-              "statement": "Peralatan dan perlengkapan disiapkan di",
+              "statement": "Peralatan dan perlengkapan disiapkan di tempat kerja.",
               "sequence": 2
             }
           ]
@@ -83,12 +83,12 @@
           "kuks": [
             {
               "code_number": "2.1",
-              "statement": "Peralatan dan perlengkapan dikalibrasi sesuai",
+              "statement": "Peralatan dan perlengkapan dikalibrasi sesuai jenis dan fungsi.",
               "sequence": 1
             },
             {
               "code_number": "2.2",
-              "statement": "Peralatan dan perlengkapan digunakan sesuai",
+              "statement": "Peralatan dan perlengkapan digunakan sesuai manual perbaikan",
               "sequence": 2
             }
           ]
@@ -97,7 +97,7 @@
     },
     {
       "code": "G.45OTO01.003.2",
-      "title": "Unit Kompetensi",
+      "title": "Melaksanakan Komunikasi di Tempat Kerja",
       "standard_reference": "SKKNI No. 097 Tahun 2018",
       "sequence": 3,
       "elements": [
@@ -107,17 +107,17 @@
           "kuks": [
             {
               "code_number": "1.1",
-              "statement": "Data dan informasi yang akan disampai",
+              "statement": "Data dan informasi yang akan disampai kan diidentifikasi kebenarannya.",
               "sequence": 1
             },
             {
               "code_number": "1.2",
-              "statement": "Data informas dan bukti disiapkan sesuai",
+              "statement": "Data informas dan bukti disiapkan sesuai prosedur.",
               "sequence": 2
             },
             {
               "code_number": "1.3",
-              "statement": "Data informasi dan bukti diperiksa ulang",
+              "statement": "Data informasi dan bukti diperiksa ulang sebelum dikomunikasikan.",
               "sequence": 3
             }
           ]
@@ -128,17 +128,17 @@
           "kuks": [
             {
               "code_number": "2.1",
-              "statement": "Data Informasi dan bukti dikomunikasikan",
+              "statement": "Data Informasi dan bukti dikomunikasikan kerekan kerja dan atasan di tempat kerja.",
               "sequence": 1
             },
             {
               "code_number": "2.2",
-              "statement": "Data informasi dan bukti komunikasi",
+              "statement": "Data informasi dan bukti komunikasi dicatat.",
               "sequence": 2
             },
             {
               "code_number": "2.3",
-              "statement": "Data informasi dan bukti komunikasi",
+              "statement": "Data informasi dan bukti komunikasi disimpan.",
               "sequence": 3
             }
           ]
@@ -147,7 +147,7 @@
     },
     {
       "code": "G.45OTO01.004.2",
-      "title": "Unit Kompetensi",
+      "title": "Melaksanakan Pemeliharaan Komponen",
       "standard_reference": "SKKNI No. 097 Tahun 2018",
       "sequence": 4,
       "elements": [
@@ -167,12 +167,12 @@
             },
             {
               "code_number": "1.3",
-              "statement": "Manual perbaikan dipersiapkan di",
+              "statement": "Manual perbaikan dipersiapkan di tempat kerja.",
               "sequence": 3
             },
             {
               "code_number": "1.4",
-              "statement": "Tools dan SST dipersiapkan di",
+              "statement": "Tools dan SST dipersiapkan di tempat kerja.",
               "sequence": 4
             }
           ]
@@ -183,12 +183,12 @@
           "kuks": [
             {
               "code_number": "2.1",
-              "statement": "Komponen diperiksa dengan alat",
+              "statement": "Komponen diperiksa dengan alat sesuaidengan manual perbaikan.",
               "sequence": 1
             },
             {
               "code_number": "2.2",
-              "statement": "Hasil pemeriksaan dicatat di Form",
+              "statement": "Hasil pemeriksaan dicatat di Form pemeriksa.",
               "sequence": 2
             },
             {
@@ -202,7 +202,7 @@
     },
     {
       "code": "G.45OTO01.007.2",
-      "title": "Unit Kompetensi",
+      "title": "Membaca Gambar Teknik",
       "standard_reference": "SKKNI No. 097 Tahun 2018",
       "sequence": 5,
       "elements": [
@@ -233,7 +233,7 @@
             },
             {
               "code_number": "2.2",
-              "statement": "Gambar teknik dijelaskan sesuai fungsi dan",
+              "statement": "Gambar teknik dijelaskan sesuai fungsi dan cara kerja.",
               "sequence": 2
             }
           ]
@@ -242,7 +242,7 @@
     },
     {
       "code": "G.45OTO01.008.2",
-      "title": "Unit Kompetensi",
+      "title": "Menggunakan Alat Ukur",
       "standard_reference": "SKKNI No. 097 Tahun 2018",
       "sequence": 6,
       "elements": [
@@ -278,7 +278,7 @@
             },
             {
               "code_number": "2.2",
-              "statement": "Alat ukur digunakan sesuai fungsi dan jenis",
+              "statement": "Alat ukur digunakan sesuai fungsi dan jenis alat ukur.",
               "sequence": 2
             },
             {
@@ -292,8 +292,8 @@
     },
     {
       "code": "G.45OBR02.008.2",
-      "title": "Unit Kompetensi",
-      "standard_reference": "SKKNI Terkait",
+      "title": "Melakukan Analisis Kerusakan Bodi Kendaraan",
+      "standard_reference": "SKKNI No. 097 Tahun 2018",
       "sequence": 7,
       "elements": [
         {
@@ -302,17 +302,17 @@
           "kuks": [
             {
               "code_number": "1.1",
-              "statement": "Prosedur menetapkan jenis dan tingkat",
+              "statement": "Prosedur menetapkan jenis dan tingkat kerusakan diidentifikasi.",
               "sequence": 1
             },
             {
               "code_number": "1.2",
-              "statement": "Perubahan bentuk bodi kendaraan",
+              "statement": "Perubahan bentuk bodi kendaraan diidentifikasi.",
               "sequence": 2
             },
             {
               "code_number": "1.3",
-              "statement": "Jenis dan tingkat kerusakan serta prosedur",
+              "statement": "Jenis dan tingkat kerusakan serta prosedur perbaikannya diidentifikasi.",
               "sequence": 3
             },
             {
@@ -322,12 +322,12 @@
             },
             {
               "code_number": "1.5",
-              "statement": "Prosedur menetapkan jenis dan tingkat",
+              "statement": "Prosedur menetapkan jenis dan tingkat kerusakan diidentifikasi.",
               "sequence": 5
             },
             {
               "code_number": "1.6",
-              "statement": "Perubahan bentuk bodi kendaraan",
+              "statement": "Perubahan bentuk bodi kendaraan diidentifikasi.",
               "sequence": 6
             }
           ]
@@ -338,17 +338,17 @@
           "kuks": [
             {
               "code_number": "2.1",
-              "statement": "Perubahan bentuk bodi kendaraan",
+              "statement": "Perubahan bentuk bodi kendaraan diperiksa sesuai prosedur.",
               "sequence": 1
             },
             {
               "code_number": "2.2",
-              "statement": "Perubahan bentuk bodi kendaraan dan",
+              "statement": "Perubahan bentuk bodi kendaraan dan fungsinya dianalisis sesuai prosedur.",
               "sequence": 2
             },
             {
               "code_number": "2.3",
-              "statement": "Estimasi durasi dan biaya perbaikan",
+              "statement": "Estimasi durasi dan biaya perbaikan ditetapkan.",
               "sequence": 3
             }
           ]
@@ -357,8 +357,8 @@
     },
     {
       "code": "G.45OBR02.010.2",
-      "title": "Unit Kompetensi",
-      "standard_reference": "SKKNI Terkait",
+      "title": "Mengkomunikasikan Prosedur Perawatan Bodi Kendaraan",
+      "standard_reference": "SKKNI No. 097 Tahun 2018",
       "sequence": 8,
       "elements": [
         {
@@ -367,27 +367,27 @@
           "kuks": [
             {
               "code_number": "1.1",
-              "statement": "Jenis,tipe, dan spesifikasi kendaraan di",
+              "statement": "Jenis,tipe, dan spesifikasi kendaraan di identifikasi.",
               "sequence": 1
             },
             {
               "code_number": "1.2",
-              "statement": "Panel,komponen, dan aksesoris bodi kenda",
+              "statement": "Panel,komponen, dan aksesoris bodi kenda raan diidentifikasi.",
               "sequence": 2
             },
             {
               "code_number": "1.3",
-              "statement": "Alat dan bahan perawatan bodi kendaraan",
+              "statement": "Alat dan bahan perawatan bodi kendaraan diidentifikasi.",
               "sequence": 3
             },
             {
               "code_number": "1.4",
-              "statement": "Jenis-jenis dan prosedur perawatan bodi",
+              "statement": "Jenis-jenis dan prosedur perawatan bodi kendaraan diidentifikasi.",
               "sequence": 4
             },
             {
               "code_number": "1.5",
-              "statement": "Spesifikasi teknis bahan bodi kendaraan",
+              "statement": "Spesifikasi teknis bahan bodi kendaraan diidentifikasi.",
               "sequence": 5
             }
           ]
@@ -398,12 +398,12 @@
           "kuks": [
             {
               "code_number": "2.1",
-              "statement": "Perubahan bentuk bodi kendaraan",
+              "statement": "Perubahan bentuk bodi kendaraan diperiksa sesuai prosedur.",
               "sequence": 1
             },
             {
               "code_number": "2.2",
-              "statement": "Perubahan bentuk bodi kendaraan dan",
+              "statement": "Perubahan bentuk bodi kendaraan dan fungsinya dianalisis",
               "sequence": 2
             }
           ]
@@ -412,8 +412,8 @@
     },
     {
       "code": "G.45OBR02.014.2",
-      "title": "Unit Kompetensi",
-      "standard_reference": "SKKNI Terkait",
+      "title": "Melepas dan Memasang Rangkaian Elektrikal Pada Bodi",
+      "standard_reference": "SKKNI No. 097 Tahun 2018",
       "sequence": 9,
       "elements": [
         {
@@ -422,17 +422,17 @@
           "kuks": [
             {
               "code_number": "1.1",
-              "statement": "Nama, jenis, spesifikasi, fungsi, dan lokasi",
+              "statement": "Nama, jenis, spesifikasi, fungsi, dan lokasi komponen electrical bodi kendaraan diidentifikasi",
               "sequence": 1
             },
             {
               "code_number": "1.2",
-              "statement": "Prosedur melepas dan memasang komponen",
+              "statement": "Prosedur melepas dan memasang komponen rangkaian electrical bodi diidentifikasi.",
               "sequence": 2
             },
             {
               "code_number": "1.3",
-              "statement": "Sistem rangkaian electrical",
+              "statement": "Sistem rangkaian electrical bodi kendaraan diidentifikasi.",
               "sequence": 3
             },
             {
@@ -447,7 +447,7 @@
             },
             {
               "code_number": "1.6",
-              "statement": "Peralatan dan perlengkapan disiapkan di meja",
+              "statement": "Peralatan dan perlengkapan disiapkan di meja kerja.",
               "sequence": 6
             }
           ]
@@ -458,52 +458,52 @@
           "kuks": [
             {
               "code_number": "2.1",
-              "statement": "Sumber arus listrik baterai dilepas sesuai",
+              "statement": "Sumber arus listrik baterai dilepas sesuai prosedur.",
               "sequence": 1
             },
             {
               "code_number": "2.2",
-              "statement": "Komponen rangkaian electrical bodi dilepas",
+              "statement": "Komponen rangkaian electrical bodi dilepas sesuai prosedur.",
               "sequence": 2
             },
             {
               "code_number": "2.3",
-              "statement": "Jenis dan spesifikasi komponen electrical bodi",
+              "statement": "Jenis dan spesifikasi komponen electrical bodi diidentifikasi.",
               "sequence": 3
             },
             {
               "code_number": "2.4",
-              "statement": "Komponen electrical bodi dicek kondisinya",
+              "statement": "Komponen electrical bodi dicek kondisinya sesuai spesifikasi.",
               "sequence": 4
             },
             {
               "code_number": "2.5",
-              "statement": "Hasil pengecekan kondisi komponen electrical",
+              "statement": "Hasil pengecekan kondisi komponen electrical bodi ditindaklanjuti sesuai spesifikasi.",
               "sequence": 5
             },
             {
               "code_number": "2.6",
-              "statement": "Hasil pengecekan kondisi komponen electrical",
+              "statement": "Hasil pengecekan kondisi komponen electrical bodi ditindaklanjuti sesuai spesifikasi.",
               "sequence": 6
             },
             {
               "code_number": "2.7",
-              "statement": "Komponen rangkaian electrical bodi",
+              "statement": "Komponen rangkaian electrical bodi dipasang sesuai prosedur.",
               "sequence": 7
             },
             {
               "code_number": "2.8",
-              "statement": "Hasil pemasangan komponen electrical bodi",
+              "statement": "Hasil pemasangan komponen electrical bodi dilaporkan sesuai prosedur.",
               "sequence": 8
             },
             {
               "code_number": "2.9",
-              "statement": "Hasil pemasangankomponen electrical bodi",
+              "statement": "Hasil pemasangankomponen electrical bodi didokumentasikan sesuai prosedur.",
               "sequence": 9
             },
             {
               "code_number": "2.10",
-              "statement": "Kegiatan pada unit ini merujuk pada prosedur",
+              "statement": "Kegiatan pada unit ini merujuk pada prosedur K3 yang terkait.",
               "sequence": 10
             }
           ]
@@ -512,8 +512,8 @@
     },
     {
       "code": "G.45OBR02.022.2",
-      "title": "Memperbaiki Panel Bodi Kendaraan dengan Palu Dan Dolly",
-      "standard_reference": "SKKNI Terkait",
+      "title": "Memperbaiki Panel Bodi Kendaraan dengan Palu dan Dolly",
+      "standard_reference": "SKKNI No. 097 Tahun 2018",
       "sequence": 10,
       "elements": [
         {
@@ -522,27 +522,27 @@
           "kuks": [
             {
               "code_number": "1.1",
-              "statement": "Jenis, area dan tingkat kerusakan",
+              "statement": "Jenis, area dan tingkat kerusakan panel bodi kendaraan diidentifikasi.",
               "sequence": 1
             },
             {
               "code_number": "1.2",
-              "statement": "Prosedur penggunaan palu dan dolly",
+              "statement": "Prosedur penggunaan palu dan dolly diidentifikasi.",
               "sequence": 2
             },
             {
               "code_number": "1.3",
-              "statement": "Peralatan dan perlengkapan yang",
+              "statement": "Peralatan dan perlengkapan yang diperlukan untuk memperbaiki panel bodi diidentifikasi dan disiapkan.",
               "sequence": 3
             },
             {
               "code_number": "1.4",
-              "statement": "Panel bodi kendaraan yang tidak",
+              "statement": "Panel bodi kendaraan yang tidak memerlukan perbaikan ditutup sesuai prosedur.",
               "sequence": 4
             },
             {
               "code_number": "1.5",
-              "statement": "Kegiatan pada unit ini dilaksanakan",
+              "statement": "Kegiatan pada unit ini dilaksanakan dengan merujuk pada prosedur K3L yang terkait.",
               "sequence": 5
             }
           ]
@@ -553,32 +553,32 @@
           "kuks": [
             {
               "code_number": "2.1",
-              "statement": "Aksesoris, anti karat dan peredam suara",
+              "statement": "Aksesoris, anti karat dan peredam suara pada panel bodi yang diperbaiki dilepas sesuai prosedur.",
               "sequence": 1
             },
             {
               "code_number": "2.2",
-              "statement": "Perbaikan panel bodi kendaraan dengan",
+              "statement": "Perbaikan panel bodi kendaraan dengan palu dan dolly dilakukan sesuai prosedur.",
               "sequence": 2
             },
             {
               "code_number": "2.3",
-              "statement": "Pengerutan dilakukan pada panel yang",
+              "statement": "Pengerutan dilakukan pada panel yang mulur/lentur.",
               "sequence": 3
             },
             {
               "code_number": "2.4",
-              "statement": "Kebersihan, kerataan, celah, dan bentuk",
+              "statement": "Kebersihan, kerataan, celah, dan bentuk panel hasil perbaikan diperiksa sesuai standar.",
               "sequence": 4
             },
             {
               "code_number": "2.5",
-              "statement": "Anti karat diaplikasikan pada panel bodi",
+              "statement": "Anti karat diaplikasikan pada panel bodi kendaraan yang diperbaiki.",
               "sequence": 5
             },
             {
               "code_number": "2.6",
-              "statement": "Hasil perbaikan panel bodi kendaraan",
+              "statement": "Hasil perbaikan panel bodi kendaraan dengan palu dan dolly dilaporkan sesuai prosedur. Rekomendasi Untuk Asesi: Asesi : Asesmen dapat / tidak dapat dilanjutkan Nama Tanda tangan/ Tanggal Ditinjau Oleh Asesor : Nama : No. Reg: Tanda tangan/ Tanggal",
               "sequence": 6
             }
           ]

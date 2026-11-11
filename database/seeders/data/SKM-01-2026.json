@@ -22,7 +22,7 @@
           "kuks": [
             {
               "code_number": "1.1",
-              "statement": "Potensi bahaya pada area kerja",
+              "statement": "Potensi bahaya pada area kerja diidentifikasi.",
               "sequence": 1
             },
             {
@@ -43,12 +43,12 @@
             },
             {
               "code_number": "2.2",
-              "statement": "Prosedur kesehatan dan keselamatan",
+              "statement": "Prosedur kesehatan dan keselamatan kerja dilaksanakan di tempat kerja.",
               "sequence": 2
             },
             {
               "code_number": "2.3",
-              "statement": "Pencegahan bahaya Keselamatan dan",
+              "statement": "Pencegahan bahaya Keselamatan dan Kesehatan Kerja dilakukan Unit Kompetensi 2",
               "sequence": 3
             }
           ]
@@ -67,12 +67,12 @@
           "kuks": [
             {
               "code_number": "1.1",
-              "statement": "Peralatan dan perlengkapan tempat",
+              "statement": "Peralatan dan perlengkapan tempat kerja diidentifikasi.",
               "sequence": 1
             },
             {
               "code_number": "1.2",
-              "statement": "Peralatan dan perlengkapan",
+              "statement": "Peralatan dan perlengkapan disiapkan di tempat kerja.",
               "sequence": 2
             }
           ]
@@ -83,12 +83,12 @@
           "kuks": [
             {
               "code_number": "2.1",
-              "statement": "Peralatan dan perlengkapan",
+              "statement": "Peralatan dan perlengkapan dikalibrasi sesuai jenis dan fungsi.",
               "sequence": 1
             },
             {
               "code_number": "2.2",
-              "statement": "Peralatan dan perlengkapan",
+              "statement": "Peralatan dan perlengkapan digunakan sesuai manual perbaikan. Unit Kompetensi 3",
               "sequence": 2
             }
           ]
@@ -107,17 +107,17 @@
           "kuks": [
             {
               "code_number": "1.1",
-              "statement": "Data dan informasi yang akan",
+              "statement": "Data dan informasi yang akan disampaikan diidentifikasi kebenarannya.",
               "sequence": 1
             },
             {
               "code_number": "1.2",
-              "statement": "Data informasi dan bukti disiapkan",
+              "statement": "Data informasi dan bukti disiapkan sesuai prosedur.",
               "sequence": 2
             },
             {
               "code_number": "1.3",
-              "statement": "Data informasi dan bukti diperiksa",
+              "statement": "Data informasi dan bukti diperiksa ulang sebelum dikomunikasikan.",
               "sequence": 3
             }
           ]
@@ -128,17 +128,17 @@
           "kuks": [
             {
               "code_number": "2.1",
-              "statement": "Data Informasi dan bukti",
+              "statement": "Data Informasi dan bukti dikomunikasikan kerekan kerja dan atasan di tempat kerja.",
               "sequence": 1
             },
             {
               "code_number": "2.2",
-              "statement": "Data informasi dan bukti komunikasi",
+              "statement": "Data informasi dan bukti komunikasi dicatat.",
               "sequence": 2
             },
             {
               "code_number": "2.3",
-              "statement": "Data informasi dan bukti komunikasi",
+              "statement": "Data informasi dan bukti komunikasi disimpan. Unit Kompetensi 4",
               "sequence": 3
             }
           ]
@@ -167,12 +167,12 @@
             },
             {
               "code_number": "1.3",
-              "statement": "Manual perbaikan dipersiapkan di",
+              "statement": "Manual perbaikan dipersiapkan di tempat kerja.",
               "sequence": 3
             },
             {
               "code_number": "1.4",
-              "statement": "Tools dan SST dipersiapkan di",
+              "statement": "Tools dan SST dipersiapkan di tempat kerja.",
               "sequence": 4
             }
           ]
@@ -183,17 +183,17 @@
           "kuks": [
             {
               "code_number": "2.1",
-              "statement": "Komponen diperiksa dengan alat",
+              "statement": "Komponen diperiksa dengan alat sesuai dengan manual perbaikan.",
               "sequence": 1
             },
             {
               "code_number": "2.2",
-              "statement": "Hasil pemeriksaan dicatat di form",
+              "statement": "Hasil pemeriksaan dicatat di form pemeriksa.",
               "sequence": 2
             },
             {
               "code_number": "2.3",
-              "statement": "Hasil pemeriksaan disimpan.",
+              "statement": "Hasil pemeriksaan disimpan. Unit Kompetensi 5",
               "sequence": 3
             }
           ]
@@ -217,12 +217,12 @@
             },
             {
               "code_number": "1.2",
-              "statement": "Minyak hidrolik disiapakan sesuai",
+              "statement": "Minyak hidrolik disiapakan sesuai spesifikasi pabrik.",
               "sequence": 2
             },
             {
               "code_number": "1.3",
-              "statement": "Tools, SST dan hidrolik tester",
+              "statement": "Tools, SST dan hidrolik tester disiapkan di tempat kerja.",
               "sequence": 3
             }
           ]
@@ -233,27 +233,27 @@
           "kuks": [
             {
               "code_number": "2.1",
-              "statement": "Sistem hidrolik diperiksa secara",
+              "statement": "Sistem hidrolik diperiksa secara visual dan atau dengan alat khusus.",
               "sequence": 1
             },
             {
               "code_number": "2.2",
-              "statement": "Sistem hidrolik dibersihkan sesuai",
+              "statement": "Sistem hidrolik dibersihkan sesuai manual perbaikan.",
               "sequence": 2
             },
             {
               "code_number": "2.3",
-              "statement": "Kerja system hidrolik diperiksa sesuai",
+              "statement": "Kerja system hidrolik diperiksa sesuai prosedur manual perbaikan.",
               "sequence": 3
             },
             {
               "code_number": "2.4",
-              "statement": "Sistem hidrolik diperbaiki tanpa",
+              "statement": "Sistem hidrolik diperbaiki tanpa menyebabkan kerusakan komponen lain.",
               "sequence": 4
             },
             {
               "code_number": "2.5",
-              "statement": "Hasil pemeriksaan sistem hidrolik",
+              "statement": "Hasil pemeriksaan sistem hidrolik didokumentasikan. Unit Kompetensi 6",
               "sequence": 5
             }
           ]
@@ -272,17 +272,17 @@
           "kuks": [
             {
               "code_number": "1.1",
-              "statement": "Komponen dan bahan material",
+              "statement": "Komponen dan bahan material diidentifikasi.",
               "sequence": 1
             },
             {
               "code_number": "1.2",
-              "statement": "Komponen dan bahan disiapkan di",
+              "statement": "Komponen dan bahan disiapkan di tempat kerja.",
               "sequence": 2
             },
             {
               "code_number": "1.3",
-              "statement": "Tools dan peralatan disiapkan di",
+              "statement": "Tools dan peralatan disiapkan di tempat kerja..",
               "sequence": 3
             }
           ]
@@ -298,22 +298,22 @@
             },
             {
               "code_number": "2.2",
-              "statement": "Komponen dipatri sesuai prosedur",
+              "statement": "Komponen dipatri sesuai prosedur manual perbaikan.",
               "sequence": 2
             },
             {
               "code_number": "2.3",
-              "statement": "Hasil pematrian di periksa secara",
+              "statement": "Hasil pematrian di periksa secara visual.",
               "sequence": 3
             },
             {
               "code_number": "2.4",
-              "statement": "Fungsi komponen hasil pematrian",
+              "statement": "Fungsi komponen hasil pematrian diuji sesuai prosedur.",
               "sequence": 4
             },
             {
               "code_number": "2.5",
-              "statement": "Hasil pematrian didokumentasikan.",
+              "statement": "Hasil pematrian didokumentasikan. Unit Kompetensi 7",
               "sequence": 5
             }
           ]
@@ -332,7 +332,7 @@
           "kuks": [
             {
               "code_number": "1.1",
-              "statement": "Gambar Teknik diidentifikasi sesuai",
+              "statement": "Gambar Teknik diidentifikasi sesuai kebutuhan.",
               "sequence": 1
             },
             {
@@ -348,12 +348,12 @@
           "kuks": [
             {
               "code_number": "2.1",
-              "statement": "Simbol dan kode gambar teknik",
+              "statement": "Simbol dan kode gambar teknik diidentifikasi.",
               "sequence": 1
             },
             {
               "code_number": "2.2",
-              "statement": "Gambar teknik dijelaskan sesuai",
+              "statement": "Gambar teknik dijelaskan sesuai fungsi dan cara kerja. Unit Kompetensi 8",
               "sequence": 2
             }
           ]
@@ -372,17 +372,17 @@
           "kuks": [
             {
               "code_number": "1.1",
-              "statement": "Jenis alat ukur dan komponen",
+              "statement": "Jenis alat ukur dan komponen diidentifikasi.",
               "sequence": 1
             },
             {
               "code_number": "1.2",
-              "statement": "Alat ukur yang sesuai disiapkan di",
+              "statement": "Alat ukur yang sesuai disiapkan di tempat kerja.",
               "sequence": 2
             },
             {
               "code_number": "1.3",
-              "statement": "Alat ukur dikalibrasi sebelum",
+              "statement": "Alat ukur dikalibrasi sebelum digunakan.",
               "sequence": 3
             }
           ]
@@ -398,12 +398,12 @@
             },
             {
               "code_number": "2.2",
-              "statement": "Alat ukur digunakan sesuai fungsi",
+              "statement": "Alat ukur digunakan sesuai fungsi dan jenis alat ukur.",
               "sequence": 2
             },
             {
               "code_number": "2.3",
-              "statement": "Hasil pengukuran didokumentasikan.",
+              "statement": "Hasil pengukuran didokumentasikan. Unit Kompetensi 9",
               "sequence": 3
             }
           ]
@@ -422,32 +422,32 @@
           "kuks": [
             {
               "code_number": "1.1",
-              "statement": "Nama, jenis, spesifikasi, fungsi,",
+              "statement": "Nama, jenis, spesifikasi, fungsi, prinsip kerja engine diidentifikasi sesuai prosedur.",
               "sequence": 1
             },
             {
               "code_number": "1.2",
-              "statement": "Prosedur pengoperasian alat ukur",
+              "statement": "Prosedur pengoperasian alat ukur dan peralatan khusus/SST untuk perawatan berkala engine diidentifikasi sesuai prosedur.",
               "sequence": 2
             },
             {
               "code_number": "1.3",
-              "statement": "Peralatan, perlengkapan dan bahan",
+              "statement": "Peralatan, perlengkapan dan bahan disiapkan di tempat kerja sesuai prosedur.",
               "sequence": 3
             },
             {
               "code_number": "1.4",
-              "statement": "Manual perbaikan engine disiapkan",
+              "statement": "Manual perbaikan engine disiapkan di tempat kerja sesuai prosedur.",
               "sequence": 4
             },
             {
               "code_number": "1.5",
-              "statement": "Data perawatan berkala engine",
+              "statement": "Data perawatan berkala engine diidentifikasi sesuai prosedur.",
               "sequence": 5
             },
             {
               "code_number": "1.6",
-              "statement": "Kendaraan yang akan dilakukan",
+              "statement": "Kendaraan yang akan dilakukan perawatan berkala engine disiapkan di area kerja sesuai prosedur.",
               "sequence": 6
             }
           ]
@@ -458,52 +458,52 @@
           "kuks": [
             {
               "code_number": "2.1",
-              "statement": "Engine dibersihkan dari kotoran",
+              "statement": "Engine dibersihkan dari kotoran sesuai prosedur.",
               "sequence": 1
             },
             {
               "code_number": "2.2",
-              "statement": "Sistem pelumasan engine diperiksa",
+              "statement": "Sistem pelumasan engine diperiksa sesuai prosedur.",
               "sequence": 2
             },
             {
               "code_number": "2.3",
-              "statement": "Sistem pendinginan engine dan",
+              "statement": "Sistem pendinginan engine dan komponen engine diperiksa sesuai prosedur.",
               "sequence": 3
             },
             {
               "code_number": "2.4",
-              "statement": "Sistem pemasukan udara dan sistem",
+              "statement": "Sistem pemasukan udara dan sistem gas buang engine diperiksa sesuai prosedur.",
               "sequence": 4
             },
             {
               "code_number": "2.5",
-              "statement": "Sistem pengapian engine diperiksa",
+              "statement": "Sistem pengapian engine diperiksa sesuai prosedur.",
               "sequence": 5
             },
             {
               "code_number": "2.6",
-              "statement": "Sistem bahan bakar diperiksa sesuai",
+              "statement": "Sistem bahan bakar diperiksa sesuai prosedur.",
               "sequence": 6
             },
             {
               "code_number": "2.7",
-              "statement": "Emisi gas buang engine diperiksa",
+              "statement": "Emisi gas buang engine diperiksa sesuai prosedur.",
               "sequence": 7
             },
             {
               "code_number": "2.8",
-              "statement": "Hasil pemeriksaan engine",
+              "statement": "Hasil pemeriksaan engine ditindaklanjuti sesuai dengan kondisi.",
               "sequence": 8
             },
             {
               "code_number": "2.9",
-              "statement": "Hasil pemeriksaan engine diuji",
+              "statement": "Hasil pemeriksaan engine diuji kinerjanya sesuai prosedur.",
               "sequence": 9
             },
             {
               "code_number": "2.10",
-              "statement": "Hasil pemeriksaan engine",
+              "statement": "Hasil pemeriksaan engine didokumentasikan dan dilaporkan sesuai prosedur.",
               "sequence": 10
             }
           ]
@@ -512,7 +512,7 @@
     },
     {
       "code": "G.45OTO01.020.2",
-      "title": "Unit Kompetensi",
+      "title": "Memelihara Sistem Pelumasan Engine",
       "standard_reference": "SKKNI No. 097 Tahun 2018",
       "sequence": 10,
       "elements": [
@@ -522,37 +522,37 @@
           "kuks": [
             {
               "code_number": "1.1",
-              "statement": "Nama komponen, jenis, spesifikasi,",
+              "statement": "Nama komponen, jenis, spesifikasi, fungsi, prinsip kerja dan Sistem pelumasan diidentifikasi sesuai prosedur.",
               "sequence": 1
             },
             {
               "code_number": "1.2",
-              "statement": "Peralatan dan bahan disiapkan di",
+              "statement": "Peralatan dan bahan disiapkan di meja kerja sesuai prosedur.",
               "sequence": 2
             },
             {
               "code_number": "1.3",
-              "statement": "Manual pemeliharaan sistem",
+              "statement": "Manual pemeliharaan sistem pelumasan disiapkan di meja kerja sesuai prosedur.",
               "sequence": 3
             },
             {
               "code_number": "1.4",
-              "statement": "Riwayat pemeliharaan pada sistem",
+              "statement": "Riwayat pemeliharaan pada sistem pelumasan engine diidentifikasi sesuai prosedur.",
               "sequence": 4
             },
             {
               "code_number": "1.5",
-              "statement": "Kebutuhan pemeliharaan Sistem",
+              "statement": "Kebutuhan pemeliharaan Sistem pelumasan diidentifikasi sesuai dengan data riwayat perbaikan kendaraan sesuai prosedur.",
               "sequence": 5
             },
             {
               "code_number": "1.6",
-              "statement": "Prosedur pemeliharaan sistem",
+              "statement": "Prosedur pemeliharaan sistem pelumasan diidentifikasi sesuai prosedur.",
               "sequence": 6
             },
             {
               "code_number": "1.7",
-              "statement": "Kendaraan yang akan dilakukan",
+              "statement": "Kendaraan yang akan dilakukan pemeliharaan pada sistem pelumasan disiapkan di area kerja sesuai prosedur sesuai prosedur.",
               "sequence": 7
             }
           ]
@@ -563,32 +563,32 @@
           "kuks": [
             {
               "code_number": "2.1",
-              "statement": "Kondisi sistem pelumasan engine",
+              "statement": "Kondisi sistem pelumasan engine diperiksa sesuai prosedur.",
               "sequence": 1
             },
             {
               "code_number": "2.2",
-              "statement": "Oli dan komponen pada sistem",
+              "statement": "Oli dan komponen pada sistem pelumasan engine diperiksa sesuai prosedur.",
               "sequence": 2
             },
             {
               "code_number": "2.3",
-              "statement": "Hasil pemeriksaan sistem pelumasan",
+              "statement": "Hasil pemeriksaan sistem pelumasan diperiksa sesuai standar spesifikasi.",
               "sequence": 3
             },
             {
               "code_number": "2.4",
-              "statement": "Hasil pemeriksaan ditindaklanjuti",
+              "statement": "Hasil pemeriksaan ditindaklanjuti sesuai dengan kondisi.",
               "sequence": 4
             },
             {
               "code_number": "2.5",
-              "statement": "Dokumen pemeliharaan sistem",
+              "statement": "Dokumen pemeliharaan sistem pelumasan diisi sesuai hasil pelaksanaan pemeliharaan.",
               "sequence": 5
             },
             {
               "code_number": "2.6",
-              "statement": "Hasil pemeliharaan Sistem",
+              "statement": "Hasil pemeliharaan Sistem pelumasan dilaporkan sesuai prosedur.",
               "sequence": 6
             }
           ]
@@ -597,7 +597,7 @@
     },
     {
       "code": "G.45OTO01.022.2",
-      "title": "Unit Kompetensi",
+      "title": "Memelihara Sistem Pendinginan Engine",
       "standard_reference": "SKKNI No. 097 Tahun 2018",
       "sequence": 11,
       "elements": [
@@ -607,37 +607,37 @@
           "kuks": [
             {
               "code_number": "1.1",
-              "statement": "Nama komponen, jenis, spesifikasi,",
+              "statement": "Nama komponen, jenis, spesifikasi, fungsi, prinsip kerja dan Sistem pelumasan diidentifikasi sesuai prosedur.",
               "sequence": 1
             },
             {
               "code_number": "1.2",
-              "statement": "Peralatan dan bahan disiapkan di",
+              "statement": "Peralatan dan bahan disiapkan di meja kerja sesuai prosedur.",
               "sequence": 2
             },
             {
               "code_number": "1.3",
-              "statement": "Manual pemeliharaan sistem",
+              "statement": "Manual pemeliharaan sistem pelumasan disiapkan di meja kerja sesuai prosedur.",
               "sequence": 3
             },
             {
               "code_number": "1.4",
-              "statement": "Riwayat pemeliharaan pada sistem",
+              "statement": "Riwayat pemeliharaan pada sistem pelumasan engine diidentifikasi sesuai prosedur.",
               "sequence": 4
             },
             {
               "code_number": "1.5",
-              "statement": "Kebutuhan pemeliharaan Sistem",
+              "statement": "Kebutuhan pemeliharaan Sistem pelumasan diidentifikasi sesuai dengan data riwayat perbaikan kendaraan sesuai prosedur.",
               "sequence": 5
             },
             {
               "code_number": "1.6",
-              "statement": "Prosedur pemeliharaan sistem",
+              "statement": "Prosedur pemeliharaan sistem pelumasan diidentifikasi sesuai prosedur.",
               "sequence": 6
             },
             {
               "code_number": "1.7",
-              "statement": "Kendaraan yang akan dilakukan",
+              "statement": "Kendaraan yang akan dilakukan pemeliharaan pada sistem pelumasan disiapkan di area kerja sesuai prosedur sesuai prosedur.",
               "sequence": 7
             }
           ]
@@ -648,37 +648,37 @@
           "kuks": [
             {
               "code_number": "2.1",
-              "statement": "Kebocoran sistem pendinginan",
+              "statement": "Kebocoran sistem pendinginan engine diperiksa sesuai prosedur.",
               "sequence": 1
             },
             {
               "code_number": "2.2",
-              "statement": "Cairan sistem pendinginan engine",
+              "statement": "Cairan sistem pendinginan engine diperiksa sesuai prosedur.",
               "sequence": 2
             },
             {
               "code_number": "2.3",
-              "statement": "Pemeliharaan sistem pendinginan",
+              "statement": "Pemeliharaan sistem pendinginan engine dilakukan sesuai prosedur.",
               "sequence": 3
             },
             {
               "code_number": "2.4",
-              "statement": "Hasil pemeliharaan Sistem",
+              "statement": "Hasil pemeliharaan Sistem pendinginan diuji sesua standar spesifikasi.",
               "sequence": 4
             },
             {
               "code_number": "2.5",
-              "statement": "Hasil pengujian ditindaklanjuti sesuai",
+              "statement": "Hasil pengujian ditindaklanjuti sesuai dengan kondisi.",
               "sequence": 5
             },
             {
               "code_number": "2.6",
-              "statement": "Dokumen pemeliharaan sistem",
+              "statement": "Dokumen pemeliharaan sistem pendinginan diisi sesuai hasil pelaksanaan pemeliharaan.",
               "sequence": 6
             },
             {
               "code_number": "2.7",
-              "statement": "Hasil                        pemeliharaan Sistem",
+              "statement": "Hasil pemeliharaan Sistem pendinginan dilaporkan sesuai prosedur.",
               "sequence": 7
             }
           ]
@@ -687,7 +687,7 @@
     },
     {
       "code": "G.45OTO01.026.2",
-      "title": "Unit Kompetensi",
+      "title": "Memelihara Sistem Bahan Bakar Bensin",
       "standard_reference": "SKKNI No. 097 Tahun 2018",
       "sequence": 12,
       "elements": [
@@ -697,37 +697,37 @@
           "kuks": [
             {
               "code_number": "1.1",
-              "statement": "Nama komponen, jenis, spesifikasi,",
+              "statement": "Nama komponen, jenis, spesifikasi, fungsi, prinsip kerja dan sistem bahan bakar bensin diidentifikasi sesuai prosedur.",
               "sequence": 1
             },
             {
               "code_number": "1.2",
-              "statement": "Peralatan dan bahan disiapkan di",
+              "statement": "Peralatan dan bahan disiapkan di meja kerja sesuai prosedur.",
               "sequence": 2
             },
             {
               "code_number": "1.3",
-              "statement": "Manual pemeliharaan sistem bahan",
+              "statement": "Manual pemeliharaan sistem bahan bakar bensin disiapkan di meja kerja sesuai prosedur.",
               "sequence": 3
             },
             {
               "code_number": "1.4",
-              "statement": "Riwayat pemeliharaan pada sistem",
+              "statement": "Riwayat pemeliharaan pada sistem bahan bakar bensin diidentifikasi sesuai prosedur.",
               "sequence": 4
             },
             {
               "code_number": "1.5",
-              "statement": "Kebutuhan pemeliharaan sistem",
+              "statement": "Kebutuhan pemeliharaan sistem bahan bakar bensin diidentifikasi sesuai dengan data riwayat perbaikan kendaraan sesuai prosedur.",
               "sequence": 5
             },
             {
               "code_number": "1.6",
-              "statement": "Prosedur pemeliharaan sistem bahan",
+              "statement": "Prosedur pemeliharaan sistem bahan bakar bensin diidentifikasi sesuai prosedur.",
               "sequence": 6
             },
             {
               "code_number": "1.7",
-              "statement": "Kendaraan yang akan dilakukan",
+              "statement": "Kendaraan yang akan dilakukan pemeliharaan pada sistem bahan bakar bensin disiapkan di area kerja sesuai prosedur sesuai prosedur.",
               "sequence": 7
             }
           ]
@@ -738,32 +738,32 @@
           "kuks": [
             {
               "code_number": "2.1",
-              "statement": "Kondisi sistem bahan bakar bensin",
+              "statement": "Kondisi sistem bahan bakar bensin diperiksa sesuai prosedur.",
               "sequence": 1
             },
             {
               "code_number": "2.2",
-              "statement": "Pemeliharaan sistem bahan bakar",
+              "statement": "Pemeliharaan sistem bahan bakar bensin dilakukan sesuai dengan prosedur.",
               "sequence": 2
             },
             {
               "code_number": "2.3",
-              "statement": "Hasil pemeliharaan sistem bahan",
+              "statement": "Hasil pemeliharaan sistem bahan bakar bensin diperiksa sesuai standar spesifikasi.",
               "sequence": 3
             },
             {
               "code_number": "2.4",
-              "statement": "Hasil pemeriksaan sistem bahan",
+              "statement": "Hasil pemeriksaan sistem bahan bakar bensin ditindaklanjuti sesuai dengan kondisi.",
               "sequence": 4
             },
             {
               "code_number": "2.5",
-              "statement": "Dokumen pemeliharaan sistem",
+              "statement": "Dokumen pemeliharaan sistem bahan bakar bensin diisi sesuai hasil pelaksanaan pemeliharaan.",
               "sequence": 5
             },
             {
               "code_number": "2.6",
-              "statement": "Hasil pemeliharaan Sistem",
+              "statement": "Hasil pemeliharaan Sistem pelumasan dilaporkan sesuai prosedur.",
               "sequence": 6
             }
           ]
@@ -772,7 +772,7 @@
     },
     {
       "code": "G.45OTO01.032.2",
-      "title": "Unit Kompetensi",
+      "title": "Memelihara Sistem Kontrol Emisi",
       "standard_reference": "SKKNI No. 097 Tahun 2018",
       "sequence": 13,
       "elements": [
@@ -782,37 +782,37 @@
           "kuks": [
             {
               "code_number": "1.1",
-              "statement": "Nama komponen, jenis, spesifikasi,",
+              "statement": "Nama komponen, jenis, spesifikasi, fungsi, prinsip kerja dan sistem kontrol emisi diidentifikasi sesuai prosedur.",
               "sequence": 1
             },
             {
               "code_number": "1.2",
-              "statement": "Peralatan dan bahan disiapkan di",
+              "statement": "Peralatan dan bahan disiapkan di meja kerja sesuai prosedur.",
               "sequence": 2
             },
             {
               "code_number": "1.3",
-              "statement": "Manual pemeliharaan sistem kontrol",
+              "statement": "Manual pemeliharaan sistem kontrol emisi disiapkan di meja kerja sesuai prosedur.",
               "sequence": 3
             },
             {
               "code_number": "1.4",
-              "statement": "Riwayat pemeliharaan pada sistem",
+              "statement": "Riwayat pemeliharaan pada sistem kontrol emisi diidentifikasi sesuai prosedur.",
               "sequence": 4
             },
             {
               "code_number": "1.5",
-              "statement": "Kebutuhan pemeliharaan sistem",
+              "statement": "Kebutuhan pemeliharaan sistem kontrol emisi diidentifikasi sesuai dengan data riwayat perbaikan kendaraan sesuai prosedur.",
               "sequence": 5
             },
             {
               "code_number": "1.6",
-              "statement": "Prosedur pemeliharaan sistem",
+              "statement": "Prosedur pemeliharaan sistem kontrol emisi diidentifikasi sesuai prosedur.",
               "sequence": 6
             },
             {
               "code_number": "1.7",
-              "statement": "Kendaraan yang akan dilakukan",
+              "statement": "Kendaraan yang akan dilakukan pemeliharaan pada sistem kontrol emisi disiapkan di area kerja sesuai prosedur sesuai prosedur.",
               "sequence": 7
             }
           ]
@@ -823,32 +823,32 @@
           "kuks": [
             {
               "code_number": "2.1",
-              "statement": "Kondisi sistem kontrol emisi diperiksa",
+              "statement": "Kondisi sistem kontrol emisi diperiksa sesuai prosedur.",
               "sequence": 1
             },
             {
               "code_number": "2.2",
-              "statement": "Pemeliharaan sistem kontrol emisi",
+              "statement": "Pemeliharaan sistem kontrol emisi dilakukan sesuai dengan prosedur.",
               "sequence": 2
             },
             {
               "code_number": "2.3",
-              "statement": "Hasil pemeliharaan sistem kontrol",
+              "statement": "Hasil pemeliharaan sistem kontrol emisi diperiksa sesuai standar spesifikasi.",
               "sequence": 3
             },
             {
               "code_number": "2.4",
-              "statement": "Hasil pemeriksaan ditindaklanjuti",
+              "statement": "Hasil pemeriksaan ditindaklanjuti sesuai dengan prosedur.",
               "sequence": 4
             },
             {
               "code_number": "2.5",
-              "statement": "Dokumen pemeliharaan emisi gas",
+              "statement": "Dokumen pemeliharaan emisi gas buang diisi sesuai hasil pelaksanaan pemeliharaan.",
               "sequence": 5
             },
             {
               "code_number": "2.6",
-              "statement": "Hasil pemeliharaan sistem control",
+              "statement": "Hasil pemeliharaan sistem control emisi dilaporkan sesuai prosedur.",
               "sequence": 6
             }
           ]
@@ -857,7 +857,7 @@
     },
     {
       "code": "G.45OTO01.065.2",
-      "title": "Unit Kompetensi",
+      "title": "Memelihara Baterai",
       "standard_reference": "SKKNI No. 097 Tahun 2018",
       "sequence": 14,
       "elements": [
@@ -867,27 +867,27 @@
           "kuks": [
             {
               "code_number": "1.1",
-              "statement": "Manual perbaikan pemeliharaan",
+              "statement": "Manual perbaikan pemeliharaan baterai yang digunakan disiapkan.",
               "sequence": 1
             },
             {
               "code_number": "1.2",
-              "statement": "Peralatan dan perangkat kerja",
+              "statement": "Peralatan dan perangkat kerja pendukung diperiksa atas kondisi dan kelayakan pakai berdasarkan kebutuhan pemeliharaan.",
               "sequence": 2
             },
             {
               "code_number": "1.3",
-              "statement": "Baterai yang digunakan",
+              "statement": "Baterai yang digunakan disiapkan untuk menentukan proses pemeliharaan.",
               "sequence": 3
             },
             {
               "code_number": "1.4",
-              "statement": "Level cairan elektrolit diperiksa",
+              "statement": "Level cairan elektrolit diperiksa dan disesuaikan pada level yang tepat berdasarkan manual perbaikan. (Hanya berlaku untuk baterai basah).",
               "sequence": 4
             },
             {
               "code_number": "1.5",
-              "statement": "Perlengkapan pelindung",
+              "statement": "Perlengkapan pelindung kendaraan dipasang berdasarkan prosedur di tempat kerja.",
               "sequence": 5
             }
           ]
@@ -898,27 +898,27 @@
           "kuks": [
             {
               "code_number": "2.1",
-              "statement": "Kondisi rumah atau casing",
+              "statement": "Kondisi rumah atau casing baterai, terminal baterai dan koneksi ke kabel kendaraan diperiksa sesuai manual perbaikan.",
               "sequence": 1
             },
             {
               "code_number": "2.2",
-              "statement": "Tegangan baterai diperiksa",
+              "statement": "Tegangan baterai diperiksa dengan menggunakan alat ukur yang sesuai dengan manual perbaikan.",
               "sequence": 2
             },
             {
               "code_number": "2.3",
-              "statement": "Berat jenis air baterai diperiksa",
+              "statement": "Berat jenis air baterai diperiksa menggunakan alat ukur yang sesuai dengan manual perbaikan.",
               "sequence": 3
             },
             {
               "code_number": "2.4",
-              "statement": "Baterai dan terminal dibersihkan",
+              "statement": "Baterai dan terminal dibersihkan sesuai dengan manual perbaikan.",
               "sequence": 4
             },
             {
               "code_number": "2.5",
-              "statement": "Dokumen pemeriksaan baterai",
+              "statement": "Dokumen pemeriksaan baterai diisi sesuai dengan hasil pelaksanaan pemeriksaan baterai.",
               "sequence": 5
             }
           ]
@@ -929,12 +929,12 @@
           "kuks": [
             {
               "code_number": "3.1",
-              "statement": "Baterai di uji dengan",
+              "statement": "Baterai di uji dengan menggunakan diagnostic tool sesuai dengan manual perbaikan.",
               "sequence": 1
             },
             {
               "code_number": "3.2",
-              "statement": "Hasil pekerjaan menguji baterai",
+              "statement": "Hasil pekerjaan menguji baterai didokumentasikan.",
               "sequence": 2
             }
           ]
@@ -943,7 +943,7 @@
     },
     {
       "code": "G.45OTO01.066.2",
-      "title": "Unit Kompetensi",
+      "title": "Mengganti Baterai Kendaraan Ringan",
       "standard_reference": "SKKNI No. 097 Tahun 2018",
       "sequence": 15,
       "elements": [
@@ -953,22 +953,22 @@
           "kuks": [
             {
               "code_number": "1.1",
-              "statement": "Manual perbaikan pekerjaan",
+              "statement": "Manual perbaikan pekerjaan mengganti baterai disiapkan di area kerja sesuai prosedur.",
               "sequence": 1
             },
             {
               "code_number": "1.2",
-              "statement": "Peralatan dan perangkat kerja",
+              "statement": "Peralatan dan perangkat kerja pendukung diperiksa atas kondisi dan kelayakan pakai berdasarkan kebutuhan penggantian.",
               "sequence": 2
             },
             {
               "code_number": "1.3",
-              "statement": "Baterai yang akan digunakan untuk",
+              "statement": "Baterai yang akan digunakan untuk mengganti disiapkan sesuai prosedur kerja.",
               "sequence": 3
             },
             {
               "code_number": "1.4",
-              "statement": "Perlengkapan pelindung kendaraan",
+              "statement": "Perlengkapan pelindung kendaraan dipasang berdasarkan prosedur di tempat kerja.",
               "sequence": 4
             }
           ]
@@ -979,12 +979,12 @@
           "kuks": [
             {
               "code_number": "2.1",
-              "statement": "Baterai diganti sesuai dengan",
+              "statement": "Baterai diganti sesuai dengan spesifikasi pada manual perbaikan kendaraan yang digunakan.",
               "sequence": 1
             },
             {
               "code_number": "2.2",
-              "statement": "Baterai dipasang berdasarkan",
+              "statement": "Baterai dipasang berdasarkan manual perbaikan.",
               "sequence": 2
             }
           ]
@@ -995,12 +995,12 @@
           "kuks": [
             {
               "code_number": "3.1",
-              "statement": "Baterai di uji dengan menggunakan",
+              "statement": "Baterai di uji dengan menggunakan diagnostic tool sesuai dengan manual perbaikan.",
               "sequence": 1
             },
             {
               "code_number": "3.2",
-              "statement": "Hasil pekerjaan menguji baterai",
+              "statement": "Hasil pekerjaan menguji baterai dicatat dan dilaporkan sesuai prosedur yang berlaku.",
               "sequence": 2
             }
           ]
@@ -1009,7 +1009,7 @@
     },
     {
       "code": "G.45OTO01.067.2",
-      "title": "Unit Kompetensi",
+      "title": "Melepas Komponen Kelistrikan",
       "standard_reference": "SKKNI No. 097 Tahun 2018",
       "sequence": 16,
       "elements": [
@@ -1019,17 +1019,17 @@
           "kuks": [
             {
               "code_number": "1.1",
-              "statement": "Wiring diagram yang relevan dengan",
+              "statement": "Wiring diagram yang relevan dengan kendaraan disiapkan.",
               "sequence": 1
             },
             {
               "code_number": "1.2",
-              "statement": "Informasi teknis tentang skema",
+              "statement": "Informasi teknis tentang skema jaringan kelistrikan dan komponen kendaraan bermotor disiapkan.",
               "sequence": 2
             },
             {
               "code_number": "1.3",
-              "statement": "Perlengkapan pelindung kendaraan",
+              "statement": "Perlengkapan pelindung kendaraan dipasang berdasarkan prosedur di tempat kerja.",
               "sequence": 3
             }
           ]
@@ -1040,27 +1040,27 @@
           "kuks": [
             {
               "code_number": "2.1",
-              "statement": "Komponen sistem kelistrikan yang",
+              "statement": "Komponen sistem kelistrikan yang akan dilepas diperiksa sesuai manual perbaikan.",
               "sequence": 1
             },
             {
               "code_number": "2.2",
-              "statement": "Komponen sistem kelistrikan dilepas",
+              "statement": "Komponen sistem kelistrikan dilepas sesuai manual perbaikan.",
               "sequence": 2
             },
             {
               "code_number": "2.3",
-              "statement": "Komponen sistem kelistrikan",
+              "statement": "Komponen sistem kelistrikan diperiksa sesuai manual perbaikan.",
               "sequence": 3
             },
             {
               "code_number": "2.4",
-              "statement": "Komponen kelistrikan ditandai sesuai",
+              "statement": "Komponen kelistrikan ditandai sesuai manual perbaikan.",
               "sequence": 4
             },
             {
               "code_number": "2.5",
-              "statement": "Dokumen pemeriksaan komponen",
+              "statement": "Dokumen pemeriksaan komponen kelistrikan diisi sesuai dengan hasil pemeriksaan dan dilaporkan sesuai prosedur.",
               "sequence": 5
             }
           ]
@@ -1069,7 +1069,7 @@
     },
     {
       "code": "G.45OTO01.024.2",
-      "title": "Unit Kompetensi",
+      "title": "Mengganti Cairan pada Sistem Pendinginan Engine",
       "standard_reference": "SKKNI No. 097 Tahun 2018",
       "sequence": 17,
       "elements": [
@@ -1079,37 +1079,37 @@
           "kuks": [
             {
               "code_number": "1.1",
-              "statement": "Nama komponen, jenis, spesifikasi,",
+              "statement": "Nama komponen, jenis, spesifikasi, fungsi, prinsip kerja dan Sistem pendinginan engine diidentifikasi sesuai prosedur.",
               "sequence": 1
             },
             {
               "code_number": "1.2",
-              "statement": "Peralatan dan bahan disiapkan di",
+              "statement": "Peralatan dan bahan disiapkan di meja Kerja sesuai prosedur.",
               "sequence": 2
             },
             {
               "code_number": "1.3",
-              "statement": "Manual perbaikan Sistem",
+              "statement": "Manual perbaikan Sistem pendinginan engine disiapkan di meja Kerja sesuai prosedur.",
               "sequence": 3
             },
             {
               "code_number": "1.4",
-              "statement": "Riwayat pemeliharaan pada sistem",
+              "statement": "Riwayat pemeliharaan pada sistem pendinginan engine diidentifikasi sesuai prosedur.",
               "sequence": 4
             },
             {
               "code_number": "1.5",
-              "statement": "Kebutuhan penggantian cairan pada",
+              "statement": "Kebutuhan penggantian cairan pada system pendinginan engine diidentifikasi sesuai dengan data riwayat perbaikan kendaraan sesuai prosedur.",
               "sequence": 5
             },
             {
               "code_number": "1.6",
-              "statement": "Prosedur penggantian cairan pada",
+              "statement": "Prosedur penggantian cairan pada Sistem pendinginan engine diidentifikasi sesuai prosedur.",
               "sequence": 6
             },
             {
               "code_number": "1.7",
-              "statement": "Kendaraan yang akan diganti cairan",
+              "statement": "Kendaraan yang akan diganti cairan pendingin engine disiapkan di area kerja sesuai prosedur.",
               "sequence": 7
             }
           ]
@@ -1120,37 +1120,37 @@
           "kuks": [
             {
               "code_number": "2.1",
-              "statement": "Kebocoran sistem pendinginan",
+              "statement": "Kebocoran sistem pendinginan engine diperiksa sesuai prosedur.",
               "sequence": 1
             },
             {
               "code_number": "2.2",
-              "statement": "Cairan pendingin engine dikuras",
+              "statement": "Cairan pendingin engine dikuras sesuai dengan prosedur.",
               "sequence": 2
             },
             {
               "code_number": "2.3",
-              "statement": "Cairan pendingin engine diisi sesuai",
+              "statement": "Cairan pendingin engine diisi sesuai prosedur.",
               "sequence": 3
             },
             {
               "code_number": "2.4",
-              "statement": "Hasil penggantian cairan pada",
+              "statement": "Hasil penggantian cairan pada Sistem pendinginan engine diuji sesuai standar spesifikasi.",
               "sequence": 4
             },
             {
               "code_number": "2.5",
-              "statement": "Hasil pengujian ditindaklanjuti sesuai",
+              "statement": "Hasil pengujian ditindaklanjuti sesuai dengan kondisi.",
               "sequence": 5
             },
             {
               "code_number": "2.6",
-              "statement": "Dokumen penggantian cairan pada",
+              "statement": "Dokumen penggantian cairan pada sistem pendinginan diisi sesuai hasil penggantian.",
               "sequence": 6
             },
             {
               "code_number": "2.7",
-              "statement": "Hasil penggantian cairan pada",
+              "statement": "Hasil penggantian cairan pada Sistem pendinginan engine dilaporkan sesuai prosedur.",
               "sequence": 7
             }
           ]
@@ -1159,7 +1159,7 @@
     },
     {
       "code": "G.45OTO01.084.2",
-      "title": "Unit Kompetensi",
+      "title": "Memelihara Sistem Air Conditioner",
       "standard_reference": "SKKNI No. 097 Tahun 2018",
       "sequence": 18,
       "elements": [
@@ -1169,27 +1169,27 @@
           "kuks": [
             {
               "code_number": "1.1",
-              "statement": "Pekerjaan menyiapkan pemeliharaan",
+              "statement": "Pekerjaan menyiapkan pemeliharaan sistem air conditioner dilakukan sesuai dengan manual perbaikan.",
               "sequence": 1
             },
             {
               "code_number": "1.2",
-              "statement": "Alat dan perlengkapan pengaman",
+              "statement": "Alat dan perlengkapan pengaman sistem air conditioner disiapkan untuk memastikan tidak terjadi pencemaran lingkungan akibat bahan refrigerant yang dapat merusak lapisan ozon.",
               "sequence": 2
             },
             {
               "code_number": "1.3",
-              "statement": "Metode pemeliharaan ditentukan",
+              "statement": "Metode pemeliharaan ditentukan sesuai manual perbaikan.",
               "sequence": 3
             },
             {
               "code_number": "1.4",
-              "statement": "Material dan komponen sistem air",
+              "statement": "Material dan komponen sistem air conditioner disiapkan untuk proses pemeliharaan sesuai dengan kendaraan yang digunakan.",
               "sequence": 4
             },
             {
               "code_number": "1.5",
-              "statement": "Perlengkapan pelindung kendaraan",
+              "statement": "Perlengkapan pelindung kendaraan dipasang berdasarkan prosedur di tempat kerja",
               "sequence": 5
             }
           ]
@@ -1200,27 +1200,27 @@
           "kuks": [
             {
               "code_number": "2.1",
-              "statement": "Sistem air conditioner diuji dengan",
+              "statement": "Sistem air conditioner diuji dengan menggunakan metode dan peralatan sesuai manual perbaikan untuk membandingkan hasil uji dengan spesifikasi.",
               "sequence": 1
             },
             {
               "code_number": "2.2",
-              "statement": "Hasil pengujian air conditioner dicatat",
+              "statement": "Hasil pengujian air conditioner dicatat dan dilaporkan sesuai prosedur yang berlaku.",
               "sequence": 2
             },
             {
               "code_number": "2.3",
-              "statement": "Jumlah refrigerant disesuaikan",
+              "statement": "Jumlah refrigerant disesuaikan dengan spesifikasi pedoman manual perbaikan.",
               "sequence": 3
             },
             {
               "code_number": "2.4",
-              "statement": "Hasil pekerjaan memelihara",
+              "statement": "Hasil pekerjaan memelihara komponen air conditioner dicatat dan dilaporkan sesuai prosedur.",
               "sequence": 4
             },
             {
               "code_number": "2.5",
-              "statement": "Pengujian final dilakukan untuk",
+              "statement": "Pengujian final dilakukan untuk memastikan sistem air conditioner bekerja dengan baik dan aman sesuai manual perbaikan. Asesmen dapat / tidak dapat dilanjutkan Nama Tanda tangan/ Tanggal Ditinjau Oleh Asesor : Nama : No. Reg: Tanda tangan/ Tanggal",
               "sequence": 5
             }
           ]
