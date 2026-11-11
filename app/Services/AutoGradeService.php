@@ -34,6 +34,7 @@ class AutoGradeService
                 'question' => $q->question_text,
                 'question_image' => $q->question_image,
                 'answer' => $ans,
+                'user_answer' => $ans,
                 'correct_answer' => $q->correct_answer,
                 'is_correct' => $isCorrect,
             ];

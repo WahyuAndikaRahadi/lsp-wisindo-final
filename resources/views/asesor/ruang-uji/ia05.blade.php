@@ -22,8 +22,9 @@
     @php
         $totalQuestions = count($breakdown ?? []);
         $correctAnswers = collect($breakdown ?? [])->where('is_correct', true)->count();
-        $score = $totalQuestions > 0 ? round(($correctAnswers / $totalQuestions) * 100, 1) : ($assessment->ia05_score ?? 0);
-        $isPassed = $score >= 70;
+        $score = $totalQuestions > 0 ? round(($correctAnswers / $totalQuestions) * 100, 1) : (float) ($response?->score ?? $assessment->ia05_score ?? 0);
+        $passingGrade = (float) ($scheme?->passing_grade_theory ?? \App\Models\Setting::get('cbt_passing_grade', 75.0));
+        $isPassed = $score >= $passingGrade;
     @endphp
     <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
         <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm flex items-center space-x-4">
@@ -74,7 +75,7 @@
             <table class="w-full text-sm">
                 <thead class="bg-slate-50 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
                     <tr>
-                        <th class="px-6 py-3 w-16">No</th>
+                        <th class="px-6 py-3 w-16 text-center">No</th>
                         <th class="px-6 py-3">Pertanyaan</th>
                         <th class="px-6 py-3 text-center w-28">Jawaban Asesi</th>
                         <th class="px-6 py-3 text-center w-28">Kunci Jawaban</th>
@@ -83,13 +84,33 @@
                 </thead>
                 <tbody class="divide-y divide-slate-100">
                     @forelse($breakdown ?? [] as $i => $item)
+                        @php
+                            $qId = is_object($item) ? ($item->question_id ?? $i) : ($item['question_id'] ?? $i);
+                            $qText = is_object($item) ? ($item->question ?? '') : ($item['question'] ?? '');
+                            $qImg = is_object($item) ? ($item->question_image ?? null) : ($item['question_image'] ?? null);
+                            $userAns = is_object($item)
+                                ? ($item->answer ?? $item->user_answer ?? null)
+                                : ($item['answer'] ?? $item['user_answer'] ?? null);
+                            if ($userAns === null && isset($savedAnswers[$qId])) {
+                                $userAns = $savedAnswers[$qId];
+                            }
+                            if ($userAns !== null && $userAns !== '') {
+                                $userAns = strtoupper(trim((string) $userAns));
+                            }
+                            $correctAns = is_object($item)
+                                ? ($item->correct_answer ?? null)
+                                : ($item['correct_answer'] ?? null);
+                            if ($correctAns !== null && $correctAns !== '') {
+                                $correctAns = strtoupper(trim((string) $correctAns));
+                            }
+                            $isCorrect = is_object($item)
+                                ? ($item->is_correct ?? false)
+                                : ($item['is_correct'] ?? false);
+                        @endphp
                         <tr class="hover:bg-slate-50/50">
-                            <td class="px-6 py-3 text-slate-500 font-mono text-xs">{{ $i + 1 }}</td>
+                            <td class="px-6 py-3 text-slate-500 font-mono text-xs text-center font-bold">{{ $loop->iteration }}</td>
                             <td class="px-6 py-3 text-slate-800">
-                                <div class="font-medium text-sm">{{ $item->question ?? $item['question'] }}</div>
-                                @php
-                                    $qImg = $item->question_image ?? $item['question_image'] ?? null;
-                                @endphp
+                                <div class="font-medium text-sm">{{ $qText }}</div>
                                 @if($qImg)
                                     <div class="mt-2 inline-block">
                                         <a href="{{ asset('storage/' . $qImg) }}" target="_blank" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-xs font-semibold text-slate-700 border border-slate-300 transition">
@@ -100,16 +121,28 @@
                                 @endif
                             </td>
                             <td class="px-6 py-3 text-center font-mono font-bold text-xs">
-                                {{ $item->user_answer ?? $item['user_answer'] ?? '-' }}
+                                @if(!empty($userAns))
+                                    <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-xs font-bold {{ $isCorrect ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-rose-100 text-rose-800 border border-rose-300' }}">
+                                        {{ $userAns }}
+                                    </span>
+                                @else
+                                    <span class="text-slate-400 font-normal italic">-</span>
+                                @endif
                             </td>
                             <td class="px-6 py-3 text-center font-mono font-bold text-xs text-slate-600">
-                                {{ $item->correct_answer ?? $item['correct_answer'] ?? '-' }}
+                                @if(!empty($correctAns))
+                                    <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 border border-slate-300">
+                                        {{ $correctAns }}
+                                    </span>
+                                @else
+                                    <span class="text-slate-400">-</span>
+                                @endif
                             </td>
                             <td class="px-6 py-3 text-center">
-                                @if($item->is_correct ?? $item['is_correct'] ?? false)
-                                    <span class="px-2 py-0.5 rounded text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">Benar</span>
+                                @if($isCorrect)
+                                    <span class="px-2.5 py-1 rounded-md text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">Benar</span>
                                 @else
-                                    <span class="px-2 py-0.5 rounded text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200">Salah</span>
+                                    <span class="px-2.5 py-1 rounded-md text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200">Salah</span>
                                 @endif
                             </td>
                         </tr>

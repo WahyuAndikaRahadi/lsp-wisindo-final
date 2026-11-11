@@ -6,6 +6,7 @@ use App\Http\Controllers\Concerns\AuthorizesAssessor;
 use App\Http\Controllers\Controller;
 use App\Models\Assessment;
 use App\Models\AssessmentIaResponse;
+use App\Models\QuestionBank;
 use App\Models\Schedule;
 use App\Models\Setting;
 use App\Rules\ValidSignature;
@@ -420,6 +421,28 @@ class InstrumentController extends Controller
         }
 
         $breakdown = $savedData['breakdown'] ?? $savedData['items'] ?? [];
+        if (empty($breakdown) && ! empty($savedAnswers) && $code === 'ia05') {
+            $questionIds = array_keys($savedAnswers);
+            $qModels = QuestionBank::whereIn('id', $questionIds)->get()->keyBy('id');
+            $breakdown = [];
+            foreach ($questionIds as $qid) {
+                $q = $qModels->get($qid);
+                if (! $q) {
+                    continue;
+                }
+                $ans = $savedAnswers[$qid] ?? null;
+                $isCorrect = ($ans !== null && strtoupper((string) $ans) === $q->correct_answer);
+                $breakdown[$qid] = [
+                    'question_id' => $q->id,
+                    'question' => $q->question_text,
+                    'question_image' => $q->question_image,
+                    'answer' => $ans,
+                    'user_answer' => $ans,
+                    'correct_answer' => $q->correct_answer,
+                    'is_correct' => $isCorrect,
+                ];
+            }
+        }
         $score = $response?->score ?? $savedData['score'] ?? ($assessment->ia05_score ?? 0);
         $ia02Text = ($code === 'ia02') ? $instrumentService->getIa02FullText($scheme) : '';
         $ia02Html = ($code === 'ia02') ? $instrumentService->getIa02FormattedHtml($scheme) : '';
