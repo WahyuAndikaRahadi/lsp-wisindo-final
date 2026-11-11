@@ -202,4 +202,73 @@ class Ia01bExportReworkTest extends TestCase
         $this->assertEquals('application/pdf', $exportRes->headers->get('Content-Type'));
         $this->assertStringContainsString('FR.IA.01B-REPORT_SHEET', $exportRes->headers->get('Content-Disposition'));
     }
+
+    public function test_assessor_ia01b_view_is_not_marked_completed_when_only_assessee_uploaded_evidence(): void
+    {
+        Storage::fake('local');
+
+        $fakePdf = UploadedFile::fake()->create('Laporan_Pemeriksaan_Asesi.pdf', 300, 'application/pdf');
+
+        // Asesi uploads report sheet
+        $uploadRes = $this->actingAs($this->asesi)->post(
+            route('asesi.assessment.instrument.upload-evidence', [$this->assessment, 'IA01B']),
+            ['evidence_image' => $fakePdf]
+        );
+        $uploadRes->assertSessionHasNoErrors();
+        $uploadRes->assertRedirect();
+
+        // Response exists with evidence, but assessor has NOT signed or evaluated yet
+        $iaResponse = AssessmentIaResponse::where('assessment_id', $this->assessment->id)
+            ->where('instrument_code', 'IA01B')
+            ->first();
+        $this->assertNotNull($iaResponse);
+        $this->assertNull($iaResponse->assessor_signed_at);
+        $this->assertNull($iaResponse->assessor_signature);
+
+        // Assessor opens the evaluation page
+        $assessorPage = $this->actingAs($this->asesor)->get(
+            route('asesor.ruang-uji.ia01b', $this->assessment)
+        );
+        $assessorPage->assertOk();
+
+        // Must NOT show completed banner or Edit Penilaian button
+        $assessorPage->assertDontSee('Penilaian FR.IA.01B Telah Selesai');
+        $assessorPage->assertDontSee('✎ Edit Penilaian');
+
+        // Must show active editing state and submit button
+        $assessorPage->assertSee('Simpan Penilaian FR.IA.01B');
+        $assessorPage->assertSee('Semua Sesuai');
+        $assessorPage->assertSee('Semua Tidak');
+        $assessorPage->assertSee('isEditing: true');
+
+        // Assessor now submits evaluation
+        $submitRes = $this->actingAs($this->asesor)->post(
+            route('asesor.ruang-uji.ia01b.store', $this->assessment->id),
+            [
+                'items' => [
+                    0 => ['measured' => '12.6 Volt', 'result' => 'SESUAI'],
+                ],
+                'notes' => 'Pengukuran sesuai standar manual pabrikan.',
+                'signature_data' => 'data:image/png;base64,mockSignatureAsesor123',
+            ]
+        );
+        $submitRes->assertSessionHasNoErrors();
+        $submitRes->assertRedirect(route('asesor.schedule.instrument', [
+            'schedule' => $this->assessment->schedule_id,
+            'code' => 'ia01b',
+        ]));
+
+        $iaResponse->refresh();
+        $this->assertNotNull($iaResponse->assessor_signed_at);
+        $this->assertEquals('data:image/png;base64,mockSignatureAsesor123', $iaResponse->assessor_signature);
+
+        // Assessor reopens page after evaluation: now it is completed
+        $reopenedPage = $this->actingAs($this->asesor)->get(
+            route('asesor.ruang-uji.ia01b', $this->assessment)
+        );
+        $reopenedPage->assertOk();
+        $reopenedPage->assertSee('Penilaian FR.IA.01B Telah Selesai');
+        $reopenedPage->assertSee('✎ Edit Penilaian');
+        $reopenedPage->assertSee('isEditing: false');
+    }
 }

@@ -1,5 +1,5 @@
 @php
-    $isCompleted = (bool) $response;
+    $isCompleted = (bool) ($response?->assessor_signed_at || ! empty($response?->assessor_signature));
     $isScheduleClosed = (bool) ($assessment->schedule?->isClosedForAssessor());
 @endphp
 @extends('layouts.app', ['title' => 'FR.IA.01B - Lembar Pemeriksaan Teknis (Report Sheet)'])
@@ -304,9 +304,11 @@
                     <span>Jadwal Telah Ditutup (Read-Only)</span>
                 </button>
             @else
-                <button type="button" x-show="!isEditing" @click="isEditing = true" class="px-6 py-2.5 text-sm font-bold bg-amber-500 hover:bg-amber-600 text-white rounded-lg shadow-sm transition">
-                    ✎ Edit Penilaian
-                </button>
+                @if($isCompleted)
+                    <button type="button" x-show="!isEditing" @click="isEditing = true" class="px-6 py-2.5 text-sm font-bold bg-amber-500 hover:bg-amber-600 text-white rounded-lg shadow-sm transition">
+                        ✎ Edit Penilaian
+                    </button>
+                @endif
                 <button type="submit" x-show="isEditing" class="px-6 py-2.5 text-sm font-bold bg-brand-600 hover:bg-brand-700 text-white rounded-lg shadow-sm transition">
                     {{ $isCompleted ? 'Simpan Perubahan Penilaian' : 'Simpan Penilaian FR.IA.01B' }}
                 </button>
