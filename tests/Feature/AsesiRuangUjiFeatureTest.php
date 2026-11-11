@@ -47,6 +47,7 @@ class AsesiRuangUjiFeatureTest extends TestCase
             'schedule_id' => $schedule->id,
             'scheme_id' => $scheme->id,
             'apl_status' => 'APPROVED',
+            'ak01_data' => ['selected_instruments' => ['IA01', 'IA01B', 'IA02', 'IA03', 'IA05']],
         ]);
 
         $response = $this->actingAs($asesi)->get(route('asesi.assessment.ruang-uji', $assessment));
@@ -72,6 +73,102 @@ class AsesiRuangUjiFeatureTest extends TestCase
         $response->assertDontSee('Alur Asesmen Kompetensi');
         $response->assertDontSee('Penyelesaian Akhir Asesi');
         $response->assertDontSee('Selesaikan Asesmen Mandiri');
+    }
+
+    public function test_ruang_uji_hub_is_empty_when_assessor_has_not_set_ak01(): void
+    {
+        $asesi = User::where('role', 'ASESI')->first();
+        $scheme = Scheme::first();
+        $admin = User::where('role', 'ADMIN_LSP')->first();
+
+        $schedule = Schedule::create([
+            'scheme_id' => $scheme->id,
+            'name' => 'Jadwal Belum AK01',
+            'code' => 'SCH-NO-AK01-'.uniqid(),
+            'tuk_name' => 'TUK Otomotif Mandiri',
+            'date' => now()->toDateString(),
+            'start_time' => '08:00:00',
+            'end_time' => '16:00:00',
+            'selected_instruments' => ['IA01', 'IA01B', 'IA02', 'IA03', 'IA05'],
+            'status' => 'ACTIVE',
+            'created_by' => $admin->id,
+        ]);
+
+        $assessment = Assessment::create([
+            'asesi_id' => $asesi->id,
+            'schedule_id' => $schedule->id,
+            'scheme_id' => $scheme->id,
+            'apl_status' => 'APPROVED',
+            // ak01_data and ak01_agreed_at are intentionally empty/null
+        ]);
+
+        $response = $this->actingAs($asesi)->get(route('asesi.assessment.ruang-uji', $assessment));
+        $response->assertOk();
+
+        // Empty state must be shown
+        $response->assertSee('Ruang Uji Belum Memiliki Instrumen Aktif');
+        $response->assertSee('Menunggu Penetapan FR.AK.01 oleh Asesor');
+
+        // Individual instruments should NOT be visible
+        $response->assertDontSee('FR.IA.01');
+        $response->assertDontSee('FR.IA.02');
+        $response->assertDontSee('FR.IA.05');
+
+        // Direct URL access to CBT must redirect with warning
+        $cbtResponse = $this->actingAs($asesi)->get(route('asesi.assessment.instrument.ia05', $assessment));
+        $cbtResponse->assertRedirect(route('asesi.assessment.ruang-uji', $assessment));
+        $cbtResponse->assertSessionHas('warning');
+
+        // Direct URL access to IA01 view must redirect with warning
+        $ia01Response = $this->actingAs($asesi)->get(route('asesi.assessment.instrument.view', [$assessment, 'IA01']));
+        $ia01Response->assertRedirect(route('asesi.assessment.ruang-uji', $assessment));
+        $ia01Response->assertSessionHas('warning');
+    }
+
+    public function test_ruang_uji_hub_dynamically_displays_only_instruments_selected_in_ak01(): void
+    {
+        $asesi = User::where('role', 'ASESI')->first();
+        $scheme = Scheme::first();
+        $admin = User::where('role', 'ADMIN_LSP')->first();
+
+        $schedule = Schedule::create([
+            'scheme_id' => $scheme->id,
+            'name' => 'Jadwal Subset AK01',
+            'code' => 'SCH-SUB-AK01-'.uniqid(),
+            'tuk_name' => 'TUK Otomotif Mandiri',
+            'date' => now()->toDateString(),
+            'start_time' => '08:00:00',
+            'end_time' => '16:00:00',
+            'selected_instruments' => ['IA01', 'IA01B', 'IA02', 'IA03', 'IA05'],
+            'status' => 'ACTIVE',
+            'created_by' => $admin->id,
+        ]);
+
+        // Assessor only assigned IA01 and IA02
+        $assessment = Assessment::create([
+            'asesi_id' => $asesi->id,
+            'schedule_id' => $schedule->id,
+            'scheme_id' => $scheme->id,
+            'apl_status' => 'APPROVED',
+            'ak01_data' => ['selected_instruments' => ['IA01', 'IA02']],
+        ]);
+
+        $response = $this->actingAs($asesi)->get(route('asesi.assessment.ruang-uji', $assessment));
+        $response->assertOk();
+
+        // Selected instruments must appear
+        $response->assertSee('FR.IA.01');
+        $response->assertSee('FR.IA.02');
+
+        // Unselected instruments must NOT appear
+        $response->assertDontSee('FR.IA.01B');
+        $response->assertDontSee('FR.IA.03');
+        $response->assertDontSee('FR.IA.05');
+
+        // Accessing unassigned IA05 must redirect
+        $cbtRes = $this->actingAs($asesi)->get(route('asesi.assessment.instrument.ia05', $assessment));
+        $cbtRes->assertRedirect(route('asesi.assessment.ruang-uji', $assessment));
+        $cbtRes->assertSessionHas('warning');
     }
 
     public function test_asesi_can_download_instrument_pdf_templates(): void

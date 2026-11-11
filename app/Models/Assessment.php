@@ -138,6 +138,16 @@ class Assessment extends Model
     }
 
     /**
+     * Check if FR.AK.01 has been completed/approved by the assessor.
+     */
+    public function hasAk01Completed(): bool
+    {
+        return ! empty($this->ak01_data['selected_instruments'])
+            || ! empty($this->ak01_agreed_at)
+            || ! empty($this->schedule?->ak01_data);
+    }
+
+    /**
      * Get list of assigned FR.IA instrument codes for this assessment.
      *
      * @return array<string>
@@ -152,7 +162,7 @@ class Assessment extends Model
             }
         }
 
-        $scheduleRaw = $this->schedule?->selected_instruments ?? null;
+        $scheduleRaw = $this->schedule?->ak01_data['selected_instruments'] ?? $this->schedule?->selected_instruments ?? null;
         if (! empty($scheduleRaw) && is_array($scheduleRaw)) {
             $filtered = array_values(array_filter($scheduleRaw, fn ($c) => str_starts_with(strtoupper($c), 'IA')));
             if (! empty($filtered)) {
@@ -178,6 +188,10 @@ class Assessment extends Model
      */
     public function hasCompletedAllAssignedInstruments(): bool
     {
+        if ($this->status === 'COMPLETED') {
+            return true;
+        }
+
         $assigned = $this->getAssignedInstruments();
         if (empty($assigned)) {
             return true;

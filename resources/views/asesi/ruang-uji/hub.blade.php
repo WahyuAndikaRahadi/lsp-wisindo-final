@@ -117,8 +117,20 @@
                 </div>
             </div>
         @empty
-            <div class="col-span-full bg-white rounded-xl border border-slate-200 p-8 text-center shadow-sm">
-                <p class="text-sm text-slate-500">Tidak ada instrumen yang terdaftar untuk asesmen ini.</p>
+            <div class="col-span-full bg-white rounded-2xl border border-dashed border-slate-300 p-8 sm:p-12 text-center shadow-xs">
+                <div class="w-14 h-14 rounded-2xl bg-amber-50 border border-amber-200 text-amber-600 flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <h3 class="text-base font-bold text-slate-900">Ruang Uji Belum Memiliki Instrumen Aktif</h3>
+                <p class="text-xs sm:text-sm text-slate-500 max-w-md mx-auto mt-1.5 leading-relaxed">
+                    Asesor belum menetapkan instrumen asesmen pada formulir persetujuan (FR.AK.01). Seluruh instrumen unjuk kerja akan otomatis tampil di sini setelah penetapan diselesaikan oleh asesor.
+                </p>
+                <div class="mt-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200 text-xs font-semibold">
+                    <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+                    <span>Menunggu Penetapan FR.AK.01 oleh Asesor</span>
+                </div>
             </div>
         @endforelse
     </div>

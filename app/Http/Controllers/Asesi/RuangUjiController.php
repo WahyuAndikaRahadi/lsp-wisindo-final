@@ -96,10 +96,14 @@ class RuangUjiController extends Controller
         $schedule = $assessment->schedule;
         $responses = $assessment->iaResponses->keyBy('instrument_code');
 
-        $assignedCodes = array_values(array_filter(
-            $assessment->getAssignedInstruments(),
-            fn ($c) => str_starts_with(strtoupper($c), 'IA')
-        ));
+        // Ruang Uji Asesi is empty until the assessor has completed/approved FR.AK.01
+        $assignedCodes = [];
+        if ($assessment->hasAk01Completed()) {
+            $assignedCodes = array_values(array_filter(
+                $assessment->getAssignedInstruments(),
+                fn ($c) => str_starts_with(strtoupper($c), 'IA')
+            ));
+        }
 
         $catalog = [
             'IA01' => [
@@ -232,9 +236,26 @@ class RuangUjiController extends Controller
         return view('asesi.ruang-uji.hub', compact('assessment', 'schedule', 'instruments', 'responses'));
     }
 
+    /**
+     * Check if the candidate can access a specific instrument.
+     * Requires the assessor to have completed FR.AK.01, and the instrument to be assigned.
+     */
+    private function canAsesiAccessInstrument(Assessment $assessment, string $code): bool
+    {
+        if (! $assessment->hasAk01Completed()) {
+            return false;
+        }
+
+        return $assessment->hasAssignedInstrument($code);
+    }
+
     public function downloadTemplate(Assessment $assessment, string $code, SchemeInstrumentService $instrumentService)
     {
         abort_if($assessment->asesi_id !== auth()->id() && auth()->user()->role !== 'ASESOR' && auth()->user()->role !== 'ADMIN_LSP', 403);
+
+        if ($assessment->asesi_id === auth()->id() && ! $assessment->hasAssignedInstrument($code)) {
+            return back()->with('error', 'Instrumen FR.'.strtoupper($code).' belum ditetapkan untuk asesmen ini.');
+        }
 
         $path = $instrumentService->getInstrumentTemplatePath($assessment->schedule->scheme, $code);
 
@@ -250,9 +271,14 @@ class RuangUjiController extends Controller
         ]);
     }
 
-    public function ia05(Assessment $assessment): View
+    public function ia05(Assessment $assessment): View|RedirectResponse
     {
         abort_if($assessment->asesi_id !== auth()->id(), 403);
+
+        if (! $this->canAsesiAccessInstrument($assessment, 'IA05')) {
+            return redirect()->route('asesi.assessment.ruang-uji', $assessment)
+                ->with('warning', 'Instrumen CBT (FR.IA.05) belum ditetapkan oleh asesor pada formulir persetujuan asesmen (FR.AK.01).');
+        }
 
         $assessment->load('schedule.scheme', 'iaResponses');
         $questionIds = $assessment->schedule ? $assessment->schedule->getCbtQuestionIds() : [];
@@ -353,6 +379,11 @@ class RuangUjiController extends Controller
                 ->with('info', "Jawaban ujian CBT (IA.05) Anda telah tersimpan sebelumnya dengan skor: {$existing->score}.");
         }
 
+        if (! $assessment->hasAssignedInstrument('IA05')) {
+            return redirect()->route('asesi.assessment.ruang-uji', $assessment)
+                ->with('warning', 'Instrumen CBT (FR.IA.05) tidak ditetapkan untuk asesmen ini.');
+        }
+
         $rawAnswers = $request->input('answers', []);
         $draftAnswers = [];
         $existingDraft = AssessmentIaResponse::where('assessment_id', $assessment->id)
@@ -379,12 +410,17 @@ class RuangUjiController extends Controller
             ->with('success', 'Jawaban CBT berhasil dikirim.');
     }
 
-    public function iaView(Assessment $assessment, $code, SchemeInstrumentService $instrumentService): View
+    public function iaView(Assessment $assessment, $code, SchemeInstrumentService $instrumentService): View|RedirectResponse
     {
         abort_if($assessment->asesi_id !== auth()->id(), 403);
 
-        $assessment->load('schedule.scheme.competencyUnits.elements.kuks', 'iaResponses', 'assessor');
         $codeUpper = strtoupper($code);
+        if (! $this->canAsesiAccessInstrument($assessment, $codeUpper)) {
+            return redirect()->route('asesi.assessment.ruang-uji', $assessment)
+                ->with('warning', "Instrumen FR.{$codeUpper} belum ditetapkan oleh asesor pada formulir persetujuan asesmen (FR.AK.01).");
+        }
+
+        $assessment->load('schedule.scheme.competencyUnits.elements.kuks', 'iaResponses', 'assessor');
         $response = $assessment->iaResponses->firstWhere('instrument_code', $codeUpper);
         $scheme = $assessment->schedule->scheme;
         $reportSheetItems = $instrumentService->getReportSheetItems($scheme);
@@ -404,6 +440,11 @@ class RuangUjiController extends Controller
         }
 
         $codeUpper = strtoupper($code);
+        if (! $assessment->hasAssignedInstrument($codeUpper)) {
+            return redirect()->route('asesi.assessment.ruang-uji', $assessment)
+                ->with('warning', "Instrumen FR.{$codeUpper} tidak ditetapkan untuk asesmen ini.");
+        }
+
         $response = AssessmentIaResponse::firstOrNew([
             'assessment_id' => $assessment->id,
             'instrument_code' => $codeUpper,
@@ -461,6 +502,12 @@ class RuangUjiController extends Controller
 
         if ($assessment->schedule && $assessment->schedule->is_closed) {
             return back()->with('error', 'Jadwal asesmen sudah resmi ditutup.');
+        }
+
+        $codeUpper = strtoupper($code);
+        if (! $assessment->hasAssignedInstrument($codeUpper)) {
+            return redirect()->route('asesi.assessment.ruang-uji', $assessment)
+                ->with('warning', "Instrumen FR.{$codeUpper} tidak ditetapkan untuk asesmen ini.");
         }
 
         $request->validate([
