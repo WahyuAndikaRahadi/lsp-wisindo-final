@@ -88,6 +88,7 @@ class AssessmentRevisionsAndWorkflowTest extends TestCase
             [
                 'assessor_id' => $this->asesor->id,
                 'apl_status' => 'APPROVED',
+                'ak01_agreed_at' => now(),
                 'asesi_signature' => 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
                 'asesi_signed_at' => now(),
             ]

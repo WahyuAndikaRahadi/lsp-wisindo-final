@@ -96,10 +96,15 @@ class RuangUjiController extends Controller
         $schedule = $assessment->schedule;
         $responses = $assessment->iaResponses->keyBy('instrument_code');
 
-        $assignedCodes = array_values(array_filter(
-            $assessment->getAssignedInstruments(),
-            fn ($c) => str_starts_with(strtoupper($c), 'IA')
-        ));
+        $ak01Agreed = (bool) $assessment->ak01_agreed_at;
+        $hasAk07 = AssessmentAk07Item::where('assessment_id', $assessment->id)->count() > 0;
+
+        $assignedCodes = $ak01Agreed
+            ? array_values(array_filter(
+                $assessment->getAssignedInstruments(),
+                fn ($c) => str_starts_with(strtoupper($c), 'IA')
+            ))
+            : [];
 
         $catalog = [
             'IA01' => [
@@ -229,7 +234,7 @@ class RuangUjiController extends Controller
             $instruments[] = $meta;
         }
 
-        return view('asesi.ruang-uji.hub', compact('assessment', 'schedule', 'instruments', 'responses'));
+        return view('asesi.ruang-uji.hub', compact('assessment', 'schedule', 'instruments', 'responses', 'ak01Agreed', 'hasAk07'));
     }
 
     public function downloadTemplate(Assessment $assessment, string $code, SchemeInstrumentService $instrumentService)
@@ -250,9 +255,14 @@ class RuangUjiController extends Controller
         ]);
     }
 
-    public function ia05(Assessment $assessment): View
+    public function ia05(Assessment $assessment): View|RedirectResponse
     {
         abort_if($assessment->asesi_id !== auth()->id(), 403);
+
+        if (! $assessment->ak01_agreed_at) {
+            return redirect()->route('asesi.assessment.ruang-uji', $assessment)
+                ->with('warning', 'Anda wajib mempelajari dan menyetujui formulir FR.AK.01 terlebih dahulu sebelum dapat mengakses instrumen CBT.');
+        }
 
         $assessment->load('schedule.scheme', 'iaResponses');
         $questionIds = $assessment->schedule ? $assessment->schedule->getCbtQuestionIds() : [];
@@ -379,9 +389,14 @@ class RuangUjiController extends Controller
             ->with('success', 'Jawaban CBT berhasil dikirim.');
     }
 
-    public function iaView(Assessment $assessment, $code, SchemeInstrumentService $instrumentService): View
+    public function iaView(Assessment $assessment, $code, SchemeInstrumentService $instrumentService): View|RedirectResponse
     {
         abort_if($assessment->asesi_id !== auth()->id(), 403);
+
+        if (! $assessment->ak01_agreed_at) {
+            return redirect()->route('asesi.assessment.ruang-uji', $assessment)
+                ->with('warning', 'Anda wajib mempelajari dan menyetujui formulir FR.AK.01 terlebih dahulu sebelum dapat mengakses instrumen uji.');
+        }
 
         $assessment->load('schedule.scheme.competencyUnits.elements.kuks', 'iaResponses', 'assessor');
         $codeUpper = strtoupper($code);

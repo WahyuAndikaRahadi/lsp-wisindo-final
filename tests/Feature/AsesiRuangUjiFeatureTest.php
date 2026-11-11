@@ -47,6 +47,7 @@ class AsesiRuangUjiFeatureTest extends TestCase
             'schedule_id' => $schedule->id,
             'scheme_id' => $scheme->id,
             'apl_status' => 'APPROVED',
+            'ak01_agreed_at' => now(),
         ]);
 
         $response = $this->actingAs($asesi)->get(route('asesi.assessment.ruang-uji', $assessment));
@@ -74,6 +75,53 @@ class AsesiRuangUjiFeatureTest extends TestCase
         $response->assertDontSee('Selesaikan Asesmen Mandiri');
     }
 
+    public function test_ruang_uji_hub_hides_instruments_when_ak01_not_agreed(): void
+    {
+        $asesi = User::where('role', 'ASESI')->first();
+        $scheme = Scheme::first();
+        $admin = User::where('role', 'ADMIN_LSP')->first();
+
+        $schedule = Schedule::create([
+            'scheme_id' => $scheme->id,
+            'name' => 'Jadwal Ruang Uji Unapproved AK01',
+            'code' => 'SCH-RUANG-UJI-AK01-'.uniqid(),
+            'tuk_name' => 'TUK Otomotif Mandiri',
+            'date' => now()->toDateString(),
+            'start_time' => '08:00:00',
+            'end_time' => '16:00:00',
+            'selected_instruments' => ['IA01', 'IA01B', 'IA02', 'IA03', 'IA05'],
+            'status' => 'ACTIVE',
+            'created_by' => $admin->id,
+        ]);
+
+        $assessment = Assessment::create([
+            'asesi_id' => $asesi->id,
+            'schedule_id' => $schedule->id,
+            'scheme_id' => $scheme->id,
+            'apl_status' => 'APPROVED',
+            'ak01_agreed_at' => null,
+        ]);
+
+        $response = $this->actingAs($asesi)->get(route('asesi.assessment.ruang-uji', $assessment));
+        $response->assertOk();
+
+        // Warning to agree to FR.AK.01 must be present
+        $response->assertSee('Persetujuan Asesmen dan Kerahasiaan (FR.AK.01) Belum Disetujui');
+        // Instruments must NOT be visible
+        $response->assertDontSee('FR.IA.05');
+        $response->assertDontSee('FR.IA.02');
+
+        // Direct attempt to open IA05 redirects with warning
+        $ia05Res = $this->actingAs($asesi)->get(route('asesi.assessment.instrument.ia05', $assessment));
+        $ia05Res->assertRedirect(route('asesi.assessment.ruang-uji', $assessment));
+        $ia05Res->assertSessionHas('warning');
+
+        // Direct attempt to open IA01B redirects with warning
+        $ia01bRes = $this->actingAs($asesi)->get(route('asesi.assessment.instrument.view', [$assessment, 'IA01B']));
+        $ia01bRes->assertRedirect(route('asesi.assessment.ruang-uji', $assessment));
+        $ia01bRes->assertSessionHas('warning');
+    }
+
     public function test_asesi_can_download_instrument_pdf_templates(): void
     {
         $asesi = User::where('role', 'ASESI')->first();
@@ -98,6 +146,7 @@ class AsesiRuangUjiFeatureTest extends TestCase
             'schedule_id' => $schedule->id,
             'scheme_id' => $scheme->id,
             'apl_status' => 'APPROVED',
+            'ak01_agreed_at' => now(),
         ]);
 
         // Download IA02 template
@@ -137,6 +186,7 @@ class AsesiRuangUjiFeatureTest extends TestCase
             'schedule_id' => $schedule->id,
             'scheme_id' => $scheme->id,
             'apl_status' => 'APPROVED',
+            'ak01_agreed_at' => now(),
             'asesi_signature' => 'data:image/png;base64,mockSignatureAsesi123',
         ]);
 
@@ -195,6 +245,7 @@ class AsesiRuangUjiFeatureTest extends TestCase
             'schedule_id' => $schedule->id,
             'scheme_id' => $scheme->id,
             'apl_status' => 'APPROVED',
+            'ak01_agreed_at' => now(),
             'asesi_signature' => 'data:image/png;base64,mockAsesiSign',
         ]);
 
@@ -261,6 +312,7 @@ class AsesiRuangUjiFeatureTest extends TestCase
             'schedule_id' => $schedule->id,
             'scheme_id' => $scheme->id,
             'apl_status' => 'APPROVED',
+            'ak01_agreed_at' => now(),
         ]);
 
         $res = $this->actingAs($asesi)->get(route('asesi.assessment.instrument.view', [$assessment, 'IA01B']));
@@ -310,6 +362,7 @@ class AsesiRuangUjiFeatureTest extends TestCase
             'schedule_id' => $schedule->id,
             'scheme_id' => $scheme->id,
             'apl_status' => 'APPROVED',
+            'ak01_agreed_at' => now(),
         ]);
 
         // Access CBT page
@@ -378,6 +431,7 @@ class AsesiRuangUjiFeatureTest extends TestCase
             'schedule_id' => $schedule->id,
             'scheme_id' => $scheme->id,
             'apl_status' => 'APPROVED',
+            'ak01_agreed_at' => now(),
         ]);
 
         // Assessor saves evaluation data for IA01B

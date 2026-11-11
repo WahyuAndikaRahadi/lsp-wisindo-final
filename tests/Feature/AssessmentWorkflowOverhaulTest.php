@@ -219,6 +219,7 @@ class AssessmentWorkflowOverhaulTest extends TestCase
             'schedule_id' => $this->schedule->id,
             'asesi_id' => $asesi->id,
             'apl_status' => 'APPROVED',
+            'ak01_agreed_at' => now(),
             'last_active_step' => 'ruang-uji',
         ]);
 

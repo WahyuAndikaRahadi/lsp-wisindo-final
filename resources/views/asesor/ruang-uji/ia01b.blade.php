@@ -7,6 +7,16 @@
 @section('content')
 <div class="space-y-6" x-data="{
     isEditing: {{ ($isCompleted || $isScheduleClosed) ? 'false' : 'true' }},
+    modalOpen: false,
+    modalSrc: '',
+    modalTitle: '',
+    modalType: 'pdf',
+    viewDocument(src, title, type = 'pdf') {
+        this.modalSrc = src;
+        this.modalTitle = title;
+        this.modalType = type;
+        this.modalOpen = true;
+    },
     setAllItems(val) {
         if (!this.isEditing) return;
         const targetVal = (val === 'K' || val === 'SESUAI') ? 'sesuai' : 'tidak';
@@ -97,20 +107,37 @@
                     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
                         {{-- Preview Box --}}
                         <div class="lg:col-span-5 bg-slate-50 rounded-xl p-4 border border-slate-200 space-y-3">
-                            <div class="relative group rounded-lg overflow-hidden border border-slate-300 bg-white aspect-4/3 flex items-center justify-center">
-                                @if(str_ends_with(strtolower($evidencePath), '.pdf'))
+                            @php
+                                $isPdf = str_ends_with(strtolower($evidencePath), '.pdf');
+                                $fileType = $isPdf ? 'pdf' : (preg_match('/\.(docx?)$/i', $evidencePath) ? 'doc' : 'image');
+                            @endphp
+                            <div class="relative group rounded-lg overflow-hidden border border-slate-300 bg-white aspect-4/3 flex items-center justify-center cursor-pointer shadow-xs"
+                                 @click="viewDocument('{{ $evidenceUrl }}', '{{ addslashes($evidenceName) }}', '{{ $fileType }}')">
+                                @if($isPdf)
                                     <div class="text-center p-6 space-y-2">
                                         <span class="text-4xl text-rose-600 font-black block">📄</span>
                                         <div class="text-xs font-bold text-slate-800 truncate max-w-[200px]">{{ $evidenceName }}</div>
                                         <div class="text-[11px] text-slate-500">Dokumen PDF Report Sheet</div>
                                     </div>
+                                @elseif($fileType === 'doc')
+                                    <div class="text-center p-6 space-y-2">
+                                        <span class="text-4xl text-blue-600 font-black block">📝</span>
+                                        <div class="text-xs font-bold text-slate-800 truncate max-w-[200px]">{{ $evidenceName }}</div>
+                                        <div class="text-[11px] text-slate-500">Dokumen Word / Docx</div>
+                                    </div>
                                 @else
-                                    <img src="{{ $evidenceUrl }}" alt="Report Sheet Fisik Asesi" class="w-full h-full object-contain cursor-pointer transition hover:scale-105" onclick="window.open('{{ $evidenceUrl }}', '_blank')">
+                                    <img src="{{ $evidenceUrl }}" alt="Report Sheet Fisik Asesi" class="w-full h-full object-contain transition duration-200 group-hover:scale-105">
                                 @endif
+                                <div class="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                    <span class="px-3 py-1.5 bg-white/95 text-slate-900 rounded-lg text-xs font-bold shadow">🔍 Perbesar Dokumen</span>
+                                </div>
                             </div>
-                            <div class="pt-1">
-                                <a href="{{ $evidenceUrl }}" target="_blank" class="w-full text-center px-4 py-2.5 text-xs font-bold uppercase tracking-wider bg-brand-600 hover:bg-brand-700 text-white rounded-lg shadow-sm transition inline-flex items-center justify-center gap-1.5">
-                                    <span>🔍 Buka Lembar Penuh (Tab Baru)</span>
+                            <div class="pt-1 flex flex-col sm:flex-row gap-2">
+                                <button type="button" @click="viewDocument('{{ $evidenceUrl }}', '{{ addslashes($evidenceName) }}', '{{ $fileType }}')" class="flex-1 text-center px-3 py-2 text-xs font-bold uppercase tracking-wider bg-brand-600 hover:bg-brand-700 text-white rounded-lg shadow-sm transition inline-flex items-center justify-center gap-1.5">
+                                    <span>🔍 Pratinjau (Modal)</span>
+                                </button>
+                                <a href="{{ $evidenceUrl }}" target="_blank" class="px-3 py-2 text-xs font-bold uppercase tracking-wider bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-lg shadow-xs transition inline-flex items-center justify-center gap-1">
+                                    <span>Tab Baru</span>
                                     <span>&nearr;</span>
                                 </a>
                             </div>
@@ -286,5 +313,57 @@
             @endif
         </div>
     </form>
+
+    {{-- Lightbox Modal Pratinjau Dokumen Report Sheet --}}
+    <div x-show="modalOpen" x-cloak
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         class="fixed inset-0 z-50 overflow-y-auto bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-4"
+         @keydown.escape.window="modalOpen = false">
+        <div class="relative w-full max-w-5xl bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-200 flex flex-col max-h-[92vh]"
+             @click.away="modalOpen = false">
+            <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-slate-50">
+                <div class="flex items-center gap-2 min-w-0">
+                    <span class="text-xs font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-brand-100 text-brand-700" x-text="modalType.toUpperCase()"></span>
+                    <h3 class="text-sm font-bold text-slate-800 truncate" x-text="modalTitle"></h3>
+                </div>
+                <div class="flex items-center gap-2 shrink-0">
+                    <a :href="modalSrc" target="_blank" download class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition">
+                        <span>Unduh / Buka Tab Baru ↗</span>
+                    </a>
+                    <button type="button" @click="modalOpen = false" class="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-200 transition">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+            </div>
+            <div class="p-4 bg-slate-900/5 flex-1 flex items-center justify-center overflow-auto min-h-[350px]">
+                <template x-if="modalType === 'image'">
+                    <img :src="modalSrc" class="max-h-[78vh] w-auto max-w-full rounded shadow object-contain">
+                </template>
+                <template x-if="modalType === 'pdf'">
+                    <iframe :src="modalSrc" class="w-full h-[78vh] rounded border border-slate-300 bg-white shadow-inner"></iframe>
+                </template>
+                <template x-if="modalType === 'doc'">
+                    <div class="text-center p-8 bg-white rounded-xl border border-slate-200 shadow-sm max-w-md mx-auto space-y-4">
+                        <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mx-auto text-3xl font-black">
+                            📄
+                        </div>
+                        <div>
+                            <div class="font-bold text-slate-800 text-sm" x-text="modalTitle"></div>
+                            <p class="text-xs text-slate-500 mt-1">Dokumen Microsoft Word / Office tidak dapat dipratinjau langsung di dalam browser.</p>
+                        </div>
+                        <a :href="modalSrc" target="_blank" download class="inline-flex items-center gap-2 px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold rounded-lg shadow-sm transition">
+                            <span>Unduh File Sekarang</span>
+                            <span>&darr;</span>
+                        </a>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </div>
 </div>
 @endsection

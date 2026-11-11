@@ -494,6 +494,7 @@ class LspWorkflowIntegrationTest extends TestCase
             'schedule_id' => $schedule->id,
             'scheme_id' => $scheme->id,
             'apl_status' => 'APPROVED',
+            'ak01_agreed_at' => now(),
         ]);
 
         // Asesi uploads photo evidence of physical paper worksheet
@@ -563,6 +564,7 @@ class LspWorkflowIntegrationTest extends TestCase
             'schedule_id' => $schedule->id,
             'scheme_id' => $scheme->id,
             'apl_status' => 'APPROVED',
+            'ak01_agreed_at' => now(),
         ]);
 
         $sampleItems = [

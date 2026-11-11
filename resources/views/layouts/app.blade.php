@@ -647,7 +647,7 @@
                 opacity: 1,
                 borderRadius: '12px',
                 rtl: false,
-                timeout: 4000,
+                timeout: 3000,
                 messageMaxLength: 300,
                 plainText: false,
                 showOnlyTheLastOne: false,

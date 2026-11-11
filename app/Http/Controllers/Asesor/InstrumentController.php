@@ -154,11 +154,17 @@ class InstrumentController extends Controller
                 if (! $resp) {
                     return false;
                 }
+                if ($c === 'IA05') {
+                    return $resp->score !== null || ! empty($resp->asesi_signed_at);
+                }
                 if ($c === 'IA02') {
                     return ! empty($resp->assessor_signed_at);
                 }
+                if ($c === 'IA01B') {
+                    return ! empty($resp->assessor_signed_at);
+                }
 
-                return true;
+                return ! empty($resp->assessor_signed_at);
             })->count();
 
             $meta['raw_code'] = $c;
@@ -240,7 +246,7 @@ class InstrumentController extends Controller
             } else {
                 if ($response) {
                     if ($codeUpper === 'IA05') {
-                        $isCompleted = true;
+                        $isCompleted = (bool) ($response->score !== null || ! empty($response->asesi_signed_at));
                         $score = $response->score ?? ($assessment->ia05_score ?? 0);
                         $scoreLabel = "Nilai CBT: {$score}%";
                         $passingGrade = (float) ($assessment->schedule?->scheme?->passing_grade_theory ?? Setting::get('cbt_passing_grade', 75.0));
@@ -251,15 +257,42 @@ class InstrumentController extends Controller
                         $isCompleted = $isSigned;
                         $statusLabel = $isSigned ? 'Sudah Ditandatangani' : 'Belum Ditandatangani';
                         $statusClass = $isSigned ? 'bg-emerald-50 text-emerald-700 border-emerald-300' : 'bg-amber-50 text-amber-700 border-amber-300';
+                    } elseif ($codeUpper === 'IA01B') {
+                        $hasUploadedEvidence = ! empty($response->data_json['evidence_image_path']);
+                        $isSignedByAssessor = ! empty($response->assessor_signed_at);
+
+                        if ($isSignedByAssessor) {
+                            $isCompleted = true;
+                            $statusLabel = 'Sudah Dinilai';
+                            $statusClass = 'bg-emerald-50 text-emerald-700 border-emerald-300';
+                        } elseif ($hasUploadedEvidence) {
+                            $isCompleted = false;
+                            $statusLabel = 'Menunggu Penilaian Asesor';
+                            $statusClass = 'bg-amber-50 text-amber-800 border-amber-300';
+                        } else {
+                            $isCompleted = false;
+                            $statusLabel = 'Belum Diunggah Asesi';
+                            $statusClass = 'bg-slate-100 text-slate-600 border-slate-300';
+                        }
                     } else {
-                        $isCompleted = true;
-                        $statusLabel = 'Sudah Dinilai';
-                        $statusClass = 'bg-emerald-50 text-emerald-700 border-emerald-300';
+                        $isSignedByAssessor = ! empty($response->assessor_signed_at);
+                        if ($isSignedByAssessor) {
+                            $isCompleted = true;
+                            $statusLabel = 'Sudah Dinilai';
+                            $statusClass = 'bg-emerald-50 text-emerald-700 border-emerald-300';
+                        } else {
+                            $isCompleted = false;
+                            $statusLabel = 'Belum Dinilai';
+                            $statusClass = 'bg-slate-100 text-slate-700 border-slate-300';
+                        }
                     }
                 } else {
                     if ($codeUpper === 'IA02') {
                         $statusLabel = 'Belum Ditandatangani';
                         $statusClass = 'bg-amber-50 text-amber-700 border-amber-300';
+                    } elseif ($codeUpper === 'IA01B') {
+                        $statusLabel = 'Belum Diunggah Asesi';
+                        $statusClass = 'bg-slate-100 text-slate-600 border-slate-300';
                     }
                 }
                 $inspectUrl = route('asesor.assessment.instrument', ['assessment' => $assessment->id, 'code' => $codeLower]);

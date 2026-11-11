@@ -25,10 +25,15 @@
     modalOpen: false, 
     modalSrc: '', 
     modalTitle: '',
-    viewImage(src, title) {
+    modalType: 'image',
+    viewDocument(src, title, type = 'image') {
         this.modalSrc = src;
         this.modalTitle = title;
+        this.modalType = type;
         this.modalOpen = true;
+    },
+    viewImage(src, title) {
+        this.viewDocument(src, title, 'image');
     }
 }">
     {{-- Header & Navigation --}}
@@ -229,6 +234,9 @@
                             @php
                                 $proof = $existingProofs[$type] ?? null;
                                 $isImg = $proof ? preg_match('/\.(jpg|jpeg|png|webp)$/i', $proof->file_path) : false;
+                                $isPdf = $proof ? preg_match('/\.pdf$/i', $proof->file_path) : false;
+                                $isDoc = $proof ? preg_match('/\.(doc|docx)$/i', $proof->file_path) : false;
+                                $fileType = $isImg ? 'image' : ($isPdf ? 'pdf' : ($isDoc ? 'doc' : 'other'));
                                 $fileUrl = $proof ? route('secure-file.proof', $proof) : '#';
                             @endphp
                             <div class="bg-white p-3.5 rounded-lg border {{ $proof ? 'border-emerald-300 ring-1 ring-emerald-200' : 'border-slate-200' }} flex flex-col justify-between">
@@ -250,6 +258,29 @@
                                         <p class="text-xs text-slate-600 mt-1 truncate" title="{{ $proof->original_filename }}">
                                             Berkas: <span class="font-mono text-slate-800">{{ $proof->original_filename }}</span>
                                         </p>
+
+                                        {{-- Thumbnail Preview untuk Bukti Persyaratan Dasar --}}
+                                        @if($isImg)
+                                            <div class="mt-2.5 rounded-md overflow-hidden border border-slate-200 bg-slate-50 max-w-[200px] cursor-pointer" @click="viewDocument('{{ $fileUrl }}', '{{ $label }}', 'image')">
+                                                <img src="{{ $fileUrl }}" alt="{{ $label }}" class="w-full h-24 object-cover hover:opacity-90 transition">
+                                            </div>
+                                        @elseif($isPdf)
+                                            <div class="mt-2.5 rounded-md overflow-hidden border border-rose-200 bg-rose-50/70 p-3 max-w-[260px] cursor-pointer hover:bg-rose-100/70 transition flex items-center gap-2.5" @click="viewDocument('{{ $fileUrl }}', '{{ $label }}', 'pdf')">
+                                                <span class="text-3xl text-rose-600 shrink-0">📄</span>
+                                                <div class="overflow-hidden">
+                                                    <span class="text-xs font-bold text-rose-950 block truncate">{{ $proof->original_filename }}</span>
+                                                    <span class="text-[10px] text-rose-700 font-medium">Dokumen PDF (Klik pratinjau modal)</span>
+                                                </div>
+                                            </div>
+                                        @elseif($isDoc)
+                                            <div class="mt-2.5 rounded-md overflow-hidden border border-blue-200 bg-blue-50/70 p-3 max-w-[260px] cursor-pointer hover:bg-blue-100/70 transition flex items-center gap-2.5" @click="viewDocument('{{ $fileUrl }}', '{{ $label }}', 'doc')">
+                                                <span class="text-3xl text-blue-600 shrink-0">📝</span>
+                                                <div class="overflow-hidden">
+                                                    <span class="text-xs font-bold text-blue-950 block truncate">{{ $proof->original_filename }}</span>
+                                                    <span class="text-[10px] text-blue-700 font-medium">Dokumen Word (Klik opsi berkas)</span>
+                                                </div>
+                                            </div>
+                                        @endif
                                     @else
                                         <p class="text-xs text-slate-400 mt-1 italic">Asesi tidak mengunggah dokumen ini.</p>
                                     @endif
@@ -257,14 +288,10 @@
 
                                 @if($proof)
                                     <div class="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between">
-                                        @if($isImg)
-                                            <button type="button" @click="viewImage('{{ $fileUrl }}', '{{ $label }}')" class="inline-flex items-center gap-1 text-xs font-bold text-indigo-600 hover:text-indigo-800 transition">
-                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                                                Lihat Gambar
-                                            </button>
-                                        @else
-                                            <span class="text-xs text-slate-500 font-medium">Dokumen File</span>
-                                        @endif
+                                        <button type="button" @click="viewDocument('{{ $fileUrl }}', '{{ $label }}', '{{ $fileType }}')" class="inline-flex items-center gap-1 text-xs font-bold text-indigo-600 hover:text-indigo-800 transition">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                            <span>{{ $isImg ? 'Perbesar Gambar' : ($isPdf ? 'Perbesar Dokumen (Modal)' : 'Lihat Dokumen') }}</span>
+                                        </button>
 
                                         <a href="{{ $fileUrl }}" target="_blank" class="text-xs font-bold text-brand-600 hover:text-brand-800 inline-flex items-center gap-0.5">
                                             Buka Tab Baru &nearr;
@@ -293,6 +320,9 @@
                         @php
                             $ktpProof = $existingProofs['KTP'] ?? null;
                             $ktpIsImg = $ktpProof ? preg_match('/\.(jpg|jpeg|png|webp)$/i', $ktpProof->file_path) : false;
+                            $ktpIsPdf = $ktpProof ? preg_match('/\.pdf$/i', $ktpProof->file_path) : false;
+                            $ktpIsDoc = $ktpProof ? preg_match('/\.(doc|docx)$/i', $ktpProof->file_path) : false;
+                            $ktpType = $ktpIsImg ? 'image' : ($ktpIsPdf ? 'pdf' : ($ktpIsDoc ? 'doc' : 'other'));
                             $ktpUrl = $ktpProof ? route('secure-file.proof', $ktpProof) : '#';
                         @endphp
                         <div class="bg-white p-3.5 rounded-lg border {{ $ktpProof ? 'border-emerald-300 ring-1 ring-emerald-200' : 'border-rose-200 bg-rose-50/20' }} flex flex-col justify-between">
@@ -315,8 +345,16 @@
                                         Berkas: <span class="font-mono text-slate-800">{{ $ktpProof->original_filename }}</span>
                                     </p>
                                     @if($ktpIsImg)
-                                        <div class="mt-2.5 rounded-md overflow-hidden border border-slate-200 bg-slate-50 max-w-[200px] cursor-pointer" @click="viewImage('{{ $ktpUrl }}', 'Fotokopi KTP / Identitas Diri')">
+                                        <div class="mt-2.5 rounded-md overflow-hidden border border-slate-200 bg-slate-50 max-w-[200px] cursor-pointer" @click="viewDocument('{{ $ktpUrl }}', 'Fotokopi KTP / Identitas Diri', 'image')">
                                             <img src="{{ $ktpUrl }}" alt="KTP Asesi" class="w-full h-24 object-cover hover:opacity-90 transition">
+                                        </div>
+                                    @elseif($ktpIsPdf)
+                                        <div class="mt-2.5 rounded-md overflow-hidden border border-rose-200 bg-rose-50/70 p-3 max-w-[260px] cursor-pointer hover:bg-rose-100/70 transition flex items-center gap-2.5" @click="viewDocument('{{ $ktpUrl }}', 'Fotokopi KTP / Identitas Diri', 'pdf')">
+                                            <span class="text-3xl text-rose-600 shrink-0">📄</span>
+                                            <div class="overflow-hidden">
+                                                <span class="text-xs font-bold text-rose-950 block truncate">{{ $ktpProof->original_filename }}</span>
+                                                <span class="text-[10px] text-rose-700 font-medium">Dokumen PDF (Klik pratinjau modal)</span>
+                                            </div>
                                         </div>
                                     @endif
                                 @else
@@ -326,11 +364,10 @@
 
                             @if($ktpProof)
                                 <div class="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between">
-                                    @if($ktpIsImg)
-                                        <button type="button" @click="viewImage('{{ $ktpUrl }}', 'Fotokopi KTP / Identitas Diri')" class="text-xs font-bold text-indigo-600 hover:text-indigo-800">
-                                            Perbesar Gambar
-                                        </button>
-                                    @endif
+                                    <button type="button" @click="viewDocument('{{ $ktpUrl }}', 'Fotokopi KTP / Identitas Diri', '{{ $ktpType }}')" class="inline-flex items-center gap-1 text-xs font-bold text-indigo-600 hover:text-indigo-800">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                        <span>{{ $ktpIsImg ? 'Perbesar Gambar' : ($ktpIsPdf ? 'Perbesar Dokumen (Modal)' : 'Lihat Dokumen') }}</span>
+                                    </button>
                                     <a href="{{ $ktpUrl }}" target="_blank" class="text-xs font-bold text-brand-600 hover:text-brand-800">
                                         Buka Tab Baru &nearr;
                                     </a>
@@ -342,6 +379,8 @@
                         @php
                             $fotoProof = $existingProofs['PAS_FOTO'] ?? null;
                             $fotoIsImg = $fotoProof ? preg_match('/\.(jpg|jpeg|png|webp)$/i', $fotoProof->file_path) : false;
+                            $fotoIsPdf = $fotoProof ? preg_match('/\.pdf$/i', $fotoProof->file_path) : false;
+                            $fotoType = $fotoIsImg ? 'image' : ($fotoIsPdf ? 'pdf' : 'other');
                             $fotoUrl = $fotoProof ? route('secure-file.proof', $fotoProof) : '#';
                         @endphp
                         <div class="bg-white p-3.5 rounded-lg border {{ $fotoProof ? 'border-emerald-300 ring-1 ring-emerald-200' : 'border-rose-200 bg-rose-50/20' }} flex flex-col justify-between">
@@ -364,8 +403,16 @@
                                         Berkas: <span class="font-mono text-slate-800">{{ $fotoProof->original_filename }}</span>
                                     </p>
                                     @if($fotoIsImg)
-                                        <div class="mt-2.5 rounded-md overflow-hidden border border-slate-200 bg-slate-50 w-20 cursor-pointer" @click="viewImage('{{ $fotoUrl }}', 'Pas Foto 3x4')">
+                                        <div class="mt-2.5 rounded-md overflow-hidden border border-slate-200 bg-slate-50 w-20 cursor-pointer" @click="viewDocument('{{ $fotoUrl }}', 'Pas Foto 3x4', 'image')">
                                             <img src="{{ $fotoUrl }}" alt="Pas Foto Asesi" class="w-full h-24 object-cover hover:opacity-90 transition">
+                                        </div>
+                                    @elseif($fotoIsPdf)
+                                        <div class="mt-2.5 rounded-md overflow-hidden border border-rose-200 bg-rose-50/70 p-3 max-w-[260px] cursor-pointer hover:bg-rose-100/70 transition flex items-center gap-2.5" @click="viewDocument('{{ $fotoUrl }}', 'Pas Foto 3x4', 'pdf')">
+                                            <span class="text-3xl text-rose-600 shrink-0">📄</span>
+                                            <div class="overflow-hidden">
+                                                <span class="text-xs font-bold text-rose-950 block truncate">{{ $fotoProof->original_filename }}</span>
+                                                <span class="text-[10px] text-rose-700 font-medium">Dokumen PDF</span>
+                                            </div>
                                         </div>
                                     @endif
                                 @else
@@ -375,11 +422,10 @@
 
                             @if($fotoProof)
                                 <div class="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between">
-                                    @if($fotoIsImg)
-                                        <button type="button" @click="viewImage('{{ $fotoUrl }}', 'Pas Foto 3x4')" class="text-xs font-bold text-indigo-600 hover:text-indigo-800">
-                                            Perbesar Gambar
-                                        </button>
-                                    @endif
+                                    <button type="button" @click="viewDocument('{{ $fotoUrl }}', 'Pas Foto 3x4', '{{ $fotoType }}')" class="inline-flex items-center gap-1 text-xs font-bold text-indigo-600 hover:text-indigo-800">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                        <span>{{ $fotoIsImg ? 'Perbesar Gambar' : 'Perbesar Dokumen (Modal)' }}</span>
+                                    </button>
                                     <a href="{{ $fotoUrl }}" target="_blank" class="text-xs font-bold text-brand-600 hover:text-brand-800">
                                         Buka Tab Baru &nearr;
                                     </a>
@@ -648,20 +694,39 @@
         </form>
     </div>
 
-    {{-- MODAL LIGHTBOX IMAGE VIEWER --}}
+    {{-- MODAL LIGHTBOX IMAGE & PDF VIEWER --}}
     <div x-show="modalOpen" x-cloak class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4">
-        <div @click.away="modalOpen = false" class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full overflow-hidden border border-slate-200 flex flex-col max-h-[90vh]">
-            <div class="px-6 py-4 bg-slate-800 text-white flex items-center justify-between">
-                <h3 class="text-sm font-bold truncate" x-text="modalTitle">Pratinjau Dokumen</h3>
+        <div @click.away="modalOpen = false" class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full overflow-hidden border border-slate-200 flex flex-col max-h-[92vh]">
+            <div class="px-6 py-4 bg-slate-900 text-white flex items-center justify-between">
+                <div class="flex items-center gap-2 truncate pr-4">
+                    <span class="text-sm" x-text="modalType === 'pdf' ? '📄' : (modalType === 'doc' ? '📝' : '🖼️')"></span>
+                    <h3 class="text-sm font-bold truncate" x-text="modalTitle">Pratinjau Dokumen</h3>
+                </div>
                 <button type="button" @click="modalOpen = false" class="text-slate-400 hover:text-white p-1 rounded-lg">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
             </div>
-            <div class="p-4 bg-slate-100 flex items-center justify-center overflow-auto flex-1">
-                <img :src="modalSrc" alt="Preview Dokumen" class="max-w-full max-h-[70vh] object-contain rounded-lg shadow-sm">
+            <div class="p-3 bg-slate-100 flex items-center justify-center overflow-auto flex-1 min-h-[350px]">
+                <template x-if="modalType === 'pdf'">
+                    <iframe :src="modalSrc" class="w-full h-[72vh] rounded-lg border border-slate-300 bg-white" title="Pratinjau Dokumen PDF"></iframe>
+                </template>
+                <template x-if="modalType === 'image'">
+                    <img :src="modalSrc" alt="Preview Dokumen" class="max-w-full max-h-[70vh] object-contain rounded-lg shadow-sm">
+                </template>
+                <template x-if="modalType === 'doc'">
+                    <div class="text-center p-8 bg-white rounded-xl border border-slate-200 shadow-sm max-w-md my-auto">
+                        <span class="text-5xl block mb-2">📝</span>
+                        <h4 class="font-bold text-slate-800 text-sm mb-1" x-text="modalTitle">Dokumen Word</h4>
+                        <p class="text-xs text-slate-500 mb-4">Format dokumen Office dapat diunduh untuk diperiksa secara menyeluruh.</p>
+                        <a :href="modalSrc" download class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg shadow-sm transition inline-flex items-center gap-1.5">
+                            <span>Unduh Berkas</span>
+                            <span>&darr;</span>
+                        </a>
+                    </div>
+                </template>
             </div>
             <div class="px-6 py-3 bg-white border-t border-slate-200 flex items-center justify-between">
-                <span class="text-xs text-slate-500">Pratinjau Resolusi Asli</span>
+                <span class="text-xs text-slate-500">Pratinjau Langsung Tanpa Tab Baru</span>
                 <div class="flex items-center gap-3">
                     <a :href="modalSrc" target="_blank" class="text-xs font-bold text-indigo-600 hover:text-indigo-800">
                         Buka di Tab Baru &nearr;

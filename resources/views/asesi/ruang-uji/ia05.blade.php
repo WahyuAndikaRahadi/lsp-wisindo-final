@@ -75,24 +75,31 @@
                              data-qid="{{ $qId }}">
                             
                             {{-- Panel Header --}}
-                            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                            <div class="flex items-center justify-between pb-3 border-b border-slate-100 gap-2">
                                 <div class="flex items-center gap-2">
                                     <span class="px-3 py-1 bg-brand-50 text-brand-700 text-xs font-bold rounded-lg border border-brand-200 font-mono">
                                         Soal No. {{ $index + 1 }} dari {{ $questions->count() }}
                                     </span>
                                 </div>
 
-                                {{-- Ragu-ragu Checkbox --}}
-                                @if(! $isSubmitted)
-                                    <label class="inline-flex items-center gap-2 cursor-pointer px-3 py-1.5 rounded-lg border border-amber-300 bg-amber-50 hover:bg-amber-100 transition text-xs font-bold text-amber-900 select-none">
-                                        <input type="checkbox"
-                                               class="doubtful-checkbox rounded text-amber-500 focus:ring-amber-400 w-4 h-4 cursor-pointer"
-                                               data-index="{{ $index }}"
-                                               data-qid="{{ $qId }}"
-                                               {{ $isDoubtful ? 'checked' : '' }}>
-                                        <span>⚠️ Ragu-ragu</span>
-                                    </label>
-                                @endif
+                                <div class="flex items-center gap-2">
+                                    <a href="#palette-card" class="lg:hidden inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300 transition" title="Lompat ke Daftar Nomor Soal">
+                                        <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+                                        <span>Daftar Nomor</span>
+                                    </a>
+
+                                    {{-- Ragu-ragu Checkbox --}}
+                                    @if(! $isSubmitted)
+                                        <label class="inline-flex items-center gap-2 cursor-pointer px-3 py-1.5 rounded-lg border border-amber-300 bg-amber-50 hover:bg-amber-100 transition text-xs font-bold text-amber-900 select-none">
+                                            <input type="checkbox"
+                                                   class="doubtful-checkbox rounded text-amber-500 focus:ring-amber-400 w-4 h-4 cursor-pointer"
+                                                   data-index="{{ $index }}"
+                                                   data-qid="{{ $qId }}"
+                                                   {{ $isDoubtful ? 'checked' : '' }}>
+                                            <span>⚠️ Ragu-ragu</span>
+                                        </label>
+                                    @endif
+                                </div>
                             </div>
 
                             {{-- Question Text --}}
@@ -168,56 +175,58 @@
 
                 {{-- Right Column: Question Palette Sidebar --}}
                 <div class="lg:col-span-4 space-y-4">
-                    <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-sm space-y-4 sticky top-6">
+                    <div id="palette-card" class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-sm space-y-4 lg:sticky lg:top-6">
                         <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                             <h2 class="text-sm font-black text-slate-900 uppercase tracking-wider">
                                 Nomor Soal
                             </h2>
-                            <span class="text-xs font-bold text-slate-500 font-mono" id="palette-progress">
+                            <span class="text-xs font-bold text-brand-700 bg-brand-50 px-2.5 py-1 rounded-full border border-brand-200 font-mono" id="palette-progress">
                                 0 / {{ $questions->count() }}
                             </span>
                         </div>
 
                         {{-- Legend --}}
-                        <div class="grid grid-cols-3 gap-2 text-[11px] pb-2 border-b border-slate-100">
-                            <div class="flex items-center gap-1.5 text-slate-600">
-                                <span class="w-3.5 h-3.5 rounded bg-blue-600 shrink-0"></span>
+                        <div class="grid grid-cols-3 gap-2 text-[11px] py-2.5 px-3 bg-slate-50/80 rounded-xl border border-slate-200/80">
+                            <div class="flex items-center gap-1.5 text-slate-700 font-medium">
+                                <span class="w-3.5 h-3.5 rounded-md bg-blue-600 border border-blue-700 shrink-0"></span>
                                 <span>Dijawab</span>
                             </div>
-                            <div class="flex items-center gap-1.5 text-slate-600">
-                                <span class="w-3.5 h-3.5 rounded bg-amber-400 shrink-0"></span>
+                            <div class="flex items-center gap-1.5 text-slate-700 font-medium">
+                                <span class="w-3.5 h-3.5 rounded-md bg-amber-400 border border-amber-500 shrink-0"></span>
                                 <span>Ragu-ragu</span>
                             </div>
-                            <div class="flex items-center gap-1.5 text-slate-600">
-                                <span class="w-3.5 h-3.5 rounded bg-slate-100 border border-slate-300 shrink-0"></span>
+                            <div class="flex items-center gap-1.5 text-slate-700 font-medium">
+                                <span class="w-3.5 h-3.5 rounded-md bg-white border-2 border-slate-300 shrink-0"></span>
                                 <span>Belum</span>
                             </div>
                         </div>
 
-                        {{-- Grid of Number Buttons --}}
-                        <div class="grid grid-cols-5 sm:grid-cols-6 lg:grid-cols-5 gap-2 max-h-72 overflow-y-auto pr-1">
-                            @foreach($questions as $index => $q)
-                                @php
-                                    $qId = (string) $q->id;
-                                    $hasAnswer = isset($draftAnswers[$qId]) && $draftAnswers[$qId] !== null && $draftAnswers[$qId] !== '';
-                                    $isDoubtful = in_array($qId, $draftDoubtful ?? [], true);
-                                    
-                                    $btnClass = 'bg-slate-100 text-slate-700 border-slate-200 hover:border-slate-400';
-                                    if ($isDoubtful) {
-                                        $btnClass = 'bg-amber-400 text-slate-900 border-amber-500 font-black';
-                                    } elseif ($hasAnswer) {
-                                        $btnClass = 'bg-blue-600 text-white border-blue-700 font-bold';
-                                    }
-                                @endphp
-                                <button type="button"
-                                        id="palette-btn-{{ $index }}"
-                                        data-index="{{ $index }}"
-                                        data-qid="{{ $qId }}"
-                                        class="palette-btn w-full aspect-square rounded-lg text-xs flex items-center justify-center transition border {{ $btnClass }} {{ $index === 0 ? 'ring-2 ring-brand-500 ring-offset-1' : '' }}"
-                                        onclick="goToQuestion({{ $index }})">
-                                    {{ $index + 1 }}
-                                </button>
-                            @endforeach
+                        {{-- Grid of Number Buttons with Distinct Margin & Clean Borders --}}
+                        <div class="p-2 sm:p-2.5 bg-slate-50/60 rounded-xl border border-slate-200/80 my-2">
+                            <div class="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-5 gap-2.5 sm:gap-3 max-h-72 sm:max-h-80 overflow-y-auto p-1.5 pr-2">
+                                @foreach($questions as $index => $q)
+                                    @php
+                                        $qId = (string) $q->id;
+                                        $hasAnswer = isset($draftAnswers[$qId]) && $draftAnswers[$qId] !== null && $draftAnswers[$qId] !== '';
+                                        $isDoubtful = in_array($qId, $draftDoubtful ?? [], true);
+                                        
+                                        $btnClass = 'bg-white text-slate-700 border-2 border-slate-300 hover:border-slate-400 hover:bg-slate-100 shadow-2xs font-bold';
+                                        if ($isDoubtful) {
+                                            $btnClass = 'bg-amber-400 text-slate-900 border-2 border-amber-500 font-black shadow-xs hover:bg-amber-500';
+                                        } elseif ($hasAnswer) {
+                                            $btnClass = 'bg-blue-600 text-white border-2 border-blue-700 font-bold shadow-xs hover:bg-blue-700';
+                                        }
+                                    @endphp
+                                    <button type="button"
+                                            id="palette-btn-{{ $index }}"
+                                            data-index="{{ $index }}"
+                                            data-qid="{{ $qId }}"
+                                            class="palette-btn w-full aspect-square min-h-[42px] rounded-xl text-xs sm:text-sm flex items-center justify-center transition-all duration-150 {{ $btnClass }} {{ $index === 0 ? 'ring-2 ring-brand-500 ring-offset-2 scale-105 z-10' : '' }}"
+                                            onclick="goToQuestion({{ $index }})">
+                                        {{ $index + 1 }}
+                                    </button>
+                                @endforeach
+                            </div>
                         </div>
 
                         {{-- Stats Summary --}}
@@ -291,12 +300,12 @@
 
         // Hide current panel and remove ring from old button
         $('#question-panel-' + currentIndex).addClass('hidden');
-        $('#palette-btn-' + currentIndex).removeClass('ring-2 ring-brand-500 ring-offset-1');
+        $('#palette-btn-' + currentIndex).removeClass('ring-2 ring-brand-500 ring-offset-2 scale-105 z-10');
 
         // Show new panel and add ring to new button
         currentIndex = index;
         $('#question-panel-' + currentIndex).removeClass('hidden');
-        $('#palette-btn-' + currentIndex).addClass('ring-2 ring-brand-500 ring-offset-1');
+        $('#palette-btn-' + currentIndex).addClass('ring-2 ring-brand-500 ring-offset-2 scale-105 z-10');
 
         // Scroll to question panel smoothly on mobile
         if (window.innerWidth < 1024) {
@@ -313,14 +322,14 @@
         const $btn = $('#palette-btn-' + index);
 
         // Reset base classes
-        $btn.removeClass('bg-slate-100 text-slate-700 border-slate-200 hover:border-slate-400 bg-amber-400 text-slate-900 border-amber-500 font-black bg-blue-600 text-white border-blue-700 font-bold');
+        $btn.removeClass('bg-white bg-slate-100 text-slate-700 border-2 border-slate-200 border-slate-300 hover:border-slate-400 hover:bg-slate-100 bg-amber-400 text-slate-900 border-amber-500 font-black shadow-xs hover:bg-amber-500 bg-blue-600 text-white border-blue-700 font-bold hover:bg-blue-700');
 
         if (isDoubtful) {
-            $btn.addClass('bg-amber-400 text-slate-900 border-amber-500 font-black');
+            $btn.addClass('bg-amber-400 text-slate-900 border-2 border-amber-500 font-black shadow-xs hover:bg-amber-500');
         } else if (hasAnswer) {
-            $btn.addClass('bg-blue-600 text-white border-blue-700 font-bold');
+            $btn.addClass('bg-blue-600 text-white border-2 border-blue-700 font-bold shadow-xs hover:bg-blue-700');
         } else {
-            $btn.addClass('bg-slate-100 text-slate-700 border-slate-200 hover:border-slate-400');
+            $btn.addClass('bg-white text-slate-700 border-2 border-slate-300 hover:border-slate-400 hover:bg-slate-100 shadow-2xs font-bold');
         }
     }
 
