@@ -341,21 +341,24 @@ class FinalizationController extends Controller
             'ak05_penolakan_asesi_ids' => 'nullable|array',
             'ak05_penolakan_asesi_ids.*' => 'integer|exists:t_assessments,id',
             'ak05_penolakan_catatan' => 'nullable|string|max:1000',
-            'ak06_valid' => 'required|in:YA,TIDAK',
-            'ak06_valid_notes' => 'required|string|min:5',
-            'ak06_reliabel' => 'required|in:YA,TIDAK',
-            'ak06_reliabel_notes' => 'required|string|min:5',
-            'ak06_fleksibel' => 'required|in:YA,TIDAK',
-            'ak06_fleksibel_notes' => 'required|string|min:5',
-            'ak06_adil' => 'required|in:YA,TIDAK',
-            'ak06_adil_notes' => 'required|string|min:5',
-            'ak06_catatan_peninjau' => 'required|string|min:10',
+            'ak06_template_type' => 'required_without:ak06_valid|in:langsung,tidak_langsung',
+            'ak06_catatan_peninjau' => 'nullable|string|max:1000',
+            'ak06_valid' => 'nullable|in:YA,TIDAK',
+            'ak06_valid_notes' => 'nullable|string',
+            'ak06_reliabel' => 'nullable|in:YA,TIDAK',
+            'ak06_reliabel_notes' => 'nullable|string',
+            'ak06_fleksibel' => 'nullable|in:YA,TIDAK',
+            'ak06_fleksibel_notes' => 'nullable|string',
+            'ak06_adil' => 'nullable|in:YA,TIDAK',
+            'ak06_adil_notes' => 'nullable|string',
             'confirm_draft_review' => 'accepted',
         ], [
             'ak05_aspek_positif.required' => 'Aspek positif laporan asesmen (FR.AK.05) wajib diisi.',
             'ak05_aspek_negatif.required' => 'Aspek negatif laporan asesmen (FR.AK.05) wajib diisi.',
             'ak05_rekomendasi.required' => 'Rekomendasi peningkatan mutu (FR.AK.05) wajib diisi.',
-            'ak06_catatan_peninjau.required' => 'Catatan keseluruhan peninjau proses (FR.AK.06) wajib diisi.',
+            'ak06_template_type.required' => 'Anda wajib memilih salah satu tipe FR.AK.06 (Langsung atau Tidak Langsung).',
+            'ak06_template_type.required_without' => 'Anda wajib memilih salah satu tipe FR.AK.06 (Langsung atau Tidak Langsung).',
+            'ak06_template_type.in' => 'Pilihan tipe FR.AK.06 tidak valid. Pilih Langsung atau Tidak Langsung.',
             'confirm_draft_review.accepted' => 'Anda wajib mencentang konfirmasi peninjauan draf laporan sebelum menyimpan dan menutup jadwal.',
         ]);
 
@@ -385,16 +388,33 @@ class FinalizationController extends Controller
             'improvement_suggestions' => $validated['ak05_rekomendasi'],
         ];
 
+        $templateType = $request->input('ak06_template_type', 'langsung');
+        if (! in_array($templateType, ['langsung', 'tidak_langsung'], true)) {
+            $templateType = 'langsung';
+        }
+        $templateName = $templateType === 'langsung'
+            ? 'FR.AK.06 Meninjau Proses Asesmen (Langsung)'
+            : 'FR.AK.06 Meninjau Proses Asesmen (Tidak Langsung)';
+
+        $defaultCatatan = "Proses asesmen telah ditinjau menggunakan instrumen {$templateName} dan dinyatakan memenuhi seluruh prinsip asesmen dan dimensi kompetensi BNSP.";
+        $catatanPeninjau = ! empty($validated['ak06_catatan_peninjau'] ?? null)
+            ? $validated['ak06_catatan_peninjau']
+            : ($request->input('ak06_catatan_peninjau') ?: $defaultCatatan);
+
         $ak06 = [
-            'valid' => $validated['ak06_valid'],
-            'valid_notes' => $validated['ak06_valid_notes'],
-            'reliabel' => $validated['ak06_reliabel'],
-            'reliabel_notes' => $validated['ak06_reliabel_notes'],
-            'fleksibel' => $validated['ak06_fleksibel'],
-            'fleksibel_notes' => $validated['ak06_fleksibel_notes'],
-            'adil' => $validated['ak06_adil'],
-            'adil_notes' => $validated['ak06_adil_notes'],
-            'catatan_peninjau' => $validated['ak06_catatan_peninjau'],
+            'template_type' => $templateType,
+            'template_name' => $templateName,
+            'valid' => $request->input('ak06_valid', 'YA'),
+            'valid_notes' => $request->input('ak06_valid_notes', 'Seluruh bukti dikumpulkan mengacu langsung pada KUK SKKNI.'),
+            'reliabel' => $request->input('ak06_reliabel', 'YA'),
+            'reliabel_notes' => $request->input('ak06_reliabel_notes', 'Rubrik penilaian dan instrumen diterapkan secara seragam dan konsisten.'),
+            'fleksibel' => $request->input('ak06_fleksibel', 'YA'),
+            'fleksibel_notes' => $request->input('ak06_fleksibel_notes', 'Metode dan instrumen asesmen telah disesuaikan dengan kondisi TUK dan asesi.'),
+            'adil' => $request->input('ak06_adil', 'YA'),
+            'adil_notes' => $request->input('ak06_adil_notes', 'Semua asesi mendapat kesempatan dan perlakuan yang setara tanpa diskriminasi.'),
+            'catatan_peninjau' => $catatanPeninjau,
+            'procedure_recommendation' => 'Seluruh prosedur asesmen terlaksana secara valid, reliabel, fleksibel dan adil sesuai pedoman BNSP 301.',
+            'improvement_recommendations' => 'MUK yang digunakan sangat komprehensif. Disarankan pembaruan berkelanjutan pada bank soal dan instrumen asesmen.',
         ];
 
         if ($schedule->isClosedForAssessor()) {

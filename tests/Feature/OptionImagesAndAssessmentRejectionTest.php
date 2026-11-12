@@ -334,4 +334,73 @@ class OptionImagesAndAssessmentRejectionTest extends TestCase
         $this->assertNotFalse($pos2);
         $this->assertTrue($pos1 < $pos2, 'Questions should be ordered ascending matching document sequence.');
     }
+
+    public function test_submitting_reports_requires_ak06_template_type(): void
+    {
+        $response = $this->actingAs($this->asesor)->post(route('asesor.schedule.reports.submit', $this->schedule), [
+            'ak05_aspek_positif' => 'Aspek positif asesmen berjalan lancar dan tertib.',
+            'ak05_aspek_negatif' => 'Tidak ada kendala fatal yang ditemukan.',
+            'ak05_rekomendasi' => 'Pertahankan dan tingkatkan kualitas pelatihan.',
+            'ak05_has_penolakan' => '0',
+            'confirm_draft_review' => '1',
+        ]);
+
+        $response->assertSessionHasErrors('ak06_template_type');
+    }
+
+    public function test_submitting_reports_with_langsung_template_updates_muk_export_view(): void
+    {
+        $response = $this->actingAs($this->asesor)->post(route('asesor.schedule.reports.submit', $this->schedule), [
+            'ak05_aspek_positif' => 'Aspek positif asesmen berjalan lancar dan tertib.',
+            'ak05_aspek_negatif' => 'Tidak ada kendala fatal yang ditemukan.',
+            'ak05_rekomendasi' => 'Pertahankan dan tingkatkan kualitas pelatihan.',
+            'ak05_has_penolakan' => '0',
+            'ak06_template_type' => 'langsung',
+            'ak06_catatan_peninjau' => 'Proses asesmen langsung telah ditinjau dan sesuai.',
+            'confirm_draft_review' => '1',
+        ]);
+
+        $response->assertSessionHasNoErrors();
+        $this->schedule->refresh();
+        $this->assertEquals('langsung', $this->schedule->ak06_review['template_type']);
+
+        $exportRes = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.export', [
+            'schedule' => $this->schedule->id,
+            'type' => 'ak06',
+        ]));
+
+        $exportRes->assertOk();
+        $exportRes->assertSee('FR.AK.06. MENINJAU PROSES ASESMEN (LANGSUNG)');
+        $exportRes->assertSee('L / CL');
+        $exportRes->assertSee('FR.IA 01, FR IA 02, FR IA 03');
+    }
+
+    public function test_submitting_reports_with_tidak_langsung_template_updates_muk_export_view(): void
+    {
+        $response = $this->actingAs($this->asesor)->post(route('asesor.schedule.reports.submit', $this->schedule), [
+            'ak05_aspek_positif' => 'Aspek positif asesmen portofolio berjalan lancar.',
+            'ak05_aspek_negatif' => 'Tidak ada kendala fatal yang ditemukan.',
+            'ak05_rekomendasi' => 'Pertahankan kelengkapan berkas portofolio.',
+            'ak05_has_penolakan' => '0',
+            'ak06_template_type' => 'tidak_langsung',
+            'ak06_catatan_peninjau' => 'Proses asesmen tidak langsung telah ditinjau dan sesuai standar portofolio.',
+            'confirm_draft_review' => '1',
+        ]);
+
+        $response->assertSessionHasNoErrors();
+        $this->schedule->refresh();
+        $this->assertEquals('tidak_langsung', $this->schedule->ak06_review['template_type']);
+
+        $exportRes = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.export', [
+            'schedule' => $this->schedule->id,
+            'type' => 'ak06',
+        ]));
+
+        $exportRes->assertOk();
+        $exportRes->assertSee('FR.AK.06. MENINJAU PROSES ASESMEN (TIDAK LANGSUNG)');
+        $exportRes->assertSee('TL / CLO');
+        $exportRes->assertSee('FR.IA 08');
+        $exportRes->assertSee('T / PW');
+        $exportRes->assertSee('FR.IA 09');
+    }
 }

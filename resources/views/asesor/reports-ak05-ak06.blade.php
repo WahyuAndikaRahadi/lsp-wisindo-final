@@ -60,6 +60,8 @@
         $assessorId = auth()->id();
         $ak05Data = $schedule->ak05_report['by_assessor'][$assessorId] ?? $schedule->ak05_report ?? [];
         $ak06Data = $schedule->ak06_review['by_assessor'][$assessorId] ?? $schedule->ak06_review ?? [];
+        $initialTemplateType = old('ak06_template_type', $ak06Data['template_type'] ?? '');
+        $initialAk06Catatan = old('ak06_catatan_peninjau', $ak06Data['catatan_peninjau'] ?? '');
 
         $existingPenolakanIds = old('ak05_penolakan_asesi_ids', $ak05Data['penolakan_assessment_ids'] ?? $myAssessments->where('has_rejection', true)->pluck('id')->map(fn($v) => (string)$v)->all() ?? []);
         if (!is_array($existingPenolakanIds)) {
@@ -108,20 +110,28 @@
                     this.showPenolakanModal = true;
                 }
             },
-            ak06ValidNotes: '{{ addslashes(old('ak06_valid_notes', $ak06Data['valid_notes'] ?? '')) }}',
-            ak06ReliabelNotes: '{{ addslashes(old('ak06_reliabel_notes', $ak06Data['reliabel_notes'] ?? '')) }}',
-            ak06FleksibelNotes: '{{ addslashes(old('ak06_fleksibel_notes', $ak06Data['fleksibel_notes'] ?? '')) }}',
-            ak06AdilNotes: '{{ addslashes(old('ak06_adil_notes', $ak06Data['adil_notes'] ?? '')) }}',
-            ak06Catatan: '{{ addslashes(old('ak06_catatan_peninjau', $ak06Data['catatan_peninjau'] ?? '')) }}',
+            selectedTemplate: '{{ $initialTemplateType }}',
+            showPreviewModal: false,
+            previewTemplate: '{{ $initialTemplateType ?: 'langsung' }}',
+            ak06Catatan: '{{ addslashes($initialAk06Catatan) }}',
+            openPreview(type) {
+                this.previewTemplate = type;
+                this.showPreviewModal = true;
+            },
+            selectAndClosePreview(type) {
+                this.selectedTemplate = type;
+                this.showPreviewModal = false;
+            },
             useDraft() {
                 this.ak05Positif = 'Sarana dan prasarana bengkel TUK lengkap, ketersediaan alat ukur dan APD sesuai standar K3, asesi hadir tepat waktu.';
                 this.ak05Negatif = 'Tidak ditemukan kendala signifikan selama proses asesmen berlangsung.';
                 this.ak05Rekomendasi = 'Mempertahankan konsistensi kalibrasi peralatan tangan dan SST serta peningkatan durasi praktik mandiri.';
-                this.ak06ValidNotes = 'Seluruh bukti dikumpulkan mengacu langsung pada KUK SKKNI.';
-                this.ak06ReliabelNotes = 'Rubrik penilaian dan kunci jawaban diterapkan secara seragam dan konsisten.';
-                this.ak06FleksibelNotes = 'Formulir penyesuaian wajar (FR.AK.07) telah difasilitasi jika asesi membutuhkan.';
-                this.ak06AdilNotes = 'Semua asesi mendapat kesempatan dan hak yang setara tanpa bias ras/gender/latar belakang.';
-                this.ak06Catatan = 'Proses sertifikasi kompetensi telah mematuhi SOP BNSP dan standar mutu LSP PrO Indo.';
+                if (!this.selectedTemplate) {
+                    this.selectedTemplate = 'langsung';
+                }
+                if (!this.ak06Catatan) {
+                    this.ak06Catatan = 'Proses sertifikasi kompetensi telah mematuhi SOP BNSP dan standar mutu LSP PrO Indo.';
+                }
             }
         }">
         @csrf
@@ -258,78 +268,155 @@
         </div>
 
         {{-- FR.AK.06 Tinjauan Proses Asesmen --}}
-        <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm space-y-4">
-            <div class="border-b border-slate-200 pb-3">
-                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-200 uppercase">FR.AK.06</span>
-                <h2 class="text-base font-bold text-slate-900 mt-1">Meninjau Proses Asesmen (Quality Review)</h2>
-                <p class="text-xs text-slate-500">Verifikasi pemenuhan 4 Prinsip Asesmen BNSP (Valid, Reliabel, Fleksibel, Adil)</p>
+        <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm space-y-5">
+            <div class="border-b border-slate-200 pb-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                <div>
+                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-200 uppercase">FR.AK.06</span>
+                    <h2 class="text-base font-bold text-slate-900 mt-1">Meninjau Proses Asesmen (Quality Review)</h2>
+                    <p class="text-xs text-slate-500">Pilih salah satu format FR.AK.06 yang digunakan (Langsung atau Tidak Langsung). Format dokumen ini bersifat baku sesuai standar BNSP.</p>
+                </div>
+                <div class="text-xs text-rose-600 font-semibold flex items-center gap-1.5 shrink-0" x-show="!selectedTemplate">
+                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                    <span>* Wajib memilih salah satu opsi</span>
+                </div>
             </div>
 
-            <div class="overflow-x-auto border border-slate-200 rounded-lg">
-                <table class="w-full text-xs">
-                    <thead class="bg-slate-50 text-slate-700 font-bold border-b border-slate-200">
-                        <tr>
-                            <th class="px-3 py-2 text-left w-28">Prinsip Asesmen</th>
-                            <th class="px-3 py-2 text-center w-24">Kesesuaian</th>
-                            <th class="px-3 py-2 text-left">Catatan & Komentar Verifikasi</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-100">
-                        <tr>
-                            <td class="px-3 py-2.5 font-bold text-slate-800">Validitas (Valid)</td>
-                            <td class="px-3 py-2.5 text-center">
-                                <select name="ak06_valid" @disabled($isClosedForMe) class="text-xs rounded-lg border border-slate-300 bg-white font-bold text-emerald-700 py-1.5 px-2.5 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:outline-none transition shadow-2xs cursor-pointer">
-                                    <option value="YA" selected>YA</option>
-                                    <option value="TIDAK">TIDAK</option>
-                                </select>
-                            </td>
-                            <td class="px-3 py-2.5">
-                                <input type="text" name="ak06_valid_notes" x-model="ak06ValidNotes" required @disabled($isClosedForMe) placeholder="Catatan kesesuaian prinsip validitas..." class="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-300 bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:outline-none transition shadow-2xs {{ $isClosedForMe ? 'bg-slate-50 text-slate-700' : '' }}">
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="px-3 py-2.5 font-bold text-slate-800">Reliabilitas (Reliable)</td>
-                            <td class="px-3 py-2.5 text-center">
-                                <select name="ak06_reliabel" @disabled($isClosedForMe) class="text-xs rounded-lg border border-slate-300 bg-white font-bold text-emerald-700 py-1.5 px-2.5 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:outline-none transition shadow-2xs cursor-pointer">
-                                    <option value="YA" selected>YA</option>
-                                    <option value="TIDAK">TIDAK</option>
-                                </select>
-                            </td>
-                            <td class="px-3 py-2.5">
-                                <input type="text" name="ak06_reliabel_notes" x-model="ak06ReliabelNotes" required @disabled($isClosedForMe) placeholder="Catatan kesesuaian reliabilitas..." class="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-300 bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:outline-none transition shadow-2xs {{ $isClosedForMe ? 'bg-slate-50 text-slate-700' : '' }}">
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="px-3 py-2.5 font-bold text-slate-800">Fleksibilitas (Flexible)</td>
-                            <td class="px-3 py-2.5 text-center">
-                                <select name="ak06_fleksibel" @disabled($isClosedForMe) class="text-xs rounded-lg border border-slate-300 bg-white font-bold text-emerald-700 py-1.5 px-2.5 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:outline-none transition shadow-2xs cursor-pointer">
-                                    <option value="YA" selected>YA</option>
-                                    <option value="TIDAK">TIDAK</option>
-                                </select>
-                            </td>
-                            <td class="px-3 py-2.5">
-                                <input type="text" name="ak06_fleksibel_notes" x-model="ak06FleksibelNotes" required @disabled($isClosedForMe) placeholder="Catatan fleksibilitas..." class="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-300 bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:outline-none transition shadow-2xs {{ $isClosedForMe ? 'bg-slate-50 text-slate-700' : '' }}">
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="px-3 py-2.5 font-bold text-slate-800">Keadilan (Fair)</td>
-                            <td class="px-3 py-2.5 text-center">
-                                <select name="ak06_adil" @disabled($isClosedForMe) class="text-xs rounded-lg border border-slate-300 bg-white font-bold text-emerald-700 py-1.5 px-2.5 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:outline-none transition shadow-2xs cursor-pointer">
-                                    <option value="YA" selected>YA</option>
-                                    <option value="TIDAK">TIDAK</option>
-                                </select>
-                            </td>
-                            <td class="px-3 py-2.5">
-                                <input type="text" name="ak06_adil_notes" x-model="ak06AdilNotes" required @disabled($isClosedForMe) placeholder="Catatan keadilan..." class="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-300 bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:outline-none transition shadow-2xs {{ $isClosedForMe ? 'bg-slate-50 text-slate-700' : '' }}">
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+            @error('ak06_template_type')
+                <div class="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700 font-semibold flex items-center gap-2">
+                    <svg class="w-4 h-4 shrink-0 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <span>{{ $message }}</span>
+                </div>
+            @enderror
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {{-- Opsi 1: FR.AK.06 Langsung --}}
+                <div class="rounded-2xl border-2 p-5 transition flex flex-col justify-between cursor-pointer relative shadow-2xs"
+                     :class="selectedTemplate === 'langsung' ? 'border-brand-600 bg-brand-50/40 ring-2 ring-brand-500/20' : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/50'"
+                     @click="if (!{{ $isClosedForMe ? 'true' : 'false' }}) { selectedTemplate = 'langsung'; }">
+                    <div class="space-y-3">
+                        <div class="flex items-start justify-between gap-3">
+                            <label class="flex items-start gap-3 cursor-pointer flex-1" @click.stop>
+                                <input type="radio" name="ak06_template_type" value="langsung"
+                                       x-model="selectedTemplate"
+                                       @disabled($isClosedForMe)
+                                       required
+                                       class="mt-1 w-4 h-4 text-brand-600 border-slate-300 focus:ring-brand-500 cursor-pointer">
+                                <div>
+                                    <div class="text-sm font-bold text-slate-900 leading-snug">
+                                        FR.AK.06 Meninjau Proses Asesmen (Langsung)
+                                    </div>
+                                    <span class="inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                        Bukti Langsung (L / CL)
+                                    </span>
+                                </div>
+                            </label>
+                            <span class="w-6 h-6 rounded-full flex items-center justify-center shrink-0 text-xs font-bold transition"
+                                  :class="selectedTemplate === 'langsung' ? 'bg-brand-600 text-white shadow-xs' : 'bg-slate-100 text-slate-400'">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                            </span>
+                        </div>
+
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            Instrumen peninjauan untuk asesmen berbasis <strong>observasi langsung, demonstrasi praktik, dan tugas praktik</strong>.
+                        </p>
+
+                        <div class="bg-slate-50/80 rounded-lg p-2.5 border border-slate-100 text-[11px] text-slate-600 space-y-1">
+                            <div class="font-semibold text-slate-700 flex items-center gap-1.5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                Instrumen Terkait:
+                            </div>
+                            <div class="flex flex-wrap gap-1 font-mono text-[10px]">
+                                <span class="px-1.5 py-0.5 bg-white border border-slate-200 rounded text-slate-700">FR.IA.01 (Ceklis Observasi)</span>
+                                <span class="px-1.5 py-0.5 bg-white border border-slate-200 rounded text-slate-700">FR.IA.02 (Tugas Praktik)</span>
+                                <span class="px-1.5 py-0.5 bg-white border border-slate-200 rounded text-slate-700">FR.IA.03 (Pertanyaan Lisan)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-4 mt-4 border-t border-slate-100 flex items-center justify-between gap-2">
+                        <button type="button"
+                                @click.stop="openPreview('langsung')"
+                                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-brand-700 bg-brand-50 hover:bg-brand-100 transition border border-brand-200 cursor-pointer">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                            <span>Pratinjau Format</span>
+                        </button>
+
+                        <button type="button"
+                                x-show="!{{ $isClosedForMe ? 'true' : 'false' }}"
+                                @click.stop="selectedTemplate = 'langsung'"
+                                class="text-xs font-bold transition px-2.5 py-1 rounded-md cursor-pointer"
+                                :class="selectedTemplate === 'langsung' ? 'text-brand-700 font-extrabold' : 'text-slate-500 hover:text-slate-800'">
+                            <span x-text="selectedTemplate === 'langsung' ? '✓ Terpilih' : 'Pilih Opsi'"></span>
+                        </button>
+                    </div>
+                </div>
+
+                {{-- Opsi 2: FR.AK.06 Tidak Langsung --}}
+                <div class="rounded-2xl border-2 p-5 transition flex flex-col justify-between cursor-pointer relative shadow-2xs"
+                     :class="selectedTemplate === 'tidak_langsung' ? 'border-brand-600 bg-brand-50/40 ring-2 ring-brand-500/20' : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/50'"
+                     @click="if (!{{ $isClosedForMe ? 'true' : 'false' }}) { selectedTemplate = 'tidak_langsung'; }">
+                    <div class="space-y-3">
+                        <div class="flex items-start justify-between gap-3">
+                            <label class="flex items-start gap-3 cursor-pointer flex-1" @click.stop>
+                                <input type="radio" name="ak06_template_type" value="tidak_langsung"
+                                       x-model="selectedTemplate"
+                                       @disabled($isClosedForMe)
+                                       required
+                                       class="mt-1 w-4 h-4 text-brand-600 border-slate-300 focus:ring-brand-500 cursor-pointer">
+                                <div>
+                                    <div class="text-sm font-bold text-slate-900 leading-snug">
+                                        FR.AK.06 Meninjau Proses Asesmen (Tidak Langsung)
+                                    </div>
+                                    <span class="inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200">
+                                        Bukti Tidak Langsung (TL / CLO &amp; T / PW)
+                                    </span>
+                                </div>
+                            </label>
+                            <span class="w-6 h-6 rounded-full flex items-center justify-center shrink-0 text-xs font-bold transition"
+                                  :class="selectedTemplate === 'tidak_langsung' ? 'bg-brand-600 text-white shadow-xs' : 'bg-slate-100 text-slate-400'">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                            </span>
+                        </div>
+
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            Instrumen peninjauan untuk asesmen berbasis <strong>verifikasi portofolio (CLO) dan pertanyaan wawancara (PW)</strong>.
+                        </p>
+
+                        <div class="bg-slate-50/80 rounded-lg p-2.5 border border-slate-100 text-[11px] text-slate-600 space-y-1">
+                            <div class="font-semibold text-slate-700 flex items-center gap-1.5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                                Instrumen Terkait:
+                            </div>
+                            <div class="flex flex-wrap gap-1 font-mono text-[10px]">
+                                <span class="px-1.5 py-0.5 bg-white border border-slate-200 rounded text-slate-700">FR.IA.08 (Verifikasi Portofolio)</span>
+                                <span class="px-1.5 py-0.5 bg-white border border-slate-200 rounded text-slate-700">FR.IA.09 (Pertanyaan Wawancara)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-4 mt-4 border-t border-slate-100 flex items-center justify-between gap-2">
+                        <button type="button"
+                                @click.stop="openPreview('tidak_langsung')"
+                                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-brand-700 bg-brand-50 hover:bg-brand-100 transition border border-brand-200 cursor-pointer">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                            <span>Pratinjau Format</span>
+                        </button>
+
+                        <button type="button"
+                                x-show="!{{ $isClosedForMe ? 'true' : 'false' }}"
+                                @click.stop="selectedTemplate = 'tidak_langsung'"
+                                class="text-xs font-bold transition px-2.5 py-1 rounded-md cursor-pointer"
+                                :class="selectedTemplate === 'tidak_langsung' ? 'text-brand-700 font-extrabold' : 'text-slate-500 hover:text-slate-800'">
+                            <span x-text="selectedTemplate === 'tidak_langsung' ? '✓ Terpilih' : 'Pilih Opsi'"></span>
+                        </button>
+                    </div>
+                </div>
             </div>
 
+            {{-- Catatan Keseluruhan Peninjau / Lead Asesor --}}
             <div class="pt-2 text-xs">
-                <label class="block font-bold text-slate-700 mb-1">Catatan Keseluruhan Peninjau / Lead Asesor:</label>
-                <textarea name="ak06_catatan_peninjau" x-model="ak06Catatan" rows="2" required @disabled($isClosedForMe) class="w-full p-3 text-xs rounded-xl border border-slate-300 bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:outline-none transition shadow-2xs {{ $isClosedForMe ? 'bg-slate-50 text-slate-700' : '' }}" placeholder="Tuliskan catatan keseluruhan peninjauan proses asesmen..."></textarea>
+                <label class="block font-bold text-slate-700 mb-1">Catatan / Komentar Lead Asesor (Opsional pada Dokumen Cetak):</label>
+                <textarea name="ak06_catatan_peninjau" x-model="ak06Catatan" rows="2" @disabled($isClosedForMe) class="w-full p-3 text-xs rounded-xl border border-slate-300 bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:outline-none transition shadow-2xs {{ $isClosedForMe ? 'bg-slate-50 text-slate-700' : '' }}" placeholder="Proses asesmen telah memenuhi seluruh standar mutu penjaminan asesmen BNSP."></textarea>
             </div>
         </div>
 
@@ -455,6 +542,308 @@ Apakah Anda yakin ingin menyimpan laporan FR.AK.05 & FR.AK.06 ini?"
                             class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-xs font-bold shadow-sm transition cursor-pointer">
                         Selesai Memilih
                     </button>
+                </div>
+            </div>
+        </div>
+
+        {{-- Modal Pratinjau Format FR.AK.06 (Langsung & Tidak Langsung) --}}
+        <div x-show="showPreviewModal" x-cloak
+             class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
+            <div @click.away="showPreviewModal = false"
+                 class="bg-white rounded-2xl max-w-4xl w-full shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[92vh]">
+                {{-- Header Modal --}}
+                <div class="px-5 py-4 border-b border-slate-200 bg-slate-50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-100 text-purple-800 uppercase">FR.AK.06</span>
+                            <h3 class="text-sm sm:text-base font-bold text-slate-900">Pratinjau Format Dokumen Meninjau Proses Asesmen</h3>
+                        </div>
+                        <p class="text-[11px] text-slate-500 mt-0.5">Tampilan cetak resmi MUK statis sesuai standar pedoman BNSP 301</p>
+                    </div>
+
+                    {{-- Tab Switcher --}}
+                    <div class="flex items-center gap-1.5 p-1 bg-slate-200/70 rounded-xl">
+                        <button type="button"
+                                @click="previewTemplate = 'langsung'"
+                                class="px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer"
+                                :class="previewTemplate === 'langsung' ? 'bg-white text-brand-700 shadow-xs' : 'text-slate-600 hover:text-slate-900'">
+                            Format Langsung (L/CL)
+                        </button>
+                        <button type="button"
+                                @click="previewTemplate = 'tidak_langsung'"
+                                class="px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer"
+                                :class="previewTemplate === 'tidak_langsung' ? 'bg-white text-brand-700 shadow-xs' : 'text-slate-600 hover:text-slate-900'">
+                            Format Tidak Langsung (TL/CLO)
+                        </button>
+                        <button type="button" @click="showPreviewModal = false" class="text-slate-400 hover:text-slate-600 p-1.5 ml-1 rounded-lg cursor-pointer">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
+                    </div>
+                </div>
+
+                {{-- Modal Body Document Preview --}}
+                <div class="p-5 sm:p-6 overflow-y-auto space-y-4 bg-slate-100 text-[11px] text-slate-800">
+                    <div class="bg-white p-6 rounded-xl border border-slate-300 shadow-sm space-y-4">
+                        {{-- Kop Surat Dokumen --}}
+                        <div class="text-center border-b-2 border-slate-900 pb-3">
+                            <div class="font-bold text-xs uppercase tracking-wide text-slate-900">Lembaga Sertifikasi Profesi Praktisi Otomotif LSP-PrO Indo</div>
+                            <div class="text-base font-extrabold text-slate-900 mt-1 uppercase tracking-tight">
+                                FR.AK.06. Meninjau Proses Asesmen
+                                <span class="text-brand-700" x-text="previewTemplate === 'langsung' ? '(LANGSUNG)' : '(TIDAK LANGSUNG)'"></span>
+                            </div>
+                        </div>
+
+                        {{-- Metadata Grid --}}
+                        <table class="w-full border border-slate-400 text-[11px]">
+                            <tbody>
+                                <tr class="border-b border-slate-300">
+                                    <td class="font-bold p-2 border-r border-slate-300 w-1/4 bg-slate-50" rowspan="2">
+                                        Skema Sertifikasi<br><span class="font-normal text-[10px] text-slate-500">(KKNI/Okupasi/Klaster)</span>
+                                    </td>
+                                    <td class="p-2 border-r border-slate-300 w-24">Judul</td>
+                                    <td class="p-2 border-r border-slate-300 w-4 text-center">:</td>
+                                    <td class="p-2 font-semibold">{{ $schedule->scheme->name }}</td>
+                                </tr>
+                                <tr class="border-b border-slate-300">
+                                    <td class="p-2 border-r border-slate-300">Nomor</td>
+                                    <td class="p-2 border-r border-slate-300 text-center">:</td>
+                                    <td class="p-2 font-mono">{{ $schedule->scheme->code }}</td>
+                                </tr>
+                                <tr class="border-b border-slate-300">
+                                    <td class="font-bold p-2 border-r border-slate-300 bg-slate-50">TUK</td>
+                                    <td class="p-2 border-r border-slate-300" colspan="2">:</td>
+                                    <td class="p-2">Sewaktu/Tempat Kerja/Mandiri* (<strong>{{ $schedule->tuk_name }}</strong>)</td>
+                                </tr>
+                                <tr class="border-b border-slate-300">
+                                    <td class="font-bold p-2 border-r border-slate-300 bg-slate-50">Nama Asesor</td>
+                                    <td class="p-2 border-r border-slate-300" colspan="2">:</td>
+                                    <td class="p-2 font-bold">{{ auth()->user()->full_name ?? auth()->user()->name }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="font-bold p-2 border-r border-slate-300 bg-slate-50">Tanggal</td>
+                                    <td class="p-2 border-r border-slate-300" colspan="2">:</td>
+                                    <td class="p-2">{{ \Carbon\Carbon::parse($schedule->date)->translatedFormat('d F Y') }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        {{-- Penjelasan --}}
+                        <div class="p-3 bg-slate-50 border border-slate-300 rounded text-[10.5px] leading-relaxed">
+                            <strong>Penjelasan:</strong>
+                            <ol class="list-decimal ml-4 mt-1 space-y-0.5 text-slate-600">
+                                <li>Peninjauan dapat dilakukan oleh lead asesor atau asesor yang melaksanakan asesmen.</li>
+                                <li>Peninjauan dapat dilakukan secara terpadu dalam skema sertifikasi dan / atau peserta kelompok yang homogen.</li>
+                                <li>Isilah pemenuhan dimensi kompetensi dengan menuliskan jenis bukti dan instrumen yang digunakan pada saat asesmen sebagai bukti terpenuhinya dimensi kompetensi.</li>
+                            </ol>
+                        </div>
+
+                        {{-- Tabel 1: Kesesuaian dengan Prinsip Asesmen --}}
+                        <div>
+                            <div class="font-bold text-xs text-slate-900 mb-1.5">1. Kesesuaian dengan Prinsip Asesmen:</div>
+                            <table class="w-full border border-slate-400 text-center text-[10.5px]">
+                                <thead class="bg-slate-100 font-bold border-b border-slate-400">
+                                    <tr>
+                                        <th class="border border-slate-400 p-2 text-left w-1/2" rowspan="2">Aspek yang ditinjau</th>
+                                        <th class="border border-slate-400 p-1" colspan="4">Kesesuaian dengan prinsip asesmen</th>
+                                    </tr>
+                                    <tr>
+                                        <th class="border border-slate-400 p-1 w-14">Validitas</th>
+                                        <th class="border border-slate-400 p-1 w-14">Reliabel</th>
+                                        <th class="border border-slate-400 p-1 w-14">Fleksibel</th>
+                                        <th class="border border-slate-400 p-1 w-14">Adil</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="bg-slate-50 font-bold text-left">
+                                        <td class="border border-slate-400 p-1.5" colspan="5">Prosedur asesmen:</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="border border-slate-400 p-1.5 text-left pl-4">&bull; Rencana asesmen</td>
+                                        <td class="border border-slate-400 p-1 font-bold text-emerald-700">✓</td>
+                                        <td class="border border-slate-400 p-1 font-bold text-emerald-700">✓</td>
+                                        <td class="border border-slate-400 p-1 font-bold text-emerald-700">✓</td>
+                                        <td class="border border-slate-400 p-1 font-bold text-emerald-700">✓</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="border border-slate-400 p-1.5 text-left pl-4">&bull; Persiapan asesmen</td>
+                                        <td class="border border-slate-400 p-1 font-bold text-emerald-700">✓</td>
+                                        <td class="border border-slate-400 p-1 font-bold text-emerald-700">✓</td>
+                                        <td class="border border-slate-400 p-1 font-bold text-emerald-700">✓</td>
+                                        <td class="border border-slate-400 p-1 font-bold text-emerald-700">✓</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="border border-slate-400 p-1.5 text-left pl-4">&bull; Implementasi asesmen</td>
+                                        <td class="border border-slate-400 p-1 font-bold text-emerald-700">✓</td>
+                                        <td class="border border-slate-400 p-1 font-bold text-emerald-700">✓</td>
+                                        <td class="border border-slate-400 p-1 font-bold text-emerald-700">✓</td>
+                                        <td class="border border-slate-400 p-1 font-bold text-emerald-700">✓</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="border border-slate-400 p-1.5 text-left pl-4">&bull; Keputusan asesmen</td>
+                                        <td class="border border-slate-400 p-1 font-bold text-emerald-700">✓</td>
+                                        <td class="border border-slate-400 p-1 font-bold text-emerald-700">✓</td>
+                                        <td class="border border-slate-400 p-1 text-slate-300">-</td>
+                                        <td class="border border-slate-400 p-1 font-bold text-emerald-700">✓</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="border border-slate-400 p-1.5 text-left pl-4">&bull; Umpan balik asesmen</td>
+                                        <td class="border border-slate-400 p-1 font-bold text-emerald-700">✓</td>
+                                        <td class="border border-slate-400 p-1 font-bold text-emerald-700">✓</td>
+                                        <td class="border border-slate-400 p-1 text-slate-300">-</td>
+                                        <td class="border border-slate-400 p-1 font-bold text-emerald-700">✓</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="border border-slate-400 p-2 font-bold text-left">Rekomendasi untuk peningkatan</td>
+                                        <td class="border border-slate-400 p-2 text-left" colspan="4">
+                                            Seluruh prosedur asesmen terlaksana secara valid, reliabel, fleksibel dan adil sesuai pedoman BNSP 301.
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {{-- Tabel 2: Pemenuhan Dimensi Kompetensi --}}
+                        <div>
+                            <div class="font-bold text-xs text-slate-900 mb-1.5">2. Pemenuhan Dimensi Kompetensi:</div>
+                            <table class="w-full border border-slate-400 text-center text-[10.5px]">
+                                <thead class="bg-slate-100 font-bold border-b border-slate-400">
+                                    <tr>
+                                        <th class="border border-slate-400 p-2 text-left w-1/3" rowspan="2">Aspek yang ditinjau</th>
+                                        <th class="border border-slate-400 p-1" colspan="5">Pemenuhan dimensi kompetensi</th>
+                                    </tr>
+                                    <tr class="text-[9.5px]">
+                                        <th class="border border-slate-400 p-1">Task Skills</th>
+                                        <th class="border border-slate-400 p-1">Task Management Skills</th>
+                                        <th class="border border-slate-400 p-1">Contingency Management Skills</th>
+                                        <th class="border border-slate-400 p-1">Job Role/ Env Skills</th>
+                                        <th class="border border-slate-400 p-1">Transfer Skills</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="border border-slate-400 p-2 text-left">
+                                            <strong>Konsistensi keputusan asesmen</strong><br>
+                                            <span class="text-[9.5px] text-slate-500">Bukti dari berbagai asesmen diperiksa untuk konsistensi dimensi kompetensi</span>
+                                        </td>
+                                        {{-- Dimensi Langsung --}}
+                                        <template x-if="previewTemplate === 'langsung'">
+                                            <td class="border border-slate-400 p-1.5">
+                                                <strong class="text-emerald-800">L / CL</strong><br>
+                                                <span class="text-[9px] text-slate-600">FR.IA 01, FR IA 02, FR IA 03</span>
+                                            </td>
+                                        </template>
+                                        <template x-if="previewTemplate === 'langsung'">
+                                            <td class="border border-slate-400 p-1.5">
+                                                <strong class="text-emerald-800">L / CL</strong><br>
+                                                <span class="text-[9px] text-slate-600">FR. IA 01, FR IA 02, FR IA 03</span>
+                                            </td>
+                                        </template>
+                                        <template x-if="previewTemplate === 'langsung'">
+                                            <td class="border border-slate-400 p-1.5">
+                                                <strong class="text-emerald-800">L / CL</strong><br>
+                                                <span class="text-[9px] text-slate-600">FR. IA 01, FR IA 02, FR IA 03</span>
+                                            </td>
+                                        </template>
+                                        <template x-if="previewTemplate === 'langsung'">
+                                            <td class="border border-slate-400 p-1.5">
+                                                <strong class="text-emerald-800">L / CL</strong><br>
+                                                <span class="text-[9px] text-slate-600">FR. IA 01, FR IA 02, FR IA 03</span>
+                                            </td>
+                                        </template>
+                                        <template x-if="previewTemplate === 'langsung'">
+                                            <td class="border border-slate-400 p-1.5">
+                                                <strong class="text-emerald-800">L / CL</strong><br>
+                                                <span class="text-[9px] text-slate-600">FR. IA 01, FR IA 02, FR IA 03</span>
+                                            </td>
+                                        </template>
+
+                                        {{-- Dimensi Tidak Langsung --}}
+                                        <template x-if="previewTemplate === 'tidak_langsung'">
+                                            <td class="border border-slate-400 p-1.5">
+                                                <strong class="text-amber-800">TL / CLO</strong><br>
+                                                <span class="text-[9px] text-slate-600">FR.IA 08</span>
+                                            </td>
+                                        </template>
+                                        <template x-if="previewTemplate === 'tidak_langsung'">
+                                            <td class="border border-slate-400 p-1.5">
+                                                <strong class="text-amber-800">TL / CLO</strong><br>
+                                                <span class="text-[9px] text-slate-600">FR.IA 08</span>
+                                            </td>
+                                        </template>
+                                        <template x-if="previewTemplate === 'tidak_langsung'">
+                                            <td class="border border-slate-400 p-1.5">
+                                                <strong class="text-amber-800">T / PW</strong><br>
+                                                <span class="text-[9px] text-slate-600">FR.IA 09</span>
+                                            </td>
+                                        </template>
+                                        <template x-if="previewTemplate === 'tidak_langsung'">
+                                            <td class="border border-slate-400 p-1.5">
+                                                <strong class="text-amber-800">TL / CLO</strong><br>
+                                                <span class="text-[9px] text-slate-600">FR.IA 08</span>
+                                            </td>
+                                        </template>
+                                        <template x-if="previewTemplate === 'tidak_langsung'">
+                                            <td class="border border-slate-400 p-1.5">
+                                                <strong class="text-amber-800">TL / CLO</strong><br>
+                                                <span class="text-[9px] text-slate-600">FR.IA 08</span>
+                                            </td>
+                                        </template>
+                                    </tr>
+                                    <tr>
+                                        <td class="border border-slate-400 p-2 font-bold text-left">Rekomendasi untuk peningkatan:</td>
+                                        <td class="border border-slate-400 p-2 text-left" colspan="5">
+                                            MUK yang digunakan sangat komprehensif. Disarankan pembaruan berkelanjutan pada bank soal dan instrumen asesmen.
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {{-- Tanda Tangan & Komentar --}}
+                        <table class="w-full border border-slate-400 text-[10.5px]">
+                            <thead class="bg-slate-100 font-bold border-b border-slate-400 text-center">
+                                <tr>
+                                    <th class="border border-slate-400 p-2 w-1/3">Nama Lead Asesor / Asesor</th>
+                                    <th class="border border-slate-400 p-2 w-1/4">Tanggal &amp; Tanda Tangan</th>
+                                    <th class="border border-slate-400 p-2">Komentar</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="border border-slate-400 p-3 align-top">
+                                        <div class="font-bold text-slate-900">{{ auth()->user()->full_name ?? auth()->user()->name }}</div>
+                                        <div class="text-[10px] text-slate-500 mt-0.5">No. MET: {{ auth()->user()->profile?->met_number ?? '-' }}</div>
+                                    </td>
+                                    <td class="border border-slate-400 p-3 align-top text-center">
+                                        <div class="text-[10px] text-slate-500 mb-2">{{ \Carbon\Carbon::parse($schedule->date)->translatedFormat('d F Y') }}</div>
+                                        <div class="text-[10px] italic text-slate-400 border-b border-dashed border-slate-300 pb-1">Tanda Tangan Digital</div>
+                                    </td>
+                                    <td class="border border-slate-400 p-3 align-top text-slate-700">
+                                        <span x-text="ak06Catatan || 'Proses asesmen telah memenuhi seluruh standar mutu penjaminan asesmen BNSP.'"></span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                {{-- Modal Footer --}}
+                <div class="px-5 py-3 border-t border-slate-200 bg-slate-50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5">
+                    <span class="text-xs text-slate-600">
+                        Format pratinjau: <strong class="text-brand-700" x-text="previewTemplate === 'langsung' ? 'Langsung (L/CL)' : 'Tidak Langsung (TL/CLO)'"></strong>
+                    </span>
+                    <div class="flex items-center gap-2">
+                        <button type="button" @click="showPreviewModal = false"
+                                class="px-4 py-2 border border-slate-300 text-slate-700 hover:bg-slate-100 rounded-lg text-xs font-semibold transition cursor-pointer">
+                            Tutup
+                        </button>
+                        @if(!$isClosedForMe)
+                            <button type="button" @click="selectAndClosePreview(previewTemplate)"
+                                    class="px-5 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-xs font-bold shadow-sm transition cursor-pointer">
+                                <span x-text="selectedTemplate === previewTemplate ? '✓ Format Ini Sedang Terpilih (Selesai)' : 'Gunakan & Pilih Format Ini'"></span>
+                            </button>
+                        @endif
+                    </div>
                 </div>
             </div>
         </div>
