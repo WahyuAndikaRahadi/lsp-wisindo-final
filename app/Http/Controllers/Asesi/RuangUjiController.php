@@ -607,6 +607,7 @@ class RuangUjiController extends Controller
     public function showAppeal(Assessment $assessment): View
     {
         abort_if($assessment->asesi_id !== auth()->id(), 403);
+        abort_unless($assessment->canAppeal(), 403, 'Akses pengajuan banding tidak tersedia atau tidak diizinkan untuk asesi ini.');
 
         $assessment->load('schedule.scheme.competencyUnits', 'assessor', 'appeals');
         $units = $assessment->schedule->scheme->competencyUnits;
@@ -624,6 +625,7 @@ class RuangUjiController extends Controller
     public function submitAppeal(Assessment $assessment, Request $request): RedirectResponse
     {
         abort_if($assessment->asesi_id !== auth()->id(), 403);
+        abort_unless($assessment->canAppeal(), 403, 'Akses pengajuan banding tidak tersedia atau tidak diizinkan untuk asesi ini.');
 
         if ($assessment->appeals()->exists()) {
             return redirect()->route('asesi.dashboard')

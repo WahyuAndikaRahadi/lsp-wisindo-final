@@ -37,14 +37,25 @@
             @foreach(['A' => $questionBank->option_a, 'B' => $questionBank->option_b, 'C' => $questionBank->option_c, 'D' => $questionBank->option_d] as $key => $opt)
                 @php
                     $isCorrect = ($questionBank->correct_answer === $key);
+                    $optImgUrl = $questionBank->getOptionImageUrl($key);
                 @endphp
-                <div class="p-3 rounded-lg border text-sm flex items-center justify-between {{ $isCorrect ? 'bg-emerald-50 border-emerald-300 text-emerald-950 font-bold' : 'bg-slate-50/70 border-slate-200 text-slate-700' }}">
-                    <div class="flex items-center space-x-3">
-                        <span class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold {{ $isCorrect ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-700' }}">{{ $key }}</span>
-                        <span>{{ $opt }}</span>
+                <div class="p-3.5 rounded-lg border text-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3 {{ $isCorrect ? 'bg-emerald-50 border-emerald-300 text-emerald-950 font-bold' : 'bg-slate-50/70 border-slate-200 text-slate-700' }}">
+                    <div class="flex items-start space-x-3">
+                        <span class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5 {{ $isCorrect ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-700' }}">{{ $key }}</span>
+                        <div class="space-y-2">
+                            @if($opt)
+                                <div>{{ $opt }}</div>
+                            @endif
+                            @if($optImgUrl)
+                                <div>
+                                    <img src="{{ $optImgUrl }}" alt="Gambar Pilihan {{ $key }}" class="max-h-36 rounded border border-slate-300 bg-white object-contain cursor-pointer shadow-2xs" onclick="window.open(this.src, '_blank')">
+                                    <span class="text-[10px] text-slate-400 block mt-0.5">Klik untuk memperbesar gambar</span>
+                                </div>
+                            @endif
+                        </div>
                     </div>
                     @if($isCorrect)
-                        <span class="px-2 py-0.5 text-xs rounded bg-emerald-200 text-emerald-900 font-bold uppercase tracking-wider">Kunci Benar</span>
+                        <span class="self-start sm:self-auto px-2 py-0.5 text-xs rounded bg-emerald-200 text-emerald-900 font-bold uppercase tracking-wider shrink-0">Kunci Benar</span>
                     @endif
                 </div>
             @endforeach

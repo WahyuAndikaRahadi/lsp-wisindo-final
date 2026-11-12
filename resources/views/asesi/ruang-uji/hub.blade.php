@@ -148,12 +148,14 @@
                     <span>FR.AK.03 Umpan Balik</span>
                     <span class="ml-1">&rarr;</span>
                 </a>
-                <a href="{{ route('asesi.assessment.appeal', $assessment) }}" class="px-4 py-2.5 min-h-[40px] inline-flex items-center justify-center bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 text-xs font-bold rounded-xl shadow-sm transition gap-1.5">
-                    <span>FR.AK.04 Banding</span>
-                    @if($assessment->appeals->isNotEmpty())
-                        <span class="px-1.5 py-0.5 bg-amber-100 text-amber-800 text-[10px] rounded font-mono font-semibold">Tercatat</span>
-                    @endif
-                </a>
+                @if($assessment->canAppeal())
+                    <a href="{{ route('asesi.assessment.appeal', $assessment) }}" class="px-4 py-2.5 min-h-[40px] inline-flex items-center justify-center bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 text-xs font-bold rounded-xl shadow-sm transition gap-1.5">
+                        <span>FR.AK.04 Banding</span>
+                        @if($assessment->appeals->isNotEmpty())
+                            <span class="px-1.5 py-0.5 bg-amber-100 text-amber-800 text-[10px] rounded font-mono font-semibold">Tercatat</span>
+                        @endif
+                    </a>
+                @endif
             </div>
         </div>
     @endif

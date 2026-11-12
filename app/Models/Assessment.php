@@ -39,6 +39,7 @@ class Assessment extends Model
         'follow_up_action',
         'ak01_agreed_at',
         'ak01_data',
+        'has_rejection',
         'pleno_decision',
         'pleno_notes',
         'registered_at',
@@ -56,6 +57,7 @@ class Assessment extends Model
             'admin_reviewed_at' => 'datetime',
             'ak01_agreed_at' => 'datetime',
             'ak01_data' => 'array',
+            'has_rejection' => 'boolean',
             'final_result_at' => 'datetime',
             'assessor_signed_at' => 'datetime',
             'asesi_signed_at' => 'datetime',
@@ -228,5 +230,25 @@ class Assessment extends Model
         }
 
         return false;
+    }
+
+    /**
+     * Determine if this candidate is eligible to submit/view an assessment appeal (FR.AK.04).
+     */
+    public function canAppeal(): bool
+    {
+        $hasAppeal = $this->relationLoaded('appeals')
+            ? $this->appeals->isNotEmpty()
+            : $this->appeals()->exists();
+
+        $isEligible = (bool) $this->has_rejection || $hasAppeal;
+
+        if (! $isEligible) {
+            return false;
+        }
+
+        return $this->status === 'COMPLETED'
+            || ! empty($this->final_result)
+            || (bool) ($this->schedule?->is_closed);
     }
 }

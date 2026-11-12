@@ -77,40 +77,43 @@
                 @enderror
             </div>
 
-            <div class="space-y-3 pt-2 border-t border-slate-100">
-                <h3 class="text-sm font-bold text-slate-800">Pilihan Jawaban & Kunci</h3>
-
+            <div class="space-y-4 pt-2 border-t border-slate-100">
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Pilihan A <span class="text-rose-500">*</span></label>
-                    <input type="text" name="option_a" required value="{{ old('option_a', $questionBank->option_a) }}" class="w-full px-4 py-2 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
-                    @error('option_a')
-                        <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
-                    @enderror
+                    <h3 class="text-sm font-bold text-slate-800">Pilihan Jawaban & Kunci</h3>
+                    <p class="text-xs text-slate-500">Perbarui teks pilihan dan/atau unggah gambar untuk setiap pilihan ganda (A, B, C, D).</p>
                 </div>
 
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Pilihan B <span class="text-rose-500">*</span></label>
-                    <input type="text" name="option_b" required value="{{ old('option_b', $questionBank->option_b) }}" class="w-full px-4 py-2 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
-                    @error('option_b')
-                        <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
+                @foreach(['a' => 'A', 'b' => 'B', 'c' => 'C', 'd' => 'D'] as $optKey => $optLabel)
+                    @php
+                        $optImgCol = 'option_' . $optKey . '_image';
+                        $hasOptImg = !empty($questionBank->$optImgCol);
+                    @endphp
+                    <div class="p-3.5 bg-slate-50/70 border border-slate-200 rounded-xl space-y-2">
+                        <label class="block text-xs font-bold text-slate-700">Pilihan {{ $optLabel }} <span class="text-rose-500">* (Teks atau Gambar)</span></label>
+                        <input type="text" name="option_{{ $optKey }}" value="{{ old('option_' . $optKey, $questionBank->{'option_' . $optKey}) }}" placeholder="Teks jawaban pilihan {{ $optLabel }}..." class="w-full px-4 py-2 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none bg-white">
 
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Pilihan C <span class="text-rose-500">*</span></label>
-                    <input type="text" name="option_c" required value="{{ old('option_c', $questionBank->option_c) }}" class="w-full px-4 py-2 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
-                    @error('option_c')
-                        <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
+                        @if($hasOptImg)
+                            <div class="p-2.5 bg-white border border-slate-200 rounded-lg flex items-center justify-between gap-3">
+                                <div class="flex items-center space-x-2.5">
+                                    <img src="{{ $questionBank->getOptionImageUrl($optLabel) }}" alt="Preview Pilihan {{ $optLabel }}" class="h-14 w-auto object-contain rounded border border-slate-200">
+                                    <span class="text-[11px] text-slate-600 font-mono">{{ $questionBank->$optImgCol }}</span>
+                                </div>
+                                <label class="inline-flex items-center space-x-1.5 text-xs font-semibold text-rose-700 cursor-pointer">
+                                    <input type="checkbox" name="remove_option_{{ $optKey }}_image" value="1" class="rounded border-rose-300 text-rose-600 focus:ring-rose-500">
+                                    <span>Hapus Gambar</span>
+                                </label>
+                            </div>
+                        @endif
 
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Pilihan D <span class="text-rose-500">*</span></label>
-                    <input type="text" name="option_d" required value="{{ old('option_d', $questionBank->option_d) }}" class="w-full px-4 py-2 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
-                    @error('option_d')
-                        <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
+                        <div class="flex flex-col sm:flex-row sm:items-center gap-2">
+                            <span class="text-xs font-semibold text-slate-600 shrink-0">{{ $hasOptImg ? 'Ganti Gambar Pilihan ' . $optLabel . ':' : 'Upload Gambar Pilihan ' . $optLabel . ':' }}</span>
+                            <input type="file" name="option_{{ $optKey }}_image" accept="image/*" class="w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100">
+                        </div>
+                        @error('option_' . $optKey)
+                            <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                @endforeach
 
                 <div class="pt-2">
                     <label class="block text-sm font-semibold text-slate-700 mb-1">Kunci Jawaban Benar <span class="text-rose-500">*</span></label>

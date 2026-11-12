@@ -19,9 +19,13 @@ class QuestionBank extends Model
         'question_text',
         'question_image',
         'option_a',
+        'option_a_image',
         'option_b',
+        'option_b_image',
         'option_c',
+        'option_c_image',
         'option_d',
+        'option_d_image',
         'correct_answer',
     ];
 
@@ -32,6 +36,16 @@ class QuestionBank extends Model
         }
 
         return Storage::disk('public')->url($this->question_image);
+    }
+
+    public function getOptionImageUrl(string $key): ?string
+    {
+        $col = 'option_'.strtolower($key).'_image';
+        if (empty($this->$col)) {
+            return null;
+        }
+
+        return Storage::disk('public')->url($this->$col);
     }
 
     public function scheme(): BelongsTo

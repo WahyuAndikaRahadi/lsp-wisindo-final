@@ -113,7 +113,37 @@
                 Pencatatan Penolakan Hasil Asesmen
             </td>
             <td style="vertical-align: top; padding: 6px;">
-                <strong>Ada Penolakan :</strong> {{ $ak05Data['rejection_notes'] ?? 'Tidak ada penolakan dari asesi atas keputusan asesmen.' }}
+                @php
+                    $hasPenolakan = ! empty($ak05Data['has_penolakan']) || ! empty($ak05Data['penolakan_assessment_ids']);
+                    $rejectionNotes = $ak05Data['rejection_notes'] ?? $ak05Data['penolakan_catatan'] ?? null;
+                    $rejectedCandidates = collect();
+                    if (! empty($ak05Data['penolakan_assessment_ids']) && is_array($ak05Data['penolakan_assessment_ids'])) {
+                        $rejectedCandidates = $assessments->whereIn('id', $ak05Data['penolakan_assessment_ids']);
+                    }
+                @endphp
+                @if($hasPenolakan)
+                    <div style="color: #991b1b; font-weight: bold; margin-bottom: 4px;">
+                        &bull; Ada Penolakan / Permohonan Banding dari Asesi
+                    </div>
+                    @if($rejectedCandidates->isNotEmpty())
+                        <div style="margin-bottom: 6px;">
+                            <strong>Daftar Asesi yang Mengajukan Penolakan:</strong>
+                            <ul style="margin: 4px 0 6px 18px; padding: 0;">
+                                @foreach($rejectedCandidates as $ra)
+                                    <li>
+                                        <strong>{{ $ra->asesi->full_name }}</strong> (NIK: {{ $ra->asesi->profile->nik ?? '-' }}) &mdash; Rekomendasi: {{ $ra->final_result ?? 'Belum Dinilai' }}
+                                    </li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+                    <div>
+                        <strong>Keterangan / Catatan Penolakan:</strong><br>
+                        <span>{{ $rejectionNotes ?? 'Asesi menyatakan penolakan atas hasil rekomendasi dan mengajukan banding resmi.' }}</span>
+                    </div>
+                @else
+                    <strong>Ada Penolakan :</strong> Tidak ada penolakan dari asesi atas keputusan asesmen.
+                @endif
             </td>
         </tr>
         <tr>

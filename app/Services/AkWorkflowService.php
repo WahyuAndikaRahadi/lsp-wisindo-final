@@ -382,11 +382,54 @@ class AkWorkflowService
                 'reviewed_at' => now()->toIso8601String(),
             ]);
 
+            // Synchronize candidate rejection (has_rejection flag) for this assessor's pool
+            $assessor = auth()->user();
+            $myAssessments = $schedule->assessorAssessments($assessor);
+            $myAssessmentIds = $myAssessments->pluck('id')->all();
+            $penolakanIds = $ak05Data['penolakan_assessment_ids'] ?? [];
+
+            if (! empty($myAssessmentIds)) {
+                if (! empty($penolakanIds)) {
+                    Assessment::whereIn('id', $myAssessmentIds)
+                        ->whereIn('id', $penolakanIds)
+                        ->update(['has_rejection' => true]);
+
+                    Assessment::whereIn('id', $myAssessmentIds)
+                        ->whereNotIn('id', $penolakanIds)
+                        ->update(['has_rejection' => false]);
+                } else {
+                    Assessment::whereIn('id', $myAssessmentIds)
+                        ->update(['has_rejection' => false]);
+                }
+            }
+
+            // Aggregate all penolakan across assessors for top-level report
+            $allPenolakanIds = [];
+            $allNotes = [];
+            foreach ($reportsByAssessorAk05 as $rep) {
+                if (! empty($rep['penolakan_assessment_ids']) && is_array($rep['penolakan_assessment_ids'])) {
+                    $allPenolakanIds = array_merge($allPenolakanIds, $rep['penolakan_assessment_ids']);
+                }
+                if (! empty($rep['penolakan_catatan'])) {
+                    $allNotes[] = $rep['penolakan_catatan'];
+                } elseif (! empty($rep['rejection_notes']) && $rep['rejection_notes'] !== 'Tidak ada penolakan dari asesi atas keputusan asesmen.') {
+                    $allNotes[] = $rep['rejection_notes'];
+                }
+            }
+            $allPenolakanIds = array_values(array_unique($allPenolakanIds));
+            $hasPenolakanSchedule = ! empty($allPenolakanIds) || ! empty($ak05Data['has_penolakan']);
+            $finalRejectionNotes = $hasPenolakanSchedule
+                ? (! empty($allNotes) ? implode("\n", array_unique($allNotes)) : 'Terdapat penolakan dari asesi atas keputusan asesmen.')
+                : 'Tidak ada penolakan dari asesi atas keputusan asesmen.';
+
             $lockedSchedule->update([
                 'ak05_report' => array_merge($ak05Data, [
                     'assessor_id' => $assessorId,
                     'submitted_at' => now()->toIso8601String(),
                     'by_assessor' => $reportsByAssessorAk05,
+                    'has_penolakan' => $hasPenolakanSchedule,
+                    'penolakan_assessment_ids' => $allPenolakanIds,
+                    'rejection_notes' => $finalRejectionNotes,
                 ]),
                 'ak06_review' => array_merge($ak06Data, [
                     'reviewer_id' => $assessorId,

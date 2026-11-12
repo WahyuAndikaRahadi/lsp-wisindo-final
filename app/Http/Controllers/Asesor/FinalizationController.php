@@ -320,7 +320,7 @@ class FinalizationController extends Controller
                 ->with('warning', 'Rekam seluruh rekomendasi hasil akhir asesmen (FR.AK.02) terlebih dahulu sebelum membuka laporan penutupan jadwal.');
         }
 
-        $schedule->load('scheme', 'assessors', 'assessments.asesi');
+        $schedule->load('scheme', 'assessors', 'assessments.asesi.profile');
         $myAssessments = $schedule->assessorAssessments();
 
         return view('asesor.reports-ak05-ak06', compact('schedule', 'myAssessments'));
@@ -337,6 +337,10 @@ class FinalizationController extends Controller
             'ak05_aspek_positif' => 'required|string|min:10',
             'ak05_aspek_negatif' => 'required|string|min:10',
             'ak05_rekomendasi' => 'required|string|min:10',
+            'ak05_has_penolakan' => 'nullable|in:0,1',
+            'ak05_penolakan_asesi_ids' => 'nullable|array',
+            'ak05_penolakan_asesi_ids.*' => 'integer|exists:t_assessments,id',
+            'ak05_penolakan_catatan' => 'nullable|string|max:1000',
             'ak06_valid' => 'required|in:YA,TIDAK',
             'ak06_valid_notes' => 'required|string|min:5',
             'ak06_reliabel' => 'required|in:YA,TIDAK',
@@ -355,10 +359,30 @@ class FinalizationController extends Controller
             'confirm_draft_review.accepted' => 'Anda wajib mencentang konfirmasi peninjauan draf laporan sebelum menyimpan dan menutup jadwal.',
         ]);
 
+        $hasPenolakan = (string) $request->input('ak05_has_penolakan') === '1';
+        $penolakanAssessmentIds = $hasPenolakan ? array_map('intval', (array) $request->input('ak05_penolakan_asesi_ids', [])) : [];
+        $penolakanCatatan = $hasPenolakan ? $request->input('ak05_penolakan_catatan') : null;
+
+        $rejectionNotes = null;
+        if ($hasPenolakan) {
+            $rejectionNotes = ! empty($penolakanCatatan)
+                ? $penolakanCatatan
+                : 'Terdapat penolakan dari asesi atas keputusan asesmen.';
+        } else {
+            $rejectionNotes = 'Tidak ada penolakan dari asesi atas keputusan asesmen.';
+        }
+
         $ak05 = [
             'aspek_positif' => $validated['ak05_aspek_positif'],
             'aspek_negatif' => $validated['ak05_aspek_negatif'],
             'rekomendasi' => $validated['ak05_rekomendasi'],
+            'has_penolakan' => $hasPenolakan,
+            'penolakan_assessment_ids' => $penolakanAssessmentIds,
+            'penolakan_catatan' => $penolakanCatatan,
+            'rejection_notes' => $rejectionNotes,
+            'negative_aspects' => $validated['ak05_aspek_negatif'],
+            'positive_aspects' => $validated['ak05_aspek_positif'],
+            'improvement_suggestions' => $validated['ak05_rekomendasi'],
         ];
 
         $ak06 = [

@@ -113,9 +113,9 @@
                                     <div class="p-2 border border-slate-200 rounded-lg bg-slate-50 inline-block max-w-full">
                                         <img src="{{ $q->image_url ?? asset('storage/' . $q->question_image) }}"
                                              alt="Gambar Soal No. {{ $index + 1 }}"
-                                             class="max-h-72 rounded object-contain cursor-pointer"
-                                             onclick="window.open(this.src, '_blank')">
-                                        <span class="text-[10px] text-slate-500 block mt-1 text-center">Klik gambar untuk melihat ukuran penuh</span>
+                                             class="max-h-72 rounded object-contain cursor-pointer hover:opacity-95 transition"
+                                             onclick="openCbtImageModal(this.src, 'Gambar Soal No. {{ $index + 1 }}')">
+                                        <span class="text-[10px] text-slate-500 block mt-1 text-center">Klik gambar untuk memperbesar</span>
                                     </div>
                                 @endif
                             </div>
@@ -123,19 +123,36 @@
                             {{-- Options --}}
                             <div class="space-y-2.5 pt-2">
                                 @foreach(['A' => $q->option_a, 'B' => $q->option_b, 'C' => $q->option_c, 'D' => $q->option_d] as $optKey => $optText)
-                                    @if($optText)
+                                    @php
+                                        $optImg = $q->getOptionImageUrl($optKey);
+                                    @endphp
+                                    @if($optText || $optImg)
                                         <label class="cbt-option-label flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 hover:border-brand-500 hover:bg-brand-50/30 cursor-pointer transition {{ $savedVal === $optKey ? 'bg-brand-50/60 border-brand-500 ring-1 ring-brand-500' : 'bg-white' }}">
                                             <input type="radio"
                                                    name="answers[{{ $q->id }}]"
                                                    value="{{ $optKey }}"
                                                    data-index="{{ $index }}"
                                                    data-qid="{{ $qId }}"
-                                                   class="cbt-radio mt-0.5 text-brand-600 focus:ring-brand-500 w-4 h-4 cursor-pointer"
+                                                   class="cbt-radio mt-0.5 text-brand-600 focus:ring-brand-500 w-4 h-4 cursor-pointer shrink-0"
                                                    @checked($savedVal === $optKey)
                                                    @disabled($isSubmitted)>
-                                            <div class="flex-1 text-xs sm:text-sm text-slate-800">
-                                                <span class="font-bold text-slate-900 mr-1.5">{{ $optKey }}.</span>
-                                                <span>{{ $optText }}</span>
+                                            <div class="flex-1 min-w-0 text-xs sm:text-sm text-slate-800 space-y-2">
+                                                <div class="flex items-start gap-1.5">
+                                                    <span class="font-bold text-slate-900">{{ $optKey }}.</span>
+                                                    @if($optText)
+                                                        <span class="break-words">{{ $optText }}</span>
+                                                    @endif
+                                                </div>
+                                                @if($optImg)
+                                                    <div class="mt-1.5 inline-block max-w-full">
+                                                        <img src="{{ $optImg }}"
+                                                             alt="Pilihan {{ $optKey }}"
+                                                             class="max-h-40 sm:max-h-52 max-w-full rounded-lg border border-slate-200 bg-white object-contain shadow-2xs cursor-pointer hover:ring-2 hover:ring-brand-400 transition"
+                                                             onclick="event.stopPropagation(); openCbtImageModal('{{ $optImg }}', 'Gambar Pilihan {{ $optKey }} (Soal No. {{ $index + 1 }})')"
+                                                             loading="lazy">
+                                                        <span class="text-[10px] text-slate-400 block mt-0.5">Ketuk gambar untuk memperbesar</span>
+                                                    </div>
+                                                @endif
                                             </div>
                                         </label>
                                     @endif
@@ -275,11 +292,54 @@
             </div>
         </form>
     @endif
+
+    {{-- Lightbox Image Preview Modal --}}
+    <div id="cbtImageModal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 transition-all" onclick="closeCbtImageModal()">
+        <div class="relative max-w-4xl max-h-[92vh] w-full bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col" onclick="event.stopPropagation()">
+            <div class="flex items-center justify-between px-4 py-3 border-b border-slate-100 bg-slate-50/90">
+                <div class="flex items-center gap-2 min-w-0">
+                    <span class="w-2 h-2 rounded-full bg-brand-500 shrink-0"></span>
+                    <h4 id="cbtImageModalTitle" class="text-xs sm:text-sm font-bold text-slate-800 truncate">Pratinjau Gambar</h4>
+                </div>
+                <button type="button" onclick="closeCbtImageModal()" class="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 transition cursor-pointer">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div class="p-3 sm:p-5 flex items-center justify-center overflow-auto bg-slate-900/5 min-h-[220px]">
+                <img id="cbtImageModalImg" src="" alt="Pratinjau Gambar" class="max-h-[72vh] w-auto max-w-full rounded-lg object-contain shadow-xs">
+            </div>
+            <div class="px-4 py-2.5 border-t border-slate-100 bg-slate-50 flex items-center justify-between text-xs">
+                <span class="text-[11px] text-slate-500">Ketuk di luar gambar atau tekan tombol silang untuk menutup.</span>
+                <a id="cbtImageModalOpenTab" href="#" target="_blank" class="font-semibold text-brand-600 hover:text-brand-800 hover:underline">Buka Ukuran Asli &rarr;</a>
+            </div>
+        </div>
+    </div>
 </div>
 
 {{-- jQuery for Auto-save, Palette Navigation, and State Validation --}}
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script>
+    function openCbtImageModal(src, title) {
+        if (!src) return;
+        $('#cbtImageModalImg').attr('src', src);
+        $('#cbtImageModalTitle').text(title || 'Pratinjau Gambar');
+        $('#cbtImageModalOpenTab').attr('href', src);
+        $('#cbtImageModal').removeClass('hidden').addClass('flex');
+        $('body').addClass('overflow-hidden');
+    }
+
+    function closeCbtImageModal() {
+        $('#cbtImageModal').addClass('hidden').removeClass('flex');
+        $('#cbtImageModalImg').attr('src', '');
+        $('body').removeClass('overflow-hidden');
+    }
+
+    $(document).keydown(function(e) {
+        if (e.key === "Escape" && !$('#cbtImageModal').hasClass('hidden')) {
+            closeCbtImageModal();
+        }
+    });
+
     const totalQuestions = {{ $questions->count() }};
     const isSubmitted = {{ $isSubmitted ? 'true' : 'false' }};
     let currentIndex = 0;

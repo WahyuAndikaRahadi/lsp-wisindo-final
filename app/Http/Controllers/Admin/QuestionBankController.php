@@ -67,15 +67,34 @@ class QuestionBankController extends Controller
             'competency_unit_id' => 'nullable|exists:m_competency_units,id',
             'question_text' => 'required|string',
             'question_image' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:2048',
-            'option_a' => 'required|string',
-            'option_b' => 'required|string',
-            'option_c' => 'required|string',
-            'option_d' => 'required|string',
+            'option_a' => 'nullable|string',
+            'option_a_image' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:2048',
+            'option_b' => 'nullable|string',
+            'option_b_image' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:2048',
+            'option_c' => 'nullable|string',
+            'option_c_image' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:2048',
+            'option_d' => 'nullable|string',
+            'option_d_image' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:2048',
             'correct_answer' => 'required|in:A,B,C,D',
         ]);
 
+        foreach (['a', 'b', 'c', 'd'] as $opt) {
+            $hasText = $request->filled("option_{$opt}");
+            $hasImage = $request->hasFile("option_{$opt}_image");
+            if (! $hasText && ! $hasImage) {
+                return back()->withInput()->withErrors(["option_{$opt}" => 'Pilihan '.strtoupper($opt).' wajib memiliki teks atau gambar.']);
+            }
+        }
+
         if ($request->hasFile('question_image')) {
             $validated['question_image'] = $request->file('question_image')->store('question-images', 'public');
+        }
+
+        foreach (['a', 'b', 'c', 'd'] as $opt) {
+            $fileKey = "option_{$opt}_image";
+            if ($request->hasFile($fileKey)) {
+                $validated[$fileKey] = $request->file($fileKey)->store('question-images/options', 'public');
+            }
         }
 
         QuestionBank::create($validated);
@@ -98,12 +117,25 @@ class QuestionBankController extends Controller
             'competency_unit_id' => 'nullable|exists:m_competency_units,id',
             'question_text' => 'required|string',
             'question_image' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:2048',
-            'option_a' => 'required|string',
-            'option_b' => 'required|string',
-            'option_c' => 'required|string',
-            'option_d' => 'required|string',
+            'option_a' => 'nullable|string',
+            'option_a_image' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:2048',
+            'option_b' => 'nullable|string',
+            'option_b_image' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:2048',
+            'option_c' => 'nullable|string',
+            'option_c_image' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:2048',
+            'option_d' => 'nullable|string',
+            'option_d_image' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:2048',
             'correct_answer' => 'required|in:A,B,C,D',
         ]);
+
+        foreach (['a', 'b', 'c', 'd'] as $opt) {
+            $hasText = $request->filled("option_{$opt}");
+            $hasNewImage = $request->hasFile("option_{$opt}_image");
+            $hasExistingImage = ! empty($questionBank->{"option_{$opt}_image"}) && ! $request->boolean("remove_option_{$opt}_image");
+            if (! $hasText && ! $hasNewImage && ! $hasExistingImage) {
+                return back()->withInput()->withErrors(["option_{$opt}" => 'Pilihan '.strtoupper($opt).' wajib memiliki teks atau gambar.']);
+            }
+        }
 
         if ($request->hasFile('question_image')) {
             if ($questionBank->question_image && Storage::disk('public')->exists($questionBank->question_image)) {
@@ -117,6 +149,22 @@ class QuestionBankController extends Controller
             $validated['question_image'] = null;
         }
 
+        foreach (['a', 'b', 'c', 'd'] as $opt) {
+            $fileKey = "option_{$opt}_image";
+            $removeKey = "remove_option_{$opt}_image";
+            if ($request->hasFile($fileKey)) {
+                if ($questionBank->$fileKey && Storage::disk('public')->exists($questionBank->$fileKey)) {
+                    Storage::disk('public')->delete($questionBank->$fileKey);
+                }
+                $validated[$fileKey] = $request->file($fileKey)->store('question-images/options', 'public');
+            } elseif ($request->boolean($removeKey)) {
+                if ($questionBank->$fileKey && Storage::disk('public')->exists($questionBank->$fileKey)) {
+                    Storage::disk('public')->delete($questionBank->$fileKey);
+                }
+                $validated[$fileKey] = null;
+            }
+        }
+
         $questionBank->update($validated);
 
         return redirect()->route('admin.question-banks.show', $questionBank->id)
@@ -127,6 +175,13 @@ class QuestionBankController extends Controller
     {
         if ($questionBank->question_image && Storage::disk('public')->exists($questionBank->question_image)) {
             Storage::disk('public')->delete($questionBank->question_image);
+        }
+
+        foreach (['a', 'b', 'c', 'd'] as $opt) {
+            $fileKey = "option_{$opt}_image";
+            if ($questionBank->$fileKey && Storage::disk('public')->exists($questionBank->$fileKey)) {
+                Storage::disk('public')->delete($questionBank->$fileKey);
+            }
         }
 
         $questionBank->delete();

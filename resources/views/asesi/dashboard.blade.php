@@ -231,9 +231,11 @@
                                 <a href="{{ route('asesi.assessment.ak03', $item->id) }}" class="flex-1 sm:flex-initial text-center px-3 py-2 min-h-[38px] inline-flex items-center justify-center text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 rounded-lg shadow-xs transition" title="FR.AK.03 Umpan Balik Asesmen">
                                     Umpan Balik
                                 </a>
-                                <a href="{{ route('asesi.assessment.appeal', $item->id) }}" class="flex-1 sm:flex-initial text-center px-3 py-2 min-h-[38px] inline-flex items-center justify-center text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 border border-slate-300 rounded-lg shadow-xs transition" title="FR.AK.04 Banding Asesmen">
-                                    Banding
-                                </a>
+                                @if($item->canAppeal())
+                                    <a href="{{ route('asesi.assessment.appeal', $item->id) }}" class="flex-1 sm:flex-initial text-center px-3 py-2 min-h-[38px] inline-flex items-center justify-center text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 border border-slate-300 rounded-lg shadow-xs transition" title="FR.AK.04 Banding Asesmen">
+                                        Banding
+                                    </a>
+                                @endif
                             @elseif($item->apl_status === 'REVISION_REQUESTED')
                                 <a href="{{ route('asesi.assessment.apl', $item->id) }}" class="w-full sm:w-auto text-center justify-center px-5 py-2.5 min-h-[40px] text-xs font-bold bg-amber-500 hover:bg-amber-600 text-white rounded-lg shadow-sm transition inline-flex items-center">
                                     Perbaiki APL &rarr;
