@@ -91,7 +91,7 @@
                         <tr>
                             <th class="px-6 py-3 w-16 text-center">No</th>
                             <th class="px-6 py-3">Daftar Pertanyaan &amp; Kunci Jawaban</th>
-                            <th class="px-6 py-3 text-center w-40">Hasil (Memuaskan / Tidak)</th>
+                            <th class="px-6 py-3 text-center w-40">Hasil (Memadai / Tidak)</th>
                             <th class="px-6 py-3 w-64">Tanggapan / Catatan Asesi</th>
                         </tr>
                     </thead>
@@ -122,7 +122,7 @@
                                             <span class="ml-1.5 text-xs font-bold text-rose-700">TM</span>
                                         </label>
                                     </div>
-                                    <div class="text-[10px] text-slate-400 mt-0.5">M: Memuaskan | TM: Tidak</div>
+                                    <div class="text-[10px] text-slate-400 mt-0.5">M: Memadai | TM: Tidak</div>
                                 </td>
                                 <td class="px-6 py-3">
                                     <textarea name="questions[{{ $q->id }}][response]" rows="2" :disabled="!isEditing" placeholder="Catatan tanggapan asesi..." class="w-full px-2.5 py-1 text-xs rounded border border-slate-300 focus:ring-1 focus:ring-brand-500 focus:outline-none">{{ $qResponse }}</textarea>
