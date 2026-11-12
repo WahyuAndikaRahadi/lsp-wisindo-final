@@ -119,17 +119,40 @@
                     @endforeach
                 </select>
 
+                @if(!empty($units) && $units->isNotEmpty())
+                    <select name="unit_id" onchange="this.form.submit()" class="text-xs px-3 py-1.5 rounded-lg border border-slate-300 bg-white text-slate-700 focus:ring-brand-500 max-w-xs">
+                        <option value="">-- Semua Unit Kompetensi --</option>
+                        @foreach($units as $u)
+                            <option value="{{ $u->id }}" {{ ($selectedUnitId ?? null) == $u->id ? 'selected' : '' }}>
+                                {{ $u->code }} - {{ Str::limit($u->title, 35) }}
+                            </option>
+                        @endforeach
+                    </select>
+                @endif
+
+                <select name="sort" onchange="this.form.submit()" class="text-xs px-3 py-1.5 rounded-lg border border-slate-300 bg-white text-slate-700 focus:ring-brand-500">
+                    <option value="asc" {{ ($sort ?? 'asc') === 'asc' ? 'selected' : '' }}>Urutan Dokumen MUK (1 &rarr; Terakhir)</option>
+                    <option value="desc" {{ ($sort ?? 'asc') === 'desc' ? 'selected' : '' }}>Terbaru (ID Terbesar)</option>
+                </select>
+
+                <select name="per_page" onchange="this.form.submit()" class="text-xs px-2.5 py-1.5 rounded-lg border border-slate-300 bg-white text-slate-700 focus:ring-brand-500" title="Jumlah butir per halaman">
+                    <option value="15" {{ ($perPage ?? 15) == 15 ? 'selected' : '' }}>15 / Hal</option>
+                    <option value="25" {{ ($perPage ?? 15) == 25 ? 'selected' : '' }}>25 / Hal</option>
+                    <option value="50" {{ ($perPage ?? 15) == 50 ? 'selected' : '' }}>50 / Hal (Semua)</option>
+                    <option value="100" {{ ($perPage ?? 15) == 100 ? 'selected' : '' }}>100 / Hal</option>
+                </select>
+
                 <div class="relative">
                     <input type="text" name="search" value="{{ $search }}" placeholder="Cari teks soal..."
-                        class="text-xs px-3 py-1.5 pl-8 rounded-lg border border-slate-300 bg-white text-slate-700 focus:ring-brand-500 w-44 sm:w-56">
+                        class="text-xs px-3 py-1.5 pl-8 rounded-lg border border-slate-300 bg-white text-slate-700 focus:ring-brand-500 w-36 sm:w-48">
                     <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                 </div>
 
-                <button type="submit" class="px-3 py-1.5 text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 rounded-lg">
+                <button type="submit" class="px-3 py-1.5 text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 rounded-lg cursor-pointer">
                     Cari
                 </button>
 
-                @if($selectedSchemeId || $search)
+                @if($selectedSchemeId || $selectedUnitId || $search || ($sort ?? 'asc') !== 'asc' || ($perPage ?? 15) != ($selectedSchemeId ? 50 : 15))
                     <a href="{{ route('admin.question-banks.index') }}#daftar-butir" class="px-2.5 py-1.5 text-xs text-slate-600 hover:text-slate-900 bg-slate-100 rounded-lg">
                         Reset Filter
                     </a>
@@ -153,23 +176,31 @@
                     <tbody class="divide-y divide-slate-100">
                         @forelse($questions as $index => $q)
                             <tr class="hover:bg-slate-50/70 transition">
-                                <td class="px-4 py-3 text-center text-slate-400 font-mono">
-                                    {{ $questions->firstItem() + $index }}
+                                <td class="px-4 py-3 text-center font-mono">
+                                    <div class="font-bold text-slate-800 text-xs">
+                                        {{ $questions->firstItem() + $index }}
+                                    </div>
+                                    <span class="text-[10px] text-slate-400 block font-normal">#{{ $q->id }}</span>
                                 </td>
                                 <td class="px-4 py-3">
                                     <div class="space-y-1.5">
                                         <p class="font-semibold text-slate-900 leading-relaxed">{{ $q->question_text }}</p>
-                                        @if($q->question_image)
-                                            <div class="flex items-center space-x-2">
+                                        <div class="flex items-center gap-2 flex-wrap">
+                                            @if($q->question_image)
                                                 <span class="inline-flex items-center gap-1 text-[10px] font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded border border-purple-200">
                                                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                                                    Terdapat Gambar
+                                                    Gambar Soal
                                                 </span>
                                                 <a href="{{ $q->image_url ?? asset('storage/' . $q->question_image) }}" target="_blank" class="text-[11px] text-brand-600 hover:underline">
                                                     Lihat Gambar &rarr;
                                                 </a>
-                                            </div>
-                                        @endif
+                                            @endif
+                                            @if($q->option_a_image || $q->option_b_image || $q->option_c_image || $q->option_d_image)
+                                                <span class="inline-flex items-center gap-1 text-[10px] font-bold text-teal-700 bg-teal-50 px-2 py-0.5 rounded border border-teal-200">
+                                                    Opsi Bergambar
+                                                </span>
+                                            @endif
+                                        </div>
                                         <div class="grid grid-cols-2 gap-1 text-[11px] text-slate-600 pt-1">
                                             <span class="{{ $q->correct_answer === 'A' ? 'font-bold text-emerald-700' : '' }}">A: {{ Str::limit($q->option_a, 40) }}</span>
                                             <span class="{{ $q->correct_answer === 'B' ? 'font-bold text-emerald-700' : '' }}">B: {{ Str::limit($q->option_b, 40) }}</span>
@@ -180,9 +211,14 @@
                                 </td>
                                 <td class="px-4 py-3 text-slate-600">
                                     <div class="font-bold text-slate-800">{{ $q->scheme->name ?? '-' }}</div>
-                                    <div class="text-[11px] font-mono text-slate-500 mt-0.5">
+                                    <div class="text-[11px] font-mono text-brand-700 mt-0.5">
                                         {{ $q->competencyUnit?->code ?? 'Umum / Seluruh Unit' }}
                                     </div>
+                                    @if($q->competencyUnit?->title)
+                                        <div class="text-[10px] text-slate-500 leading-tight mt-0.5 max-w-xs">
+                                            {{ Str::limit($q->competencyUnit->title, 45) }}
+                                        </div>
+                                    @endif
                                 </td>
                                 <td class="px-3 py-3 text-center">
                                     <span class="w-7 h-7 rounded-full inline-flex items-center justify-center font-bold text-xs bg-emerald-100 text-emerald-800 border border-emerald-300 shadow-xs">

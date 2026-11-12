@@ -295,4 +295,43 @@ class OptionImagesAndAssessmentRejectionTest extends TestCase
         $response->assertSee($this->asesi2->full_name);
         $response->assertSee('Asesi Dua keberatan atas hasil uji dan mengajukan banding.');
     }
+
+    public function test_question_bank_list_is_ordered_ascending_by_default_when_scheme_selected(): void
+    {
+        // Create 3 questions with specific ordering
+        QuestionBank::create([
+            'scheme_id' => $this->scheme->id,
+            'competency_unit_id' => $this->unit->id,
+            'question_text' => 'Butir Soal Pertama 001',
+            'option_a' => 'A',
+            'option_b' => 'B',
+            'option_c' => 'C',
+            'option_d' => 'D',
+            'correct_answer' => 'A',
+        ]);
+
+        QuestionBank::create([
+            'scheme_id' => $this->scheme->id,
+            'competency_unit_id' => $this->unit->id,
+            'question_text' => 'Butir Soal Kedua 002',
+            'option_a' => 'A',
+            'option_b' => 'B',
+            'option_c' => 'C',
+            'option_d' => 'D',
+            'correct_answer' => 'B',
+        ]);
+
+        $response = $this->actingAs($this->admin)->get(route('admin.question-banks.index', [
+            'scheme_id' => $this->scheme->id,
+        ]));
+
+        $response->assertOk();
+        // Assert first question appears before second question in HTML output (Ascending order)
+        $content = $response->getContent();
+        $pos1 = strpos($content, 'Butir Soal Pertama 001');
+        $pos2 = strpos($content, 'Butir Soal Kedua 002');
+        $this->assertNotFalse($pos1);
+        $this->assertNotFalse($pos2);
+        $this->assertTrue($pos1 < $pos2, 'Questions should be ordered ascending matching document sequence.');
+    }
 }

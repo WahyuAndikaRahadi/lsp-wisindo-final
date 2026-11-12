@@ -15,11 +15,20 @@ class QuestionBankController extends Controller
     public function index(Request $request): View
     {
         $selectedSchemeId = $request->query('scheme_id');
+        $selectedUnitId = $request->query('unit_id');
         $search = $request->query('search');
+        $sort = $request->query('sort', 'asc');
+        $perPage = (int) $request->query('per_page', $selectedSchemeId ? 50 : 15);
+        if (! in_array($perPage, [15, 25, 50, 100], true)) {
+            $perPage = $selectedSchemeId ? 50 : 15;
+        }
 
         $schemes = Scheme::active()
             ->withCount('questionBanks')
             ->get();
+
+        $selectedScheme = $selectedSchemeId ? Scheme::with('competencyUnits')->find($selectedSchemeId) : null;
+        $units = $selectedScheme ? $selectedScheme->competencyUnits : collect();
 
         $questionBanks = $schemes->map(function ($scheme) {
             return (object) [
@@ -33,17 +42,37 @@ class QuestionBankController extends Controller
             ];
         });
 
-        $questionsQuery = QuestionBank::with('scheme', 'competencyUnit')->latest();
+        $questionsQuery = QuestionBank::with('scheme', 'competencyUnit');
         if ($selectedSchemeId) {
             $questionsQuery->where('scheme_id', $selectedSchemeId);
+        }
+        if ($selectedUnitId) {
+            $questionsQuery->where('competency_unit_id', $selectedUnitId);
         }
         if ($search) {
             $questionsQuery->where('question_text', 'like', "%{$search}%");
         }
 
-        $questions = $questionsQuery->paginate(15)->withQueryString();
+        if ($sort === 'desc') {
+            $questionsQuery->orderBy('id', 'desc');
+        } else {
+            $questionsQuery->orderBy('id', 'asc');
+        }
 
-        return view('admin.question-banks.index', compact('questionBanks', 'questions', 'schemes', 'selectedSchemeId', 'search'));
+        $questions = $questionsQuery->paginate($perPage)->withQueryString();
+
+        return view('admin.question-banks.index', compact(
+            'questionBanks',
+            'questions',
+            'schemes',
+            'selectedSchemeId',
+            'selectedScheme',
+            'selectedUnitId',
+            'units',
+            'search',
+            'sort',
+            'perPage'
+        ));
     }
 
     public function show(QuestionBank $questionBank): View
