@@ -111,6 +111,40 @@ class DokumenMukController extends Controller
             return $this->exporter->exportScheduleAsesorXls($schedule);
         }
 
+        if ($targetType === 'ak06') {
+            $ak06Data = is_array($schedule->ak06_review) ? $schedule->ak06_review : [];
+            $templateType = $ak06Data['template_type'] ?? 'langsung';
+            if (! empty($ak06Data['by_assessor']) && is_array($ak06Data['by_assessor'])) {
+                $first = reset($ak06Data['by_assessor']);
+                $templateType = $first['template_type'] ?? $templateType;
+            }
+
+            $baseName = ($templateType === 'tidak_langsung')
+                ? '24 FR.AK.06 Meninjau Proses Asesmen (Tidak Langsung)'
+                : '24 FR.AK.06 Meninjau Proses Asesmen (Langsung)';
+
+            $isDocx = $request->query('format') === 'docx' || $request->query('source') === 'docx';
+            $ext = $isDocx ? 'docx' : 'pdf';
+            $mime = $isDocx
+                ? 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+                : 'application/pdf';
+
+            $filePath = public_path("AK06/{$baseName}.{$ext}");
+            if (! file_exists($filePath)) {
+                $ext = 'docx';
+                $mime = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+                $filePath = public_path("AK06/{$baseName}.docx");
+            }
+
+            $download = $request->boolean('download', false);
+            $disposition = $download ? 'attachment' : 'inline';
+
+            return response()->file($filePath, [
+                'Content-Type' => $mime,
+                'Content-Disposition' => "{$disposition}; filename=\"{$baseName}.{$ext}\"",
+            ]);
+        }
+
         if ($request->query('source') === 'dynamic' || ($request->query('format') === 'pdf' && in_array($targetType, ['ba', 'hadir-asesor', 'hadir-asesi'], true))) {
             return $this->dynamicService->exportSchedule($schedule, $targetType, $request->boolean('download'));
         }

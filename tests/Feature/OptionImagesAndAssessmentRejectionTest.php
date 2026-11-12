@@ -370,9 +370,8 @@ class OptionImagesAndAssessmentRejectionTest extends TestCase
         ]));
 
         $exportRes->assertOk();
-        $exportRes->assertSee('FR.AK.06. MENINJAU PROSES ASESMEN (LANGSUNG)');
-        $exportRes->assertSee('L / CL');
-        $exportRes->assertSee('FR.IA 01, FR IA 02, FR IA 03');
+        $exportRes->assertHeader('content-type', 'application/pdf');
+        $this->assertStringContainsString('Langsung', (string) $exportRes->headers->get('content-disposition'));
     }
 
     public function test_submitting_reports_with_tidak_langsung_template_updates_muk_export_view(): void
@@ -397,10 +396,7 @@ class OptionImagesAndAssessmentRejectionTest extends TestCase
         ]));
 
         $exportRes->assertOk();
-        $exportRes->assertSee('FR.AK.06. MENINJAU PROSES ASESMEN (TIDAK LANGSUNG)');
-        $exportRes->assertSee('TL / CLO');
-        $exportRes->assertSee('FR.IA 08');
-        $exportRes->assertSee('T / PW');
-        $exportRes->assertSee('FR.IA 09');
+        $exportRes->assertHeader('content-type', 'application/pdf');
+        $this->assertStringContainsString('Tidak Langsung', (string) $exportRes->headers->get('content-disposition'));
     }
 }

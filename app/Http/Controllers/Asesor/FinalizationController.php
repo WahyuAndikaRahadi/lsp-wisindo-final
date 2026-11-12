@@ -334,9 +334,9 @@ class FinalizationController extends Controller
         $this->authorizeAssessorSchedule($schedule);
 
         $validated = $request->validate([
-            'ak05_aspek_positif' => 'required|string|min:10',
-            'ak05_aspek_negatif' => 'required|string|min:10',
-            'ak05_rekomendasi' => 'required|string|min:10',
+            'ak05_aspek_positif' => 'required|string|min:3',
+            'ak05_aspek_negatif' => 'required|string|min:3',
+            'ak05_rekomendasi' => 'required|string|min:3',
             'ak05_has_penolakan' => 'nullable|in:0,1',
             'ak05_penolakan_asesi_ids' => 'nullable|array',
             'ak05_penolakan_asesi_ids.*' => 'integer|exists:t_assessments,id',
@@ -404,17 +404,8 @@ class FinalizationController extends Controller
         $ak06 = [
             'template_type' => $templateType,
             'template_name' => $templateName,
-            'valid' => $request->input('ak06_valid', 'YA'),
-            'valid_notes' => $request->input('ak06_valid_notes', 'Seluruh bukti dikumpulkan mengacu langsung pada KUK SKKNI.'),
-            'reliabel' => $request->input('ak06_reliabel', 'YA'),
-            'reliabel_notes' => $request->input('ak06_reliabel_notes', 'Rubrik penilaian dan instrumen diterapkan secara seragam dan konsisten.'),
-            'fleksibel' => $request->input('ak06_fleksibel', 'YA'),
-            'fleksibel_notes' => $request->input('ak06_fleksibel_notes', 'Metode dan instrumen asesmen telah disesuaikan dengan kondisi TUK dan asesi.'),
-            'adil' => $request->input('ak06_adil', 'YA'),
-            'adil_notes' => $request->input('ak06_adil_notes', 'Semua asesi mendapat kesempatan dan perlakuan yang setara tanpa diskriminasi.'),
+            'source' => 'static',
             'catatan_peninjau' => $catatanPeninjau,
-            'procedure_recommendation' => 'Seluruh prosedur asesmen terlaksana secara valid, reliabel, fleksibel dan adil sesuai pedoman BNSP 301.',
-            'improvement_recommendations' => 'MUK yang digunakan sangat komprehensif. Disarankan pembaruan berkelanjutan pada bank soal dan instrumen asesmen.',
         ];
 
         if ($schedule->isClosedForAssessor()) {

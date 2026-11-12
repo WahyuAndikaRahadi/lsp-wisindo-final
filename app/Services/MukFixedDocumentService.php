@@ -32,6 +32,8 @@ class MukFixedDocumentService
         'berita-acara',
         'hadir-asesor',
         'daftar-hadir-asesor',
+        'ak06',
+        'fr-ak-06',
     ];
 
     /**
@@ -124,6 +126,13 @@ class MukFixedDocumentService
             $rootHadir = $base.'/2.4 DAFTAR HADIR ASESOR.docx.pdf';
             if (file_exists($rootHadir)) {
                 return $rootHadir;
+            }
+        }
+
+        if (in_array($type, ['ak06', 'fr-ak-06', 'ak-06'], true)) {
+            $ak06Langsung = public_path('AK06/24 FR.AK.06 Meninjau Proses Asesmen (Langsung).pdf');
+            if (file_exists($ak06Langsung)) {
+                return $ak06Langsung;
             }
         }
 

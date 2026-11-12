@@ -313,11 +313,7 @@ class DokumenMukPrintViewsTest extends TestCase
             'type' => 'ak06',
         ]));
         $response->assertOk();
-        $response->assertSee('FR.AK.06. MENINJAU PROSES ASESMEN');
-        $response->assertSee('Kesesuaian dengan prinsip asesmen');
-        $response->assertSee('Validitas');
-        $response->assertSee('Reliabel');
-        $response->assertSee('Pemenuhan dimensi kompetensi');
+        $response->assertHeader('content-type', 'application/pdf');
     }
 
     public function test_can_render_cover_daftar_periksa_and_surat_pernyataan(): void
