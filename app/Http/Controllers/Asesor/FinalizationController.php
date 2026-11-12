@@ -104,12 +104,9 @@ class FinalizationController extends Controller
         $user = auth()->user();
         $isSingleAssessor = $schedule->assessors->count() === 1 && $schedule->assessors->first()?->id === $user->id;
 
-        $myAssessments = $schedule->assessments()
+        $myAssessments = $schedule->assessorAssessmentsQuery()
             ->with(['asesi'])
             ->get()
-            ->filter(function ($a) use ($user, $isSingleAssessor) {
-                return (int) $a->assessor_id === (int) $user->id || (empty($a->assessor_id) && $isSingleAssessor);
-            })
             ->keyBy('id');
 
         $units = $schedule->scheme->competencyUnits;

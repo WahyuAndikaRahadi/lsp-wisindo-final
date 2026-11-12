@@ -24,6 +24,11 @@ class RuangUjiController extends Controller
     {
         abort_if($assessment->asesi_id !== auth()->id(), 403);
 
+        if ($assessment->apl_status === 'REJECTED' || $assessment->admin_status === 'REJECTED') {
+            return redirect()->route('asesi.assessment.apl', $assessment)
+                ->with('error', 'Permohonan APL Anda pada jadwal asesmen ini telah ditolak. Anda tidak dapat mengikuti jadwal ini.');
+        }
+
         if ($assessment->apl_status !== 'APPROVED') {
             return redirect()->route('asesi.assessment.apl', $assessment)
                 ->with('error', 'FR.AK.01 hanya dapat diakses setelah permohonan APL Anda disetujui asesor.');
@@ -86,6 +91,11 @@ class RuangUjiController extends Controller
     public function hub(Assessment $assessment): View|RedirectResponse
     {
         abort_if($assessment->asesi_id !== auth()->id(), 403);
+
+        if ($assessment->apl_status === 'REJECTED' || $assessment->admin_status === 'REJECTED') {
+            return redirect()->route('asesi.assessment.apl', $assessment)
+                ->with('error', 'Permohonan APL Anda pada jadwal asesmen ini telah ditolak. Anda tidak dapat mengikuti jadwal ini.');
+        }
 
         if ($assessment->apl_status !== 'APPROVED') {
             return redirect()->route('asesi.assessment.apl', $assessment)

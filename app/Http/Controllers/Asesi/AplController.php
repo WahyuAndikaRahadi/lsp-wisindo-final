@@ -38,6 +38,10 @@ class AplController extends Controller
             return back()->with('error', 'Jadwal asesmen sudah resmi ditutup.');
         }
 
+        if ($assessment->apl_status === 'REJECTED' || $assessment->admin_status === 'REJECTED') {
+            return back()->with('error', 'Permohonan APL Anda pada jadwal asesmen ini telah ditolak. Anda tidak dapat mengikuti jadwal ini.');
+        }
+
         if ($assessment->apl_status === 'SUBMITTED') {
             return back()->with('info', 'Permohonan APL Anda sudah diajukan dan sedang menunggu verifikasi asesor.');
         }

@@ -72,6 +72,10 @@ class JadwalController extends Controller
         });
 
         if (! $assessment->wasRecentlyCreated) {
+            if ($assessment->apl_status === 'REJECTED' || $assessment->admin_status === 'REJECTED') {
+                return back()->with('error', 'Permohonan APL Anda untuk jadwal asesmen ini telah ditolak. Anda tidak dapat mengikuti jadwal ini.');
+            }
+
             if ($assessment->last_active_step === 'ruang-uji' && $assessment->apl_status === 'APPROVED') {
                 return redirect()->route('asesi.assessment.ruang-uji', $assessment)
                     ->with('info', 'Anda sudah terdaftar pada jadwal ini dan telah disetujui untuk Ruang Uji.');

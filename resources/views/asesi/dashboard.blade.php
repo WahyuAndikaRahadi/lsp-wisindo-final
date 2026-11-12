@@ -135,7 +135,12 @@
                         $hasFinalDecision = ($item->status === 'COMPLETED') || in_array($item->final_result, ['KOMPETEN', 'BELUM_KOMPETEN', 'K', 'BK'], true);
 
                         // 5-Stage progress determination
-                        if ($hasFinalDecision) {
+                        if ($item->apl_status === 'REJECTED' || $item->admin_status === 'REJECTED') {
+                            $stageNumber = 0;
+                            $stageTitle = 'Permohonan APL Ditolak (Tidak Dapat Mengikuti Jadwal)';
+                            $stageBadgeColor = 'bg-rose-100 text-rose-800 border-rose-300';
+                            $targetUrl = route('asesi.assessment.apl', $item->id);
+                        } elseif ($hasFinalDecision) {
                             $stageNumber = 5;
                             $stageTitle = 'Tahap 5 dari 5: Hasil Keputusan Asesmen (' . ($item->final_result ?? 'Selesai') . ')';
                             $stageBadgeColor = in_array($item->final_result, ['KOMPETEN', 'K'], true) ? 'bg-emerald-100 text-emerald-800 border-emerald-300' : 'bg-rose-100 text-rose-800 border-rose-300';
@@ -201,12 +206,12 @@
                                 @endif
                             </div>
 
-                            {{-- Revision Callout Box --}}
-                            @if($item->apl_status === 'REVISION_REQUESTED' && ($item->apl_revision_notes || $item->admin_notes))
+                            {{-- Revision / Rejection Callout Box --}}
+                            @if(($item->apl_status === 'REVISION_REQUESTED' || $item->apl_status === 'REJECTED' || $item->admin_status === 'REJECTED') && ($item->apl_revision_notes || $item->admin_notes))
                                 <div class="p-3 bg-rose-50 border-l-4 border-rose-500 rounded-r-lg text-xs text-rose-900 mt-2">
                                     <div class="flex items-center space-x-1.5 font-bold mb-0.5">
                                         <svg class="w-4 h-4 text-rose-600 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
-                                        <span>Catatan Revisi Persyaratan:</span>
+                                        <span>{{ ($item->apl_status === 'REJECTED' || $item->admin_status === 'REJECTED') ? 'Alasan Penolakan Permohonan:' : 'Catatan Revisi Persyaratan:' }}</span>
                                     </div>
                                     <p class="pl-5 text-rose-800">{{ $item->apl_revision_notes ?? $item->admin_notes }}</p>
                                 </div>
@@ -215,7 +220,11 @@
 
                         {{-- Action Buttons --}}
                         <div class="flex items-center gap-2 shrink-0 w-full sm:w-auto flex-wrap">
-                            @if($hasFinalDecision)
+                            @if($item->apl_status === 'REJECTED' || $item->admin_status === 'REJECTED')
+                                <a href="{{ route('asesi.assessment.apl', $item->id) }}" class="w-full sm:w-auto text-center justify-center px-4 py-2 min-h-[40px] text-xs font-bold bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-300 rounded-lg shadow-xs transition inline-flex items-center gap-1.5">
+                                    <span>✕ Permohonan Ditolak</span>
+                                </a>
+                            @elseif($hasFinalDecision)
                                 <a href="{{ route('asesi.assessment.ruang-uji', $item->id) }}" class="flex-1 sm:flex-initial text-center px-3 py-2 min-h-[38px] inline-flex items-center justify-center text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 border border-slate-300 rounded-lg shadow-xs transition">
                                     Rekap Hasil
                                 </a>

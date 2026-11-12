@@ -71,7 +71,7 @@
                     <label class="block text-xs font-semibold text-slate-800 mb-1.5" for="email">
                         Alamat email
                     </label>
-                    <input id="email" type="email" name="email" value="{{ old('email', 'adminlsp@gmail.com') }}" required
+                    <input id="email" type="email" name="email" value="{{ old('email') }}" required
                         class="w-full px-3.5 py-2.5 bg-lsp-input-bg border border-slate-300 focus:border-lsp-navy text-sm sm:text-xs rounded-lg text-slate-900 focus:outline-none focus:ring-1 focus:ring-lsp-navy transition @error('email') border-lsp-red ring-1 ring-lsp-red @enderror"
                         placeholder="contoh@email.com" />
                     @error('email')
@@ -84,8 +84,8 @@
                     <label class="block text-xs font-semibold text-slate-800 mb-1.5" for="password">
                         Kata sandi
                     </label>
-                    <input id="password" type="password" name="password" required value="@Kompeten86"
-                        class="w-full px-3.5 py-2.5 bg-lsp-input-bg border border-slate-300 focus:border-lsp-navy text-sm sm:text-xs rounded-lg text-slate-900 focus:outline-none focus:ring-1 focus:ring-lsp-navy transition @error('password') border-lsp-red ring-1 ring-lsp-red @enderror"
+                    <x-password-input id="password" name="password" required
+                        class="px-3.5 py-2.5 bg-lsp-input-bg border border-slate-300 focus:border-lsp-navy text-sm sm:text-xs rounded-lg text-slate-900 focus:outline-none focus:ring-1 focus:ring-lsp-navy transition @error('password') border-lsp-red ring-1 ring-lsp-red @enderror"
                         placeholder="••••••••••••" />
                     @error('password')
                         <p class="mt-1 text-[11px] text-lsp-red font-medium">{{ $message }}</p>

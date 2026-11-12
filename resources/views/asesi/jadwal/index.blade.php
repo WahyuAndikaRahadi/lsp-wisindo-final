@@ -103,7 +103,8 @@
                 @foreach($assessments as $item)
                     @php
                         $sch = $item->schedule;
-                        $aplStatus = $item->apl_status;
+                        $isRejected = ($item->apl_status === 'REJECTED' || $item->admin_status === 'REJECTED');
+                        $aplStatus = $isRejected ? 'REJECTED' : $item->apl_status;
 
                         $aplBadge = match($aplStatus) {
                             'APPROVED' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
@@ -176,9 +177,9 @@
                                 @endif
                             </div>
 
-                            @if($aplStatus === 'REVISION_REQUESTED' && $item->apl_revision_notes && ! $sch->is_closed)
-                                <div class="p-2.5 rounded bg-amber-50 border border-amber-200 text-xs text-amber-900">
-                                    <strong class="font-bold">Catatan Revisi Asesor:</strong>
+                            @if(($aplStatus === 'REVISION_REQUESTED' || $isRejected) && $item->apl_revision_notes && ! $sch->is_closed)
+                                <div class="p-2.5 rounded bg-rose-50 border border-rose-200 text-xs text-rose-900">
+                                    <strong class="font-bold">{{ $isRejected ? 'Alasan Penolakan Asesor:' : 'Catatan Revisi Asesor:' }}</strong>
                                     <p class="mt-0.5">{{ $item->apl_revision_notes }}</p>
                                 </div>
                             @endif
@@ -189,7 +190,11 @@
                                 Terdaftar: {{ $item->created_at ? $item->created_at->diffForHumans() : '-' }}
                             </span>
 
-                            @if($sch->is_closed || $item->status === 'COMPLETED')
+                            @if($isRejected)
+                                <a href="{{ route('asesi.assessment.apl', $item->id) }}" class="px-4 py-2 text-xs font-bold bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-300 rounded-lg shadow-xs transition inline-flex items-center gap-1">
+                                    <span>✕ Permohonan Ditolak</span>
+                                </a>
+                            @elseif($sch->is_closed || $item->status === 'COMPLETED')
                                 <a href="{{ route('asesi.assessment.ruang-uji', $item->id) }}" class="px-4 py-2 text-xs font-bold bg-slate-800 hover:bg-slate-900 text-white rounded-lg transition flex items-center gap-1.5">
                                     <svg class="w-3.5 h-3.5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                     <span>Lihat Ruang Uji &rarr;</span>

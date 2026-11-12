@@ -403,6 +403,7 @@ Route::middleware(['auth', 'role:SUPER_ADMIN,ADMIN_LSP,KOMITE_TEKNIS,TUK_ADMIN']
 
     // Master Data (Super Admin only)
     Route::middleware(['role:SUPER_ADMIN'])->group(function () {
+        Route::post('/users/{user}/reset-password', [Admin\UserController::class, 'resetPassword'])->name('users.reset-password');
         Route::resource('users', Admin\UserController::class);
         Route::resource('schemes', Admin\SchemeController::class);
         Route::resource('question-banks', Admin\QuestionBankController::class);

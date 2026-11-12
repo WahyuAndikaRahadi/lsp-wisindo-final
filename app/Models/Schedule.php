@@ -126,7 +126,7 @@ class Schedule extends Model
 
     public function assessors(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 't_schedule_assessors', 'schedule_id', 'assessor_id');
+        return $this->belongsToMany(User::class, 't_schedule_assessors', 'schedule_id', 'assessor_id')->orderBy('full_name', 'asc');
     }
 
     public function assessments(): HasMany
@@ -146,7 +146,9 @@ class Schedule extends Model
     public function assessorAssessmentsQuery(?User $assessor = null)
     {
         $user = $assessor ?? (auth()->check() && auth()->user()->role === 'ASESOR' ? auth()->user() : null);
-        $query = $this->assessments();
+        $query = $this->assessments()
+            ->where('apl_status', '!=', 'REJECTED')
+            ->where('admin_status', '!=', 'REJECTED');
 
         if (! $user || $user->role !== 'ASESOR') {
             return $query;
@@ -171,15 +173,19 @@ class Schedule extends Model
     {
         $user = $assessor ?? (auth()->check() && auth()->user()->role === 'ASESOR' ? auth()->user() : null);
 
+        $assessments = $this->assessments->filter(function ($a) {
+            return $a->apl_status !== 'REJECTED' && $a->admin_status !== 'REJECTED';
+        });
+
         if (! $user || $user->role !== 'ASESOR') {
-            return $this->assessments;
+            return $assessments->values();
         }
 
         $isSingleAssessor = $this->relationLoaded('assessors')
             ? ($this->assessors->count() === 1 && $this->assessors->first()?->id === $user->id)
             : ($this->assessors()->count() === 1 && $this->assessors()->where('users.id', $user->id)->exists());
 
-        return $this->assessments->filter(function ($a) use ($user, $isSingleAssessor) {
+        return $assessments->filter(function ($a) use ($user, $isSingleAssessor) {
             return (int) $a->assessor_id === (int) $user->id || (empty($a->assessor_id) && $isSingleAssessor);
         })->values();
     }

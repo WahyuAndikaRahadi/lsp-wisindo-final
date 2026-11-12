@@ -13,9 +13,29 @@ use Illuminate\View\View;
 
 class UserController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        $users = User::latest()->paginate(20);
+        $query = User::query();
+
+        if ($request->filled('role')) {
+            $query->where('role', $request->role);
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('search')) {
+            $search = trim($request->search);
+            $query->where(function ($q) use ($search) {
+                $q->where('full_name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('phone', 'like', "%{$search}%")
+                    ->orWhere('assessor_registration_number', 'like', "%{$search}%");
+            });
+        }
+
+        $users = $query->latest()->paginate(20)->withQueryString();
 
         return view('admin.users.index', compact('users'));
     }
@@ -103,5 +123,18 @@ class UserController extends Controller
 
         return redirect()->route('admin.users.index')
             ->with('success', 'User berhasil dihapus.');
+    }
+
+    public function resetPassword(User $user): RedirectResponse
+    {
+        abort_unless(auth()->user()->isRole('SUPER_ADMIN'), 403);
+
+        $defaultPassword = 'proindo123';
+        $user->update([
+            'password' => Hash::make($defaultPassword),
+        ]);
+
+        return redirect()->route('admin.users.index')
+            ->with('success', "Password untuk pengguna '{$user->full_name}' ({$user->email}) berhasil direset menjadi '{$defaultPassword}'.");
     }
 }

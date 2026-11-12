@@ -447,6 +447,8 @@ class AkWorkflowService
     public function isScheduleReadyForClosure(Schedule $schedule): array
     {
         $uncompletedAssessments = $schedule->assessments()
+            ->where('apl_status', '!=', 'REJECTED')
+            ->where('admin_status', '!=', 'REJECTED')
             ->where(function ($query) {
                 $query->where('status', '!=', 'COMPLETED')
                     ->where('final_result', '!=', 'TIDAK_HADIR');

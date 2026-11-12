@@ -82,7 +82,8 @@ class AplReviewController extends Controller
                 'apl_revision_notes' => $notes,
                 'assessor_id' => $assessorId,
                 'approved_at' => $status === 'APPROVED' ? $now : null,
-                'admin_status' => 'APPROVED',
+                'admin_status' => $status === 'REJECTED' ? 'REJECTED' : 'APPROVED',
+                'status' => $status === 'REJECTED' ? 'REJECTED' : $assessment->status,
             ]);
 
             if ($status === 'APPROVED') {
@@ -92,8 +93,14 @@ class AplReviewController extends Controller
             }
         });
 
+        $msg = match ($status) {
+            'APPROVED' => 'APL asesi berhasil disetujui.',
+            'REJECTED' => 'Permohonan APL asesi berhasil ditolak dan asesi telah dikeluarkan dari jadwal asesmen ini.',
+            default => 'Permintaan revisi APL berhasil dikirim ke asesi.',
+        };
+
         return redirect()->route('asesor.schedule.instrument', ['schedule' => $assessment->schedule_id, 'code' => 'apl'])
-            ->with('success', $status === 'APPROVED' ? 'APL asesi berhasil disetujui.' : 'Keputusan review APL berhasil disimpan.');
+            ->with('success', $msg);
     }
 
     public function bulkApprove(Schedule $schedule, Request $request): RedirectResponse

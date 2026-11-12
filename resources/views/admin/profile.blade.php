@@ -97,8 +97,8 @@
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
                         Password Saat Ini
                     </label>
-                    <input type="password" name="current_password" placeholder="••••••••"
-                        class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                    <x-password-input name="current_password" placeholder="••••••••"
+                        class="px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none" />
                     @error('current_password') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
                 </div>
 
@@ -106,8 +106,8 @@
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
                         Password Baru
                     </label>
-                    <input type="password" name="new_password" placeholder="Minimal 8 karakter"
-                        class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                    <x-password-input name="new_password" placeholder="Minimal 8 karakter"
+                        class="px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none" />
                     @error('new_password') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
                 </div>
 
@@ -115,8 +115,8 @@
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
                         Konfirmasi Password Baru
                     </label>
-                    <input type="password" name="new_password_confirmation" placeholder="Ulangi password baru"
-                        class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                    <x-password-input name="new_password_confirmation" placeholder="Ulangi password baru"
+                        class="px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none" />
                 </div>
             </div>
         </div>

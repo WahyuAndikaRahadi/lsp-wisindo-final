@@ -21,18 +21,7 @@ class Ak07Controller extends Controller
 
         $schedule->load('scheme', 'assessments.asesi.profile', 'assessments.ak07Items', 'assessors');
 
-        $user = auth()->user();
-        $isSingleAssessor = $schedule->assessors->count() === 1 && $schedule->assessors->first()?->id === $user?->id;
-
-        $myAssessments = $schedule->assessments
-            ->filter(function ($assessment) use ($user, $isSingleAssessor) {
-                if (! $user || $user->role !== 'ASESOR') {
-                    return true;
-                }
-
-                return (int) $assessment->assessor_id === (int) $user->id || (empty($assessment->assessor_id) && $isSingleAssessor);
-            })
-            ->values();
+        $myAssessments = $schedule->assessorAssessments();
 
         if (! $schedule->isStepUnlocked('ak07')) {
             return redirect()->route('asesor.schedule.ak01', $schedule->id)
@@ -56,18 +45,7 @@ class Ak07Controller extends Controller
 
         $schedule->load('assessments', 'assessors');
 
-        $user = auth()->user();
-        $isSingleAssessor = $schedule->assessors->count() === 1 && $schedule->assessors->first()?->id === $user?->id;
-
-        $myAssessments = $schedule->assessments
-            ->filter(function ($assessment) use ($user, $isSingleAssessor) {
-                if (! $user || $user->role !== 'ASESOR') {
-                    return true;
-                }
-
-                return (int) $assessment->assessor_id === (int) $user->id || (empty($assessment->assessor_id) && $isSingleAssessor);
-            })
-            ->values();
+        $myAssessments = $schedule->assessorAssessments();
 
         if (! $schedule->isStepUnlocked('ak07')) {
             return redirect()->route('asesor.schedule.ak01', $schedule->id)

@@ -27,6 +27,23 @@
         </div>
     @endif
 
+    @if($assessment->apl_status === 'REJECTED' || $assessment->admin_status === 'REJECTED')
+        <div class="p-4 sm:p-5 bg-rose-50 border-2 border-rose-300 rounded-2xl text-rose-900 flex flex-col sm:flex-row items-start sm:items-center gap-3.5 shadow-xs">
+            <span class="text-2xl shrink-0">🚫</span>
+            <div class="space-y-1">
+                <div class="font-bold text-sm text-rose-900">Permohonan APL Anda Ditolak</div>
+                <p class="text-xs text-rose-800 leading-relaxed">
+                    Permohonan APL Anda pada jadwal asesmen ini telah ditolak oleh Asesor/Admin LSP. Anda dinyatakan tidak dapat mengikuti jadwal ini.
+                </p>
+                @if($assessment->apl_revision_notes)
+                    <div class="mt-2 p-2.5 bg-white/90 rounded-lg border border-rose-200 text-xs text-rose-900">
+                        <strong class="font-bold">Alasan Penolakan Asesor:</strong> {{ $assessment->apl_revision_notes }}
+                    </div>
+                @endif
+            </div>
+        </div>
+    @endif
+
     {{-- Info Header Card --}}
     <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
@@ -40,7 +57,17 @@
             </p>
         </div>
         <div class="shrink-0">
-            @if($assessment->apl_status === 'APPROVED')
+            @if($assessment->apl_status === 'REJECTED' || $assessment->admin_status === 'REJECTED')
+                <div class="bg-rose-50 border border-rose-300 rounded-xl p-3 text-right">
+                    <span class="inline-flex items-center px-3 py-1 rounded text-xs font-bold bg-rose-600 text-white shadow-xs">
+                        ✕ Permohonan Ditolak
+                    </span>
+                    <p class="text-xs text-rose-700 mt-1 font-semibold">Tidak Dapat Mengikuti Jadwal</p>
+                    @if($assessment->apl_revision_notes)
+                        <p class="text-xs text-slate-600 italic mt-0.5 max-w-xs text-right truncate">"{{ $assessment->apl_revision_notes }}"</p>
+                    @endif
+                </div>
+            @elseif($assessment->apl_status === 'APPROVED')
                 <div class="text-right">
                     <span class="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-semibold bg-emerald-500 text-white shadow-sm">
                         ✓ Disetujui Asesor
@@ -101,7 +128,7 @@
             <div class="p-4 sm:p-6">
                 @php
                     $isProfileComplete = $profile && !empty($profile->nik) && !empty($profile->tempat_lahir) && !empty($profile->tanggal_lahir) && !empty($profile->jenis_kelamin) && !empty($profile->alamat_rumah) && !empty($profile->kode_pos) && !empty($profile->pendidikan_terakhir) && !empty($profile->jabatan) && !empty(auth()->user()->phone);
-                    $isAplLocked = $assessment->apl_status === 'SUBMITTED';
+                    $isAplLocked = in_array($assessment->apl_status, ['SUBMITTED', 'REJECTED'], true) || $assessment->admin_status === 'REJECTED' || (bool) $assessment->schedule?->is_closed;
                 @endphp
 
                 @if(! $isProfileComplete)
@@ -373,7 +400,7 @@
                                     'Lainnya',
                                 ];
                                 $selectedTujuan = old('tujuan_asesmen', $assessment->tujuan_asesmen ?? 'Sertifikasi');
-                                $isAplLocked = $assessment->apl_status === 'SUBMITTED';
+                                $isAplLocked = in_array($assessment->apl_status, ['SUBMITTED', 'REJECTED'], true) || $assessment->admin_status === 'REJECTED' || (bool) $assessment->schedule?->is_closed;
                             @endphp
                             <select name="tujuan_asesmen" id="tujuan_asesmen" required class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 bg-white text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none" @disabled($isAplLocked)>
                                 @foreach($tujuanOptions as $opt)
@@ -390,7 +417,7 @@
 
                 {{-- Pemilihan Asesor Penguji --}}
                 @php
-                    $scheduleAssessors = $assessment->schedule->assessors ?? collect();
+                    $scheduleAssessors = ($assessment->schedule->assessors ?? collect())->sortBy('full_name', SORT_NATURAL | SORT_FLAG_CASE);
                 @endphp
                 @if($scheduleAssessors->isNotEmpty())
                     <div class="mt-4 p-4 rounded-xl border border-indigo-100 bg-indigo-50/50 mb-6">
@@ -398,7 +425,7 @@
                             <span>Pilih Asesor Penguji <span class="text-rose-500">*</span></span>
                             <span class="text-[11px] text-slate-500 font-normal lowercase">Asesor yang akan memverifikasi berkas & menguji Anda</span>
                         </label>
-                        <select name="assessor_id" required class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 bg-white text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none" @disabled($assessment->apl_status === 'SUBMITTED')>
+                        <select name="assessor_id" required class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 bg-white text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none" @disabled($isAplLocked)>
                             <option value="">-- Pilih Salah Satu Asesor Penguji --</option>
                             @foreach($scheduleAssessors as $asesor)
                                 <option value="{{ $asesor->id }}" {{ old('assessor_id', $assessment->assessor_id) == $asesor->id || $scheduleAssessors->count() === 1 ? 'selected' : '' }}>
@@ -435,7 +462,7 @@
                             {{-- Opsi A --}}
                             <div class="bg-white p-3 rounded-lg border border-slate-200">
                                 <label class="block text-xs font-bold text-slate-700 mb-1">A. Ijazah SMK Otomotif</label>
-                                <input type="file" name="proofs[IJAZAH_SMK]" accept=".jpg,.jpeg,.png,.pdf" class="block w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" @disabled($assessment->apl_status === 'SUBMITTED')>
+                                <input type="file" name="proofs[IJAZAH_SMK]" accept=".jpg,.jpeg,.png,.pdf" class="block w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" @disabled($isAplLocked)>
                                 @if(isset($existingProofs['IJAZAH_SMK']))
                                     <span class="text-xs text-emerald-600 font-medium mt-1 inline-block">✓ Terunggah: {{ $existingProofs['IJAZAH_SMK']->original_filename }}</span>
                                 @endif
@@ -444,7 +471,7 @@
                             {{-- Opsi B --}}
                             <div class="bg-white p-3 rounded-lg border border-slate-200">
                                 <label class="block text-xs font-bold text-slate-700 mb-1">B. Surat Keterangan Siswa Aktif SMK</label>
-                                <input type="file" name="proofs[SURAT_SISWA_AKTIF]" accept=".jpg,.jpeg,.png,.pdf" class="block w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" @disabled($assessment->apl_status === 'SUBMITTED')>
+                                <input type="file" name="proofs[SURAT_SISWA_AKTIF]" accept=".jpg,.jpeg,.png,.pdf" class="block w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" @disabled($isAplLocked)>
                                 @if(isset($existingProofs['SURAT_SISWA_AKTIF']))
                                     <span class="text-xs text-emerald-600 font-medium mt-1 inline-block">✓ Terunggah: {{ $existingProofs['SURAT_SISWA_AKTIF']->original_filename }}</span>
                                 @endif
@@ -453,7 +480,7 @@
                             {{-- Opsi C --}}
                             <div class="bg-white p-3 rounded-lg border border-slate-200">
                                 <label class="block text-xs font-bold text-slate-700 mb-1">C. Ijazah SMA + Sertifikat Pelatihan Otomotif</label>
-                                <input type="file" name="proofs[IJAZAH_SMA_SERTIFIKAT]" accept=".jpg,.jpeg,.png,.pdf" class="block w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" @disabled($assessment->apl_status === 'SUBMITTED')>
+                                <input type="file" name="proofs[IJAZAH_SMA_SERTIFIKAT]" accept=".jpg,.jpeg,.png,.pdf" class="block w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" @disabled($isAplLocked)>
                                 @if(isset($existingProofs['IJAZAH_SMA_SERTIFIKAT']))
                                     <span class="text-xs text-emerald-600 font-medium mt-1 inline-block">✓ Terunggah: {{ $existingProofs['IJAZAH_SMA_SERTIFIKAT']->original_filename }}</span>
                                 @endif
@@ -462,7 +489,7 @@
                             {{-- Opsi D --}}
                             <div class="bg-white p-3 rounded-lg border border-slate-200">
                                 <label class="block text-xs font-bold text-slate-700 mb-1">D. Surat Pengalaman Kerja Bengkel Otomotif</label>
-                                <input type="file" name="proofs[PENGALAMAN_KERJA]" accept=".jpg,.jpeg,.png,.pdf" class="block w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" @disabled($assessment->apl_status === 'SUBMITTED')>
+                                <input type="file" name="proofs[PENGALAMAN_KERJA]" accept=".jpg,.jpeg,.png,.pdf" class="block w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" @disabled($isAplLocked)>
                                 @if(isset($existingProofs['PENGALAMAN_KERJA']))
                                     <span class="text-xs text-emerald-600 font-medium mt-1 inline-block">✓ Terunggah: {{ $existingProofs['PENGALAMAN_KERJA']->original_filename }}</span>
                                 @endif
@@ -485,7 +512,7 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div class="bg-white p-3 rounded-lg border border-slate-200">
                                 <label class="block text-xs font-bold text-slate-700 mb-1">Fotokopi KTP / Identitas Diri <span class="text-rose-500">*</span></label>
-                                <input type="file" name="proofs[KTP]" accept=".jpg,.jpeg,.png,.pdf" class="block w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100" @disabled($assessment->apl_status === 'SUBMITTED')>
+                                <input type="file" name="proofs[KTP]" accept=".jpg,.jpeg,.png,.pdf" class="block w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100" @disabled($isAplLocked)>
                                 @if(isset($existingProofs['KTP']))
                                     <span class="text-xs text-emerald-600 font-medium mt-1 inline-block">✓ Terunggah: {{ $existingProofs['KTP']->original_filename }}</span>
                                 @endif
@@ -493,7 +520,7 @@
 
                             <div class="bg-white p-3 rounded-lg border border-slate-200">
                                 <label class="block text-xs font-bold text-slate-700 mb-1">Pas Foto 3x4 (Latar Belakang Merah) <span class="text-rose-500">*</span></label>
-                                <input type="file" name="proofs[PAS_FOTO]" accept=".jpg,.jpeg,.png,.pdf" class="block w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100" @disabled($assessment->apl_status === 'SUBMITTED')>
+                                <input type="file" name="proofs[PAS_FOTO]" accept=".jpg,.jpeg,.png,.pdf" class="block w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100" @disabled($isAplLocked)>
                                 @if(isset($existingProofs['PAS_FOTO']))
                                     <span class="text-xs text-emerald-600 font-medium mt-1 inline-block">✓ Terunggah: {{ $existingProofs['PAS_FOTO']->original_filename }}</span>
                                 @endif
@@ -590,13 +617,13 @@
                                             <span class="text-slate-600">{{ $kuk->statement }}</span>
                                         </td>
                                         <td class="p-3 text-center bg-emerald-50/50">
-                                            <input type="radio" name="kuks[{{ $kuk->id }}][value]" value="K" class="radio-kuk-K text-emerald-600 focus:ring-emerald-500 w-4 h-4 cursor-pointer" @checked($val === 'K') @disabled($assessment->apl_status === 'SUBMITTED')>
+                                            <input type="radio" name="kuks[{{ $kuk->id }}][value]" value="K" class="radio-kuk-K text-emerald-600 focus:ring-emerald-500 w-4 h-4 cursor-pointer" @checked($val === 'K') @disabled($isAplLocked)>
                                         </td>
                                         <td class="p-3 text-center bg-rose-50/50">
-                                            <input type="radio" name="kuks[{{ $kuk->id }}][value]" value="BK" class="radio-kuk-BK text-rose-600 focus:ring-rose-500 w-4 h-4 cursor-pointer" @checked($val === 'BK') @disabled($assessment->apl_status === 'SUBMITTED')>
+                                            <input type="radio" name="kuks[{{ $kuk->id }}][value]" value="BK" class="radio-kuk-BK text-rose-600 focus:ring-rose-500 w-4 h-4 cursor-pointer" @checked($val === 'BK') @disabled($isAplLocked)>
                                         </td>
                                         <td class="p-3">
-                                            <select name="kuks[{{ $kuk->id }}][proof_type]" class="select-proof w-full text-xs border border-slate-300 rounded-lg px-2.5 py-1.5 bg-white text-slate-800 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:outline-none transition shadow-2xs" @disabled($assessment->apl_status === 'SUBMITTED')>
+                                            <select name="kuks[{{ $kuk->id }}][proof_type]" class="select-proof w-full text-xs border border-slate-300 rounded-lg px-2.5 py-1.5 bg-white text-slate-800 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:outline-none transition shadow-2xs" @disabled($isAplLocked)>
                                                 <option value="IJAZAH_SMK" @selected($proof === 'IJAZAH_SMK')>Ijazah SMK Otomotif</option>
                                                 <option value="SURAT_SISWA_AKTIF" @selected($proof === 'SURAT_SISWA_AKTIF')>Surat Keterangan Siswa Aktif</option>
                                                 <option value="IJAZAH_SMA_SERTIFIKAT" @selected($proof === 'IJAZAH_SMA_SERTIFIKAT')>Ijazah SMA + Sertifikat Pelatihan</option>
@@ -635,6 +662,10 @@
                                 <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
                                 <span>Jadwal Telah Ditutup (Read-Only)</span>
                             </button>
+                        </div>
+                    @elseif($assessment->apl_status === 'REJECTED' || $assessment->admin_status === 'REJECTED')
+                        <div class="w-full sm:w-auto px-6 py-3.5 bg-rose-600 text-white font-bold text-xs rounded-xl shadow-md text-center">
+                            ✕ Permohonan Ditolak (Tidak Dapat Mengikuti Jadwal)
                         </div>
                     @elseif($assessment->apl_status === 'APPROVED')
                         <div class="mb-2 p-3.5 bg-emerald-50 border border-emerald-200 rounded-xl text-left w-full md:max-w-md">

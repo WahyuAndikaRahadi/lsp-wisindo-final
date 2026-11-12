@@ -95,8 +95,8 @@
                         <label class="block text-xs font-semibold text-slate-800 mb-1" for="password">
                             Kata Sandi <span class="text-lsp-red">*</span>
                         </label>
-                        <input id="password" type="password" name="password" required
-                            class="w-full px-3.5 py-2.5 bg-lsp-input-bg border border-slate-300 focus:border-lsp-navy text-sm sm:text-xs rounded-lg text-slate-900 focus:outline-none focus:ring-1 focus:ring-lsp-navy transition @error('password') border-lsp-red ring-1 ring-lsp-red @enderror"
+                        <x-password-input id="password" name="password" required
+                            class="px-3.5 py-2.5 bg-lsp-input-bg border border-slate-300 focus:border-lsp-navy text-sm sm:text-xs rounded-lg text-slate-900 focus:outline-none focus:ring-1 focus:ring-lsp-navy transition @error('password') border-lsp-red ring-1 ring-lsp-red @enderror"
                             placeholder="Min. 6 karakter" />
                         @error('password')
                             <p class="mt-1 text-[11px] text-lsp-red font-medium">{{ $message }}</p>
@@ -107,8 +107,8 @@
                         <label class="block text-xs font-semibold text-slate-800 mb-1" for="password_confirmation">
                             Konfirmasi Sandi <span class="text-lsp-red">*</span>
                         </label>
-                        <input id="password_confirmation" type="password" name="password_confirmation" required
-                            class="w-full px-3.5 py-2.5 bg-lsp-input-bg border border-slate-300 focus:border-lsp-navy text-sm sm:text-xs rounded-lg text-slate-900 focus:outline-none focus:ring-1 focus:ring-lsp-navy transition"
+                        <x-password-input id="password_confirmation" name="password_confirmation" required
+                            class="px-3.5 py-2.5 bg-lsp-input-bg border border-slate-300 focus:border-lsp-navy text-sm sm:text-xs rounded-lg text-slate-900 focus:outline-none focus:ring-1 focus:ring-lsp-navy transition"
                             placeholder="Ulangi sandi" />
                     </div>
                 </div>

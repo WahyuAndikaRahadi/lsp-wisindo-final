@@ -63,7 +63,7 @@ class JadwalController extends Controller
     public function create(): View
     {
         $schemes = Scheme::active()->get();
-        $assessors = User::where('role', 'ASESOR')->where('status', 'ACTIVE')->get();
+        $assessors = User::where('role', 'ASESOR')->where('status', 'ACTIVE')->orderBy('full_name', 'asc')->get();
 
         return view('admin.jadwal.create', compact('schemes', 'assessors'));
     }
@@ -121,7 +121,7 @@ class JadwalController extends Controller
     public function edit(Schedule $jadwal): View
     {
         $schemes = Scheme::active()->get();
-        $assessors = User::where('role', 'ASESOR')->where('status', 'ACTIVE')->get();
+        $assessors = User::where('role', 'ASESOR')->where('status', 'ACTIVE')->orderBy('full_name', 'asc')->get();
         $jadwal->load('assessors');
 
         return view('admin.jadwal.edit', compact('jadwal', 'schemes', 'assessors'));
