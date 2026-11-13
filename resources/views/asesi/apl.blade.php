@@ -611,9 +611,9 @@
                                         $proof = $savedItem?->selected_proof_type ?? 'IJAZAH_SMK';
                                         $currentNo = $kukCounter++;
                                     @endphp
-                                    <tr class="flex flex-col bg-white rounded-xl border border-slate-200 p-3.5 shadow-2xs gap-3 md:table-row md:border-b md:border-slate-100 md:p-0 md:shadow-none md:hover:bg-indigo-50/30 transition">
-                                        <td class="hidden md:table-cell p-3 text-center text-slate-500 font-mono">{{ $currentNo }}</td>
-                                        <td class="w-full md:table-cell p-0 md:p-3 md:pl-6">
+                                    <tr class="flex flex-wrap bg-white rounded-xl border border-slate-200 p-3.5 shadow-2xs gap-y-3 md:table-row md:border-b md:border-slate-100 md:p-0 md:shadow-none md:hover:bg-indigo-50/30 transition">
+                                        <td class="hidden md:table-cell p-3 text-center text-slate-500 font-mono md:w-12">{{ $currentNo }}</td>
+                                        <td class="w-full md:w-auto md:table-cell p-0 md:p-3 md:pl-6">
                                             <div class="flex items-start gap-2">
                                                 <span class="md:hidden inline-flex items-center justify-center px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 font-mono font-bold text-[10px] shrink-0 mt-0.5">#{{ $currentNo }}</span>
                                                 <div>
@@ -622,20 +622,18 @@
                                                 </div>
                                             </div>
                                         </td>
-                                        <div class="grid grid-cols-2 gap-2 pt-1 md:contents">
-                                            <td class="p-0 md:p-3 text-center md:bg-emerald-50/50">
-                                                <label class="flex items-center justify-center gap-2 p-2.5 rounded-lg border border-emerald-200 bg-emerald-50/60 hover:bg-emerald-100/70 cursor-pointer text-xs font-bold text-emerald-800 transition md:border-0 md:p-0 md:bg-transparent min-h-[42px] md:min-h-0">
-                                                    <input type="radio" name="kuks[{{ $kuk->id }}][value]" value="K" class="radio-kuk-K text-emerald-600 focus:ring-emerald-500 w-4 h-4 cursor-pointer" @checked($val === 'K') @disabled($isAplLocked)>
-                                                    <span class="md:hidden">K (Kompeten)</span>
-                                                </label>
-                                            </td>
-                                            <td class="p-0 md:p-3 text-center md:bg-rose-50/50">
-                                                <label class="flex items-center justify-center gap-2 p-2.5 rounded-lg border border-rose-200 bg-rose-50/60 hover:bg-rose-100/70 cursor-pointer text-xs font-bold text-rose-800 transition md:border-0 md:p-0 md:bg-transparent min-h-[42px] md:min-h-0">
-                                                    <input type="radio" name="kuks[{{ $kuk->id }}][value]" value="BK" class="radio-kuk-BK text-rose-600 focus:ring-rose-500 w-4 h-4 cursor-pointer" @checked($val === 'BK') @disabled($isAplLocked)>
-                                                    <span class="md:hidden">BK (Belum)</span>
-                                                </label>
-                                            </td>
-                                        </div>
+                                        <td class="w-1/2 pr-1.5 md:pr-0 md:w-20 md:table-cell p-0 md:p-3 text-center md:bg-emerald-50/50">
+                                            <label class="flex items-center justify-center gap-2 p-2.5 rounded-lg border border-emerald-200 bg-emerald-50/60 hover:bg-emerald-100/70 cursor-pointer text-xs font-bold text-emerald-800 transition md:border-0 md:p-0 md:bg-transparent min-h-[42px] md:min-h-0">
+                                                <input type="radio" name="kuks[{{ $kuk->id }}][value]" value="K" class="radio-kuk-K text-emerald-600 focus:ring-emerald-500 w-4 h-4 cursor-pointer" @checked($val === 'K') @disabled($isAplLocked)>
+                                                <span class="md:hidden">K (Kompeten)</span>
+                                            </label>
+                                        </td>
+                                        <td class="w-1/2 pl-1.5 md:pl-0 md:w-20 md:table-cell p-0 md:p-3 text-center md:bg-rose-50/50">
+                                            <label class="flex items-center justify-center gap-2 p-2.5 rounded-lg border border-rose-200 bg-rose-50/60 hover:bg-rose-100/70 cursor-pointer text-xs font-bold text-rose-800 transition md:border-0 md:p-0 md:bg-transparent min-h-[42px] md:min-h-0">
+                                                <input type="radio" name="kuks[{{ $kuk->id }}][value]" value="BK" class="radio-kuk-BK text-rose-600 focus:ring-rose-500 w-4 h-4 cursor-pointer" @checked($val === 'BK') @disabled($isAplLocked)>
+                                                <span class="md:hidden">BK (Belum)</span>
+                                            </label>
+                                        </td>
                                         <td class="w-full md:w-64 md:table-cell p-0 md:p-3">
                                             <div class="space-y-1">
                                                 <span class="text-[11px] font-semibold text-slate-500 md:hidden block">Bukti Pendukung:</span>
