@@ -58,11 +58,11 @@
                         <div class="text-[11px] pt-1 border-t border-slate-200/60 text-slate-600">
                             <span class="text-slate-500">Asesor Penguji:</span>
                             <div class="font-medium text-slate-800 mt-0.5">
-                                @forelse($sch->assessors as $asesor)
-                                    <span class="inline-block mr-2">{{ $asesor->full_name }}</span>
-                                @empty
+                                @if($sch->assessors->isNotEmpty())
+                                    {{ $sch->assessors->pluck('full_name')->join(', ') }}
+                                @else
                                     <span class="text-slate-400 italic">Belum ditugaskan</span>
-                                @endforelse
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -99,7 +99,7 @@
                 <tbody class="divide-y divide-slate-100">
                     @foreach($schedules as $sch)
                         <tr class="hover:bg-slate-50/60 transition">
-                            <td class="px-6 py-4 align-top">
+                            <td class="px-6 py-3.5 align-middle">
                                 <span class="font-mono text-xs font-bold px-2 py-0.5 rounded bg-brand-50 text-brand-700 border border-brand-100 inline-block mb-1">
                                     {{ $sch->code }}
                                 </span>
@@ -107,30 +107,54 @@
                                     {{ $sch->name ?? $sch->scheme?->name }}
                                 </div>
                             </td>
-                            <td class="px-6 py-4 align-top text-xs">
+                            <td class="px-6 py-3.5 align-middle text-xs">
                                 <div class="font-semibold text-slate-900 leading-snug">
                                     {{ $sch->scheme?->name }}
                                 </div>
                                 <span class="text-slate-400 font-mono text-[11px]">{{ $sch->scheme?->code }}</span>
                             </td>
-                            <td class="px-6 py-4 align-top text-xs text-slate-600 whitespace-nowrap">
+                            <td class="px-6 py-3.5 align-middle text-xs text-slate-600 whitespace-nowrap">
                                 <div class="font-medium text-slate-900">{{ $sch->tuk_name ?: '-' }}</div>
                                 <div class="text-slate-400 mt-0.5">{{ \Carbon\Carbon::parse($sch->date)->isoFormat('D MMMM Y') }}</div>
                             </td>
-                            <td class="px-6 py-4 align-top text-xs">
-                                @forelse($sch->assessors as $asesor)
-                                    <div class="font-medium text-slate-800">{{ $asesor->full_name }}</div>
-                                    <div class="text-[10px] font-mono text-slate-400 mb-1">{{ $asesor->assessor_registration_number }}</div>
-                                @empty
+                            <td class="px-6 py-3.5 align-middle text-xs">
+                                @if($sch->assessors->isEmpty())
                                     <span class="text-slate-400 italic text-[11px]">Belum ada asesor</span>
-                                @endforelse
+                                @elseif($sch->assessors->count() <= 3)
+                                    <div class="flex flex-col gap-1 max-w-[280px]">
+                                        @foreach($sch->assessors as $asesor)
+                                            <div class="inline-flex items-center gap-1.5 text-xs leading-tight">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-brand-500 shrink-0"></span>
+                                                <span class="font-medium text-slate-800 truncate" title="{{ $asesor->full_name }}">{{ $asesor->full_name }}</span>
+                                                @if($asesor->assessor_registration_number)
+                                                    <span class="text-[10px] font-mono text-slate-400 shrink-0">({{ $asesor->assessor_registration_number }})</span>
+                                                @endif
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @else
+                                    <div class="flex flex-col gap-1 max-w-[280px]">
+                                        @foreach($sch->assessors->take(2) as $asesor)
+                                            <div class="inline-flex items-center gap-1.5 text-xs leading-tight">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-brand-500 shrink-0"></span>
+                                                <span class="font-medium text-slate-800 truncate" title="{{ $asesor->full_name }}">{{ $asesor->full_name }}</span>
+                                                @if($asesor->assessor_registration_number)
+                                                    <span class="text-[10px] font-mono text-slate-400 shrink-0">({{ $asesor->assessor_registration_number }})</span>
+                                                @endif
+                                            </div>
+                                        @endforeach
+                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200 w-fit" title="{{ $sch->assessors->pluck('full_name')->join(', ') }}">
+                                            +{{ $sch->assessors->count() - 2 }} Asesor Lainnya
+                                        </span>
+                                    </div>
+                                @endif
                             </td>
-                            <td class="px-6 py-4 align-top text-center whitespace-nowrap">
+                            <td class="px-6 py-3.5 align-middle text-center whitespace-nowrap">
                                 <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold {{ $sch->assessments_count > 0 ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' : 'bg-slate-100 text-slate-600' }}">
                                     {{ $sch->assessments_count }} Asesi
                                 </span>
                             </td>
-                            <td class="px-6 py-4 align-top text-right whitespace-nowrap">
+                            <td class="px-6 py-3.5 align-middle text-right whitespace-nowrap">
                                 <a href="{{ route('admin.dokumen-muk.show', $sch) }}"
                                    class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold bg-brand-600 hover:bg-brand-700 text-white rounded-lg shadow-sm hover:shadow transition">
                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
