@@ -100,6 +100,10 @@ class DokumenMukController extends Controller
             'ia11' => 'ia11',
             'fr-ia-11' => 'ia11',
             'daftar-periksa' => 'daftar-periksa',
+            'fr-ak-05' => 'ak05',
+            'frak05' => 'ak05',
+            'laporan-asesmen' => 'ak05',
+            'laporan' => 'ak05',
         ];
         $targetType = $aliasMap[$normalizedType] ?? $normalizedType;
 
@@ -145,7 +149,7 @@ class DokumenMukController extends Controller
             ]);
         }
 
-        if ($request->query('source') === 'dynamic' || ($request->query('format') === 'pdf' && in_array($targetType, ['ba', 'hadir-asesor', 'hadir-asesi'], true))) {
+        if ($targetType === 'ak05' || $request->query('source') === 'dynamic' || ($request->query('format') === 'pdf' && in_array($targetType, ['ba', 'hadir-asesor', 'hadir-asesi'], true))) {
             return $this->dynamicService->exportSchedule($schedule, $targetType, $request->boolean('download'));
         }
 
@@ -225,8 +229,8 @@ class DokumenMukController extends Controller
             return $this->exporter->exportAssessmentAsesiXls($assessment);
         }
 
-        $dynamicTypes = ['apl01', 'apl02', 'ak01', 'ak02', 'ak03', 'ak04', 'ak07', 'ia01', 'ia01b', 'ia02', 'ia03', 'ia05a', 'ia05c', 'pernyataan'];
-        if ($targetType === 'ia01b' || $request->query('source') === 'dynamic' || ($request->query('format') === 'pdf' && in_array($targetType, $dynamicTypes, true))) {
+        $dynamicTypes = ['apl01', 'apl02', 'ak01', 'ak02', 'ak03', 'ak04', 'ak05', 'ak07', 'ia01', 'ia01b', 'ia02', 'ia03', 'ia05a', 'ia05c', 'pernyataan'];
+        if (in_array($targetType, ['ia01b', 'ak05'], true) || $request->query('source') === 'dynamic' || ($request->query('format') === 'pdf' && in_array($targetType, $dynamicTypes, true))) {
             return $this->dynamicService->exportAssessment($assessment, $targetType, $request->boolean('download'));
         }
 

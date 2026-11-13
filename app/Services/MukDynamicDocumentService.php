@@ -175,6 +175,14 @@ class MukDynamicDocumentService
                         return $file->getPathname();
                     }
                     break;
+                case 'ak05':
+                case 'frak05':
+                case 'laporanasesmen':
+                case 'laporan':
+                    if (str_contains($name, 'ak.05') || str_contains($name, 'ak 05') || str_contains($name, 'ak-05') || str_contains($name, 'laporan asesmen')) {
+                        return $file->getPathname();
+                    }
+                    break;
                 case 'ak07':
                 case 'frak07':
                     if (str_contains($name, 'ak.07') || str_contains($name, 'ak 07') || str_contains($name, 'ak-07')) {
@@ -1532,6 +1540,115 @@ class MukDynamicDocumentService
     }
 
     /**
+     * Build specific payload for FR.AK.05 (Laporan Asesmen).
+     *
+     * @return array<string, mixed>
+     */
+    public function buildAk05Data(Schedule $schedule): array
+    {
+        $schedule->loadMissing([
+            'scheme.competencyUnits',
+            'assessors.profile',
+            'assessments.asesi.profile',
+            'assessments.assessor.profile',
+            'tuk',
+        ]);
+
+        $scheme = $schedule->scheme;
+        $leadAssessor = $schedule->assessors->first() ?? $schedule->assessments->first()?->assessor;
+        if ($leadAssessor && ! $leadAssessor->relationLoaded('profile')) {
+            $leadAssessor->load('profile');
+        }
+
+        $date = Carbon::parse($schedule->date ?? now());
+        $months = [
+            1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April', 5 => 'Mei', 6 => 'Juni',
+            7 => 'Juli', 8 => 'Agustus', 9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember',
+        ];
+        $formattedDate = $date->format('d').' '.($months[(int) $date->format('m')] ?? $date->format('F')).' '.$date->format('Y');
+
+        $tukName = $schedule->tuk_name ?? ($schedule->tuk?->name ?? 'SMKN 1 Bali');
+
+        // Build candidate rows
+        $peserta = [];
+        $assessments = $schedule->assessments;
+        foreach ($assessments as $idx => $ass) {
+            $finalRes = strtoupper((string) ($ass->final_result ?? ''));
+            $status = strtoupper((string) ($ass->status ?? ''));
+
+            $isAbsent = ($finalRes === 'TIDAK_HADIR' || $status === 'ABSENT');
+            $isK = (! $isAbsent && (in_array($finalRes, ['K', 'KOMPETEN'], true) || ($finalRes === '' && $status === 'COMPLETED')));
+            $isBK = (! $isAbsent && in_array($finalRes, ['BK', 'BELUM_KOMPETEN'], true));
+
+            $keterangan = '';
+            if ($isAbsent) {
+                $keterangan = 'Tidak Hadir';
+            } elseif ($isBK) {
+                $keterangan = 'Perlu uji ulang';
+            } elseif ($isK) {
+                $keterangan = 'Memenuhi seluruh KUK';
+            } else {
+                $keterangan = 'Belum Selesai';
+            }
+
+            $peserta[] = [
+                'no' => $idx + 1,
+                'nama' => $ass->asesi?->full_name ?? ('Asesi '.($idx + 1)),
+                'is_k' => $isK,
+                'is_bk' => $isBK,
+                'keterangan' => $keterangan,
+            ];
+        }
+
+        // Extract findings from schedule's ak05_report
+        $report = is_array($schedule->ak05_report) ? $schedule->ak05_report : [];
+        if (empty($report['aspek_positif']) && ! empty($report['by_assessor']) && is_array($report['by_assessor'])) {
+            $firstAssessorReport = reset($report['by_assessor']);
+            if (is_array($firstAssessorReport)) {
+                $report = array_merge($firstAssessorReport, $report);
+            }
+        }
+
+        $aspekNegatif = $report['aspek_negatif'] ?? $report['negative_aspects'] ?? 'Tidak ditemukan kendala signifikan selama proses asesmen berlangsung.';
+        $aspekPositif = $report['aspek_positif'] ?? $report['positive_aspects'] ?? 'Sarana dan prasarana bengkel TUK lengkap, ketersediaan alat ukur dan APD sesuai standar K3, asesi hadir tepat waktu.';
+        $adaPenolakan = $report['ada_penolakan'] ?? $report['rejection_notes'] ?? $report['penolakan'] ?? 'Tidak ada penolakan dari asesi atas keputusan asesmen.';
+        $saranPerbaikan = $report['saran_perbaikan'] ?? $report['rekomendasi'] ?? $report['improvement_suggestions'] ?? 'Mempertahankan konsistensi kalibrasi peralatan tangan dan SST serta peningkatan durasi praktik mandiri.';
+        $catatan = $report['catatan'] ?? 'Laporan asesmen ini dibuat berdasarkan seluruh bukti langsung, tidak langsung, dan tambahan yang dihimpun selama proses asesmen berlangsung di TUK.';
+
+        // Signature assessor
+        $signatureAssessor = null;
+        if (! empty($leadAssessor?->profile?->signature_data)) {
+            $signatureAssessor = $leadAssessor->profile->signature_data;
+        } elseif (! empty($schedule->assessments->first()?->assessor_signature)) {
+            $signatureAssessor = $schedule->assessments->first()->assessor_signature;
+        } elseif ($leadAssessor?->profile?->signature_path && file_exists(storage_path('app/public/'.$leadAssessor->profile->signature_path))) {
+            $signatureAssessor = storage_path('app/public/'.$leadAssessor->profile->signature_path);
+        }
+
+        $assessorReg = $leadAssessor?->assessor_registration_number
+            ?: ($leadAssessor?->profile?->met_reg_number
+                ?: ($leadAssessor?->profile?->no_reg ?: 'MET.000.001234 2022'));
+
+        return [
+            'skema_nama' => $scheme?->name ?? 'Maintenance Gasoline Engine Injection System',
+            'skema_nomor' => $scheme?->muk_code ?? ($scheme?->code ?? '02/LSP PrO Indo/XI/2025'),
+            'skema_tipe' => strtoupper((string) ($scheme?->scheme_type ?? 'KLASTER')),
+            'tuk_nama' => $tukName,
+            'tuk_tipe' => 'Sewaktu/Tempat Kerja/Mandiri*',
+            'asesor_nama' => $leadAssessor?->full_name ?? 'Randi Ardiansyah',
+            'asesor_no_reg' => $assessorReg,
+            'tanggal' => $formattedDate,
+            'peserta' => $peserta,
+            'aspek_negatif' => $aspekNegatif,
+            'aspek_positif' => $aspekPositif,
+            'ada_penolakan' => $adaPenolakan,
+            'saran_perbaikan' => $saranPerbaikan,
+            'catatan' => $catatan,
+            'signature_asesor' => $signatureAssessor,
+        ];
+    }
+
+    /**
      * Get working python executable for current platform.
      */
     public function getPythonExecutable(): string
@@ -2006,6 +2123,16 @@ class MukDynamicDocumentService
                 }
             }
 
+            if (in_array($normType, ['ak05', 'frak05', 'laporanasesmen', 'laporan'], true)) {
+                $script = base_path('tools/render_fr_ak_05.py');
+                if (File::isFile($script)) {
+                    $ak05Payload = $this->buildAk05Data($schedule);
+                    if ($this->runGeneratorWithPayload($python, $script, $ak05Payload, 'muk_ak05', $outputPath, $normType)) {
+                        return $outputPath;
+                    }
+                }
+            }
+
             // 2. Scheme-specific master PDF overlay via PyMuPDF
             $masterPdf = $this->getDynamicFilePath($schedule->scheme, $normType);
             if ($masterPdf && File::isFile($masterPdf)) {
@@ -2045,6 +2172,8 @@ class MukDynamicDocumentService
                 'ak02' => 'tests/Fixtures/muk/FR_AK_02_generated.pdf',
                 'ak03' => 'tests/Fixtures/muk/FR_AK_03_generated.pdf',
                 'ak04' => 'tests/Fixtures/muk/FR_AK_04_generated.pdf',
+                'ak05' => 'tests/Fixtures/muk/FR_AK_05_generated.pdf',
+                'frak05' => 'tests/Fixtures/muk/FR_AK_05_generated.pdf',
                 'ak07' => 'tests/Fixtures/muk/FR_AK_07_generated.pdf',
                 'ia01' => 'tests/Fixtures/muk/FR_IA_01_generated.pdf',
                 'ia03' => 'tests/Fixtures/muk/FR_IA_03_generated.pdf',

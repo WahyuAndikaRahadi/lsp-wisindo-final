@@ -103,7 +103,7 @@
                 <span>Hadir Asesi</span>
             </a>
 
-            <a href="{{ route('admin.dokumen-muk.export', ['schedule' => $schedule->id, 'type' => 'ak05']) }}" target="_blank"
+            <a href="{{ route('admin.dokumen-muk.dynamic', ['schedule' => $schedule->id, 'type' => 'ak05']) }}" target="_blank"
                class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 rounded-lg shadow-2xs transition min-h-[38px]">
                 <span>FR.AK.05 (Laporan)</span>
             </a>
