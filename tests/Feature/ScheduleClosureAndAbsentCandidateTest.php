@@ -6,6 +6,7 @@ use App\Models\Assessment;
 use App\Models\Schedule;
 use App\Models\Scheme;
 use App\Models\User;
+use App\Services\MukDynamicDocumentService;
 use App\Services\MukExportService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
@@ -240,11 +241,13 @@ class ScheduleClosureAndAbsentCandidateTest extends TestCase
         $responseBaPdf->assertOk();
         $this->assertEquals('application/pdf', $responseBaPdf->headers->get('Content-Type'));
 
-        // Test AK.05 Export view rendering
+        // Test AK.05 Export PDF rendering
         $responseAk05 = $this->actingAs($this->admin)->get(
             route('admin.dokumen-muk.export', ['schedule' => $this->schedule->id, 'type' => 'ak05'])
         );
-        $responseAk05->assertOk()
-            ->assertSee('Tidak Hadir');
+        $responseAk05->assertOk();
+        $this->assertEquals('application/pdf', $responseAk05->headers->get('Content-Type'));
+        $ak05Payload = app(MukDynamicDocumentService::class)->buildAk05Data($this->schedule);
+        $this->assertEquals('Tidak Hadir', $ak05Payload['peserta'][1]['keterangan'] ?? '');
     }
 }

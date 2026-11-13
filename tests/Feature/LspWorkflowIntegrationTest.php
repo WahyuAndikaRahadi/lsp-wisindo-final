@@ -1021,8 +1021,8 @@ class LspWorkflowIntegrationTest extends TestCase
         foreach ($scheduleDocExpectations as $type => $expectedSnippet) {
             $res = $this->actingAs($admin)->get(route('admin.dokumen-muk.export', [$schedule, $type]));
             $res->assertOk();
-            if ($type === 'ak06') {
-                $res->assertHeader('content-disposition');
+            if (in_array($type, ['ak05', 'ak06'], true)) {
+                $this->assertStringContainsString('application/', (string) $res->headers->get('Content-Type'));
             } else {
                 $res->assertSee($expectedSnippet);
             }

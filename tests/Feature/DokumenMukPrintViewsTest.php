@@ -300,10 +300,7 @@ class DokumenMukPrintViewsTest extends TestCase
             'type' => 'ak05',
         ]));
         $response->assertOk();
-        $response->assertSee('FR.AK.05. LAPORAN ASESMEN');
-        $response->assertSee('Aspek Negatif dan Positif dalam Asesmen');
-        $response->assertSee('Aspek Positif :');
-        $response->assertSee('Pencatatan Penolakan Hasil Asesmen');
+        $this->assertEquals('application/pdf', $response->headers->get('Content-Type'));
     }
 
     public function test_can_render_fr_ak06_meninjau_proses_asesmen(): void

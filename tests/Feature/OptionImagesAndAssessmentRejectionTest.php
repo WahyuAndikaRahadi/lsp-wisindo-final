@@ -8,6 +8,7 @@ use App\Models\QuestionBank;
 use App\Models\Schedule;
 use App\Models\Scheme;
 use App\Models\User;
+use App\Services\MukDynamicDocumentService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -291,9 +292,11 @@ class OptionImagesAndAssessmentRejectionTest extends TestCase
         ]));
 
         $response->assertOk();
-        $response->assertSee('Ada Penolakan / Permohonan Banding dari Asesi');
-        $response->assertSee($this->asesi2->full_name);
-        $response->assertSee('Asesi Dua keberatan atas hasil uji dan mengajukan banding.');
+        $this->assertEquals('application/pdf', $response->headers->get('Content-Type'));
+
+        $ak05Payload = app(MukDynamicDocumentService::class)->buildAk05Data($this->schedule);
+        $this->assertStringContainsString('Ada Penolakan / Permohonan Banding dari Asesi', $ak05Payload['ada_penolakan']);
+        $this->assertStringContainsString('Asesi Dua keberatan atas hasil uji dan mengajukan banding.', $ak05Payload['ada_penolakan']);
     }
 
     public function test_question_bank_list_is_ordered_ascending_by_default_when_scheme_selected(): void

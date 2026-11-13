@@ -1584,7 +1584,7 @@ class MukDynamicDocumentService
             $finalRes = strtoupper((string) ($ass->final_result ?? ''));
             $status = strtoupper((string) ($ass->status ?? ''));
 
-            $isAbsent = ($finalRes === 'TIDAK_HADIR' || $status === 'ABSENT');
+            $isAbsent = ((bool) ($ass->is_absent ?? false) || $finalRes === 'TIDAK_HADIR' || $status === 'ABSENT');
             $isK = (! $isAbsent && (in_array($finalRes, ['K', 'KOMPETEN'], true) || ($finalRes === '' && $status === 'COMPLETED')));
             $isBK = (! $isAbsent && in_array($finalRes, ['BK', 'BELUM_KOMPETEN'], true));
 
@@ -1619,7 +1619,16 @@ class MukDynamicDocumentService
 
         $aspekNegatif = $report['aspek_negatif'] ?? $report['negative_aspects'] ?? 'Tidak ditemukan kendala signifikan selama proses asesmen berlangsung.';
         $aspekPositif = $report['aspek_positif'] ?? $report['positive_aspects'] ?? 'Sarana dan prasarana bengkel TUK lengkap, ketersediaan alat ukur dan APD sesuai standar K3, asesi hadir tepat waktu.';
-        $adaPenolakan = $report['ada_penolakan'] ?? $report['rejection_notes'] ?? $report['penolakan'] ?? 'Tidak ada penolakan dari asesi atas keputusan asesmen.';
+        $hasPenolakan = ! empty($report['has_penolakan']) || ! empty($report['penolakan_assessment_ids']);
+        $rejectionNotes = $report['rejection_notes'] ?? $report['penolakan_catatan'] ?? $report['ada_penolakan'] ?? $report['penolakan'] ?? null;
+        if ($hasPenolakan || ($rejectionNotes && ! str_contains(strtolower($rejectionNotes), 'tidak ada penolakan'))) {
+            $adaPenolakan = 'Ada Penolakan / Permohonan Banding dari Asesi';
+            if ($rejectionNotes && ! str_contains($rejectionNotes, 'Ada Penolakan')) {
+                $adaPenolakan .= ': '.$rejectionNotes;
+            }
+        } else {
+            $adaPenolakan = $report['ada_penolakan'] ?? $report['rejection_notes'] ?? 'Tidak ada penolakan dari asesi atas keputusan asesmen.';
+        }
         $saranPerbaikan = $report['saran_perbaikan'] ?? $report['rekomendasi'] ?? $report['improvement_suggestions'] ?? 'Mempertahankan konsistensi kalibrasi peralatan tangan dan SST serta peningkatan durasi praktik mandiri.';
         $catatan = $report['catatan'] ?? 'Laporan asesmen ini dibuat berdasarkan seluruh bukti langsung, tidak langsung, dan tambahan yang dihimpun selama proses asesmen berlangsung di TUK.';
 
