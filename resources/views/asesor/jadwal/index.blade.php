@@ -64,7 +64,7 @@
                                         default => 'bg-blue-50 text-blue-700 border-blue-200',
                                     };
                                 $statusLabel = $isClosedForMe && ! $jadwal->is_closed
-                                    ? 'BINAAN SELESAI'
+                                    ? 'SELESAI'
                                     : ($jadwal->is_closed || in_array($jadwal->status, ['COMPLETED', 'FINISHED']) ? 'SELESAI' : ($jadwal->status ?? 'AKTIF'));
                             @endphp
                             <span class="px-2.5 py-0.5 rounded text-xs font-semibold border {{ $statusBadge }}">
@@ -108,7 +108,7 @@
                                     $myCandidatesCount = $jadwal->assessorAssessments()->count();
                                     $allCandidatesCount = $jadwal->assessments->count();
                                 @endphp
-                                <span>Jumlah Asesi: <strong class="text-slate-800">{{ $myCandidatesCount }} Asesi Binaan</strong> @if($allCandidatesCount > $myCandidatesCount)<span class="text-slate-400 font-normal">({{ $allCandidatesCount }} total jadwal)</span>@endif</span>
+                                <span>Jumlah Asesi: <strong class="text-slate-800">{{ $myCandidatesCount }} Asesi</strong> @if($allCandidatesCount > $myCandidatesCount)<span class="text-slate-400 font-normal">({{ $allCandidatesCount }} total jadwal)</span>@endif</span>
                             </div>
                         </div>
                     </div>

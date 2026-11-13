@@ -11,16 +11,16 @@
             </a>
             @if($ak03)
                 <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
-                    ✓ Selesai &amp; Terkunci
+                    ✓ Selesai
                 </span>
             @endif
         </div>
         <div>
             <h1 class="text-xl sm:text-2xl md:text-3xl font-black text-slate-900 tracking-tight leading-snug">
-                FR.AK.03 Umpan Balik dan Catatan Asesmen
+                FR.AK.03 Umpan Balik Asesmen
             </h1>
             <p class="text-xs sm:text-sm text-slate-500 mt-1 leading-relaxed max-w-2xl">
-                Evaluasi pengalaman asesi terhadap transparansi dan kenyamanan pelaksanaan uji kompetensi
+                Evaluasi asesi terhadap pelaksanaan uji kompetensi
             </p>
         </div>
     </div>
@@ -30,8 +30,8 @@
             <div class="flex items-center gap-2.5">
                 <span class="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-xs shrink-0">✓</span>
                 <div>
-                    <span class="font-bold text-sm block">Formulir FR.AK.03 Umpan Balik Telah Terkirim (Terkunci)</span>
-                    <span class="text-xs text-emerald-800 mt-0.5 leading-relaxed">Tersimpan pada {{ \Carbon\Carbon::parse($ak03->created_at)->isoFormat('D MMMM Y, HH:mm') }} WIB. Seluruh isian evaluasi telah tersimpan permanen dan tidak dapat diubah kembali.</span>
+                    <span class="font-bold text-sm block">FR.AK.03 Telah Terkirim</span>
+                    <span class="text-xs text-emerald-800 mt-0.5 leading-relaxed">Tersimpan pada {{ \Carbon\Carbon::parse($ak03->created_at)->isoFormat('D MMMM Y, HH:mm') }} WIB.</span>
                 </div>
             </div>
             <a href="{{ route('asesi.dashboard') }}" class="w-full sm:w-auto shrink-0 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl transition shadow-xs text-center">
@@ -83,43 +83,51 @@
 
         <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
             <div class="px-4 sm:px-6 py-4 bg-slate-50 border-b border-slate-200">
-                <h2 class="text-sm font-bold text-slate-900">Komponen Penilaian Pengalaman Asesmen</h2>
-                <p class="text-xs text-slate-500 mt-0.5">Pilih YA jika pernyataan sesuai dengan apa yang Anda rasakan, atau TIDAK jika tidak terpenuhi</p>
+                <h2 class="text-sm font-bold text-slate-900">Komponen Penilaian Asesmen</h2>
+                <p class="text-xs text-slate-500 mt-0.5">Pilih YA jika sesuai atau TIDAK jika tidak terpenuhi</p>
             </div>
 
-            <div class="overflow-x-auto">
-                <table class="w-full min-w-[650px] text-xs">
-                    <thead class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
+            <div class="p-3 sm:p-0 overflow-x-auto md:overflow-x-visible">
+                <table class="w-full md:min-w-[650px] text-xs">
+                    <thead class="hidden md:table-header-group bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
                         <tr>
                             <th class="px-4 py-3 text-center w-12">No</th>
                             <th class="px-4 py-3 text-left">Pernyataan Evaluasi</th>
                             <th class="px-3 py-3 text-center w-28">Pilihan</th>
-                            <th class="px-4 py-3 text-left w-64">Catatan / Komentar Asesi</th>
+                            <th class="px-4 py-3 text-left w-64">Catatan (Opsional)</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-100">
+                    <tbody class="divide-y-0 md:divide-y divide-slate-100 block md:table-row-group space-y-3 md:space-y-0">
                         @foreach($items as $no => $text)
                             @php
                                 $val = $savedRatings[$no]['value'] ?? null;
                                 $comment = $savedRatings[$no]['comment'] ?? '';
                             @endphp
-                            <tr class="hover:bg-slate-50/60">
-                                <td class="px-4 py-3 text-center text-slate-500 font-mono">{{ $no }}</td>
-                                <td class="px-4 py-3 text-slate-800 leading-relaxed">{{ $text }}</td>
-                                <td class="px-3 py-3 text-center">
-                                    <div class="inline-flex items-center space-x-2">
-                                        <label class="inline-flex items-center space-x-1 {{ $ak03 ? 'cursor-default' : 'cursor-pointer' }}">
-                                            <input type="radio" name="ratings[{{ $no }}][value]" value="YA" {{ $val === 'YA' ? 'checked' : '' }} @disabled((bool) $ak03) required class="text-brand-600 focus:ring-brand-500">
-                                            <span class="font-bold text-emerald-700">Ya</span>
+                            <tr class="flex flex-col bg-white rounded-xl border border-slate-200 p-3.5 shadow-2xs gap-2.5 md:table-row md:border-0 md:p-0 md:shadow-none md:hover:bg-slate-50/60 transition">
+                                <td class="hidden md:table-cell px-4 py-3 text-center text-slate-500 font-mono">{{ $no }}</td>
+                                <td class="w-full md:table-cell p-0 md:px-4 md:py-3 text-slate-800 leading-relaxed">
+                                    <div class="flex items-start gap-2">
+                                        <span class="md:hidden inline-flex items-center justify-center px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 font-mono font-bold text-[10px] shrink-0 mt-0.5">#{{ $no }}</span>
+                                        <span>{{ $text }}</span>
+                                    </div>
+                                </td>
+                                <td class="w-full md:w-28 md:table-cell p-0 md:px-3 md:py-3 text-center">
+                                    <div class="grid grid-cols-2 gap-2 md:inline-flex md:items-center md:space-x-2">
+                                        <label class="flex items-center justify-center gap-1.5 p-2 rounded-lg border border-emerald-200 bg-emerald-50/70 hover:bg-emerald-100 text-emerald-800 font-bold text-xs cursor-pointer md:border-0 md:p-0 md:bg-transparent min-h-[38px] md:min-h-0 {{ $ak03 ? 'cursor-default opacity-80' : '' }}">
+                                            <input type="radio" name="ratings[{{ $no }}][value]" value="YA" {{ $val === 'YA' ? 'checked' : '' }} @disabled((bool) $ak03) required class="text-emerald-600 focus:ring-emerald-500 w-4 h-4">
+                                            <span>Ya</span>
                                         </label>
-                                        <label class="inline-flex items-center space-x-1 {{ $ak03 ? 'cursor-default' : 'cursor-pointer' }}">
-                                            <input type="radio" name="ratings[{{ $no }}][value]" value="TIDAK" {{ $val === 'TIDAK' ? 'checked' : '' }} @disabled((bool) $ak03) required class="text-rose-600 focus:ring-rose-500">
-                                            <span class="font-bold text-rose-700">Tidak</span>
+                                        <label class="flex items-center justify-center gap-1.5 p-2 rounded-lg border border-rose-200 bg-rose-50/70 hover:bg-rose-100 text-rose-800 font-bold text-xs cursor-pointer md:border-0 md:p-0 md:bg-transparent min-h-[38px] md:min-h-0 {{ $ak03 ? 'cursor-default opacity-80' : '' }}">
+                                            <input type="radio" name="ratings[{{ $no }}][value]" value="TIDAK" {{ $val === 'TIDAK' ? 'checked' : '' }} @disabled((bool) $ak03) required class="text-rose-600 focus:ring-rose-500 w-4 h-4">
+                                            <span>Tidak</span>
                                         </label>
                                     </div>
                                 </td>
-                                <td class="px-4 py-3">
-                                    <input type="text" name="ratings[{{ $no }}][comment]" value="{{ $comment }}" @disabled((bool) $ak03) class="w-full text-xs rounded-xl border border-slate-300 bg-white px-3.5 py-1.5 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:outline-none transition shadow-2xs @if($ak03) bg-slate-50 text-slate-600 @endif" placeholder="Opsional">
+                                <td class="w-full md:w-64 md:table-cell p-0 md:px-4 md:py-3">
+                                    <div class="space-y-1">
+                                        <span class="text-[11px] font-semibold text-slate-500 md:hidden block">Catatan (opsional):</span>
+                                        <input type="text" name="ratings[{{ $no }}][comment]" value="{{ $comment }}" @disabled((bool) $ak03) class="w-full text-xs rounded-xl border border-slate-300 bg-white px-3.5 py-2 md:py-1.5 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:outline-none transition shadow-2xs @if($ak03) bg-slate-50 text-slate-600 @endif" placeholder="Tulis catatan jika ada">
+                                    </div>
                                 </td>
                             </tr>
                         @endforeach
@@ -128,7 +136,7 @@
             </div>
 
             <div class="p-4 sm:p-6 border-t border-slate-200 bg-slate-50/50 space-y-2">
-                <label class="block text-xs font-bold text-slate-700">Catatan / Komentar Tambahan Lainnya (apabila ada):</label>
+                <label class="block text-xs font-bold text-slate-700">Catatan / Komentar Tambahan (opsional):</label>
                 <textarea name="general_notes" rows="2" @disabled((bool) $ak03) class="w-full p-3 text-xs rounded-xl border border-slate-300 bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:outline-none transition shadow-2xs @if($ak03) bg-slate-50 text-slate-600 @endif" placeholder="Kesan, pesan, atau masukan untuk pelaksanaan asesmen...">{{ $ak03?->general_notes ?? '' }}</textarea>
             </div>
         </div>
@@ -140,11 +148,11 @@
             @if($ak03)
                 <button type="button" disabled class="w-full sm:w-auto px-6 py-2.5 text-xs font-bold text-slate-500 bg-slate-200 border border-slate-300 rounded-xl cursor-not-allowed flex items-center justify-center gap-1.5">
                     <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-                    <span>Umpan Balik Telah Terkirim (Terkunci)</span>
+                    <span>Umpan Balik Terkirim (Terkunci)</span>
                 </button>
             @else
                 <button type="submit" class="w-full sm:w-auto px-6 py-3 text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 rounded-xl shadow-sm transition flex items-center justify-center gap-2">
-                    <span>Kirim Umpan Balik (FR.AK.03) &amp; Selesai</span>
+                    <span>Kirim Umpan Balik</span>
                     <span>✓</span>
                 </button>
             @endif

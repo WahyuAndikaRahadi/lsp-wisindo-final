@@ -6,13 +6,13 @@
     <div class="bg-gradient-to-r from-lsp-navy to-lsp-navy-dark rounded-2xl p-5 sm:p-6 md:p-8 text-white shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 border-t-4 border-lsp-red">
         <div>
             <span class="inline-block px-2.5 py-0.5 rounded-full bg-white/10 text-lsp-red border border-lsp-red/30 text-[10px] font-extrabold tracking-wider uppercase mb-2">
-                Peserta Asesmen Kompetensi
+                Asesi
             </span>
             <h1 class="font-sans text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight">
                 Selamat Datang, {{ auth()->user()->full_name }}!
             </h1>
             <p class="text-blue-100/80 text-xs mt-1 max-w-xl">
-                LSP PrO Indo mendigitalisasi proses sertifikasi kompetensi profesi teknisi otomotif Indonesia berstandar BNSP.
+                Sistem sertifikasi profesi teknisi otomotif berstandar BNSP.
             </p>
         </div>
         <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:space-x-3 shrink-0">
@@ -101,8 +101,8 @@
     <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
         <div class="px-4 sm:px-6 py-4 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
-                <h2 class="text-sm sm:text-base font-bold text-slate-900">Jadwal Asesmen Terkini</h2>
-                <p class="text-xs text-slate-500 mt-0.5">Daftar sertifikasi kompetensi yang sedang atau telah Anda ikuti</p>
+                <h2 class="text-sm sm:text-base font-bold text-slate-900">Jadwal Asesmen</h2>
+                <p class="text-xs text-slate-500 mt-0.5">Daftar jadwal uji yang Anda ikuti</p>
             </div>
             <a href="{{ route('asesi.jadwal.index') }}" class="self-start sm:self-auto text-xs font-semibold text-brand-600 hover:text-brand-700">
                 Lihat Semua Jadwal &rarr;
@@ -134,35 +134,35 @@
 
                         $hasFinalDecision = ($item->status === 'COMPLETED') || in_array($item->final_result, ['KOMPETEN', 'BELUM_KOMPETEN', 'K', 'BK'], true);
 
-                        // 5-Stage progress determination
+                        // Progress stage determination
                         if ($item->apl_status === 'REJECTED' || $item->admin_status === 'REJECTED') {
                             $stageNumber = 0;
-                            $stageTitle = 'Permohonan APL Ditolak (Tidak Dapat Mengikuti Jadwal)';
+                            $stageTitle = 'APL Ditolak';
                             $stageBadgeColor = 'bg-rose-100 text-rose-800 border-rose-300';
                             $targetUrl = route('asesi.assessment.apl', $item->id);
                         } elseif ($hasFinalDecision) {
                             $stageNumber = 5;
-                            $stageTitle = 'Tahap 5 dari 5: Hasil Keputusan Asesmen (' . ($item->final_result ?? 'Selesai') . ')';
+                            $stageTitle = 'Hasil: ' . ($item->final_result ?? 'Selesai');
                             $stageBadgeColor = in_array($item->final_result, ['KOMPETEN', 'K'], true) ? 'bg-emerald-100 text-emerald-800 border-emerald-300' : 'bg-rose-100 text-rose-800 border-rose-300';
                             $targetUrl = route('asesi.assessment.ruang-uji', $item->id);
                         } elseif ($item->apl_status === 'APPROVED') {
                             $stageNumber = 4;
-                            $stageTitle = 'Pelaksanaan Uji Kompetensi (Ruang Uji & CBT)';
+                            $stageTitle = 'Ruang Uji Aktif';
                             $stageBadgeColor = 'bg-emerald-100 text-emerald-800 border-emerald-200';
                             $targetUrl = route('asesi.assessment.ruang-uji', $item->id);
                         } elseif ($item->apl_status === 'SUBMITTED') {
                             $stageNumber = 2;
-                            $stageTitle = 'Menunggu Verifikasi APL oleh Asesor';
+                            $stageTitle = 'Menunggu Verifikasi APL';
                             $stageBadgeColor = 'bg-amber-100 text-amber-800 border-amber-200';
                             $targetUrl = route('asesi.assessment.apl', $item->id);
                         } elseif ($item->apl_status === 'REVISION_REQUESTED') {
                             $stageNumber = 2;
-                            $stageTitle = 'Perbaikan Dokumen / Asesmen Mandiri (APL-02)';
+                            $stageTitle = 'Perbaikan Dokumen (Revisi APL)';
                             $stageBadgeColor = 'bg-rose-100 text-rose-800 border-rose-300';
                             $targetUrl = route('asesi.assessment.apl', $item->id);
                         } else {
                             $stageNumber = 1;
-                            $stageTitle = 'Pengisian Formulir APL.01 & APL.02';
+                            $stageTitle = 'Pengisian APL';
                             $stageBadgeColor = 'bg-slate-100 text-slate-800 border-slate-300';
                             $targetUrl = route('asesi.assessment.apl', $item->id);
                         }

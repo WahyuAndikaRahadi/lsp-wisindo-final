@@ -602,7 +602,7 @@
             @if($isScheduleClosed)
                 <div class="p-3 bg-emerald-50 border border-emerald-300 rounded-xl text-xs text-emerald-900 font-semibold flex items-center gap-2">
                     <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
-                    <span>{{ $assessment->schedule?->is_closed ? 'Jadwal asesmen telah resmi ditutup dan dikunci. Formulir keputusan APL dalam mode lihat (read-only).' : 'Asesmen asesi binaan Anda telah selesai dan ditutup. Formulir keputusan APL dalam mode lihat (read-only).' }}</span>
+                    <span>{{ $assessment->schedule?->is_closed ? 'Jadwal ditutup dan dikunci. Formulir keputusan APL dalam mode lihat (read-only).' : 'Asesmen telah selesai. Formulir keputusan APL dalam mode lihat (read-only).' }}</span>
                 </div>
             @endif
 
@@ -678,7 +678,7 @@
 
                 @if($isScheduleClosed)
                     <button type="button" disabled class="w-full sm:w-auto px-6 py-3 bg-slate-200 text-slate-500 rounded-xl font-bold text-sm cursor-not-allowed">
-                        {{ $assessment->schedule?->is_closed ? 'Jadwal Telah Ditutup (Read-Only)' : 'Asesmen Binaan Telah Selesai (Read-Only)' }}
+                        {{ $assessment->schedule?->is_closed ? 'Jadwal Telah Ditutup (Read-Only)' : 'Asesmen Telah Selesai (Read-Only)' }}
                     </button>
                 @else
                     <button type="submit" class="w-full sm:w-auto px-8 py-3 bg-lsp-navy hover:bg-lsp-navy-dark text-white rounded-xl font-bold text-sm shadow-md transition transform active:scale-95 flex items-center justify-center gap-2"

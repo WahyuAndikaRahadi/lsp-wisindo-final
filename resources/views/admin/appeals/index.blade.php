@@ -493,9 +493,9 @@
                         @endif
 
                         {{-- Expanded 10 Items Breakdown --}}
-                        <div x-show="expanded" x-collapse class="p-4 sm:p-6 bg-white overflow-x-auto">
-                            <table class="w-full min-w-[600px] text-xs">
-                                <thead class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
+                        <div x-show="expanded" x-collapse class="p-3 sm:p-6 bg-white overflow-x-auto md:overflow-x-visible">
+                            <table class="w-full md:min-w-[600px] text-xs">
+                                <thead class="hidden md:table-header-group bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
                                     <tr>
                                         <th class="p-2.5 text-center w-10">No</th>
                                         <th class="p-2.5 text-left">Pernyataan Evaluasi</th>
@@ -503,16 +503,19 @@
                                         <th class="p-2.5 text-left w-56">Catatan Asesi</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-slate-100">
+                                <tbody class="divide-y-0 md:divide-y divide-slate-100 block md:table-row-group space-y-2.5 md:space-y-0">
                                     @foreach($ak03Statements as $num => $stmt)
                                         @php
                                             $itemVal = $ratings[$num]['value'] ?? '-';
                                             $itemComment = $ratings[$num]['comment'] ?? '-';
                                         @endphp
-                                        <tr class="hover:bg-slate-50/50">
-                                            <td class="p-2.5 text-center text-slate-400 font-mono">{{ $num }}</td>
-                                            <td class="p-2.5 text-slate-800 leading-relaxed">{{ $stmt }}</td>
-                                            <td class="p-2.5 text-center">
+                                        <tr class="flex flex-col bg-slate-50/70 rounded-xl border border-slate-200 p-3 gap-1.5 md:table-row md:border-0 md:p-0 md:bg-transparent md:hover:bg-slate-50/50">
+                                            <td class="hidden md:table-cell p-2.5 text-center text-slate-400 font-mono">{{ $num }}</td>
+                                            <td class="w-full md:table-cell p-0 md:p-2.5 text-slate-800 leading-relaxed">
+                                                <span class="md:hidden font-mono font-bold text-slate-500 mr-1.5">#{{ $num }}</span>{{ $stmt }}
+                                            </td>
+                                            <td class="w-full md:w-24 md:table-cell p-0 md:p-2.5 text-left md:text-center flex items-center gap-2 md:table-cell">
+                                                <span class="md:hidden text-[11px] text-slate-500 font-semibold">Hasil:</span>
                                                 @if($itemVal === 'YA')
                                                     <span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold text-[11px]">YA</span>
                                                 @elseif($itemVal === 'TIDAK')
@@ -521,7 +524,8 @@
                                                     <span class="text-slate-400">-</span>
                                                 @endif
                                             </td>
-                                            <td class="p-2.5 text-slate-600 italic">
+                                            <td class="w-full md:w-56 md:table-cell p-0 md:p-2.5 text-slate-600 italic">
+                                                <span class="md:hidden text-[11px] text-slate-500 font-semibold not-italic inline mr-1">Catatan:</span>
                                                 {{ $itemComment !== '-' && !empty($itemComment) ? $itemComment : '-' }}
                                             </td>
                                         </tr>

@@ -14,11 +14,11 @@
             <div class="flex items-center space-x-2.5">
                 <svg class="w-5 h-5 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
                 <div>
-                    <strong class="font-bold block text-sm">{{ $schedule->is_closed ? 'Jadwal Telah Resmi Ditutup & Dikunci' : 'Asesmen Asesi Binaan Anda Telah Selesai & Ditutup' }}</strong>
-                    <span>{{ $schedule->is_closed ? 'Seluruh pengujian dan penilaian telah selesai. Seluruh dokumen dalam mode lihat (read-only).' : 'Seluruh asesi binaan Anda telah selesai dinilai dan laporan telah disimpan. Dokumen dalam mode lihat (read-only).' }}</span>
+                    <strong class="font-bold block text-sm">{{ $schedule->is_closed ? 'Jadwal Ditutup' : 'Asesmen Telah Selesai' }}</strong>
+                    <span>{{ $schedule->is_closed ? 'Seluruh asesmen selesai. Dokumen dalam mode lihat (read-only).' : 'Asesmen selesai dinilai dan tersimpan. Dokumen dalam mode lihat (read-only).' }}</span>
                 </div>
             </div>
-            <span class="font-bold font-mono text-xs bg-emerald-100 text-emerald-800 px-3 py-1 rounded-lg border border-emerald-300 shrink-0">STATUS: {{ $schedule->is_closed ? 'FINISHED' : 'BINAAN SELESAI' }}</span>
+            <span class="font-bold font-mono text-xs bg-emerald-100 text-emerald-800 px-3 py-1 rounded-lg border border-emerald-300 shrink-0">STATUS: {{ $schedule->is_closed ? 'FINISHED' : 'SELESAI' }}</span>
         </div>
     @endif
 
@@ -56,12 +56,12 @@
                 <p class="text-xs text-slate-500 mt-0.5">{{ substr($schedule->start_time, 0, 5) }} - {{ substr($schedule->end_time, 0, 5) }} WIB</p>
             </div>
             <div>
-                <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Asesi Binaan Anda</span>
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Daftar Asesi</span>
                 <p class="text-2xl font-black text-slate-900 mt-1">
                     {{ $totalAsesi }} <span class="text-xs font-semibold text-slate-500">Orang @if($schedule->assessments->count() > $totalAsesi)({{ $schedule->assessments->count() }} total jadwal)@endif</span>
                 </p>
                 <span class="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 mt-1 inline-block">
-                    Status: {{ $isClosedForMe && ! $schedule->is_closed ? 'BINAAN SELESAI' : $schedule->status }}
+                    Status: {{ $isClosedForMe && ! $schedule->is_closed ? 'SELESAI' : $schedule->status }}
                 </span>
             </div>
         </div>

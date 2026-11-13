@@ -59,10 +59,10 @@
                 <p class="text-xs text-slate-500 mt-0.5">{{ substr($schedule->start_time, 0, 5) }} - {{ substr($schedule->end_time, 0, 5) }} WIB</p>
             </div>
             <div>
-                <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Asesor Pembina</span>
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Asesor</span>
                 <p class="text-slate-900 font-bold mt-1 text-sm">{{ $assessment->assessor?->full_name ?? 'Tim Asesor LSP' }}</p>
                 <span class="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 mt-1 inline-block">
-                    Status: {{ $assessment->status === 'COMPLETED' ? 'SELESAI' : 'AKTIF UJI' }}
+                    Status: {{ $assessment->status === 'COMPLETED' ? 'SELESAI' : 'AKTIF' }}
                 </span>
             </div>
         </div>
@@ -70,8 +70,8 @@
 
     {{-- Selected Instruments Heading --}}
     <div>
-        <h2 class="text-lg font-black text-slate-900 tracking-tight">Instrumen Asesmen Terpilih</h2>
-        <p class="text-xs text-slate-500">Pilih dan kerjakan instrumen asesmen kompetensi yang telah ditetapkan untuk Anda</p>
+        <h2 class="text-lg font-black text-slate-900 tracking-tight">Instrumen Asesmen</h2>
+        <p class="text-xs text-slate-500">Daftar instrumen asesmen yang ditetapkan untuk Anda</p>
     </div>
 
     {{-- Grid of Selected Instruments --}}

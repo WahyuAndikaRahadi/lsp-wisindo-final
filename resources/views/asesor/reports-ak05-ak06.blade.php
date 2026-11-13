@@ -14,11 +14,11 @@
             <div class="flex items-center space-x-2.5">
                 <svg class="w-5 h-5 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
                 <div>
-                    <strong class="font-bold block text-sm">{{ $schedule->is_closed ? 'Jadwal Telah Resmi Ditutup & Dikunci' : 'Laporan Asesmen Binaan Anda Telah Disimpan & Ditutup' }}</strong>
-                    <span>{{ $schedule->is_closed ? 'Jadwal ditutup pada ' . ($schedule->closed_at ? \Carbon\Carbon::parse($schedule->closed_at)->isoFormat('dddd, D MMMM Y, HH:mm') : '-') . ' WIB. Dokumen laporan dalam mode lihat (read-only).' : 'Seluruh asesi binaan Anda telah selesai dinilai dan laporan tersimpan permanen dalam mode lihat (read-only).' }}</span>
+                    <strong class="font-bold block text-sm">{{ $schedule->is_closed ? 'Jadwal Ditutup' : 'Laporan Asesmen Telah Disimpan' }}</strong>
+                    <span>{{ $schedule->is_closed ? 'Jadwal ditutup pada ' . ($schedule->closed_at ? \Carbon\Carbon::parse($schedule->closed_at)->isoFormat('dddd, D MMMM Y, HH:mm') : '-') . ' WIB. Dokumen dalam mode lihat (read-only).' : 'Laporan asesmen telah disimpan dalam mode lihat (read-only).' }}</span>
                 </div>
             </div>
-            <span class="font-bold font-mono text-xs bg-emerald-100 text-emerald-800 px-3 py-1 rounded-lg border border-emerald-300 shrink-0">STATUS: {{ $schedule->is_closed ? 'FINISHED' : 'BINAAN SELESAI' }}</span>
+            <span class="font-bold font-mono text-xs bg-emerald-100 text-emerald-800 px-3 py-1 rounded-lg border border-emerald-300 shrink-0">STATUS: {{ $schedule->is_closed ? 'FINISHED' : 'SELESAI' }}</span>
         </div>
     @endif
 
@@ -45,7 +45,7 @@
                 <span class="font-bold text-slate-900">{{ $schedule->tuk_name }}</span>
             </div>
             <div>
-                <span class="text-slate-500 block">Jumlah Asesi Binaan:</span>
+                <span class="text-slate-500 block">Jumlah Asesi:</span>
                 <span class="font-bold text-brand-700">{{ $myAssessments->count() }} Orang ({{ $myAssessments->where('status', 'COMPLETED')->count() }} Selesai)</span>
                 @if($schedule->assessments->count() > $myAssessments->count())
                     <span class="text-[10px] text-slate-400 block mt-0.5 font-normal">
@@ -166,7 +166,7 @@
                     <div>
                         <label class="block font-bold text-slate-800 mb-0.5">4. Pencatatan Penolakan Hasil Asesmen (Permohonan Banding Asesi):</label>
                         <p class="text-[11px] text-slate-500 leading-relaxed">
-                            Pilih apakah terdapat penolakan atau keberatan dari asesi binaan atas rekomendasi hasil akhir asesmen. Asesi yang dicatat menolak akan diberikan hak pengajuan banding resmi (FR.AK.04) di akun mereka.
+                            Pilih apakah terdapat penolakan atau keberatan dari asesi atas rekomendasi hasil akhir asesmen. Asesi yang dicatat menolak akan diberikan hak pengajuan banding resmi (FR.AK.04) di akun mereka.
                         </p>
                     </div>
 
@@ -180,7 +180,7 @@
                                    class="w-4 h-4 text-emerald-600 focus:ring-emerald-500 cursor-pointer">
                             <div>
                                 <span class="block font-bold text-xs text-slate-800">Tidak Ada Penolakan (Default)</span>
-                                <span class="block text-[11px] text-slate-500">Seluruh asesi binaan menerima keputusan hasil asesmen dengan baik.</span>
+                                <span class="block text-[11px] text-slate-500">Seluruh asesi menerima keputusan hasil asesmen dengan baik.</span>
                             </div>
                         </label>
 
@@ -206,7 +206,7 @@
                                     <span class="w-2 h-2 rounded-full bg-rose-500"></span>
                                     <strong class="text-xs font-bold text-rose-900">Daftar Asesi yang Mengajukan Penolakan / Banding:</strong>
                                 </div>
-                                <span class="text-[11px] text-rose-700 block mt-0.5" x-text="selectedPenolakan.length + ' dari {{ $myAssessments->count() }} asesi binaan dipilih'"></span>
+                                <span class="text-[11px] text-rose-700 block mt-0.5" x-text="selectedPenolakan.length + ' dari {{ $myAssessments->count() }} asesi dipilih'"></span>
                             </div>
                             @if(! $isClosedForMe)
                                 <button type="button" @click="showPenolakanModal = true"
@@ -221,7 +221,7 @@
                         <div class="space-y-2">
                             <template x-if="selectedPenolakan.length === 0">
                                 <div class="p-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-800 text-[11px] flex items-center justify-between">
-                                    <span>⚠️ Anda belum memilih asesi yang mengajukan penolakan. Klik tombol di atas untuk memilih asesi binaan.</span>
+                                    <span>⚠️ Anda belum memilih asesi yang mengajukan penolakan. Klik tombol di atas untuk memilih asesi.</span>
                                     @if(! $isClosedForMe)
                                         <button type="button" @click="showPenolakanModal = true" class="underline font-bold ml-2 cursor-pointer">Pilih Sekarang</button>
                                     @endif
@@ -452,14 +452,14 @@
                     @if($schedule->is_closed)
                         <span>Jadwal Telah Resmi Ditutup & Dikunci (Read-Only)</span>
                     @else
-                        <span>Laporan Binaan Telah Disimpan (Mode Selesai)</span>
+                        <span>Laporan Telah Disimpan (Selesai)</span>
                     @endif
                 </div>
             @else
                 <button type="submit" class="px-6 py-2.5 min-h-[40px] text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 rounded-lg shadow-sm transition inline-flex items-center justify-center"
                         data-confirm="PERINGATAN KONFIRMASI LAPORAN ASESMEN:
 
-1. Seluruh rekaman penilaian dan rekomendasi asesi binaan Anda akan disimpan.
+1. Seluruh rekaman penilaian dan rekomendasi asesi akan disimpan.
 2. Jika seluruh asesi pada jadwal ini telah selesai, jadwal akan resmi ditutup (FINISHED).
 3. Berita Acara dan Dokumen MUK siap diverifikasi untuk audit BNSP.
 
@@ -495,14 +495,14 @@ Apakah Anda yakin ingin menyimpan laporan FR.AK.05 & FR.AK.06 ini?"
                                    @change="toggleAllPenolakan($event)"
                                    :checked="selectedPenolakan.length === allCandidateIds.length && allCandidateIds.length > 0"
                                    class="rounded border-slate-300 text-rose-600 focus:ring-rose-500 w-4 h-4">
-                            <span>Pilih Semua Asesi Binaan ({{ $myAssessments->count() }} Orang)</span>
+                            <span>Pilih Semua Asesi ({{ $myAssessments->count() }})</span>
                         </label>
                         <span class="text-[11px] text-slate-400 italic">Centang asesi yang menolak</span>
                     </div>
 
                     @if($myAssessments->isEmpty())
                         <div class="p-4 bg-slate-50 border border-slate-200 rounded-lg text-slate-500 text-xs text-center">
-                            Tidak ada asesi binaan yang terdaftar pada jadwal ini.
+                            Tidak ada asesi yang terdaftar pada jadwal ini.
                         </div>
                     @else
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-[50vh] overflow-y-auto pr-1">

@@ -452,6 +452,7 @@ class MvpEndToEndWorkflowTest extends TestCase
             'admin_status' => 'APPROVED',
             'apl_status' => 'APPROVED',
             'final_result' => 'BELUM_KOMPETEN',
+            'has_rejection' => true,
             'completed_at' => now(),
         ]);
 

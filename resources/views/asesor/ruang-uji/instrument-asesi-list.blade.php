@@ -17,9 +17,9 @@
         <div class="p-3.5 bg-emerald-50 border border-emerald-300 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-emerald-900">
             <div class="flex items-center space-x-2">
                 <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
-                <span><strong>{{ $schedule->is_closed ? 'Jadwal Telah Resmi Ditutup & Dikunci:' : 'Asesmen Binaan Anda Telah Resmi Ditutup & Selesai:' }}</strong> Seluruh berkas dan instrumen dalam mode lihat (read-only). Anda tetap dapat memeriksa lembar kerja dan rekaman penilaian peserta.</span>
+                <span><strong>{{ $schedule->is_closed ? 'Jadwal Ditutup:' : 'Asesmen Telah Selesai:' }}</strong> Seluruh berkas dalam mode lihat (read-only).</span>
             </div>
-            <span class="font-bold font-mono text-[11px] bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded border border-emerald-300 shrink-0">STATUS: {{ $schedule->is_closed ? 'FINISHED' : 'BINAAN SELESAI' }}</span>
+            <span class="font-bold font-mono text-[11px] bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded border border-emerald-300 shrink-0">STATUS: {{ $schedule->is_closed ? 'FINISHED' : 'SELESAI' }}</span>
         </div>
     @endif
 
@@ -47,7 +47,7 @@
     {{-- Meta Stats Bar --}}
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
-            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Asesi Binaan Anda</span>
+            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Daftar Asesi</span>
             <div class="text-2xl font-black text-slate-900 mt-0.5">
                 {{ $asesiList->count() }} Orang
                 @if($schedule->assessments->count() > $asesiList->count())
@@ -98,7 +98,7 @@
                         if (this.hasProfileSig) {
                             window.notiflixConfirm(
                                 'Konfirmasi Tanda Tangan Massal',
-                                'Apakah Anda yakin ingin menandatangani dokumen FR.IA.02 untuk ' + count + ' asesi binaan yang dipilih menggunakan tanda tangan profil Anda?',
+                                'Apakah Anda yakin ingin menandatangani dokumen FR.IA.02 untuk ' + count + ' asesi yang dipilih menggunakan tanda tangan profil Anda?',
                                 'Ya, Tanda Tangani',
                                 'Batal',
                                 function () {
@@ -243,7 +243,7 @@
                                                 @endif
                                             </div>
                                             <span class="inline-flex items-center text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 mt-1">
-                                                ✓ Asesi Binaan Anda
+                                                ✓ Asesi Ditugaskan
                                             </span>
                                         </div>
                                     </div>

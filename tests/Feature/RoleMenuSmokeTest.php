@@ -50,6 +50,7 @@ class RoleMenuSmokeTest extends TestCase
             'status' => 'IN_PROGRESS',
             'admin_status' => 'APPROVED',
             'apl_status' => 'APPROVED',
+            'has_rejection' => true,
         ]);
 
         return compact('superAdmin', 'admin', 'asesor', 'asesi', 'scheme', 'schedule', 'assessment');

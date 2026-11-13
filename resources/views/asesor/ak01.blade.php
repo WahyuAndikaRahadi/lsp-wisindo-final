@@ -60,9 +60,9 @@
         <div class="p-3.5 bg-emerald-50 border border-emerald-300 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-emerald-900">
             <div class="flex items-center space-x-2">
                 <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
-                <span><strong>{{ $jadwal->is_closed ? 'Jadwal Telah Resmi Ditutup & Dikunci:' : 'Asesmen Binaan Anda Telah Ditutup & Selesai:' }}</strong> Dokumen persetujuan asesmen FR.AK.01 dalam mode lihat (read-only).</span>
+                <span><strong>{{ $jadwal->is_closed ? 'Jadwal Ditutup:' : 'Persetujuan Selesai:' }}</strong> Dokumen FR.AK.01 dalam mode lihat (read-only).</span>
             </div>
-            <span class="font-bold font-mono text-[11px] bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded border border-emerald-300 shrink-0">STATUS: {{ $jadwal->is_closed ? 'FINISHED' : 'BINAAN SELESAI' }}</span>
+            <span class="font-bold font-mono text-[11px] bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded border border-emerald-300 shrink-0">STATUS: {{ $jadwal->is_closed ? 'FINISHED' : 'SELESAI' }}</span>
         </div>
     @endif
 
@@ -196,7 +196,7 @@
                         <div class="flex items-center justify-between pb-2 border-b border-slate-200">
                             <label class="inline-flex items-center gap-2 {{ $isClosedForMe ? 'cursor-default' : 'cursor-pointer' }} text-xs font-bold text-slate-800">
                                 <input type="checkbox" id="check-all-asesi" checked @disabled($isClosedForMe) class="rounded border-slate-300 text-brand-600 focus:ring-brand-500 w-4 h-4">
-                                <span>Pilih Semua Asesi Binaan ({{ $assessments->count() }} Orang)</span>
+                                <span>Pilih Semua Asesi ({{ $assessments->count() }})</span>
                             </label>
                             <span class="text-[11px] text-slate-400 italic">Centang asesi yang disetujui</span>
                         </div>
@@ -543,7 +543,7 @@
             <div class="flex items-center space-x-3 w-full sm:w-auto">
                 @if($isClosedForMe)
                     <button type="button" disabled class="w-full sm:w-auto px-6 py-2.5 min-h-[40px] text-xs font-bold text-slate-500 bg-slate-200 rounded-lg cursor-not-allowed">
-                        {{ $jadwal->is_closed ? 'Jadwal Telah Ditutup (Read-Only)' : 'Asesmen Binaan Telah Selesai (Read-Only)' }}
+                        {{ $jadwal->is_closed ? 'Jadwal Telah Ditutup (Read-Only)' : 'Asesmen Telah Selesai (Read-Only)' }}
                     </button>
                 @else
                     <button type="submit" class="w-full sm:w-auto px-6 py-2.5 min-h-[40px] text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 rounded-lg shadow-sm transition flex items-center justify-center space-x-2">

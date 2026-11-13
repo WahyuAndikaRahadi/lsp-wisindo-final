@@ -13,9 +13,9 @@
         <div class="p-3.5 bg-emerald-50 border border-emerald-300 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-emerald-900">
             <div class="flex items-center space-x-2">
                 <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
-                <span><strong>{{ $schedule->is_closed ? 'Jadwal Telah Resmi Ditutup & Dikunci:' : 'Penetapan Asesi Binaan Telah Selesai & Ditutup:' }}</strong> Seluruh rekaman dan rekomendasi FR.AK.02 dalam mode lihat (read-only).</span>
+                <span><strong>{{ $schedule->is_closed ? 'Jadwal Ditutup:' : 'Penetapan Asesi Selesai:' }}</strong> Seluruh rekaman dalam mode lihat (read-only).</span>
             </div>
-            <span class="font-bold font-mono text-[11px] bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded border border-emerald-300 shrink-0">STATUS: {{ $schedule->is_closed ? 'FINISHED' : 'BINAAN SELESAI' }}</span>
+            <span class="font-bold font-mono text-[11px] bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded border border-emerald-300 shrink-0">STATUS: {{ $schedule->is_closed ? 'FINISHED' : 'SELESAI' }}</span>
         </div>
     @endif
 
@@ -35,7 +35,7 @@
     {{-- Meta Stats Bar --}}
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
-            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Asesi Binaan Anda</span>
+            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Daftar Asesi</span>
             <div class="text-2xl font-black text-slate-900 mt-0.5">
                 {{ $asesiList->count() }} Orang
                 @if($schedule->assessments->count() > $asesiList->count())
@@ -154,7 +154,7 @@
                                                 </span>
                                             @endif
                                             <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                                ✓ Asesi Binaan Anda
+                                                ✓ Asesi Ditugaskan
                                             </span>
                                         </div>
                                     </td>
@@ -214,16 +214,16 @@
                 {{-- Action Bar at Bottom of Container --}}
                 <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <span class="text-xs text-slate-500">
-                        {{ $isClosedForMe ? 'Asesmen telah ditutup. Seluruh data rekaman tersimpan permanen.' : 'Klik tombol simpan untuk merekam hasil FR.AK.02 seluruh asesi binaan Anda sekaligus.' }}
+                        {{ $isClosedForMe ? 'Asesmen telah ditutup. Seluruh data rekaman tersimpan permanen.' : 'Klik tombol simpan untuk merekam hasil FR.AK.02 seluruh asesi sekaligus.' }}
                     </span>
                     @if($isClosedForMe)
                         <button type="button" disabled 
                                 class="px-6 py-2.5 min-h-[40px] bg-slate-200 text-slate-500 font-bold text-xs uppercase tracking-wider rounded-xl cursor-not-allowed">
-                            {{ $schedule->is_closed ? 'Jadwal Telah Ditutup (Read-Only)' : 'Asesmen Binaan Selesai (Read-Only)' }}
+                            {{ $schedule->is_closed ? 'Jadwal Telah Ditutup (Read-Only)' : 'Asesmen Selesai (Read-Only)' }}
                         </button>
                     @else
                         <button type="submit" 
-                                data-confirm="Apakah Anda yakin ingin menyimpan seluruh penetapan rekaman FR.AK.02 untuk asesi binaan Anda?"
+                                data-confirm="Apakah Anda yakin ingin menyimpan seluruh penetapan rekaman FR.AK.02 untuk asesi yang ditugaskan?"
                                 data-confirm-title="Konfirmasi Rekaman FR.AK.02"
                                 data-confirm-ok="Ya, Simpan Seluruhnya"
                                 data-loading-text="Menyimpan seluruh penetapan FR.AK.02..."

@@ -6,6 +6,9 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $title ?? 'LSP PrO Indo' }} - Sistem Sertifikasi BNSP</title>
 
+    <link rel="icon" type="image/png" href="{{ asset('images/logo-lsp-proindo.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('images/logo-lsp-proindo.png') }}">
+
     <!-- Google Fonts: Plus Jakarta Sans & Inter (Modern Sans-Serif) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

@@ -61,9 +61,9 @@
         @endphp
 
         @if($isClosedForMe)
-            <span class="inline-flex items-center px-2.5 py-1.5 rounded-lg text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-300 mr-1.5 shrink-0" title="{{ $schedule->is_closed ? 'Jadwal telah ditutup dan dikunci resmi. Seluruh formulir dalam mode lihat (read-only).' : 'Asesmen untuk asesi binaan Anda telah selesai dan ditutup. Seluruh formulir dalam mode lihat (read-only).' }}">
+            <span class="inline-flex items-center px-2.5 py-1.5 rounded-lg text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-300 mr-1.5 shrink-0" title="{{ $schedule->is_closed ? 'Jadwal telah ditutup dan dikunci resmi. Seluruh formulir dalam mode lihat (read-only).' : 'Asesmen telah selesai dan ditutup. Seluruh formulir dalam mode lihat (read-only).' }}">
                 <svg class="w-3.5 h-3.5 mr-1 text-emerald-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
-                <span>{{ $schedule->is_closed ? 'Jadwal Ditutup (Mode Lihat)' : 'Binaan Selesai (Mode Lihat)' }}</span>
+                <span>{{ $schedule->is_closed ? 'Jadwal Ditutup' : 'Selesai (Read-Only)' }}</span>
             </span>
         @endif
 

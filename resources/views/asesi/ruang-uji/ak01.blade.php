@@ -31,8 +31,8 @@
         <div class="p-4 bg-emerald-50 border-2 border-emerald-300 rounded-xl text-emerald-900 flex flex-col sm:flex-row items-start sm:items-center gap-3 shadow-xs">
             <span class="text-xl shrink-0">🔒</span>
             <div>
-                <div class="font-bold text-sm">Jadwal Asesmen Telah Resmi Ditutup &amp; Dikunci</div>
-                <p class="text-xs text-emerald-800 mt-0.5 leading-relaxed">Seluruh persetujuan FR.AK.01 dalam jadwal ini berada dalam mode lihat (read-only).</p>
+                <div class="font-bold text-sm">Jadwal Ditutup</div>
+                <p class="text-xs text-emerald-800 mt-0.5 leading-relaxed">Persetujuan FR.AK.01 dalam mode lihat (read-only).</p>
             </div>
         </div>
     @endif
@@ -42,7 +42,7 @@
         <div class="bg-gradient-to-r from-slate-800 to-indigo-900 px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between text-white gap-3">
             <div>
                 <h2 class="text-base sm:text-lg font-bold">FR.AK.01. PERSETUJUAN ASESMEN DAN KERAHASIAAN</h2>
-                <p class="text-xs text-slate-300 mt-0.5">Kesepakatan pelaksanaan asesmen dan perlindungan kerahasiaan materi uji</p>
+                <p class="text-xs text-slate-300 mt-0.5">Persetujuan asesmen dan kerahasiaan materi uji</p>
             </div>
             <a href="{{ route('asesi.assessment.ruang-uji', $assessment) }}" class="self-start sm:self-auto px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white text-xs font-bold rounded-lg border border-white/20 transition">
                 ← Ruang Uji
@@ -57,8 +57,8 @@
                     <div class="flex items-center gap-2">
                         <span class="w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs font-bold shrink-0">✓</span>
                         <div>
-                            <span class="font-bold">FR.AK.01 Telah Disetujui:</span>
-                            <span class="text-emerald-700">Persetujuan asesmen dan kerahasiaan telah Anda tandatangani pada {{ \Carbon\Carbon::parse($assessment->ak01_agreed_at)->translatedFormat('d F Y, H:i') }} WIB.</span>
+                            <span class="font-bold">FR.AK.01 Disetujui:</span>
+                            <span class="text-emerald-700">Telah ditandatangani pada {{ \Carbon\Carbon::parse($assessment->ak01_agreed_at)->translatedFormat('d F Y, H:i') }} WIB.</span>
                         </div>
                     </div>
                     <a href="{{ route('asesi.assessment.ruang-uji', $assessment) }}" class="shrink-0 px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-xs transition shadow-xs">
@@ -135,31 +135,31 @@
                                 <img src="{{ $effectiveAsesiSig }}" alt="Tanda Tangan Asesi" class="max-h-full max-w-full object-contain">
                             </div>
                             <div>
-                                <span class="text-xs font-bold text-slate-900 block">Tanda Tangan Asesi Terverifikasi</span>
+                                <span class="text-xs font-bold text-slate-900 block">Tanda Tangan Terverifikasi</span>
                                 <span class="text-[11px] text-emerald-700 font-semibold flex items-center gap-1 mt-0.5">
                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                                    Tersemat Otomatis dari APL
+                                    Tersemat dari APL
                                 </span>
                             </div>
                         </div>
                     @else
                         <input type="hidden" name="signature_data" value="">
-                        <div class="text-xs text-slate-500">Tanda tangan pemohon diverifikasi dari data akun asesi terdaftar.</div>
+                        <div class="text-xs text-slate-500">Tanda tangan diverifikasi dari akun asesi.</div>
                     @endif
                 </div>
 
                 <div class="w-full md:w-auto flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                     <a href="{{ route('asesi.assessment.ruang-uji', $assessment) }}" class="w-full sm:w-auto px-5 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs uppercase tracking-wider rounded-xl border border-slate-300 transition text-center">
-                        ← Kembali ke Ruang Uji
+                        ← Ruang Uji
                     </a>
                     @if(!$assessment->ak01_agreed_at)
                         @if($assessment->schedule?->is_closed)
                             <button type="button" disabled class="w-full sm:w-auto px-6 py-3.5 bg-slate-200 text-slate-500 font-bold text-xs uppercase tracking-wider rounded-xl cursor-not-allowed border border-slate-300 text-center">
-                                Jadwal Telah Ditutup (Read-Only)
+                                Jadwal Ditutup (Read-Only)
                             </button>
                         @else
                             <button type="submit" class="w-full sm:w-auto px-8 py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-md transition flex items-center justify-center gap-2">
-                                <span>Setujui &amp; Masuk Ruang Uji</span>
+                                <span>Setujui &amp; Masuk</span>
                                 <span>→</span>
                             </button>
                         @endif

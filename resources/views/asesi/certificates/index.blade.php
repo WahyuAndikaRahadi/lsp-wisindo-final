@@ -29,7 +29,7 @@
                 Sertifikat Saya
             </h1>
             <p class="text-xs sm:text-sm text-slate-500 mt-1 leading-relaxed max-w-2xl">
-                Koleksi sertifikat kompetensi kerja resmi BNSP yang berhasil Anda raih melalui uji sertifikasi di LSP Praktisi Otomotif Indonesia.
+                Daftar sertifikat kompetensi BNSP yang telah Anda raih di LSP PrO Indo.
             </p>
         </div>
     </div>
@@ -45,7 +45,7 @@
             <div class="max-w-md mx-auto space-y-1">
                 <h3 class="text-base font-bold text-slate-800">Belum Ada Sertifikat yang Diterbitkan</h3>
                 <p class="text-xs text-slate-500 leading-relaxed">
-                    Sertifikat resmi BNSP akan otomatis muncul di sini setelah seluruh rangkaian asesmen Anda selesai, dinyatakan <strong>Kompeten (K)</strong> oleh asesor, dan berkas fisik sertifikat telah diunggah oleh Admin LSP.
+                    Sertifikat akan muncul di sini setelah Anda dinyatakan Kompeten (K) dan berkas diterbitkan oleh Admin LSP.
                 </p>
             </div>
             <div class="pt-2">
@@ -67,7 +67,7 @@
                     <div class="p-5 {{ $isExpired ? 'bg-slate-100/70 border-b border-slate-200' : 'bg-gradient-to-r from-emerald-600 to-teal-700 text-white' }}">
                         <div class="flex items-center justify-between gap-2">
                             <span class="text-[10px] font-extrabold uppercase tracking-widest {{ $isExpired ? 'text-slate-500' : 'text-emerald-100' }}">
-                                BADAN NASIONAL SERTIFIKASI PROFESI
+                                BNSP
                             </span>
                             @if($isExpired)
                                 <span class="px-2 py-0.5 text-[10px] font-bold rounded bg-slate-200 text-slate-700">
