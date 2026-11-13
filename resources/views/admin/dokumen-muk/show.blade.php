@@ -203,7 +203,7 @@
             @else
                 <div class="overflow-x-auto min-h-[360px]">
                     <table class="w-full text-xs">
-                        <thead class="bg-slate-50 text-left font-semibold text-slate-600 border-b border-slate-200">
+                        <thead class="hidden md:table-header-group bg-slate-50 text-left font-semibold text-slate-600 border-b border-slate-200">
                             <tr>
                                 <th class="px-4 py-3 whitespace-nowrap w-12">No</th>
                                 <th class="px-4 py-3 whitespace-nowrap">Nama Asesi</th>
@@ -220,20 +220,39 @@
                                     $hasIa01b = !empty($ia01bData['evidence_image_path'] ?? $ia01bData['file_path'] ?? $ia01bData['uploaded_file'] ?? null);
                                     $openUp = $assessments->count() > 3 && ($loop->last || $loop->iteration >= $assessments->count() - 1);
                                 @endphp
-                                <tr class="hover:bg-slate-50/70 transition">
-                                    <td class="px-4 py-3 text-slate-500 font-mono whitespace-nowrap">
+                                <tr class="flex flex-col md:table-row p-4 md:p-0 hover:bg-slate-50/70 transition space-y-2.5 md:space-y-0">
+                                    <td class="hidden md:table-cell px-4 py-3 text-slate-500 font-mono whitespace-nowrap">
                                         {{ $assessments->firstItem() ? $assessments->firstItem() + $idx : $idx + 1 }}
                                     </td>
-                                    <td class="px-4 py-3">
-                                        <div class="font-bold text-slate-800 text-xs">{{ $assessment->asesi?->full_name }}</div>
-                                        <div class="text-[11px] text-slate-400">
-                                            {{ $assessment->asesi?->email }} &bull; NIK: {{ $assessment->asesi?->profile?->nik ?? '-' }}
+                                    <td class="px-0 md:px-4 py-0 md:py-3">
+                                        <div class="flex items-center justify-between md:hidden pb-1 border-b border-slate-100">
+                                            <span class="font-mono text-xs font-bold text-slate-500">
+                                                #{{ $assessments->firstItem() ? $assessments->firstItem() + $idx : $idx + 1 }}
+                                            </span>
+                                            <div>
+                                                @if(in_array($assessment->final_result, ['K', 'KOMPETEN'], true))
+                                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">KOMPETEN (K)</span>
+                                                @elseif(in_array($assessment->final_result, ['BK', 'BELUM_KOMPETEN'], true))
+                                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-300">BELUM KOMPETEN (BK)</span>
+                                                @elseif($assessment->final_result === 'TIDAK_HADIR')
+                                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-200 text-slate-700 border border-slate-300">TIDAK HADIR</span>
+                                                @else
+                                                    <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-700">{{ $assessment->status ?? 'PENDING' }}</span>
+                                                @endif
+                                            </div>
+                                        </div>
+                                        <div class="mt-1 md:mt-0">
+                                            <div class="font-bold text-slate-800 text-xs sm:text-sm">{{ $assessment->asesi?->full_name }}</div>
+                                            <div class="text-[11px] text-slate-400 font-mono">
+                                                {{ $assessment->asesi?->email }} &bull; NIK: {{ $assessment->asesi?->profile?->nik ?? '-' }}
+                                            </div>
                                         </div>
                                     </td>
-                                    <td class="px-4 py-3 text-slate-600 whitespace-nowrap">
-                                        {{ $assessment->assessor?->full_name ?? '-' }}
+                                    <td class="px-0 md:px-4 py-0 md:py-3 text-slate-600 whitespace-nowrap text-xs">
+                                        <span class="text-slate-400 md:hidden">Asesor: </span>
+                                        <strong class="text-slate-800 md:font-normal">{{ $assessment->assessor?->full_name ?? '-' }}</strong>
                                     </td>
-                                    <td class="px-4 py-3 whitespace-nowrap">
+                                    <td class="hidden md:table-cell px-4 py-3 whitespace-nowrap">
                                         @if(in_array($assessment->final_result, ['K', 'KOMPETEN'], true))
                                             <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">KOMPETEN (K)</span>
                                         @elseif(in_array($assessment->final_result, ['BK', 'BELUM_KOMPETEN'], true))
@@ -244,7 +263,7 @@
                                             <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-700">{{ $assessment->status ?? 'PENDING' }}</span>
                                         @endif
                                     </td>
-                                    <td class="px-4 py-3 text-right whitespace-nowrap">
+                                    <td class="px-0 md:px-4 py-0 md:py-3 text-left md:text-right whitespace-nowrap pt-1 md:pt-0">
                                         <div class="flex items-center justify-end gap-1.5">
                                             <a href="{{ route('admin.dokumen-muk.asesi-dynamic', ['assessment' => $assessment->id, 'type' => 'ak02']) }}" 
                                                target="_blank" 

@@ -35,7 +35,7 @@
 
         <div class="overflow-x-auto">
             <table class="w-full text-xs">
-                <thead class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200 uppercase tracking-wider">
+                <thead class="hidden md:table-header-group bg-slate-100 text-slate-700 font-bold border-b border-slate-200 uppercase tracking-wider">
                     <tr>
                         <th class="px-4 py-3 text-center w-10">No</th>
                         <th class="px-4 py-3 text-left">Nama Asesi & Kontak</th>
@@ -62,17 +62,31 @@
                             };
                             $appeal = $assessment->latestAppeal;
                         @endphp
-                        <tr class="hover:bg-slate-50/60">
-                            <td class="px-4 py-3 text-center text-slate-500 font-mono">{{ $idx + 1 }}</td>
-                            <td class="px-4 py-3">
-                                <span class="font-bold text-slate-900 block text-sm">{{ $assessment->asesi->full_name }}</span>
-                                <span class="text-slate-500 font-mono text-[11px]">{{ $assessment->asesi->email }} | NIK: {{ $assessment->asesi->profile?->nik ?? '-' }}</span>
+                        <tr class="flex flex-col md:table-row p-4 md:p-0 hover:bg-slate-50/60 transition space-y-3 md:space-y-0">
+                            <td class="hidden md:table-cell px-4 py-3 text-center text-slate-500 font-mono">{{ $idx + 1 }}</td>
+                            <td class="px-0 md:px-4 py-0 md:py-3">
+                                <div class="flex items-center justify-between md:hidden pb-2 border-b border-slate-100">
+                                    <span class="font-mono text-xs font-bold text-slate-500">#{{ $idx + 1 }}</span>
+                                    <div class="flex items-center gap-1.5 flex-wrap justify-end">
+                                        <span class="px-2 py-0.5 rounded text-[10px] font-bold border {{ $asesorBadge }}">
+                                            APL: {{ str_replace('_', ' ', $assessment->apl_status ?? 'DRAFT') }}
+                                        </span>
+                                        <span class="px-2 py-0.5 rounded text-[10px] font-bold border {{ $hasilBadge }}">
+                                            {{ $assessment->final_result ?? ($assessment->status === 'COMPLETED' ? 'KOMPETEN' : 'BELUM SELESAI') }}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="mt-2 md:mt-0">
+                                    <span class="font-bold text-slate-900 block text-sm">{{ $assessment->asesi->full_name }}</span>
+                                    <span class="text-slate-500 font-mono text-[11px]">{{ $assessment->asesi->email }} &bull; NIK: {{ $assessment->asesi->profile?->nik ?? '-' }}</span>
+                                </div>
                             </td>
-                            <td class="px-3 py-3">
+                            <td class="px-0 md:px-3 py-0 md:py-3">
+                                <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider md:hidden mb-1">Asesor Penguji:</label>
                                 @if($jadwal->assessors->isNotEmpty())
                                     <form action="{{ route('admin.assessment.assign-assessor', $assessment) }}" method="POST" class="space-y-1">
                                         @csrf
-                                        <select name="assessor_id" onchange="this.form.submit()" class="text-xs py-1 px-2 border border-slate-300 rounded bg-white text-slate-800 font-medium focus:ring-1 focus:ring-brand-500 w-full max-w-[180px]">
+                                        <select name="assessor_id" onchange="this.form.submit()" class="text-xs py-2 md:py-1 px-2.5 border border-slate-300 rounded-lg bg-white text-slate-800 font-medium focus:ring-1 focus:ring-brand-500 w-full md:max-w-[180px]">
                                             <option value="">-- Pilih Asesor --</option>
                                             @foreach($jadwal->assessors as $asesor)
                                                 <option value="{{ $asesor->id }}" @selected($assessment->assessor_id == $asesor->id)>
@@ -85,27 +99,30 @@
                                         @endif
                                     </form>
                                 @else
-                                    <span class="font-semibold text-slate-800 block">{{ $assessment->assessor?->full_name ?? '-' }}</span>
+                                    <span class="font-semibold text-slate-800 block text-xs">{{ $assessment->assessor?->full_name ?? '-' }}</span>
                                     <span class="text-[10px] text-slate-400 font-mono">{{ $assessment->assessor?->assessor_registration_number ?? '' }}</span>
                                 @endif
                             </td>
-                            <td class="px-3 py-3 text-center">
+                            <td class="hidden md:table-cell px-3 py-3 text-center">
                                 <span class="px-2 py-0.5 rounded text-[11px] font-bold border {{ $asesorBadge }}">
                                     {{ str_replace('_', ' ', $assessment->apl_status ?? 'DRAFT') }}
                                 </span>
                             </td>
-                            <td class="px-3 py-3 text-center">
+                            <td class="hidden md:table-cell px-3 py-3 text-center">
                                 <span class="px-2 py-0.5 rounded text-[11px] border {{ $hasilBadge }}">
                                     {{ $assessment->final_result ?? ($assessment->status === 'COMPLETED' ? 'KOMPETEN' : 'BELUM SELESAI') }}
                                 </span>
                             </td>
-                            <td class="px-3 py-3 text-center">
+                            <td class="px-0 md:px-3 py-0 md:py-3 md:text-center">
                                 @if($appeal)
-                                    <span class="px-2 py-0.5 rounded text-[11px] font-bold border bg-purple-50 text-purple-700 border-purple-300">
-                                        {{ $appeal->status }}
-                                    </span>
+                                    <div class="flex items-center justify-between md:justify-center text-xs">
+                                        <span class="md:hidden text-slate-500">Status Banding:</span>
+                                        <span class="px-2 py-0.5 rounded text-[11px] font-bold border bg-purple-50 text-purple-700 border-purple-300">
+                                            {{ $appeal->status }}
+                                        </span>
+                                    </div>
                                 @else
-                                    <span class="text-slate-400">-</span>
+                                    <span class="hidden md:inline text-slate-400">-</span>
                                 @endif
                             </td>
                         </tr>

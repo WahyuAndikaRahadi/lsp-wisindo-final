@@ -73,7 +73,7 @@
 
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
-                <thead class="bg-slate-50 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
+                <thead class="hidden md:table-header-group bg-slate-50 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
                     <tr>
                         <th class="px-6 py-3 w-16 text-center">No</th>
                         <th class="px-6 py-3">Pertanyaan</th>
@@ -107,10 +107,13 @@
                                 ? ($item->is_correct ?? false)
                                 : ($item['is_correct'] ?? false);
                         @endphp
-                        <tr class="hover:bg-slate-50/50">
-                            <td class="px-6 py-3 text-slate-500 font-mono text-xs text-center font-bold">{{ $loop->iteration }}</td>
-                            <td class="px-6 py-3 text-slate-800">
-                                <div class="font-medium text-sm">{{ $qText }}</div>
+                        <tr class="flex flex-col md:table-row p-4 md:p-0 hover:bg-slate-50/50 transition space-y-2.5 md:space-y-0">
+                            <td class="hidden md:table-cell px-6 py-3 text-slate-500 font-mono text-xs text-center font-bold">{{ $loop->iteration }}</td>
+                            <td class="px-0 md:px-6 py-0 md:py-3 text-slate-800">
+                                <div class="flex items-start gap-2">
+                                    <span class="md:hidden font-mono text-xs font-bold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded shrink-0">#{{ $loop->iteration }}</span>
+                                    <div class="font-medium text-xs sm:text-sm leading-relaxed">{{ $qText }}</div>
+                                </div>
                                 @if($qImg)
                                     <div class="mt-2 inline-block">
                                         <a href="{{ asset('storage/' . $qImg) }}" target="_blank" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-xs font-semibold text-slate-700 border border-slate-300 transition">
@@ -120,16 +123,38 @@
                                     </div>
                                 @endif
                             </td>
-                            <td class="px-6 py-3 text-center font-mono font-bold text-xs">
-                                @if(!empty($userAns))
-                                    <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-xs font-bold {{ $isCorrect ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-rose-100 text-rose-800 border border-rose-300' }}">
-                                        {{ $userAns }}
-                                    </span>
-                                @else
-                                    <span class="text-slate-400 font-normal italic">-</span>
-                                @endif
+                            <td class="px-0 md:px-6 py-0 md:py-3 md:text-center font-mono font-bold text-xs">
+                                <div class="flex items-center justify-between md:justify-center p-2.5 md:p-0 bg-slate-50 md:bg-transparent rounded-lg border md:border-0 border-slate-200">
+                                    <div class="flex items-center gap-3 md:hidden">
+                                        <div class="flex items-center gap-1 text-[11px] font-sans text-slate-600">
+                                            <span>Jawaban:</span>
+                                            <span class="font-mono font-bold px-1.5 py-0.5 rounded {{ $isCorrect ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800' }}">{{ $userAns ?: '-' }}</span>
+                                        </div>
+                                        <div class="flex items-center gap-1 text-[11px] font-sans text-slate-600">
+                                            <span>Kunci:</span>
+                                            <span class="font-mono font-bold px-1.5 py-0.5 rounded bg-slate-200 text-slate-800">{{ $correctAns ?: '-' }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="md:hidden">
+                                        @if($isCorrect)
+                                            <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">✓ Benar</span>
+                                        @else
+                                            <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-rose-100 text-rose-800 border border-rose-300">✕ Salah</span>
+                                        @endif
+                                    </div>
+                                    {{-- Desktop Jawaban --}}
+                                    <div class="hidden md:block">
+                                        @if(!empty($userAns))
+                                            <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-xs font-bold {{ $isCorrect ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-rose-100 text-rose-800 border border-rose-300' }}">
+                                                {{ $userAns }}
+                                            </span>
+                                        @else
+                                            <span class="text-slate-400 font-normal italic">-</span>
+                                        @endif
+                                    </div>
+                                </div>
                             </td>
-                            <td class="px-6 py-3 text-center font-mono font-bold text-xs text-slate-600">
+                            <td class="hidden md:table-cell px-6 py-3 text-center font-mono font-bold text-xs text-slate-600">
                                 @if(!empty($correctAns))
                                     <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 border border-slate-300">
                                         {{ $correctAns }}
@@ -138,7 +163,7 @@
                                     <span class="text-slate-400">-</span>
                                 @endif
                             </td>
-                            <td class="px-6 py-3 text-center">
+                            <td class="hidden md:table-cell px-6 py-3 text-center">
                                 @if($isCorrect)
                                     <span class="px-2.5 py-1 rounded-md text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">Benar</span>
                                 @else

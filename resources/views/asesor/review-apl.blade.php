@@ -463,9 +463,9 @@
             </div>
         </div>
 
-        <div class="p-6 overflow-x-auto">
+        <div class="p-4 sm:p-6 overflow-x-auto">
             <table class="w-full text-left border-collapse text-xs">
-                <thead>
+                <thead class="hidden md:table-header-group">
                     <tr class="bg-slate-100 text-slate-700 border-b border-slate-200 uppercase font-bold tracking-wider">
                         <th class="p-3 w-12 text-center">No</th>
                         <th class="p-3">Unit Kompetensi / Elemen / Kriteria Unjuk Kerja (KUK)</th>
@@ -478,14 +478,14 @@
                     @php $kukCounter = 1; @endphp
                     @forelse($scheme->competencyUnits as $unit)
                         <tr class="bg-slate-100 font-bold text-slate-800">
-                            <td colspan="5" class="p-2.5 bg-slate-100 text-slate-900 border-t border-slate-300">
+                            <td colspan="5" class="p-2.5 sm:p-3 bg-slate-100 text-slate-900 border-t border-slate-300">
                                 Unit {{ $loop->iteration }}: {{ $unit->code }} - {{ $unit->title }}
                             </td>
                         </tr>
                         @foreach($unit->elements as $element)
                             <tr class="bg-slate-50 text-slate-700 font-semibold italic">
-                                <td class="p-2 text-center text-slate-400">#</td>
-                                <td colspan="4" class="p-2 pl-4 text-slate-700">
+                                <td class="hidden md:table-cell p-2 text-center text-slate-400">#</td>
+                                <td colspan="5" class="p-2 pl-3 md:pl-4 text-slate-700 md:colspan-4">
                                     Elemen {{ $loop->iteration }}: {{ $element->title }}
                                 </td>
                             </tr>
@@ -496,13 +496,18 @@
                                     $proofCode = $savedItem?->selected_proof_type ?? '-';
                                     $proofName = $proofLabels[$proofCode] ?? ($proofCode !== '-' ? $proofCode : 'Belum Ditentukan');
                                 @endphp
-                                <tr class="hover:bg-indigo-50/20 transition">
-                                    <td class="p-3 text-center text-slate-500 font-mono">{{ $kukCounter++ }}</td>
-                                    <td class="p-3 pl-6">
-                                        <span class="font-bold text-slate-700 mr-1">{{ $kuk->code_number }}</span>
-                                        <span class="text-slate-600">{{ $kuk->statement }}</span>
+                                <tr class="flex flex-col md:table-row p-3 md:p-0 hover:bg-indigo-50/20 transition space-y-2 md:space-y-0">
+                                    <td class="hidden md:table-cell p-3 text-center text-slate-500 font-mono">{{ $kukCounter }}</td>
+                                    <td class="p-0 md:p-3 md:pl-6">
+                                        <div class="flex items-start gap-1.5">
+                                            <span class="md:hidden font-mono text-[11px] font-bold text-slate-400">#{{ $kukCounter }}</span>
+                                            <div>
+                                                <span class="font-bold text-slate-800 mr-1">{{ $kuk->code_number }}</span>
+                                                <span class="text-slate-700 leading-relaxed">{{ $kuk->statement }}</span>
+                                            </div>
+                                        </div>
                                     </td>
-                                    <td class="p-3 text-center bg-emerald-50/30">
+                                    <td class="hidden md:table-cell p-3 text-center bg-emerald-50/30">
                                         @if($val === 'K')
                                             <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-500 text-white font-black text-xs shadow-sm">
                                                 ✓
@@ -511,7 +516,7 @@
                                             <span class="text-slate-300 font-mono">-</span>
                                         @endif
                                     </td>
-                                    <td class="p-3 text-center bg-rose-50/30">
+                                    <td class="hidden md:table-cell p-3 text-center bg-rose-50/30">
                                         @if($val === 'BK')
                                             <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-rose-500 text-white font-black text-xs shadow-sm">
                                                 ✕
@@ -520,12 +525,28 @@
                                             <span class="text-slate-300 font-mono">-</span>
                                         @endif
                                     </td>
-                                    <td class="p-3">
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-slate-100 text-slate-700 border border-slate-200">
-                                            {{ $proofName }}
-                                        </span>
+                                    <td class="p-0 md:p-3 pt-1 md:pt-3">
+                                        <div class="flex items-center justify-between md:block gap-2">
+                                            <div class="md:hidden">
+                                                @if($val === 'K')
+                                                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-300">
+                                                        ✓ Kompeten (K)
+                                                    </span>
+                                                @elseif($val === 'BK')
+                                                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-50 text-rose-800 border border-rose-300">
+                                                        ✕ Belum Kompeten (BK)
+                                                    </span>
+                                                @else
+                                                    <span class="text-xs text-slate-400 italic">Belum dinilai</span>
+                                                @endif
+                                            </div>
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-slate-100 text-slate-700 border border-slate-200">
+                                                <span class="md:hidden text-slate-400 mr-1">Bukti:</span> {{ $proofName }}
+                                            </span>
+                                        </div>
                                     </td>
                                 </tr>
+                                @php $kukCounter++; @endphp
                             @endforeach
                         @endforeach
                     @empty

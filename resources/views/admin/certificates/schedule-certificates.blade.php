@@ -97,7 +97,105 @@
             </h2>
         </div>
 
-        <div class="overflow-x-auto">
+        {{-- Mobile Cards (< md) --}}
+        <div class="block md:hidden divide-y divide-slate-100">
+            @forelse($competentAssessments as $index => $asm)
+                @php
+                    $cert = $asm->certificate;
+                    $asesi = $asm->asesi;
+                @endphp
+                <div class="p-4 space-y-3">
+                    <div class="flex items-start justify-between gap-2">
+                        <div>
+                            <span class="font-mono text-xs font-bold text-slate-500">#{{ $index + 1 }}</span>
+                            <h3 class="font-bold text-slate-900 text-sm leading-snug mt-0.5">{{ $asesi?->full_name ?? '-' }}</h3>
+                            <div class="text-[11px] text-slate-500 font-mono mt-0.5">
+                                NIK: {{ $asesi?->profile?->nik ?? '-' }} &bull; {{ $asesi?->email }}
+                            </div>
+                        </div>
+                        <div class="shrink-0 text-right space-y-1">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-300">
+                                ✓ KOMPETEN
+                            </span>
+                            <div>
+                                @if($cert)
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-300">
+                                        ✓ Terbit
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-300">
+                                        Belum Ada
+                                    </span>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+
+                    @if($cert)
+                        <div class="text-xs bg-slate-50 p-2.5 rounded-lg border border-slate-100 space-y-1">
+                            <div class="flex items-center justify-between">
+                                <span class="text-slate-500 text-[11px]">No. Sertifikat:</span>
+                                <span class="font-mono font-bold text-slate-900 text-[11px]">{{ $cert->certificate_number }}</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-slate-500 text-[11px]">No. Blanko:</span>
+                                <span class="font-mono text-slate-700 text-[11px]">{{ $cert->blanko_number }}</span>
+                            </div>
+                            <div class="flex items-center justify-between pt-1 border-t border-slate-200/60 text-[11px] text-slate-600">
+                                <span>Terbit: {{ \Carbon\Carbon::parse($cert->issued_date)->isoFormat('D MMM Y') }}</span>
+                                <span>s/d: {{ \Carbon\Carbon::parse($cert->valid_until)->isoFormat('D MMM Y') }}</span>
+                            </div>
+                        </div>
+                    @endif
+
+                    <div class="pt-1">
+                        @if($cert)
+                            <div class="grid grid-cols-4 gap-1.5">
+                                <button type="button" 
+                                    @click="openPreview('{{ route('admin.certificates.preview', $cert->id) }}', 'Sertifikat - {{ addslashes($asesi?->full_name) }}')"
+                                    class="px-2 py-2 text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg font-bold text-xs transition inline-flex items-center justify-center min-h-[38px]">
+                                    Preview
+                                </button>
+                                <a href="{{ route('admin.certificates.download', $cert->id) }}" 
+                                    class="px-2 py-2 text-brand-700 bg-brand-50 hover:bg-brand-100 border border-brand-200 rounded-lg font-bold text-xs transition inline-flex items-center justify-center min-h-[38px]">
+                                    Unduh
+                                </a>
+                                <button type="button" 
+                                    @click="openUpload({{ json_encode($asm) }}, {{ json_encode($cert) }})"
+                                    class="px-2 py-2 text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200 rounded-lg font-bold text-xs transition inline-flex items-center justify-center min-h-[38px]">
+                                    Edit
+                                </button>
+                                <form action="{{ route('admin.certificates.destroy', $cert->id) }}" method="POST"
+                                      data-confirm="Apakah Anda yakin ingin menghapus sertifikat ini?"
+                                      data-confirm-title="Hapus Sertifikat"
+                                      data-confirm-danger="true"
+                                      class="inline w-full">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="w-full px-2 py-2 text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-lg font-bold text-xs transition inline-flex items-center justify-center min-h-[38px]">
+                                        Hapus
+                                    </button>
+                                </form>
+                            </div>
+                        @else
+                            <button type="button" 
+                                @click="openUpload({{ json_encode($asm) }})"
+                                class="w-full px-4 py-2.5 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg shadow-xs transition inline-flex items-center justify-center gap-1.5 min-h-[42px]">
+                                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                                <span>Unggah Sertifikat BNSP</span>
+                            </button>
+                        @endif
+                    </div>
+                </div>
+            @empty
+                <div class="p-8 text-center text-slate-500 text-xs">
+                    Tidak ada asesi yang berstatus KOMPETEN (K) pada jadwal asesmen ini.
+                </div>
+            @endforelse
+        </div>
+
+        {{-- Desktop Table (md+) --}}
+        <div class="hidden md:block overflow-x-auto">
             <table class="w-full text-xs">
                 <thead class="bg-slate-100 text-left text-slate-600 font-bold uppercase tracking-wider">
                     <tr>

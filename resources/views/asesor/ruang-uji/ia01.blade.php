@@ -97,7 +97,7 @@
 
             <div class="overflow-x-auto">
                 <table class="w-full text-sm">
-                    <thead class="bg-slate-100/70 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
+                    <thead class="hidden md:table-header-group bg-slate-100/70 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
                         <tr>
                             <th class="px-4 py-3 w-16 text-center whitespace-nowrap">KUK</th>
                             <th class="px-4 py-3 min-w-[200px]">Elemen &amp; Kriteria Unjuk Kerja (KUK)</th>
@@ -110,12 +110,12 @@
                         @forelse($units ?? [] as $uIdx => $unit)
                             {{-- Baris Pemisah Unit Kompetensi --}}
                             <tr class="bg-slate-100 border-t-2 border-b border-slate-200">
-                                <td colspan="5" class="px-4 py-3.5 bg-slate-100">
+                                <td colspan="5" class="px-3 md:px-4 py-3 md:py-3.5 bg-slate-100">
                                     <div class="flex items-center gap-2.5">
                                         <span class="text-xs font-bold text-brand-700 font-mono bg-brand-50 border border-brand-200 px-2.5 py-1 rounded shadow-2xs">
                                             {{ $unit->code }}
                                         </span>
-                                        <span class="text-sm font-bold text-slate-900">
+                                        <span class="text-xs sm:text-sm font-bold text-slate-900 leading-snug">
                                             {{ $unit->title }}
                                         </span>
                                     </div>
@@ -125,8 +125,8 @@
                             @foreach($unit->elements as $element)
                                 @if(!empty($element->title))
                                     <tr class="bg-slate-50/60 border-b border-slate-100">
-                                        <td class="px-4 py-2 text-center text-slate-400 font-mono text-xs">#</td>
-                                        <td colspan="4" class="px-4 py-2 text-xs font-bold text-slate-700">
+                                        <td class="hidden md:table-cell px-4 py-2 text-center text-slate-400 font-mono text-xs">#</td>
+                                        <td colspan="5" class="px-3 md:px-4 py-2 text-xs font-bold text-slate-700 md:colspan-4">
                                             Elemen: {{ $element->title }}
                                         </td>
                                     </tr>
@@ -136,25 +136,34 @@
                                         $savedValue = $savedAnswers[$kuk->id]['result'] ?? old("kuks.{$kuk->id}.result");
                                         $savedNote = $savedAnswers[$kuk->id]['note'] ?? old("kuks.{$kuk->id}.note");
                                     @endphp
-                                    <tr class="hover:bg-slate-50/50">
-                                        <td class="px-4 py-3 text-slate-600 font-mono text-xs font-bold text-center whitespace-nowrap">{{ $kuk->code_number }}</td>
-                                        <td class="px-4 py-3 text-slate-800">
-                                            <div class="text-sm leading-relaxed">{{ $kuk->statement }}</div>
+                                    <tr class="flex flex-col md:table-row p-3 md:p-0 hover:bg-slate-50/50 transition space-y-2 md:space-y-0">
+                                        <td class="hidden md:table-cell px-4 py-3 text-slate-600 font-mono text-xs font-bold text-center whitespace-nowrap">{{ $kuk->code_number }}</td>
+                                        <td class="px-0 md:px-4 py-0 md:py-3 text-slate-800">
+                                            <div class="flex items-start gap-1.5">
+                                                <span class="md:hidden font-mono text-xs font-bold text-brand-700 bg-brand-50 px-1.5 py-0.5 rounded border border-brand-200 shrink-0">{{ $kuk->code_number }}</span>
+                                                <div class="text-xs sm:text-sm leading-relaxed">{{ $kuk->statement }}</div>
+                                            </div>
                                         </td>
-                                        <td class="px-3 py-3 text-center whitespace-nowrap">
-                                            <label class="inline-flex items-center cursor-pointer">
-                                                <input type="radio" name="kuks[{{ $kuk->id }}][result]" value="K" data-unit-id="{{ $unit->id }}" required :disabled="!isEditing" class="kuk-radio kuk-radio-k text-emerald-600 focus:ring-emerald-500 w-4 h-4 cursor-pointer" {{ $savedValue === 'K' ? 'checked' : '' }}>
-                                                <span class="ml-1 text-xs font-semibold text-emerald-700">K</span>
-                                            </label>
+                                        <td class="px-0 md:px-3 py-0 md:py-3 md:text-center whitespace-nowrap">
+                                            <div class="grid grid-cols-2 gap-2 md:block">
+                                                <label class="flex md:inline-flex items-center justify-center p-2 md:p-0 bg-emerald-50 md:bg-transparent rounded-lg md:rounded-none border md:border-0 border-emerald-200 cursor-pointer min-h-[38px] md:min-h-0">
+                                                    <input type="radio" name="kuks[{{ $kuk->id }}][result]" value="K" data-unit-id="{{ $unit->id }}" required :disabled="!isEditing" class="kuk-radio kuk-radio-k text-emerald-600 focus:ring-emerald-500 w-4 h-4 cursor-pointer" {{ $savedValue === 'K' ? 'checked' : '' }}>
+                                                    <span class="ml-1.5 md:ml-1 text-xs font-bold text-emerald-800 md:text-emerald-700">Kompeten (K)</span>
+                                                </label>
+                                                <label class="flex md:hidden items-center justify-center p-2 bg-rose-50 rounded-lg border border-rose-200 cursor-pointer min-h-[38px]">
+                                                    <input type="radio" name="kuks[{{ $kuk->id }}][result]" value="BK" data-unit-id="{{ $unit->id }}" required :disabled="!isEditing" class="kuk-radio kuk-radio-bk text-rose-600 focus:ring-rose-500 w-4 h-4 cursor-pointer" {{ $savedValue === 'BK' ? 'checked' : '' }}>
+                                                    <span class="ml-1.5 text-xs font-bold text-rose-800">Belum (BK)</span>
+                                                </label>
+                                            </div>
                                         </td>
-                                        <td class="px-3 py-3 text-center whitespace-nowrap">
+                                        <td class="hidden md:table-cell px-3 py-3 text-center whitespace-nowrap">
                                             <label class="inline-flex items-center cursor-pointer">
                                                 <input type="radio" name="kuks[{{ $kuk->id }}][result]" value="BK" data-unit-id="{{ $unit->id }}" required :disabled="!isEditing" class="kuk-radio kuk-radio-bk text-rose-600 focus:ring-rose-500 w-4 h-4 cursor-pointer" {{ $savedValue === 'BK' ? 'checked' : '' }}>
                                                 <span class="ml-1 text-xs font-semibold text-rose-700">BK</span>
                                             </label>
                                         </td>
-                                        <td class="px-4 py-3">
-                                            <input type="text" name="kuks[{{ $kuk->id }}][note]" value="{{ $savedNote }}" :disabled="!isEditing" placeholder="Catatan..." class="w-full px-2.5 py-1 text-xs rounded border border-slate-300 focus:ring-1 focus:ring-brand-500 focus:outline-none">
+                                        <td class="px-0 md:px-4 py-0 md:py-3">
+                                            <input type="text" name="kuks[{{ $kuk->id }}][note]" value="{{ $savedNote }}" :disabled="!isEditing" placeholder="Catatan penilaian asesor..." class="w-full px-3 py-2 md:py-1 text-xs rounded-lg border border-slate-300 focus:ring-1 focus:ring-brand-500 focus:outline-none bg-white">
                                         </td>
                                     </tr>
                                 @endforeach

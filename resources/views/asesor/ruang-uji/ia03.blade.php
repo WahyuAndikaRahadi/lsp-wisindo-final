@@ -87,7 +87,7 @@
 
             <div class="overflow-x-auto">
                 <table class="w-full text-sm">
-                    <thead class="bg-slate-50 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
+                    <thead class="hidden md:table-header-group bg-slate-50 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
                         <tr>
                             <th class="px-6 py-3 w-16 text-center">No</th>
                             <th class="px-6 py-3">Daftar Pertanyaan &amp; Kunci Jawaban</th>
@@ -101,31 +101,36 @@
                                 $val = $savedAnswers[$q->id]['result'] ?? old("questions.{$q->id}.result");
                                 $qResponse = $savedAnswers[$q->id]['response'] ?? old("questions.{$q->id}.response");
                             @endphp
-                            <tr class="hover:bg-slate-50/50">
-                                <td class="px-6 py-3 text-slate-500 font-mono text-xs text-center font-bold">{{ $i + 1 }}</td>
-                                <td class="px-6 py-3 text-slate-800">
-                                    <div class="font-medium text-sm leading-relaxed">{{ $q->question }}</div>
+                            <tr class="flex flex-col md:table-row p-4 md:p-0 hover:bg-slate-50/50 transition space-y-2.5 md:space-y-0">
+                                <td class="hidden md:table-cell px-6 py-3 text-slate-500 font-mono text-xs text-center font-bold">{{ $i + 1 }}</td>
+                                <td class="px-0 md:px-6 py-0 md:py-3 text-slate-800">
+                                    <div class="flex items-start gap-2">
+                                        <span class="md:hidden font-mono text-xs font-bold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded shrink-0">#{{ $i + 1 }}</span>
+                                        <div class="font-medium text-xs sm:text-sm leading-relaxed">{{ $q->question }}</div>
+                                    </div>
                                     @if(!empty($q->expected_answer))
-                                        <div class="text-xs text-slate-600 mt-1.5 bg-slate-50 p-2.5 rounded border border-slate-200">
+                                        <div class="text-xs text-slate-600 mt-2 bg-slate-50 p-2.5 rounded-lg border border-slate-200">
                                             <span class="font-bold text-slate-700">Kunci / Jawaban yang Diharapkan:</span> {{ $q->expected_answer }}
                                         </div>
                                     @endif
                                 </td>
-                                <td class="px-6 py-3 text-center">
-                                    <div class="flex items-center justify-center space-x-3">
-                                        <label class="p-2 inline-flex items-center cursor-pointer">
-                                            <input type="radio" name="questions[{{ $q->id }}][result]" value="M" required :disabled="!isEditing" class="q-radio q-radio-m text-emerald-600 focus:ring-emerald-500 w-5 h-5 cursor-pointer" {{ $val === 'M' ? 'checked' : '' }}>
-                                            <span class="ml-1.5 text-xs font-bold text-emerald-700">M</span>
+                                <td class="px-0 md:px-6 py-0 md:py-3 text-left md:text-center">
+                                    <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider md:hidden mb-1.5">Penilaian Asesor:</label>
+                                    <div class="grid grid-cols-2 gap-2 md:flex md:items-center md:justify-center md:space-x-3">
+                                        <label class="flex items-center justify-center p-2 md:p-0 bg-emerald-50 md:bg-transparent rounded-lg md:rounded-none border md:border-0 border-emerald-200 cursor-pointer min-h-[38px] md:min-h-0">
+                                            <input type="radio" name="questions[{{ $q->id }}][result]" value="M" required :disabled="!isEditing" class="q-radio q-radio-m text-emerald-600 focus:ring-emerald-500 w-4 h-4 cursor-pointer" {{ $val === 'M' ? 'checked' : '' }}>
+                                            <span class="ml-1.5 text-xs font-bold text-emerald-800 md:text-emerald-700">Memadai (M)</span>
                                         </label>
-                                        <label class="p-2 inline-flex items-center cursor-pointer">
-                                            <input type="radio" name="questions[{{ $q->id }}][result]" value="TM" required :disabled="!isEditing" class="q-radio q-radio-tm text-rose-600 focus:ring-rose-500 w-5 h-5 cursor-pointer" {{ $val === 'TM' ? 'checked' : '' }}>
-                                            <span class="ml-1.5 text-xs font-bold text-rose-700">TM</span>
+                                        <label class="flex items-center justify-center p-2 md:p-0 bg-rose-50 md:bg-transparent rounded-lg md:rounded-none border md:border-0 border-rose-200 cursor-pointer min-h-[38px] md:min-h-0">
+                                            <input type="radio" name="questions[{{ $q->id }}][result]" value="TM" required :disabled="!isEditing" class="q-radio q-radio-tm text-rose-600 focus:ring-rose-500 w-4 h-4 cursor-pointer" {{ $val === 'TM' ? 'checked' : '' }}>
+                                            <span class="ml-1.5 text-xs font-bold text-rose-800 md:text-rose-700">Tidak (TM)</span>
                                         </label>
                                     </div>
-                                    <div class="text-[10px] text-slate-400 mt-0.5">M: Memadai | TM: Tidak</div>
+                                    <div class="hidden md:block text-[10px] text-slate-400 mt-0.5">M: Memadai | TM: Tidak</div>
                                 </td>
-                                <td class="px-6 py-3">
-                                    <textarea name="questions[{{ $q->id }}][response]" rows="2" :disabled="!isEditing" placeholder="Catatan tanggapan asesi..." class="w-full px-2.5 py-1 text-xs rounded border border-slate-300 focus:ring-1 focus:ring-brand-500 focus:outline-none">{{ $qResponse }}</textarea>
+                                <td class="px-0 md:px-6 py-0 md:py-3">
+                                    <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider md:hidden mb-1">Tanggapan / Catatan Asesi:</label>
+                                    <textarea name="questions[{{ $q->id }}][response]" rows="2" :disabled="!isEditing" placeholder="Catatan tanggapan asesi..." class="w-full px-3 py-2 md:py-1 text-xs rounded-lg border border-slate-300 focus:ring-1 focus:ring-brand-500 focus:outline-none bg-white">{{ $qResponse }}</textarea>
                                 </td>
                             </tr>
                         @empty

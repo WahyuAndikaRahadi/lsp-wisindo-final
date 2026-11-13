@@ -109,7 +109,7 @@
                 {{-- Table Container --}}
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm">
-                        <thead class="bg-slate-50 text-left text-xs font-bold text-slate-700 uppercase tracking-wider border-b border-slate-200">
+                        <thead class="hidden md:table-header-group bg-slate-50 text-left text-xs font-bold text-slate-700 uppercase tracking-wider border-b border-slate-200">
                             <tr>
                                 <th class="px-4 py-3 w-10 text-center whitespace-nowrap">
                                     <input type="checkbox" id="checkAllAk02" checked class="rounded border-slate-300 text-brand-600 focus:ring-brand-500 w-4 h-4 cursor-pointer" title="Pilih Semua Asesi">
@@ -131,18 +131,24 @@
                                     $defaultNotes = $asm->final_notes ?: ($isK ? 'Asesi menunjukkan unjuk kerja optimal sesuai standar skema' : 'Terdapat kriteria unjuk kerja yang belum terpenuhi');
                                     $defaultFollowUp = $asm->follow_up_action ?: ($isK ? 'Diusulkan penerbitan sertifikat kompetensi BNSP' : 'Perlu asesmen ulang pada unit yang belum kompeten');
                                 @endphp
-                                <tr class="hover:bg-slate-50/70 transition align-top">
-                                    <td class="px-4 py-4 text-center whitespace-nowrap">
-                                        @if($asm->apl_status === 'APPROVED')
-                                            <input type="checkbox" class="ak02-row-checkbox rounded border-slate-300 text-brand-600 focus:ring-brand-500 w-4 h-4 cursor-pointer mt-1" checked data-asm-id="{{ $asm->id }}">
-                                        @else
-                                            <span class="text-slate-300 text-xs">-</span>
-                                        @endif
+                                <tr class="flex flex-col md:table-row p-4 md:p-0 hover:bg-slate-50/70 transition space-y-3 md:space-y-0">
+                                    <td class="px-0 md:px-4 py-0 md:py-4 md:text-center whitespace-nowrap">
+                                        <div class="flex items-center justify-between md:justify-center">
+                                            <div class="flex items-center gap-2">
+                                                @if($asm->apl_status === 'APPROVED')
+                                                    <input type="checkbox" class="ak02-row-checkbox rounded border-slate-300 text-brand-600 focus:ring-brand-500 w-4 h-4 cursor-pointer" checked data-asm-id="{{ $asm->id }}">
+                                                @else
+                                                    <span class="text-slate-300 text-xs">-</span>
+                                                @endif
+                                                <span class="md:hidden font-mono text-xs font-bold text-slate-500">Pilih Peserta</span>
+                                            </div>
+                                            <span class="md:hidden font-mono text-xs font-bold text-slate-400">#{{ $idx + 1 }}</span>
+                                        </div>
                                     </td>
-                                    <td class="px-4 py-4 text-center font-mono font-bold text-xs text-slate-500 whitespace-nowrap">
+                                    <td class="hidden md:table-cell px-4 py-4 text-center font-mono font-bold text-xs text-slate-500 whitespace-nowrap">
                                         {{ $idx + 1 }}
                                     </td>
-                                    <td class="px-5 py-4">
+                                    <td class="px-0 md:px-5 py-0 md:py-4">
                                         <div class="font-bold text-slate-900 text-sm">{{ $item->asesi->full_name }}</div>
                                         <div class="text-xs text-slate-500 font-mono mt-0.5">
                                             NIK: {{ $item->asesi->profile?->nik ?? '-' }}
@@ -158,18 +164,19 @@
                                             </span>
                                         </div>
                                     </td>
-                                    <td class="px-5 py-4 text-center whitespace-nowrap">
+                                    <td class="px-0 md:px-5 py-0 md:py-4 md:text-center whitespace-nowrap">
+                                        <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider md:hidden mb-1.5">Rekomendasi Hasil:</label>
                                         @if($asm->apl_status === 'APPROVED' && ! $isClosedForMe)
-                                            <div class="inline-flex rounded-lg border border-slate-300 p-1 bg-slate-100 gap-1 result-button-group" data-asm-id="{{ $asm->id }}">
+                                            <div class="grid grid-cols-2 md:inline-flex rounded-lg border border-slate-300 p-1 bg-slate-100 gap-1 result-button-group w-full md:w-auto" data-asm-id="{{ $asm->id }}">
                                                 <button type="button" 
-                                                        class="px-2.5 sm:px-3 py-1.5 rounded-md text-xs font-bold transition btn-k min-h-[34px] {{ $isK ? 'bg-emerald-600 text-white shadow-xs' : 'text-slate-700 hover:bg-slate-200' }}"
+                                                        class="px-2.5 sm:px-3 py-2 md:py-1.5 rounded-md text-xs font-bold transition btn-k min-h-[38px] md:min-h-[34px] flex items-center justify-center {{ $isK ? 'bg-emerald-600 text-white shadow-xs' : 'text-slate-700 hover:bg-slate-200' }}"
                                                         onclick="setCandidateResult({{ $asm->id }}, 'KOMPETEN')">
-                                                    <span class="hidden sm:inline">Kompeten </span>(K)
+                                                    <span>Kompeten (K)</span>
                                                 </button>
                                                 <button type="button" 
-                                                        class="px-2.5 sm:px-3 py-1.5 rounded-md text-xs font-bold transition btn-bk min-h-[34px] {{ !$isK ? 'bg-rose-600 text-white shadow-xs' : 'text-slate-700 hover:bg-slate-200' }}"
+                                                        class="px-2.5 sm:px-3 py-2 md:py-1.5 rounded-md text-xs font-bold transition btn-bk min-h-[38px] md:min-h-[34px] flex items-center justify-center {{ !$isK ? 'bg-rose-600 text-white shadow-xs' : 'text-slate-700 hover:bg-slate-200' }}"
                                                         onclick="setCandidateResult({{ $asm->id }}, 'BELUM_KOMPETEN')">
-                                                    <span class="hidden sm:inline">Belum </span>(BK)
+                                                    <span>Belum (BK)</span>
                                                 </button>
                                             </div>
                                             <input type="hidden" name="results[{{ $asm->id }}][final_result]" id="input_result_{{ $asm->id }}" value="{{ $isK ? 'KOMPETEN' : 'BELUM_KOMPETEN' }}">
@@ -183,15 +190,15 @@
                                             </span>
                                         @endif
                                     </td>
-                                    <td class="px-5 py-4 space-y-2">
+                                    <td class="px-0 md:px-5 py-0 md:py-4 space-y-2">
                                         @if($asm->apl_status === 'APPROVED')
                                             <div>
                                                 <label class="block text-[11px] font-bold text-slate-600 mb-0.5">Tindak Lanjut:</label>
-                                                <input type="text" name="results[{{ $asm->id }}][follow_up_action]" id="input_follow_up_{{ $asm->id }}" value="{{ $defaultFollowUp }}" @disabled($isClosedForMe) class="w-full text-xs rounded-lg border border-slate-300 bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:outline-none py-1.5 px-3 transition shadow-2xs {{ $isClosedForMe ? 'bg-slate-50 text-slate-700' : '' }}">
+                                                <input type="text" name="results[{{ $asm->id }}][follow_up_action]" id="input_follow_up_{{ $asm->id }}" value="{{ $defaultFollowUp }}" @disabled($isClosedForMe) class="w-full text-xs rounded-lg border border-slate-300 bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:outline-none py-2 md:py-1.5 px-3 transition shadow-2xs {{ $isClosedForMe ? 'bg-slate-50 text-slate-700' : '' }}">
                                             </div>
                                             <div>
                                                 <label class="block text-[11px] font-bold text-slate-600 mb-0.5">Catatan Asesor:</label>
-                                                <input type="text" name="results[{{ $asm->id }}][final_notes]" id="input_notes_{{ $asm->id }}" value="{{ $defaultNotes }}" @disabled($isClosedForMe) class="w-full text-xs rounded-lg border border-slate-300 bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:outline-none py-1.5 px-3 transition shadow-2xs {{ $isClosedForMe ? 'bg-slate-50 text-slate-700' : '' }}">
+                                                <input type="text" name="results[{{ $asm->id }}][final_notes]" id="input_notes_{{ $asm->id }}" value="{{ $defaultNotes }}" @disabled($isClosedForMe) class="w-full text-xs rounded-lg border border-slate-300 bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:outline-none py-2 md:py-1.5 px-3 transition shadow-2xs {{ $isClosedForMe ? 'bg-slate-50 text-slate-700' : '' }}">
                                             </div>
                                         @else
                                             <div class="text-xs text-amber-600 italic">
@@ -199,9 +206,9 @@
                                             </div>
                                         @endif
                                     </td>
-                                    <td class="px-4 py-4 text-right whitespace-nowrap">
-                                        <a href="{{ $item->inspect_url }}" target="_blank" class="inline-flex items-center px-2.5 py-1.5 min-h-[32px] text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-300 rounded-lg shadow-xs transition" title="Buka formulir rincian unit per unit">
-                                            <span>Unit</span>
+                                    <td class="px-0 md:px-4 py-0 md:py-4 text-left md:text-right whitespace-nowrap pt-1 md:pt-0">
+                                        <a href="{{ $item->inspect_url }}" target="_blank" class="w-full md:w-auto inline-flex items-center justify-center px-3 py-2 md:py-1.5 min-h-[38px] md:min-h-[32px] text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-300 rounded-lg shadow-xs transition" title="Buka formulir rincian unit per unit">
+                                            <span>Rincian Unit &rarr;</span>
                                             <svg class="w-3 h-3 ml-1 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                                         </a>
                                     </td>

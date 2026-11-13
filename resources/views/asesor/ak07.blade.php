@@ -290,7 +290,7 @@
 
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-xs border-collapse">
-                    <thead class="bg-slate-50 border-b border-slate-200 text-slate-900 font-black uppercase tracking-wider">
+                    <thead class="hidden md:table-header-group bg-slate-50 border-b border-slate-200 text-slate-900 font-black uppercase tracking-wider">
                         <tr>
                             <th class="px-4 py-3 w-12 text-center border-r border-slate-200">No</th>
                             <th class="px-4 py-3 w-2/5 border-r border-slate-200">Mengidentifikasi Persyaratan Modifikasi & Kontekstualisasi</th>
@@ -300,37 +300,47 @@
                     </thead>
                     <tbody class="divide-y divide-slate-100">
                         @foreach($itemsDef as $idx => $def)
-                            <tr class="hover:bg-slate-50/70 transition align-top">
-                                <td class="px-4 py-4 text-center font-bold font-mono border-r border-slate-200 text-slate-700">
+                            <tr class="flex flex-col md:table-row p-4 md:p-0 hover:bg-slate-50/70 transition space-y-3 md:space-y-0 align-top">
+                                <td class="hidden md:table-cell px-4 py-4 text-center font-bold font-mono border-r border-slate-200 text-slate-700">
                                     {{ $idx }}
                                     <input type="hidden" name="items[{{ $idx }}][title]" value="{{ $def['title'] }}">
                                 </td>
-                                <td class="px-4 py-4 border-r border-slate-200 text-slate-900 font-medium leading-relaxed">
-                                    {{ $def['title'] }}
-                                </td>
-                                <td class="px-4 py-4 border-r border-slate-200 text-center">
-                                    <div class="flex items-center justify-center space-x-3">
-                                        <label class="inline-flex items-center space-x-1 {{ $isClosedForMe ? 'cursor-default' : 'cursor-pointer' }}">
-                                            <input type="radio" name="items[{{ $idx }}][needed]" value="YA" @disabled($isClosedForMe) class="text-emerald-600 focus:ring-emerald-500 w-4 h-4">
-                                            <span class="font-bold text-emerald-800">Ya</span>
-                                        </label>
-                                        <label class="inline-flex items-center space-x-1 {{ $isClosedForMe ? 'cursor-default' : 'cursor-pointer' }}">
-                                            <input type="radio" name="items[{{ $idx }}][needed]" value="TIDAK" checked @disabled($isClosedForMe) class="text-slate-600 focus:ring-slate-500 w-4 h-4">
-                                            <span class="text-slate-700">Tidak</span>
-                                        </label>
+                                <td class="px-0 md:px-4 py-0 md:py-4 md:border-r border-slate-200 text-slate-900 font-medium leading-relaxed">
+                                    <div class="flex items-start gap-2">
+                                        <span class="md:hidden font-mono font-bold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded text-[11px] shrink-0">#{{ $idx }}</span>
+                                        <div class="font-bold md:font-medium text-slate-900 text-xs sm:text-sm">
+                                            {{ $def['title'] }}
+                                            <input type="hidden" class="md:hidden" name="items[{{ $idx }}][title]" value="{{ $def['title'] }}">
+                                        </div>
                                     </div>
                                 </td>
-                                <td class="px-4 py-4 space-y-2">
-                                    <div class="space-y-1.5">
+                                <td class="px-0 md:px-4 py-0 md:py-4 md:border-r border-slate-200 md:text-center">
+                                    <div class="flex items-center justify-between md:justify-center">
+                                        <span class="md:hidden text-xs text-slate-600 font-bold">Perlu Penyesuaian:</span>
+                                        <div class="flex items-center space-x-3">
+                                            <label class="inline-flex items-center space-x-1.5 {{ $isClosedForMe ? 'cursor-default' : 'cursor-pointer' }} bg-slate-50 md:bg-transparent px-2.5 py-1 rounded-lg md:p-0 border md:border-0 border-slate-200">
+                                                <input type="radio" name="items[{{ $idx }}][needed]" value="YA" @disabled($isClosedForMe) class="text-emerald-600 focus:ring-emerald-500 w-4 h-4">
+                                                <span class="font-bold text-emerald-800">Ya</span>
+                                            </label>
+                                            <label class="inline-flex items-center space-x-1.5 {{ $isClosedForMe ? 'cursor-default' : 'cursor-pointer' }} bg-slate-50 md:bg-transparent px-2.5 py-1 rounded-lg md:p-0 border md:border-0 border-slate-200">
+                                                <input type="radio" name="items[{{ $idx }}][needed]" value="TIDAK" checked @disabled($isClosedForMe) class="text-slate-600 focus:ring-slate-500 w-4 h-4">
+                                                <span class="text-slate-700 font-bold md:font-normal">Tidak</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-0 md:px-4 py-0 md:py-4 space-y-2">
+                                    <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider md:hidden mb-1">Bentuk Penyesuaian:</label>
+                                    <div class="space-y-1.5 bg-slate-50 md:bg-transparent p-2.5 md:p-0 rounded-lg border md:border-0 border-slate-200">
                                         @foreach($def['options'] as $opt)
                                             <label class="flex items-start space-x-2 text-slate-700 {{ $isClosedForMe ? 'cursor-default' : 'cursor-pointer' }}">
                                                 <input type="checkbox" name="items[{{ $idx }}][options][]" value="{{ $opt }}" @disabled($isClosedForMe) class="mt-0.5 rounded border-slate-300 text-brand-600 focus:ring-brand-500 w-3.5 h-3.5">
-                                                <span>{{ $opt }}</span>
+                                                <span class="leading-relaxed">{{ $opt }}</span>
                                             </label>
                                         @endforeach
                                     </div>
                                     <div class="pt-1">
-                                        <input type="text" name="items[{{ $idx }}][custom_note]" placeholder="Keterangan lain / catatan penyesuaian spesifik..." @disabled($isClosedForMe) class="w-full text-xs px-2.5 py-1.5 rounded border border-slate-300 focus:ring-1 focus:ring-brand-500 focus:outline-none bg-white">
+                                        <input type="text" name="items[{{ $idx }}][custom_note]" placeholder="Keterangan lain / catatan penyesuaian spesifik..." @disabled($isClosedForMe) class="w-full text-xs px-3 py-2 md:py-1.5 rounded-lg border border-slate-300 focus:ring-1 focus:ring-brand-500 focus:outline-none bg-white">
                                     </div>
                                 </td>
                             </tr>

@@ -86,7 +86,7 @@
 
             <div class="overflow-x-auto">
                 <table class="w-full text-xs">
-                    <thead class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
+                    <thead class="hidden md:table-header-group bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
                         <tr>
                             <th class="px-4 py-3 text-center w-10">No</th>
                             <th class="px-4 py-3 text-left min-w-[200px]">Kode & Judul Unit Kompetensi</th>
@@ -105,39 +105,72 @@
                                 $methods = $item?->methods_json ?? [];
                                 $isCompetent = $item ? $item->is_competent : true;
                             @endphp
-                            <tr class="hover:bg-slate-50/60">
-                                <td class="px-4 py-3 text-center text-slate-500 font-mono">{{ $idx + 1 }}</td>
-                                <td class="px-4 py-3">
-                                    <span class="font-mono font-bold text-slate-800 text-[11px] block">{{ $unit->code }}</span>
-                                    <span class="text-slate-700">{{ $unit->title }}</span>
+                            <tr class="flex flex-col md:table-row p-4 md:p-0 hover:bg-slate-50/60 transition space-y-3 md:space-y-0">
+                                <td class="hidden md:table-cell px-4 py-3 text-center text-slate-500 font-mono">{{ $idx + 1 }}</td>
+                                <td class="px-0 md:px-4 py-0 md:py-3">
+                                    <div class="flex items-start gap-2">
+                                        <span class="md:hidden font-mono font-bold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded text-[11px] shrink-0">#{{ $idx + 1 }}</span>
+                                        <div>
+                                            <span class="font-mono font-bold text-brand-700 text-xs block">{{ $unit->code }}</span>
+                                            <span class="font-bold md:font-normal text-slate-900 md:text-slate-700 text-xs sm:text-sm leading-snug">{{ $unit->title }}</span>
+                                        </div>
+                                    </div>
+
+                                    {{-- Mobile Checkboxes for Methods (< md) --}}
+                                    <div class="block md:hidden mt-3 p-2.5 bg-slate-50 rounded-lg border border-slate-200/80 space-y-2">
+                                        <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Metode Asesmen Terpilih:</div>
+                                        <div class="grid grid-cols-2 gap-2 text-xs">
+                                            <label class="flex items-center space-x-2 text-slate-700 cursor-pointer">
+                                                <input type="checkbox" name="units[{{ $unit->id }}][observasi_demonstrasi]" value="1" {{ !empty($methods['observasi_demonstrasi']) ? 'checked' : '' }} class="w-4 h-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500">
+                                                <span class="text-[11px]">Observasi Praktik</span>
+                                            </label>
+                                            <label class="flex items-center space-x-2 text-slate-700 cursor-pointer">
+                                                <input type="checkbox" name="units[{{ $unit->id }}][portofolio]" value="1" {{ !empty($methods['portofolio']) ? 'checked' : '' }} class="w-4 h-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500">
+                                                <span class="text-[11px]">Portofolio</span>
+                                            </label>
+                                            <label class="flex items-center space-x-2 text-slate-700 cursor-pointer">
+                                                <input type="checkbox" name="units[{{ $unit->id }}][lisan]" value="1" {{ !empty($methods['lisan']) ? 'checked' : '' }} class="w-4 h-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500">
+                                                <span class="text-[11px]">Lisan (PMO)</span>
+                                            </label>
+                                            <label class="flex items-center space-x-2 text-slate-700 cursor-pointer">
+                                                <input type="checkbox" name="units[{{ $unit->id }}][tulis]" value="1" {{ !empty($methods['tulis']) ? 'checked' : '' }} class="w-4 h-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500">
+                                                <span class="text-[11px]">Tulis (CBT)</span>
+                                            </label>
+                                            <label class="flex items-center space-x-2 text-slate-700 cursor-pointer col-span-2">
+                                                <input type="checkbox" name="units[{{ $unit->id }}][pihak_ketiga]" value="1" {{ !empty($methods['pihak_ketiga']) ? 'checked' : '' }} class="w-4 h-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500">
+                                                <span class="text-[11px]">Verifikasi Pihak Ketiga</span>
+                                            </label>
+                                        </div>
+                                    </div>
                                 </td>
-                                <td class="px-2 py-3 text-center">
+                                <td class="hidden md:table-cell px-2 py-3 text-center">
                                     <label class="p-2 inline-flex items-center justify-center cursor-pointer">
                                         <input type="checkbox" name="units[{{ $unit->id }}][observasi_demonstrasi]" value="1" {{ !empty($methods['observasi_demonstrasi']) ? 'checked' : '' }} class="w-5 h-5 rounded border-slate-300 text-brand-600 focus:ring-brand-500 cursor-pointer">
                                     </label>
                                 </td>
-                                <td class="px-2 py-3 text-center">
+                                <td class="hidden md:table-cell px-2 py-3 text-center">
                                     <label class="p-2 inline-flex items-center justify-center cursor-pointer">
                                         <input type="checkbox" name="units[{{ $unit->id }}][portofolio]" value="1" {{ !empty($methods['portofolio']) ? 'checked' : '' }} class="w-5 h-5 rounded border-slate-300 text-brand-600 focus:ring-brand-500 cursor-pointer">
                                     </label>
                                 </td>
-                                <td class="px-2 py-3 text-center">
+                                <td class="hidden md:table-cell px-2 py-3 text-center">
                                     <label class="p-2 inline-flex items-center justify-center cursor-pointer">
                                         <input type="checkbox" name="units[{{ $unit->id }}][lisan]" value="1" {{ !empty($methods['lisan']) ? 'checked' : '' }} class="w-5 h-5 rounded border-slate-300 text-brand-600 focus:ring-brand-500 cursor-pointer">
                                     </label>
                                 </td>
-                                <td class="px-2 py-3 text-center">
+                                <td class="hidden md:table-cell px-2 py-3 text-center">
                                     <label class="p-2 inline-flex items-center justify-center cursor-pointer">
                                         <input type="checkbox" name="units[{{ $unit->id }}][tulis]" value="1" {{ !empty($methods['tulis']) ? 'checked' : '' }} class="w-5 h-5 rounded border-slate-300 text-brand-600 focus:ring-brand-500 cursor-pointer">
                                     </label>
                                 </td>
-                                <td class="px-2 py-3 text-center">
+                                <td class="hidden md:table-cell px-2 py-3 text-center">
                                     <label class="p-2 inline-flex items-center justify-center cursor-pointer">
                                         <input type="checkbox" name="units[{{ $unit->id }}][pihak_ketiga]" value="1" {{ !empty($methods['pihak_ketiga']) ? 'checked' : '' }} class="w-5 h-5 rounded border-slate-300 text-brand-600 focus:ring-brand-500 cursor-pointer">
                                     </label>
                                 </td>
-                                <td class="px-3 py-3 text-center">
-                                    <select name="units[{{ $unit->id }}][is_competent]" class="unit-result-select text-xs font-bold rounded-lg border border-slate-300 bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:outline-none py-1.5 px-2.5 w-full transition shadow-2xs {{ $isCompetent ? 'text-emerald-700' : 'text-rose-700' }}">
+                                <td class="px-0 md:px-3 py-0 md:py-3 md:text-center">
+                                    <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider md:hidden mb-1">Hasil Unit:</label>
+                                    <select name="units[{{ $unit->id }}][is_competent]" class="unit-result-select text-xs font-bold rounded-lg border border-slate-300 bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:outline-none py-2 md:py-1.5 px-3 md:px-2.5 w-full transition shadow-2xs min-h-[40px] md:min-h-0 {{ $isCompetent ? 'text-emerald-700' : 'text-rose-700' }}">
                                         <option value="1" {{ $isCompetent ? 'selected' : '' }}>Kompeten (K)</option>
                                         <option value="0" {{ !$isCompetent ? 'selected' : '' }}>Belum Kompeten (BK)</option>
                                     </select>

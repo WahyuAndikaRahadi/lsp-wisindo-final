@@ -196,7 +196,7 @@
 
             <div class="overflow-x-auto">
                 <table class="w-full text-sm">
-                    <thead class="bg-slate-50 text-left text-xs font-bold text-slate-700 uppercase tracking-wider border-b border-slate-200">
+                    <thead class="hidden md:table-header-group bg-slate-50 text-left text-xs font-bold text-slate-700 uppercase tracking-wider border-b border-slate-200">
                         <tr>
                             @if($isBulk)
                                 <th class="px-4 py-3 w-10 text-center">
@@ -214,28 +214,34 @@
                     </thead>
                     <tbody class="divide-y divide-slate-100">
                         @foreach($asesiList as $idx => $item)
-                            <tr class="hover:bg-slate-50/80 transition">
+                            <tr class="flex flex-col md:table-row p-4 md:p-0 hover:bg-slate-50/80 transition space-y-3 md:space-y-0">
                                 @if($isBulk)
-                                    <td class="px-4 py-4 text-center">
-                                        @if($isIa02 && $item->assessment->apl_status !== 'APPROVED')
-                                            <input type="checkbox" disabled class="rounded border-slate-200 text-slate-300 w-4 h-4 cursor-not-allowed opacity-40" title="APL belum disetujui">
-                                        @else
-                                            <input type="checkbox" name="assessment_ids[]" value="{{ $item->assessment->id }}"
-                                                class="bulk-item-checkbox rounded border-slate-300 text-brand-600 focus:ring-brand-500 w-4 h-4 cursor-pointer"
-                                                {{ ($isIa02 && $item->is_completed) ? '' : 'checked' }}>
-                                        @endif
+                                    <td class="px-0 md:px-4 py-0 md:py-4 md:text-center">
+                                        <div class="flex items-center justify-between md:justify-center">
+                                            <div class="flex items-center gap-2">
+                                                @if($isIa02 && $item->assessment->apl_status !== 'APPROVED')
+                                                    <input type="checkbox" disabled class="rounded border-slate-200 text-slate-300 w-4 h-4 cursor-not-allowed opacity-40" title="APL belum disetujui">
+                                                @else
+                                                    <input type="checkbox" name="assessment_ids[]" value="{{ $item->assessment->id }}"
+                                                        class="bulk-item-checkbox rounded border-slate-300 text-brand-600 focus:ring-brand-500 w-4 h-4 cursor-pointer"
+                                                        {{ ($isIa02 && $item->is_completed) ? '' : 'checked' }}>
+                                                @endif
+                                                <span class="md:hidden font-mono text-xs font-bold text-slate-500">Pilih Peserta</span>
+                                            </div>
+                                            <span class="md:hidden font-mono text-xs font-bold text-slate-400">#{{ $idx + 1 }}</span>
+                                        </div>
                                     </td>
                                 @endif
-                                <td class="px-6 py-4 text-center font-mono font-bold text-xs text-slate-600 whitespace-nowrap">
+                                <td class="hidden md:table-cell px-6 py-4 text-center font-mono font-bold text-xs text-slate-600 whitespace-nowrap">
                                     {{ $idx + 1 }}
                                 </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center space-x-3">
-                                        <div class="w-9 h-9 rounded-full bg-slate-800 text-white font-bold flex items-center justify-center text-xs shrink-0 border border-slate-600">
+                                <td class="px-0 md:px-6 py-0 md:py-4">
+                                    <div class="flex items-start space-x-3">
+                                        <div class="w-9 h-9 rounded-full bg-slate-800 text-white font-bold flex items-center justify-center text-xs shrink-0 border border-slate-600 mt-0.5 md:mt-0">
                                             {{ strtoupper(substr($item->asesi->full_name, 0, 2)) }}
                                         </div>
-                                        <div>
-                                            <div class="font-bold text-slate-900 text-sm">{{ $item->asesi->full_name }}</div>
+                                        <div class="flex-1">
+                                            <div class="font-bold text-slate-900 text-sm leading-snug">{{ $item->asesi->full_name }}</div>
                                             <div class="text-xs text-slate-500">
                                                 {{ $item->asesi->email }}
                                                 @if(!empty($item->asesi->profile?->nik))
@@ -249,38 +255,44 @@
                                     </div>
                                 </td>
                                 @if(! $isApl)
-                                    <td class="px-6 py-4 text-center whitespace-nowrap">
-                                        <span class="px-2.5 py-1 rounded text-xs font-bold border border-slate-300 {{ $item->assessment->apl_status === 'APPROVED' ? 'bg-emerald-50 text-emerald-700 border-emerald-300' : 'bg-slate-100 text-slate-600' }}">
-                                            {{ str_replace('_', ' ', $item->assessment->apl_status) }}
-                                        </span>
+                                    <td class="px-0 md:px-6 py-0 md:py-4 md:text-center whitespace-nowrap">
+                                        <div class="flex items-center justify-between md:justify-center text-xs">
+                                            <span class="md:hidden text-slate-500">Status APL:</span>
+                                            <span class="px-2.5 py-0.5 md:py-1 rounded text-xs font-bold border border-slate-300 {{ $item->assessment->apl_status === 'APPROVED' ? 'bg-emerald-50 text-emerald-700 border-emerald-300' : 'bg-slate-100 text-slate-600' }}">
+                                                {{ str_replace('_', ' ', $item->assessment->apl_status) }}
+                                            </span>
+                                        </div>
                                     </td>
                                 @endif
-                                <td class="px-6 py-4 text-center whitespace-nowrap">
-                                    <div class="inline-flex flex-col items-center space-y-1">
-                                        <span class="px-3 py-1 rounded-full text-xs font-bold border {{ $item->status_class }}">
-                                            {{ $item->status_label }}
-                                        </span>
-                                        @if($item->score_label)
-                                            <span class="text-[11px] font-bold text-slate-600">
-                                                {{ $item->score_label }}
+                                <td class="px-0 md:px-6 py-0 md:py-4 md:text-center whitespace-nowrap">
+                                    <div class="flex items-center justify-between md:inline-flex md:flex-col md:items-center space-y-0 md:space-y-1">
+                                        <span class="md:hidden text-xs text-slate-500">Status Penilaian:</span>
+                                        <div class="inline-flex items-center gap-1.5 md:flex-col">
+                                            <span class="px-3 py-1 rounded-full text-xs font-bold border {{ $item->status_class }}">
+                                                {{ $item->status_label }}
                                             </span>
-                                        @endif
-                                        @if($meta['code'] === 'IA02')
-                                            @if($item->has_evidence)
-                                                <span class="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-300">
-                                                    ✓ Lembar Kertas Ada
-                                                </span>
-                                            @else
-                                                <span class="text-[10px] text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-300">
-                                                    Lembar Kertas Belum Diunggah
+                                            @if($item->score_label)
+                                                <span class="text-[11px] font-bold text-slate-600">
+                                                    {{ $item->score_label }}
                                                 </span>
                                             @endif
-                                        @endif
+                                            @if($meta['code'] === 'IA02')
+                                                @if($item->has_evidence)
+                                                    <span class="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-300">
+                                                        ✓ Lembar Kertas Ada
+                                                    </span>
+                                                @else
+                                                    <span class="text-[10px] text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-300">
+                                                        Lembar Belum Ada
+                                                    </span>
+                                                @endif
+                                            @endif
+                                        </div>
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 text-right whitespace-nowrap">
+                                <td class="px-0 md:px-6 py-0 md:py-4 text-left md:text-right whitespace-nowrap pt-1 md:pt-0">
                                     <a href="{{ $item->inspect_url }}"
-                                       class="inline-flex items-center space-x-1.5 px-3.5 py-2 text-xs font-bold {{ $item->is_completed || $isClosedForMe ? 'bg-slate-800 hover:bg-slate-900 text-white' : 'bg-brand-600 hover:bg-brand-700 text-white' }} rounded-lg shadow-sm transition min-h-[36px]">
+                                       class="w-full md:w-auto inline-flex items-center justify-center space-x-1.5 px-4 py-2.5 md:py-2 text-xs font-bold {{ $item->is_completed || $isClosedForMe ? 'bg-slate-800 hover:bg-slate-900 text-white' : 'bg-brand-600 hover:bg-brand-700 text-white' }} rounded-lg shadow-sm transition min-h-[40px]">
                                         <span>
                                             @if($isClosedForMe)
                                                 {{ $isApl ? 'Lihat Berkas APL' : 'Lihat Dokumen' }}

@@ -58,9 +58,103 @@
         </form>
     </div>
 
-    {{-- Users List --}}
+    {{-- Users List (Responsive: Cards on Mobile, Table on Desktop) --}}
     <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-        <div class="overflow-x-auto">
+        {{-- Mobile Cards (< md) --}}
+        <div class="block md:hidden divide-y divide-slate-100">
+            @forelse($users ?? [] as $user)
+                @php
+                    $roleBadge = match($user->role) {
+                        'SUPER_ADMIN' => 'bg-purple-100 text-purple-700 border-purple-200',
+                        'ADMIN_LSP' => 'bg-blue-100 text-blue-700 border-blue-200',
+                        'ASESOR' => 'bg-emerald-100 text-emerald-700 border-emerald-200',
+                        'ASESI' => 'bg-amber-100 text-amber-700 border-amber-200',
+                        default => 'bg-slate-100 text-slate-700 border-slate-200',
+                    };
+                    $statusBadge = match($user->status ?? 'ACTIVE') {
+                        'ACTIVE' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                        'INACTIVE' => 'bg-slate-100 text-slate-700 border-slate-200',
+                        'SUSPENDED' => 'bg-rose-50 text-rose-700 border-rose-200',
+                        default => 'bg-slate-100 text-slate-700 border-slate-200',
+                    };
+                    $statusLabel = match($user->status ?? 'ACTIVE') {
+                        'ACTIVE' => 'Aktif',
+                        'INACTIVE' => 'Nonaktif',
+                        'SUSPENDED' => 'Ditangguhkan',
+                        default => $user->status,
+                    };
+                @endphp
+                <div class="p-4 space-y-3">
+                    <div class="flex items-start justify-between gap-2">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-9 h-9 rounded-full bg-slate-800 text-white font-bold flex items-center justify-center text-xs shrink-0">
+                                {{ strtoupper(substr($user->full_name, 0, 2)) }}
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-slate-900 text-sm leading-snug">{{ $user->full_name }}</h3>
+                                <p class="text-xs font-mono text-slate-500">{{ $user->email }}</p>
+                            </div>
+                        </div>
+                        <span class="px-2 py-0.5 text-[10px] font-semibold rounded border {{ $statusBadge }}">
+                            {{ $statusLabel }}
+                        </span>
+                    </div>
+
+                    <div class="flex items-center justify-between text-xs pt-1 border-t border-slate-100">
+                        <span class="px-2.5 py-0.5 text-[11px] font-semibold rounded-full border {{ $roleBadge }}">
+                            {{ $user->role }}
+                        </span>
+                        <span class="text-[11px] text-slate-400">
+                            Dibuat {{ $user->created_at?->diffForHumans() ?? '-' }}
+                        </span>
+                    </div>
+
+                    <div class="flex items-center gap-2 pt-1 flex-wrap">
+                        <a href="{{ route('admin.users.edit', $user->id) }}" class="flex-1 px-3 py-2 text-xs font-bold text-brand-700 bg-brand-50 hover:bg-brand-100 border border-brand-200 rounded-lg text-center transition flex items-center justify-center min-h-[38px]">
+                            Edit
+                        </a>
+                        @if(auth()->user()->isRole('SUPER_ADMIN'))
+                            <form action="{{ route('admin.users.reset-password', $user->id) }}" method="POST" class="flex-1"
+                                  data-confirm="PERINGATAN RESET PASSWORD:
+
+Kata sandi akun {{ $user->full_name }} ({{ $user->email }}) akan direset kembali ke kata sandi default: 'proindo123'.
+
+Apakah Anda yakin ingin melanjutkan?"
+                                  data-confirm-title="Konfirmasi Reset Kata Sandi"
+                                  data-confirm-ok="Ya, Reset Password"
+                                  data-confirm-danger="false">
+                                @csrf
+                                <button type="submit" class="w-full px-3 py-2 text-xs font-bold text-amber-700 hover:text-amber-900 bg-amber-50 hover:bg-amber-100 border border-amber-200 rounded-lg text-center transition min-h-[38px]" title="Reset password ke default 'proindo123'">
+                                    Reset Sandi
+                                </button>
+                            </form>
+                        @endif
+                        @if($user->id !== auth()->id())
+                            <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" class="flex-1"
+                                  data-confirm="PERINGATAN KONSEKUENSI PENGHAPUSAN PENGGUNA:
+
+Jika pengguna ini memiliki riwayat asesmen atau jadwal, status akun akan dinonaktifkan (INACTIVE) untuk menjaga integritas data audit BNSP. Jika tidak ada riwayat, data akan dihapus permanen.
+
+Apakah Anda yakin ingin melanjutkan?"
+                                  data-confirm-title="Konfirmasi Penghapusan Pengguna"
+                                  data-confirm-ok="Ya, Lanjutkan Hapus"
+                                  data-confirm-danger="true">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="w-full px-3 py-2 text-xs font-bold text-rose-700 hover:text-rose-900 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-lg text-center transition min-h-[38px]">
+                                    Hapus
+                                </button>
+                            </form>
+                        @endif
+                    </div>
+                </div>
+            @empty
+                <div class="p-8 text-center text-slate-500 text-xs">Belum ada pengguna terdaftar.</div>
+            @endforelse
+        </div>
+
+        {{-- Desktop Table (md+) --}}
+        <div class="hidden md:block overflow-x-auto">
             <table class="w-full text-sm">
                 <thead class="bg-slate-50 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
                     <tr>

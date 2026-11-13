@@ -41,7 +41,7 @@
 
         <div class="overflow-x-auto border border-slate-200 rounded-lg">
             <table class="min-w-full divide-y divide-slate-200 text-xs">
-                <thead class="bg-slate-50 text-slate-700 font-bold">
+                <thead class="hidden md:table-header-group bg-slate-50 text-slate-700 font-bold">
                     <tr>
                         <th class="px-3 py-2 text-center w-12">No</th>
                         <th class="px-3 py-2 text-left">Nama Asesi</th>
@@ -53,16 +53,35 @@
                 </thead>
                 <tbody class="divide-y divide-slate-200 bg-white">
                     @forelse($schedule->assessments as $idx => $assessment)
-                        <tr>
-                            <td class="px-3 py-2 text-center">{{ $loop->iteration }}</td>
-                            <td class="px-3 py-2 font-bold text-slate-900">{{ $assessment->asesi->full_name }}</td>
-                            <td class="px-3 py-2 font-mono text-slate-600">{{ $assessment->asesi->profile?->nik ?? '-' }}</td>
-                            <td class="px-3 py-2">{{ $assessment->asesi->phone ?? '-' }}</td>
-                            <td class="px-3 py-2 text-center font-bold {{ $assessment->apl_status === 'APPROVED' ? 'text-emerald-600' : 'text-slate-500' }}">
-                                {{ $assessment->apl_status }}
+                        <tr class="flex flex-col md:table-row p-3 md:p-0 hover:bg-slate-50 transition space-y-1.5 md:space-y-0">
+                            <td class="hidden md:table-cell px-3 py-2 text-center">{{ $loop->iteration }}</td>
+                            <td class="px-0 md:px-3 py-0 md:py-2">
+                                <div class="flex items-center justify-between md:block">
+                                    <span class="font-bold text-slate-900">{{ $assessment->asesi->full_name }}</span>
+                                    <span class="md:hidden font-mono text-[11px] text-slate-400">#{{ $loop->iteration }}</span>
+                                </div>
                             </td>
-                            <td class="px-3 py-2 text-center font-bold {{ $assessment->status === 'COMPLETED' ? 'text-emerald-700' : 'text-slate-400' }}">
-                                {{ $assessment->status === 'COMPLETED' ? 'KOMPETEN (K)' : 'BELUM SELESAI' }}
+                            <td class="px-0 md:px-3 py-0 md:py-2 font-mono text-slate-600">
+                                <span class="md:hidden text-slate-400 font-sans mr-1">NIK:</span>{{ $assessment->asesi->profile?->nik ?? '-' }}
+                            </td>
+                            <td class="px-0 md:px-3 py-0 md:py-2 text-slate-600">
+                                <span class="md:hidden text-slate-400 mr-1">Telp:</span>{{ $assessment->asesi->phone ?? '-' }}
+                            </td>
+                            <td class="px-0 md:px-3 py-0 md:py-2 md:text-center">
+                                <div class="flex items-center justify-between md:justify-center">
+                                    <span class="md:hidden text-slate-400">Status APL:</span>
+                                    <span class="font-bold {{ $assessment->apl_status === 'APPROVED' ? 'text-emerald-600' : 'text-slate-500' }}">
+                                        {{ $assessment->apl_status }}
+                                    </span>
+                                </div>
+                            </td>
+                            <td class="px-0 md:px-3 py-0 md:py-2 md:text-center">
+                                <div class="flex items-center justify-between md:justify-center">
+                                    <span class="md:hidden text-slate-400">Rekomendasi:</span>
+                                    <span class="font-bold {{ $assessment->status === 'COMPLETED' ? 'text-emerald-700' : 'text-slate-400' }}">
+                                        {{ $assessment->status === 'COMPLETED' ? 'KOMPETEN (K)' : 'BELUM SELESAI' }}
+                                    </span>
+                                </div>
                             </td>
                         </tr>
                     @empty

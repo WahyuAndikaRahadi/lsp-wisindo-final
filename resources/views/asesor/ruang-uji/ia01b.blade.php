@@ -206,7 +206,7 @@
 
             <div class="overflow-x-auto">
                 <table class="w-full text-sm">
-                    <thead class="bg-slate-100/70 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
+                    <thead class="hidden md:table-header-group bg-slate-100/70 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
                         <tr>
                             <th class="px-6 py-3 w-16 text-center">No</th>
                             <th class="px-6 py-3">Item Pemeriksaan / Bagian Diukur</th>
@@ -232,12 +232,12 @@
                             @if($matchedUnit && $matchedCode !== $lastUnitCode)
                                 @php $lastUnitCode = $matchedCode; @endphp
                                 <tr class="bg-slate-100/90 border-t-2 border-b border-slate-200">
-                                    <td colspan="5" class="px-6 py-3.5 bg-slate-100">
+                                    <td colspan="5" class="px-4 sm:px-6 py-3.5 bg-slate-100">
                                         <div class="flex items-center gap-2.5">
                                             <span class="text-xs font-bold text-brand-700 font-mono bg-brand-50 border border-brand-200 px-2.5 py-1 rounded shadow-2xs">
                                                 {{ $matchedUnit->code }}
                                             </span>
-                                            <span class="text-sm font-bold text-slate-900">
+                                            <span class="text-xs sm:text-sm font-bold text-slate-900 leading-snug">
                                                 {{ $matchedUnit->title }}
                                             </span>
                                         </div>
@@ -245,28 +245,39 @@
                                 </tr>
                             @endif
 
-                            <tr class="hover:bg-slate-50/50">
-                                <td class="px-6 py-3 text-slate-500 font-mono text-xs text-center font-bold">{{ $idx + 1 }}</td>
-                                <td class="px-6 py-3 text-slate-800 font-medium">
-                                    {{ $item['item'] }}
+                            <tr class="flex flex-col md:table-row p-4 md:p-0 hover:bg-slate-50/50 transition space-y-2.5 md:space-y-0">
+                                <td class="hidden md:table-cell px-6 py-3 text-slate-500 font-mono text-xs text-center font-bold">{{ $idx + 1 }}</td>
+                                <td class="px-0 md:px-6 py-0 md:py-3 text-slate-800 font-medium">
+                                    <div class="flex items-start gap-2">
+                                        <span class="md:hidden font-mono text-xs font-bold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded shrink-0">#{{ $idx + 1 }}</span>
+                                        <div class="text-xs sm:text-sm leading-relaxed">{{ $item['item'] }}</div>
+                                    </div>
+                                    <div class="md:hidden mt-1.5 text-xs text-slate-500">
+                                        <span class="text-slate-400">Standar:</span>
+                                        <span class="bg-slate-100 px-2 py-0.5 rounded border border-slate-200 font-mono font-medium text-slate-700">
+                                            {{ $item['standard'] ?? 'Workshop Manual' }}
+                                        </span>
+                                    </div>
                                 </td>
-                                <td class="px-6 py-3 text-slate-600 text-xs">
+                                <td class="hidden md:table-cell px-6 py-3 text-slate-600 text-xs">
                                     <span class="bg-slate-100 px-2.5 py-1 rounded border border-slate-200 inline-block font-mono">
                                         {{ $item['standard'] ?? 'Workshop Manual' }}
                                     </span>
                                 </td>
-                                <td class="px-6 py-3">
-                                    <input type="text" name="items[{{ $idx }}][measured]" value="{{ $measured }}" :disabled="!isEditing" placeholder="Nilai / kondisi..." class="w-full px-2.5 py-1 text-xs rounded border border-slate-300 focus:ring-1 focus:ring-brand-500 focus:outline-none">
+                                <td class="px-0 md:px-6 py-0 md:py-3">
+                                    <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider md:hidden mb-1">Hasil Pengukuran Asesi:</label>
+                                    <input type="text" name="items[{{ $idx }}][measured]" value="{{ $measured }}" :disabled="!isEditing" placeholder="Nilai / kondisi hasil ukur..." class="w-full px-3 py-2 md:py-1 text-xs rounded-lg border border-slate-300 focus:ring-1 focus:ring-brand-500 focus:outline-none bg-white">
                                 </td>
-                                <td class="px-6 py-3 text-center">
-                                    <div class="flex items-center justify-center space-x-3">
-                                        <label class="inline-flex items-center cursor-pointer">
+                                <td class="px-0 md:px-6 py-0 md:py-3 text-left md:text-center">
+                                    <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider md:hidden mb-1.5">Verifikasi Asesor:</label>
+                                    <div class="grid grid-cols-2 gap-2 md:flex md:items-center md:justify-center md:space-x-3">
+                                        <label class="flex items-center justify-center p-2 md:p-0 bg-emerald-50 md:bg-transparent rounded-lg md:rounded-none border md:border-0 border-emerald-200 cursor-pointer min-h-[38px] md:min-h-0">
                                             <input type="radio" name="items[{{ $idx }}][result]" value="SESUAI" required :disabled="!isEditing" class="item-radio item-radio-sesuai text-emerald-600 focus:ring-emerald-500 w-4 h-4 cursor-pointer" {{ $val === 'SESUAI' ? 'checked' : '' }}>
-                                            <span class="ml-1 text-xs font-semibold text-emerald-700">Sesuai</span>
+                                            <span class="ml-1.5 md:ml-1 text-xs font-bold text-emerald-800 md:text-emerald-700">Sesuai</span>
                                         </label>
-                                        <label class="inline-flex items-center cursor-pointer">
+                                        <label class="flex items-center justify-center p-2 md:p-0 bg-rose-50 md:bg-transparent rounded-lg md:rounded-none border md:border-0 border-rose-200 cursor-pointer min-h-[38px] md:min-h-0">
                                             <input type="radio" name="items[{{ $idx }}][result]" value="TIDAK" required :disabled="!isEditing" class="item-radio item-radio-tidak text-rose-600 focus:ring-rose-500 w-4 h-4 cursor-pointer" {{ $val === 'TIDAK' ? 'checked' : '' }}>
-                                            <span class="ml-1 text-xs font-semibold text-rose-700">Tidak</span>
+                                            <span class="ml-1.5 md:ml-1 text-xs font-bold text-rose-800 md:text-rose-700">Tidak</span>
                                         </label>
                                     </div>
                                 </td>
