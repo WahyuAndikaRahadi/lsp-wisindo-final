@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Schedule;
 use App\Models\Scheme;
 use App\Models\User;
+use App\Services\RegistrationTokenService;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
@@ -24,9 +25,12 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
+        $registrationToken = RegistrationTokenService::getCurrentToken();
+
         return view('admin.dashboard', compact(
             'stats',
-            'recentSchedules'
+            'recentSchedules',
+            'registrationToken'
         ));
     }
 }

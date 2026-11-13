@@ -9,6 +9,40 @@
         </div>
     </div>
 
+    {{-- Token Registrasi Asesi (For Assessor in Field) --}}
+    @if(isset($registrationToken))
+        <div class="bg-gradient-to-r from-emerald-50 via-teal-50 to-white rounded-xl border border-emerald-200 p-3.5 sm:p-4 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-lg bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+                    </svg>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs font-bold text-emerald-900">Token Registrasi Asesi:</span>
+                    </div>
+                    <p class="text-[11px] text-slate-500">
+                        Bagikan token ini kepada calon peserta uji (asesi) yang membuat akun di lokasi asesmen. Token ini akan direset otomatis setiap minggu.
+                    </p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 self-start sm:self-auto shrink-0 bg-white px-3 py-1.5 rounded-lg border border-emerald-200 shadow-2xs"
+                 x-data="{ copied: false, token: '{{ $registrationToken }}' }">
+                <span class="font-mono font-black text-base text-emerald-700 tracking-wider select-all" x-text="token">
+                    {{ $registrationToken }}
+                </span>
+                <button type="button" 
+                        @click="navigator.clipboard.writeText(token); copied = true; setTimeout(() => copied = false, 2000)"
+                        class="px-2.5 py-1 text-xs font-bold rounded transition"
+                        :class="copied ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'">
+                    <span x-show="!copied">Salin</span>
+                    <span x-show="copied" x-cloak>Tersalin!</span>
+                </button>
+            </div>
+        </div>
+    @endif
+
     {{-- Banner Reminder if Asesor Signature is Not Set --}}
     @php
         $asesorProfile = auth()->user()->profile;

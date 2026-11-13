@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\RegistrationTokenService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -54,9 +55,19 @@ class AuthController extends Controller
             'full_name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'phone' => ['nullable', 'string', 'max:20', 'regex:/^[0-9]+$/'],
+            'registration_token' => [
+                'required',
+                'string',
+                function ($attribute, $value, $fail) {
+                    if (! RegistrationTokenService::validateToken((string) $value)) {
+                        $fail('Token registrasi tidak valid atau sudah kadaluarsa. Silakan hubungi asesor penguji atau admin LSP.');
+                    }
+                },
+            ],
             'password' => ['required', 'string', 'confirmed', Password::min(8)->letters()->numbers()],
         ], [
             'phone.regex' => 'Nomor WhatsApp / telepon hanya boleh berupa angka.',
+            'registration_token.required' => 'Token registrasi wajib diisi untuk pendaftaran asesi.',
         ]);
 
         $user = User::create([

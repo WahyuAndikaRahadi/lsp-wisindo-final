@@ -7,6 +7,7 @@ use App\Models\Schedule;
 use App\Models\Scheme;
 use App\Models\User;
 use App\Models\UserProfile;
+use App\Services\RegistrationTokenService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -24,6 +25,7 @@ class RegistrationWilayahAndNumericValidationTest extends TestCase
             'phone' => '081234567890',
             'password' => 'Password123!',
             'password_confirmation' => 'Password123!',
+            'registration_token' => RegistrationTokenService::getCurrentToken(),
         ]);
 
         $response->assertRedirect(route('login'));

@@ -349,8 +349,9 @@ Route::middleware(['auth', 'role:SUPER_ADMIN,ADMIN_LSP,KOMITE_TEKNIS,TUK_ADMIN']
     Route::get('/profile', [Admin\ProfileController::class, 'edit'])->name('profile.edit');
     Route::post('/profile', [Admin\ProfileController::class, 'update'])->name('profile.update');
 
-    // Appeals (FR.AK.04) - Read list
+    // Appeals (FR.AK.04) & Feedback (FR.AK.03) - Read list & detail per schedule
     Route::get('/appeals', [Admin\AppealController::class, 'index'])->name('appeals.index');
+    Route::get('/appeals/{schedule}', [Admin\AppealController::class, 'show'])->name('appeals.show');
 
     // Jadwal - Read list
     Route::get('/jadwal', [Admin\JadwalController::class, 'index'])->name('jadwal.index');
