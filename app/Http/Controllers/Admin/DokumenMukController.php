@@ -114,7 +114,7 @@ class DokumenMukController extends Controller
         if (in_array($targetType, ['excel-asesor', 'asesor-excel', 'hadir-asesor-excel'], true)) {
             return $this->exporter->exportScheduleAsesorXls($schedule);
         }
-
+        
         if ($targetType === 'ak06') {
             $ak06Data = is_array($schedule->ak06_review) ? $schedule->ak06_review : [];
             $templateType = $ak06Data['template_type'] ?? 'langsung';
