@@ -374,7 +374,17 @@ class OptionImagesAndAssessmentRejectionTest extends TestCase
 
         $exportRes->assertOk();
         $exportRes->assertHeader('content-type', 'application/pdf');
-        $this->assertStringContainsString('Langsung', (string) $exportRes->headers->get('content-disposition'));
+
+        $ak06Payload = app(MukDynamicDocumentService::class)->buildAk06Data($this->schedule);
+        $this->assertEquals('langsung', $ak06Payload['template_type']);
+
+        $docxRes = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.export', [
+            'schedule' => $this->schedule->id,
+            'type' => 'ak06',
+            'format' => 'docx',
+        ]));
+        $docxRes->assertOk();
+        $this->assertStringContainsString('Langsung', (string) $docxRes->headers->get('content-disposition'));
     }
 
     public function test_submitting_reports_with_tidak_langsung_template_updates_muk_export_view(): void
@@ -400,6 +410,16 @@ class OptionImagesAndAssessmentRejectionTest extends TestCase
 
         $exportRes->assertOk();
         $exportRes->assertHeader('content-type', 'application/pdf');
-        $this->assertStringContainsString('Tidak Langsung', (string) $exportRes->headers->get('content-disposition'));
+
+        $ak06Payload = app(MukDynamicDocumentService::class)->buildAk06Data($this->schedule);
+        $this->assertEquals('tidak_langsung', $ak06Payload['template_type']);
+
+        $docxRes = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.export', [
+            'schedule' => $this->schedule->id,
+            'type' => 'ak06',
+            'format' => 'docx',
+        ]));
+        $docxRes->assertOk();
+        $this->assertStringContainsString('Tidak Langsung', (string) $docxRes->headers->get('content-disposition'));
     }
 }
