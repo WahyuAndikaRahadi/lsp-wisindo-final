@@ -115,63 +115,54 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y-0 md:divide-y divide-slate-100 block md:table-row-group space-y-3 md:space-y-0">
-                        <tr class="flex flex-col bg-white rounded-xl border border-slate-200 p-3.5 shadow-2xs gap-2 md:table-row md:border-0 md:p-0 md:shadow-none md:hover:bg-slate-50/50">
-                            <td class="w-full md:table-cell p-0 md:px-4 md:py-3 text-slate-800 font-medium">
+                        <tr class="flex flex-wrap bg-white rounded-xl border border-slate-200 p-3.5 shadow-2xs gap-y-2 md:table-row md:border-0 md:p-0 md:shadow-none md:hover:bg-slate-50/50">
+                            <td class="w-full md:w-auto md:table-cell p-0 md:px-4 md:py-3 text-slate-800 font-medium">
                                 Apakah Proses Banding telah dijelaskan kepada Anda?
                             </td>
-                            <div class="grid grid-cols-2 gap-2 pt-1 md:contents">
-                                <td class="p-0 md:px-3 md:py-3 text-center">
-                                    <label class="flex items-center justify-center gap-1.5 p-2 rounded-lg border border-emerald-200 bg-emerald-50/70 hover:bg-emerald-100 text-emerald-800 font-bold text-xs cursor-pointer md:border-0 md:p-0 md:bg-transparent min-h-[38px] md:min-h-0 {{ $appeal ? 'cursor-default opacity-80' : '' }}">
-                                        <input type="radio" name="is_process_explained" value="1" {{ old('is_process_explained', $appeal?->is_process_explained ?? true) ? 'checked' : '' }} @disabled((bool) $appeal) required class="text-emerald-600 focus:ring-emerald-500 w-4 h-4">
-                                        <span>Ya</span>
-                                    </label>
-                                </td>
-                                <td class="p-0 md:px-3 md:py-3 text-center">
-                                    <label class="flex items-center justify-center gap-1.5 p-2 rounded-lg border border-rose-200 bg-rose-50/70 hover:bg-rose-100 text-rose-800 font-bold text-xs cursor-pointer md:border-0 md:p-0 md:bg-transparent min-h-[38px] md:min-h-0 {{ $appeal ? 'cursor-default opacity-80' : '' }}">
-                                        <input type="radio" name="is_process_explained" value="0" {{ !old('is_process_explained', $appeal?->is_process_explained ?? true) ? 'checked' : '' }} @disabled((bool) $appeal) required class="text-rose-600 focus:ring-rose-500 w-4 h-4">
-                                        <span>Tidak</span>
-                                    </label>
-                                </td>
-                            </div>
+                            <td class="w-1/2 pr-1 md:pr-0 md:w-24 md:table-cell p-0 md:px-3 md:py-3 text-center">
+                                <label class="flex items-center justify-center gap-1.5 p-2 rounded-lg border border-emerald-200 bg-emerald-50/70 hover:bg-emerald-100 text-emerald-800 font-bold text-xs cursor-pointer md:border-0 md:p-0 md:bg-transparent min-h-[38px] md:min-h-0 {{ $appeal ? 'cursor-default opacity-80' : '' }}">
+                                    <input type="radio" name="is_process_explained" value="1" {{ old('is_process_explained', $appeal?->is_process_explained ?? true) ? 'checked' : '' }} @disabled((bool) $appeal) required class="text-emerald-600 focus:ring-emerald-500 w-4 h-4">
+                                    <span>Ya</span>
+                                </label>
+                            </td>
+                            <td class="w-1/2 pl-1 md:pl-0 md:w-24 md:table-cell p-0 md:px-3 md:py-3 text-center">
+                                <label class="flex items-center justify-center gap-1.5 p-2 rounded-lg border border-rose-200 bg-rose-50/70 hover:bg-rose-100 text-rose-800 font-bold text-xs cursor-pointer md:border-0 md:p-0 md:bg-transparent min-h-[38px] md:min-h-0 {{ $appeal ? 'cursor-default opacity-80' : '' }}">
+                                    <input type="radio" name="is_process_explained" value="0" {{ !old('is_process_explained', $appeal?->is_process_explained ?? true) ? 'checked' : '' }} @disabled((bool) $appeal) required class="text-rose-600 focus:ring-rose-500 w-4 h-4">
+                                    <span>Tidak</span>
+                                </label>
+                            </td>
                         </tr>
-                        <tr class="flex flex-col bg-white rounded-xl border border-slate-200 p-3.5 shadow-2xs gap-2 md:table-row md:border-0 md:p-0 md:shadow-none md:hover:bg-slate-50/50">
-                            <td class="w-full md:table-cell p-0 md:px-4 md:py-3 text-slate-800 font-medium">
+                        <tr class="flex flex-wrap bg-white rounded-xl border border-slate-200 p-3.5 shadow-2xs gap-y-2 md:table-row md:border-0 md:p-0 md:shadow-none md:hover:bg-slate-50/50">
+                            <td class="w-full md:w-auto md:table-cell p-0 md:px-4 md:py-3 text-slate-800 font-medium">
                                 Apakah Anda telah mendiskusikan Banding dengan Asesor?
                             </td>
-                            <div class="grid grid-cols-2 gap-2 pt-1 md:contents">
-                                <td class="p-0 md:px-3 md:py-3 text-center">
-                                    <label class="flex items-center justify-center gap-1.5 p-2 rounded-lg border border-emerald-200 bg-emerald-50/70 hover:bg-emerald-100 text-emerald-800 font-bold text-xs cursor-pointer md:border-0 md:p-0 md:bg-transparent min-h-[38px] md:min-h-0 {{ $appeal ? 'cursor-default opacity-80' : '' }}">
-                                        <input type="radio" name="is_discussed_with_assessor" value="1" {{ old('is_discussed_with_assessor', $appeal?->is_discussed_with_assessor ?? true) ? 'checked' : '' }} @disabled((bool) $appeal) required class="text-emerald-600 focus:ring-emerald-500 w-4 h-4">
-                                        <span>Ya</span>
-                                    </label>
-                                </td>
-                                <td class="p-0 md:px-3 md:py-3 text-center">
-                                    <label class="flex items-center justify-center gap-1.5 p-2 rounded-lg border border-rose-200 bg-rose-50/70 hover:bg-rose-100 text-rose-800 font-bold text-xs cursor-pointer md:border-0 md:p-0 md:bg-transparent min-h-[38px] md:min-h-0 {{ $appeal ? 'cursor-default opacity-80' : '' }}">
-                                        <input type="radio" name="is_discussed_with_assessor" value="0" {{ !old('is_discussed_with_assessor', $appeal?->is_discussed_with_assessor ?? true) ? 'checked' : '' }} @disabled((bool) $appeal) required class="text-rose-600 focus:ring-rose-500 w-4 h-4">
-                                        <span>Tidak</span>
-                                    </label>
-                                </td>
-                            </div>
+                            <td class="w-1/2 pr-1 md:pr-0 md:w-24 md:table-cell p-0 md:px-3 md:py-3 text-center">
+                                <label class="flex items-center justify-center gap-1.5 p-2 rounded-lg border border-emerald-200 bg-emerald-50/70 hover:bg-emerald-100 text-emerald-800 font-bold text-xs cursor-pointer md:border-0 md:p-0 md:bg-transparent min-h-[38px] md:min-h-0 {{ $appeal ? 'cursor-default opacity-80' : '' }}">
+                                    <input type="radio" name="is_discussed_with_assessor" value="1" {{ old('is_discussed_with_assessor', $appeal?->is_discussed_with_assessor ?? true) ? 'checked' : '' }} @disabled((bool) $appeal) required class="text-emerald-600 focus:ring-emerald-500 w-4 h-4">
+                                    <span>Ya</span>
+                                </label>
+                            </td>
+                            <td class="w-1/2 pl-1 md:pl-0 md:w-24 md:table-cell p-0 md:px-3 md:py-3 text-center">
+                                <label class="flex items-center justify-center gap-1.5 p-2 rounded-lg border border-rose-200 bg-rose-50/70 hover:bg-rose-100 text-rose-800 font-bold text-xs cursor-pointer md:border-0 md:p-0 md:bg-transparent min-h-[38px] md:min-h-0 {{ $appeal ? 'cursor-default opacity-80' : '' }}">
+                                    <input type="radio" name="is_discussed_with_assessor" value="0" {{ !old('is_discussed_with_assessor', $appeal?->is_discussed_with_assessor ?? true) ? 'checked' : '' }} @disabled((bool) $appeal) required class="text-rose-600 focus:ring-rose-500 w-4 h-4">
+                                    <span>Tidak</span>
+                                </label>
+                            </td>
                         </tr>
-                        <tr class="flex flex-col bg-white rounded-xl border border-slate-200 p-3.5 shadow-2xs gap-2 md:table-row md:border-0 md:p-0 md:shadow-none md:hover:bg-slate-50/50">
-                            <td class="w-full md:table-cell p-0 md:px-4 md:py-3 text-slate-800 font-medium">
+                        <tr class="flex flex-wrap bg-white rounded-xl border border-slate-200 p-3.5 shadow-2xs gap-y-2 md:table-row md:border-0 md:p-0 md:shadow-none md:hover:bg-slate-50/50">
+                            <td class="w-full md:w-auto md:table-cell p-0 md:px-4 md:py-3 text-slate-800 font-medium">
                                 Apakah Anda mau melibatkan "orang lain" membantu Anda dalam Proses Banding?
                             </td>
-                            <div class="grid grid-cols-2 gap-2 pt-1 md:contents">
-                                <td class="p-0 md:px-3 md:py-3 text-center">
-                                    <label class="flex items-center justify-center gap-1.5 p-2 rounded-lg border border-emerald-200 bg-emerald-50/70 hover:bg-emerald-100 text-emerald-800 font-bold text-xs cursor-pointer md:border-0 md:p-0 md:bg-transparent min-h-[38px] md:min-h-0 {{ $appeal ? 'cursor-default opacity-80' : '' }}">
-                                        <input type="radio" name="involves_other_person" value="1" {{ old('involves_other_person', $appeal?->involves_other_person ?? false) ? 'checked' : '' }} @disabled((bool) $appeal) required class="text-emerald-600 focus:ring-emerald-500 w-4 h-4">
-                                        <span>Ya</span>
-                                    </label>
-                                </td>
-                                <td class="p-0 md:px-3 md:py-3 text-center">
-                                    <label class="flex items-center justify-center gap-1.5 p-2 rounded-lg border border-rose-200 bg-rose-50/70 hover:bg-rose-100 text-rose-800 font-bold text-xs cursor-pointer md:border-0 md:p-0 md:bg-transparent min-h-[38px] md:min-h-0 {{ $appeal ? 'cursor-default opacity-80' : '' }}">
-                                        <input type="radio" name="involves_other_person" value="0" {{ !old('involves_other_person', $appeal?->involves_other_person ?? false) ? 'checked' : '' }} @disabled((bool) $appeal) required class="text-rose-600 focus:ring-rose-500 w-4 h-4">
-                                        <span>Tidak</span>
-                                    </label>
-                                </td>
-                            </div>
-                        </tr>
+                            <td class="w-1/2 pr-1 md:pr-0 md:w-24 md:table-cell p-0 md:px-3 md:py-3 text-center">
+                                <label class="flex items-center justify-center gap-1.5 p-2 rounded-lg border border-emerald-200 bg-emerald-50/70 hover:bg-emerald-100 text-emerald-800 font-bold text-xs cursor-pointer md:border-0 md:p-0 md:bg-transparent min-h-[38px] md:min-h-0 {{ $appeal ? 'cursor-default opacity-80' : '' }}">
+                                    <input type="radio" name="involves_other_person" value="1" {{ old('involves_other_person', $appeal?->involves_other_person ?? false) ? 'checked' : '' }} @disabled((bool) $appeal) required class="text-emerald-600 focus:ring-emerald-500 w-4 h-4">
+                                    <span>Ya</span>
+                                </label>
+                            </td>
+                            <td class="w-1/2 pl-1 md:pl-0 md:w-24 md:table-cell p-0 md:px-3 md:py-3 text-center">
+                                <label class="flex items-center justify-center gap-1.5 p-2 rounded-lg border border-rose-200 bg-rose-50/70 hover:bg-rose-100 text-rose-800 font-bold text-xs cursor-pointer md:border-0 md:p-0 md:bg-transparent min-h-[38px] md:min-h-0 {{ $appeal ? 'cursor-default opacity-80' : '' }}">
+                                    <input type="radio" name="involves_other_person" value="0" {{ !old('involves_other_person', $appeal?->involves_other_person ?? false) ? 'checked' : '' }} @disabled((bool) $appeal) required class="text-rose-600 focus:ring-rose-500 w-4 h-4">
+                                    <span>Tidak</span>
                                 </label>
                             </td>
                         </tr>
