@@ -14,11 +14,23 @@ use Illuminate\View\View;
 
 class SchemeController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        $schemes = Scheme::withCount('competencyUnits', 'questionBanks')
-            ->latest()
-            ->paginate(20);
+        $query = Scheme::withCount('competencyUnits', 'questionBanks')->latest();
+
+        if ($request->filled('search')) {
+            $search = trim((string) $request->search);
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('code', 'like', "%{$search}%");
+            });
+        }
+
+        $schemes = $query->paginate(20)->withQueryString();
+
+        if ($request->ajax()) {
+            return view('admin.schemes._table', compact('schemes'));
+        }
 
         return view('admin.schemes.index', compact('schemes'));
     }

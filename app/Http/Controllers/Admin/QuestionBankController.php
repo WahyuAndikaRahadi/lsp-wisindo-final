@@ -61,6 +61,17 @@ class QuestionBankController extends Controller
 
         $questions = $questionsQuery->paginate($perPage)->withQueryString();
 
+        if ($request->ajax()) {
+            return view('admin.question-banks._table', compact(
+                'questions',
+                'selectedSchemeId',
+                'selectedUnitId',
+                'search',
+                'sort',
+                'perPage'
+            ));
+        }
+
         return view('admin.question-banks.index', compact(
             'questionBanks',
             'questions',

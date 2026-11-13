@@ -47,6 +47,14 @@ class AppealController extends Controller
             'feedbacks_total' => AssessmentAk03Item::count(),
         ];
 
+        if ($request->ajax()) {
+            if ($request->has('feedbacks_page') || $activeTab === 'feedbacks') {
+                return view('admin.appeals._feedbacks_table', compact('feedbacks'));
+            }
+
+            return view('admin.appeals._appeals_table', compact('appeals'));
+        }
+
         return view('admin.appeals.index', compact('appeals', 'feedbacks', 'counts', 'activeTab'));
     }
 

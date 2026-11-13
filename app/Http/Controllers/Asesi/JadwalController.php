@@ -27,12 +27,30 @@ class JadwalController extends Controller
         return view('asesi.dashboard', compact('activeAssessmentsCount', 'assessments'));
     }
 
-    public function index(): View
+    public function index(Request $request): View
     {
-        $assessments = Assessment::with(['schedule.scheme', 'assessor'])
+        $query = Assessment::with(['schedule.scheme', 'assessor'])
             ->where('asesi_id', auth()->id())
-            ->latest('registered_at')
-            ->get();
+            ->latest('registered_at');
+
+        if ($request->filled('search')) {
+            $search = trim((string) $request->search);
+            $query->whereHas('schedule', function ($sq) use ($search) {
+                $sq->where('name', 'like', "%{$search}%")
+                    ->orWhere('code', 'like', "%{$search}%")
+                    ->orWhere('tuk_name', 'like', "%{$search}%")
+                    ->orWhereHas('scheme', function ($schq) use ($search) {
+                        $schq->where('name', 'like', "%{$search}%")
+                            ->orWhere('code', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        $assessments = $query->paginate(10)->withQueryString();
+
+        if ($request->ajax()) {
+            return view('asesi.jadwal._table', compact('assessments'));
+        }
 
         return view('asesi.jadwal.index', compact('assessments'));
     }
