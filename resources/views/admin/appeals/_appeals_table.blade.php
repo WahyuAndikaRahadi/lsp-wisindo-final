@@ -237,8 +237,10 @@
                     </div>
                 @endforeach
 
-                <div class="pt-2">
-                    {{ $appeals->links() }}
-                </div>
+                @if(method_exists($appeals, 'links'))
+                    <div class="pt-2">
+                        {{ $appeals->links() }}
+                    </div>
+                @endif
             </div>
         @endif

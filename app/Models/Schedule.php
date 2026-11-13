@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class Schedule extends Model
 {
@@ -137,6 +138,16 @@ class Schedule extends Model
     public function certificates(): HasMany
     {
         return $this->hasMany(Certificate::class);
+    }
+
+    public function appeals(): HasManyThrough
+    {
+        return $this->hasManyThrough(AssessmentAppeal::class, Assessment::class);
+    }
+
+    public function ak03Items(): HasManyThrough
+    {
+        return $this->hasManyThrough(AssessmentAk03Item::class, Assessment::class);
     }
 
     /**
