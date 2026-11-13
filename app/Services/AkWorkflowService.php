@@ -300,12 +300,12 @@ class AkWorkflowService
         ?string $actionType = 'REASSESSMENT'
     ): AssessmentAppeal {
         $status = strtoupper($decision) === 'ACCEPTED' ? 'ACCEPTED' : 'REJECTED';
-        $type = $actionType ?: 'REASSESSMENT';
+        $type = $actionType ?: ($status === 'ACCEPTED' ? 'REASSESSMENT' : 'REJECTED');
 
-        DB::transaction(function () use ($appeal, $status, $decisionNotes, $adminId, $committeeChair, $type) {
+        return DB::transaction(function () use ($appeal, $status, $decisionNotes, $adminId, $committeeChair, $type) {
             $appeal->update([
                 'status' => $status,
-                'decision_notes' => $decisionNotes,
+                'decision_notes' => $decisionNotes ?: ($status === 'ACCEPTED' ? 'Disetujui untuk asesmen ulang.' : 'Permohonan banding ditolak / Tidak dilanjutkan asesmen ulang.'),
                 'decision_date' => now()->toDateString(),
                 'decided_by' => $adminId ?? auth()->id(),
                 'appeals_committee_chair' => $committeeChair ?: $appeal->appeals_committee_chair,
@@ -321,23 +321,66 @@ class AkWorkflowService
                             'follow_up_action' => 'Putusan Banding (FR.AK.04): Ditetapkan KOMPETEN oleh Komite Banding LSP. '.($decisionNotes ? "({$decisionNotes})" : ''),
                         ]);
                     } elseif ($type === 'REASSESSMENT') {
+                        // 1. Delete all previous assessment responses and evidence for this appealing candidate
+                        $assessment->proofs()->delete();
+                        $assessment->apl02Items()->delete();
+                        $assessment->ak07Items()->delete();
+                        $assessment->ak02Items()->delete();
+                        $assessment->ak03Items()->delete();
+                        $assessment->iaResponses()->delete();
+                        $assessment->certificate()->delete();
+
+                        // 2. Reset the assessment record to DRAFT so the candidate can retake from the beginning
                         $assessment->update([
-                            'follow_up_action' => 'Putusan Banding (FR.AK.04): Dijadwalkan Asesmen Ulang oleh Komite Banding LSP. '.($decisionNotes ? "({$decisionNotes})" : ''),
+                            'apl_status' => 'DRAFT',
+                            'status' => 'DRAFT',
+                            'last_active_step' => 'apl',
+                            'tujuan_asesmen' => $assessment->tujuan_asesmen ?? 'Sertifikasi',
+                            'apl_revision_notes' => null,
+                            'final_result' => 'BELUM_SELESAI',
+                            'final_result_at' => null,
+                            'final_notes' => null,
+                            'follow_up_action' => 'Putusan Banding (FR.AK.04): Dijadwalkan Asesmen Ulang. '.($decisionNotes ? "({$decisionNotes})" : ''),
+                            'ak01_agreed_at' => null,
+                            'ak01_data' => null,
+                            'has_rejection' => false,
+                            'pleno_decision' => null,
+                            'pleno_notes' => null,
+                            'completed_at' => null,
+                            'asesi_signature' => null,
+                            'asesi_signed_at' => null,
+                            'assessor_signature' => null,
+                            'assessor_signed_at' => null,
+                            'admin_status' => 'PENDING',
+                            'admin_notes' => null,
+                            'admin_approved_at' => null,
+                            'admin_reviewed_at' => null,
+                            'admin_reviewer_id' => null,
                         ]);
+
+                        // 3. Unlock the schedule so this candidate and their assessor can conduct the re-assessment
+                        $schedule = $assessment->schedule;
+                        if ($schedule && $schedule->is_closed) {
+                            $schedule->update([
+                                'is_closed' => false,
+                                'status' => 'ACTIVE',
+                            ]);
+                        }
                     } else {
                         $assessment->update([
                             'follow_up_action' => 'Putusan Banding (FR.AK.04): Mediasi Administratif Komite Banding LSP. '.($decisionNotes ? "({$decisionNotes})" : ''),
                         ]);
                     }
                 } elseif ($status === 'REJECTED') {
+                    // Keep candidate data as is (no reset, no reassessment)
                     $assessment->update([
-                        'follow_up_action' => 'Putusan Banding (FR.AK.04): Sanggahan Banding Ditolak. Keputusan awal tetap berlaku. '.($decisionNotes ? "({$decisionNotes})" : ''),
+                        'follow_up_action' => 'Putusan Banding (FR.AK.04): Sanggahan Banding Ditolak (Tidak Dilanjutkan Asesmen Ulang). '.($decisionNotes ? "({$decisionNotes})" : ''),
                     ]);
                 }
             }
-        });
 
-        return $appeal;
+            return $appeal;
+        });
     }
 
     /**

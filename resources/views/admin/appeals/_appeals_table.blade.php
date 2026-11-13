@@ -176,127 +176,58 @@
 
                             {{-- 5. Decision Area / Action Form --}}
                             @if($appeal->status === 'SUBMITTED' || $appeal->status === 'UNDER_REVIEW')
-                                <div class="pt-4 border-t border-slate-200" x-data="{ actionType: 'REASSESSMENT' }">
+                                <div class="pt-4 border-t border-slate-200">
                                     <div class="bg-slate-50 p-4 sm:p-5 rounded-xl border border-slate-200 space-y-4">
-                                        <div>
-                                            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-800">
-                                                Putuskan Sanggahan Banding (Admin / Komite Banding LSP)
-                                            </h4>
-                                            <p class="text-[11px] text-slate-500 mt-0.5 leading-relaxed">
-                                                Sesuai SOP Komite Banding LSP, pilih opsi tindak lanjut resmi terhadap pengajuan asesi ini (Opsi 3).
-                                            </p>
+                                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                                            <div>
+                                                <h4 class="text-xs font-bold uppercase tracking-wider text-slate-800">
+                                                    Respon Permohonan Banding
+                                                </h4>
+                                                <p class="text-[11px] text-slate-500 mt-0.5 leading-relaxed">
+                                                    Pilih untuk memberikan asesmen ulang kepada asesi (jadwal dibuka kembali & data direset) atau tidak melanjutkan asesmen ulang (keputusan awal tetap berlaku).
+                                                </p>
+                                            </div>
                                         </div>
 
-                                        <form action="{{ route('admin.appeals.decide', $appeal->id) }}" method="POST" class="space-y-4">
+                                        <form action="{{ route('admin.appeals.decide', $appeal->id) }}" method="POST" class="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2.5 pt-1">
                                             @csrf
-                                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                                                <div>
-                                                    <label class="block text-[11px] font-bold text-slate-700 mb-1">
-                                                        Ketua Tim Banding (Opsional):
-                                                    </label>
-                                                    <input type="text" 
-                                                           name="appeals_committee_chair" 
-                                                           class="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-300 bg-white text-slate-900 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:outline-none transition shadow-2xs" 
-                                                           placeholder="Nama Ketua Tim Banding..." 
-                                                           value="{{ old('appeals_committee_chair', $appeal->appeals_committee_chair) }}">
-                                                </div>
+                                            <button type="submit" name="decision" value="ACCEPTED" 
+                                                    class="px-5 py-2.5 min-h-[42px] text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-xs transition flex items-center justify-center gap-2">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                                                <span>Lanjutkan dengan Asesmen Ulang</span>
+                                            </button>
 
-                                                <div class="sm:col-span-2">
-                                                    <label class="block text-[11px] font-bold text-slate-700 mb-1">
-                                                        Catatan Putusan / Rekomendasi Tindak Lanjut (*):
-                                                    </label>
-                                                    <input type="text" 
-                                                           name="decision_notes" 
-                                                           required
-                                                           class="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-300 bg-white text-slate-900 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:outline-none transition shadow-2xs" 
-                                                           placeholder="Contoh: Banding diterima. Direkomendasikan asesmen ulang untuk unit terkait dengan asesor independen...">
-                                                </div>
-                                            </div>
-
-                                            {{-- Opsi 3: Pilihan Tindak Lanjut Komite Banding --}}
-                                            <div class="p-3.5 bg-white rounded-xl border border-slate-200 space-y-2.5">
-                                                <div class="flex items-center justify-between">
-                                                    <label class="block text-[11px] font-bold text-slate-800 uppercase tracking-wider">
-                                                        Pilihan Tindak Lanjut Bila Banding Diterima (Opsi 3):
-                                                    </label>
-                                                    <span class="text-[10px] text-slate-400 font-medium">Berlaku bila tombol "Terima Banding" ditekan</span>
-                                                </div>
-
-                                                <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5 text-xs">
-                                                    <label class="relative flex flex-col p-3 rounded-xl border cursor-pointer transition"
-                                                           :class="actionType === 'REASSESSMENT' ? 'border-brand-500 bg-brand-50/50 ring-1 ring-brand-500' : 'border-slate-200 hover:bg-slate-50'">
-                                                        <div class="flex items-center gap-2">
-                                                            <input type="radio" name="action_type" value="REASSESSMENT" x-model="actionType" class="text-brand-600 focus:ring-brand-500">
-                                                            <span class="font-bold text-slate-900">1. Asesmen Ulang</span>
-                                                        </div>
-                                                        <span class="text-[11px] text-slate-500 mt-1 leading-snug">
-                                                            Jadwalkan uji ulang untuk unit kompetensi yang disanggah dengan asesor pengganti.
-                                                        </span>
-                                                    </label>
-
-                                                    <label class="relative flex flex-col p-3 rounded-xl border cursor-pointer transition"
-                                                           :class="actionType === 'OVERRIDE_KOMPETEN' ? 'border-emerald-500 bg-emerald-50/50 ring-1 ring-emerald-500' : 'border-slate-200 hover:bg-slate-50'">
-                                                        <div class="flex items-center gap-2">
-                                                            <input type="radio" name="action_type" value="OVERRIDE_KOMPETEN" x-model="actionType" class="text-emerald-600 focus:ring-emerald-500">
-                                                            <span class="font-bold text-emerald-950">2. Tetapkan KOMPETEN</span>
-                                                        </div>
-                                                        <span class="text-[11px] text-slate-500 mt-1 leading-snug">
-                                                            Komite menganulir rekomendasi awal dan langsung menetapkan asesi <strong>KOMPETEN</strong>.
-                                                        </span>
-                                                    </label>
-
-                                                    <label class="relative flex flex-col p-3 rounded-xl border cursor-pointer transition"
-                                                           :class="actionType === 'ADMINISTRATIVE' ? 'border-indigo-500 bg-indigo-50/50 ring-1 ring-indigo-500' : 'border-slate-200 hover:bg-slate-50'">
-                                                        <div class="flex items-center gap-2">
-                                                            <input type="radio" name="action_type" value="ADMINISTRATIVE" x-model="actionType" class="text-indigo-600 focus:ring-indigo-500">
-                                                            <span class="font-bold text-slate-900">3. Mediasi Administratif</span>
-                                                        </div>
-                                                        <span class="text-[11px] text-slate-500 mt-1 leading-snug">
-                                                            Klarifikasi / mediasi komite teknis tanpa langsung mengubah status kelulusan.
-                                                        </span>
-                                                    </label>
-                                                </div>
-                                            </div>
-
-                                            <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2.5 pt-1">
-                                                <button type="submit" name="decision" value="ACCEPTED" class="px-5 py-2.5 min-h-[40px] text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-xs transition flex items-center justify-center gap-1.5">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                                                    <span>Terima Banding</span>
-                                                </button>
-                                                <button type="submit" name="decision" value="REJECTED" class="px-5 py-2.5 min-h-[40px] text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 rounded-xl shadow-xs transition flex items-center justify-center gap-1.5">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                                                    <span>Tolak Banding</span>
-                                                </button>
-                                            </div>
+                                            <button type="submit" name="decision" value="REJECTED" 
+                                                    class="px-5 py-2.5 min-h-[42px] text-xs font-bold text-slate-700 bg-white hover:bg-slate-100 border border-slate-300 rounded-xl shadow-2xs transition flex items-center justify-center gap-2">
+                                                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                                <span>Tidak</span>
+                                            </button>
                                         </form>
                                     </div>
                                 </div>
                             @else
                                 {{-- Already Decided Box --}}
                                 <div class="pt-4 border-t border-slate-200">
-                                    <div class="p-4 rounded-xl {{ $appeal->status === 'ACCEPTED' ? 'bg-emerald-50 border border-emerald-200' : 'bg-rose-50 border border-rose-200' }} text-xs space-y-2">
+                                    <div class="p-4 rounded-xl {{ $appeal->status === 'ACCEPTED' ? 'bg-emerald-50 border border-emerald-200' : 'bg-slate-100 border border-slate-200' }} text-xs space-y-2">
                                         <div class="flex items-center justify-between flex-wrap gap-2">
-                                            <span class="font-extrabold text-sm {{ $appeal->status === 'ACCEPTED' ? 'text-emerald-900' : 'text-rose-900' }}">
-                                                Putusan: {{ $appeal->status === 'ACCEPTED' ? '✓ BANDING DITERIMA (DIKABULKAN)' : '✕ BANDING DITOLAK' }}
+                                            <span class="font-extrabold text-sm {{ $appeal->status === 'ACCEPTED' ? 'text-emerald-900' : 'text-slate-800' }}">
+                                                Putusan: {{ $appeal->status === 'ACCEPTED' ? '✓ DILANJUTKAN DENGAN ASESMEN ULANG' : '✕ TIDAK DILANJUTKAN ASESMEN ULANG' }}
                                             </span>
                                             <span class="text-slate-500 text-[11px]">
                                                 Ditetapkan: {{ $appeal->decision_date ? \Carbon\Carbon::parse($appeal->decision_date)->isoFormat('D MMMM Y') : '-' }}
                                             </span>
                                         </div>
-                                        <p class="text-slate-800 leading-relaxed font-medium">
-                                            <strong>Catatan Putusan:</strong> {{ $appeal->decision_notes ?? '-' }}
-                                        </p>
+                                        @if($appeal->decision_notes)
+                                            <p class="text-slate-700 leading-relaxed font-medium">
+                                                <strong>Keterangan:</strong> {{ $appeal->decision_notes }}
+                                            </p>
+                                        @endif
                                         @if($appeal->assessment->follow_up_action)
-                                            <p class="text-slate-700 text-[11px] bg-white/70 p-2 rounded-lg border {{ $appeal->status === 'ACCEPTED' ? 'border-emerald-200' : 'border-rose-200' }}">
-                                                <strong>Tindak Lanjut Sistem:</strong> {{ $appeal->assessment->follow_up_action }}
+                                            <p class="text-slate-600 text-[11px] bg-white/70 p-2 rounded-lg border {{ $appeal->status === 'ACCEPTED' ? 'border-emerald-200' : 'border-slate-200' }}">
+                                                <strong>Status Asesmen:</strong> {{ $appeal->assessment->follow_up_action }}
                                             </p>
                                         @endif
-                                        @if($appeal->appeals_committee_chair)
-                                            <p class="text-slate-700">
-                                                <strong>Ketua Tim Banding:</strong> {{ $appeal->appeals_committee_chair }}
-                                            </p>
-                                        @endif
-                                        <div class="text-[11px] text-slate-500 pt-1 border-t {{ $appeal->status === 'ACCEPTED' ? 'border-emerald-200' : 'border-rose-200' }}">
+                                        <div class="text-[11px] text-slate-500 pt-1 border-t {{ $appeal->status === 'ACCEPTED' ? 'border-emerald-200' : 'border-slate-200' }}">
                                             Diputuskan oleh: <strong>{{ $appeal->decider->full_name ?? 'Admin LSP' }}</strong>
                                         </div>
                                     </div>

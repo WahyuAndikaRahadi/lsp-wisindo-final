@@ -62,20 +62,29 @@ class AppealController extends Controller
     {
         $request->validate([
             'decision' => 'required|in:ACCEPTED,REJECTED',
-            'decision_notes' => 'required|string',
+            'decision_notes' => 'nullable|string',
             'appeals_committee_chair' => 'nullable|string|max:255',
-            'action_type' => 'nullable|in:REASSESSMENT,OVERRIDE_KOMPETEN,ADMINISTRATIVE',
+            'action_type' => 'nullable|string',
         ]);
+
+        $decision = $request->input('decision');
+        $actionType = $request->input('action_type') ?: ($decision === 'ACCEPTED' ? 'REASSESSMENT' : 'REJECTED');
+        $defaultNote = $decision === 'ACCEPTED' ? 'Disetujui untuk asesmen ulang.' : 'Permohonan banding ditolak / Tidak dilanjutkan asesmen ulang.';
+        $decisionNotes = $request->input('decision_notes') ?: $defaultNote;
 
         $this->workflowService->decideAppeal(
             $appeal,
-            $request->input('decision'),
-            $request->input('decision_notes'),
+            $decision,
+            $decisionNotes,
             auth()->id(),
             $request->input('appeals_committee_chair'),
-            $request->input('action_type', 'REASSESSMENT')
+            $actionType
         );
 
-        return back()->with('success', 'Keputusan banding asesmen (FR.AK.04) berhasil disimpan.');
+        $msg = $decision === 'ACCEPTED'
+            ? 'Banding disetujui. Jadwal asesmen untuk asesi telah dibuka kembali dan data direset untuk asesmen ulang.'
+            : 'Banding ditolak. Keputusan hasil asesmen tetap dipertahankan.';
+
+        return back()->with('success', $msg);
     }
 }

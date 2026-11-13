@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Schedule;
 use App\Models\Scheme;
 use App\Models\User;
+use App\Services\RegistrationTokenService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -57,6 +58,7 @@ class AuthSecurityHardeningTest extends TestCase
             'email' => 'valid@example.com',
             'password' => 'Kompeten86',
             'password_confirmation' => 'Kompeten86',
+            'registration_token' => RegistrationTokenService::getCurrentToken(),
         ]);
         $resValid->assertSessionHasNoErrors();
         $this->assertDatabaseHas('users', ['email' => 'valid@example.com']);

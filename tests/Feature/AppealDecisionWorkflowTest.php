@@ -155,7 +155,9 @@ class AppealDecisionWorkflowTest extends TestCase
         $this->assessment->refresh();
 
         $this->assertEquals('ACCEPTED', $appeal->status);
-        $this->assertEquals('BELUM_KOMPETEN', $this->assessment->final_result);
+        $this->assertEquals('DRAFT', $this->assessment->status);
+        $this->assertEquals('DRAFT', $this->assessment->apl_status);
+        $this->assertEquals('BELUM_SELESAI', $this->assessment->final_result);
         $this->assertStringContainsString('Dijadwalkan Asesmen Ulang', $this->assessment->follow_up_action);
     }
 

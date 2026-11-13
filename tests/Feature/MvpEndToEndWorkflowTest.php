@@ -8,6 +8,7 @@ use App\Models\QuestionBank;
 use App\Models\Schedule;
 use App\Models\Scheme;
 use App\Models\User;
+use App\Services\RegistrationTokenService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -70,6 +71,7 @@ class MvpEndToEndWorkflowTest extends TestCase
             'phone' => '081298765432',
             'password' => 'Password123!',
             'password_confirmation' => 'Password123!',
+            'registration_token' => RegistrationTokenService::getCurrentToken(),
         ]);
         $registerRes->assertRedirect(route('login'));
         $asesi = User::where('email', $asesiEmail)->first();

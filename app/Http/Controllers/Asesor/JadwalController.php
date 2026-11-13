@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Asesor;
 
 use App\Http\Controllers\Concerns\AuthorizesAssessor;
 use App\Http\Controllers\Controller;
+use App\Services\RegistrationTokenService;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -35,6 +36,8 @@ class JadwalController extends Controller
             return view('asesor.jadwal._table', compact('schedules', 'jadwals'));
         }
 
-        return view('asesor.jadwal.index', compact('schedules', 'jadwals'));
+        $registrationToken = RegistrationTokenService::getCurrentToken();
+
+        return view('asesor.jadwal.index', compact('schedules', 'jadwals', 'registrationToken'));
     }
 }

@@ -90,6 +90,21 @@
                     @enderror
                 </div>
 
+                <div>
+                    <label class="block text-xs font-semibold text-slate-800 mb-1" for="registration_token">
+                        Token Registrasi Peserta <span class="text-lsp-red">*</span>
+                    </label>
+                    <input id="registration_token" type="text" name="registration_token" value="{{ old('registration_token') }}" required autocomplete="off"
+                        class="w-full px-3.5 py-2.5 bg-lsp-input-bg border border-slate-300 focus:border-lsp-navy text-sm sm:text-xs font-mono tracking-wider rounded-lg text-slate-900 focus:outline-none focus:ring-1 focus:ring-lsp-navy transition @error('registration_token') border-lsp-red ring-1 ring-lsp-red @enderror"
+                        placeholder="Contoh: proindo1234" />
+                    <p class="mt-1 text-[11px] text-slate-500">
+                        Token resmi mingguan dapat diperoleh dari Asesor Penguji di TUK atau Admin LSP.
+                    </p>
+                    @error('registration_token')
+                        <p class="mt-1 text-[11px] text-lsp-red font-medium">{{ $message }}</p>
+                    @enderror
+                </div>
+
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                         <label class="block text-xs font-semibold text-slate-800 mb-1" for="password">
