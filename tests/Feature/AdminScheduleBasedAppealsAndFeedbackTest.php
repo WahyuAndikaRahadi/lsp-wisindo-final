@@ -217,6 +217,12 @@ class AdminScheduleBasedAppealsAndFeedbackTest extends TestCase
         $response->assertOk();
         $response->assertSee('SCH-HAS-APPEAL');
         $response->assertDontSee('SCH-NO-APPEAL');
+
+        // Test pending_appeals filter
+        $responsePending = $this->actingAs($this->admin)->get(route('admin.appeals.index', ['filter' => 'pending_appeals']));
+        $responsePending->assertOk();
+        $responsePending->assertSee('SCH-HAS-APPEAL');
+        $responsePending->assertDontSee('SCH-NO-APPEAL');
     }
 
     public function test_admin_appeals_show_displays_schedule_participants_feedbacks_and_appeals(): void

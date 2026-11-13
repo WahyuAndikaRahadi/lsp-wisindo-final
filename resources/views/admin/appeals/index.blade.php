@@ -141,7 +141,7 @@
 
                 @if($counts['appeals_pending'] > 0)
                     <a href="{{ route('admin.appeals.index', array_merge(request()->query(), ['filter' => 'pending_appeals'])) }}"
-                       class="px-3 py-1.5 rounded-lg border font-bold transition whitespace-nowrap {{ ($filter ?? '') === 'pending_appeals' ? 'bg-rose-600 text-white border-rose-600' : 'bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100 animate-pulse' }}">
+                       class="px-3 py-1.5 rounded-lg border font-bold transition whitespace-nowrap {{ ($filter ?? '') === 'pending_appeals' ? 'bg-rose-600 text-white border-rose-600' : 'bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100' }}">
                         Perlu Putusan Banding ({{ $counts['appeals_pending'] }})
                     </a>
                 @endif

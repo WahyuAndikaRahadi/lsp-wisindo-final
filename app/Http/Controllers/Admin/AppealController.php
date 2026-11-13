@@ -63,7 +63,7 @@ class AppealController extends Controller
             $schedulesQuery->has('appeals');
         } elseif ($filter === 'pending_appeals') {
             $schedulesQuery->whereHas('appeals', function ($q) {
-                $q->whereIn('status', ['SUBMITTED', 'UNDER_REVIEW']);
+                $q->whereIn('t_assessment_appeals.status', ['SUBMITTED', 'UNDER_REVIEW']);
             });
         } elseif ($filter === 'feedbacks_incomplete') {
             $schedulesQuery->has('assessments')
