@@ -104,6 +104,11 @@ class DokumenMukController extends Controller
             'frak05' => 'ak05',
             'laporan-asesmen' => 'ak05',
             'laporan' => 'ak05',
+            'fr-ak-06' => 'ak06',
+            'frak06' => 'ak06',
+            'tinjauan-asesmen' => 'ak06',
+            'tinjauan' => 'ak06',
+            'meninjau' => 'ak06',
         ];
         $targetType = $aliasMap[$normalizedType] ?? $normalizedType;
 
@@ -114,8 +119,8 @@ class DokumenMukController extends Controller
         if (in_array($targetType, ['excel-asesor', 'asesor-excel', 'hadir-asesor-excel'], true)) {
             return $this->exporter->exportScheduleAsesorXls($schedule);
         }
-        
-        if ($targetType === 'ak06') {
+
+        if ($targetType === 'ak06' && ($request->query('format') === 'docx' || $request->query('source') === 'docx')) {
             $ak06Data = is_array($schedule->ak06_review) ? $schedule->ak06_review : [];
             $templateType = $ak06Data['template_type'] ?? 'langsung';
             if (! empty($ak06Data['by_assessor']) && is_array($ak06Data['by_assessor'])) {
@@ -127,29 +132,13 @@ class DokumenMukController extends Controller
                 ? '24 FR.AK.06 Meninjau Proses Asesmen (Tidak Langsung)'
                 : '24 FR.AK.06 Meninjau Proses Asesmen (Langsung)';
 
-            $isDocx = $request->query('format') === 'docx' || $request->query('source') === 'docx';
-            $ext = $isDocx ? 'docx' : 'pdf';
-            $mime = $isDocx
-                ? 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-                : 'application/pdf';
-
-            $filePath = public_path("AK06/{$baseName}.{$ext}");
-            if (! file_exists($filePath)) {
-                $ext = 'docx';
-                $mime = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
-                $filePath = public_path("AK06/{$baseName}.docx");
+            $filePath = public_path("AK06/{$baseName}.docx");
+            if (file_exists($filePath)) {
+                return response()->download($filePath, "{$baseName}.docx");
             }
-
-            $download = $request->boolean('download', false);
-            $disposition = $download ? 'attachment' : 'inline';
-
-            return response()->file($filePath, [
-                'Content-Type' => $mime,
-                'Content-Disposition' => "{$disposition}; filename=\"{$baseName}.{$ext}\"",
-            ]);
         }
 
-        if ($targetType === 'ak05' || $request->query('source') === 'dynamic' || ($request->query('format') === 'pdf' && in_array($targetType, ['ba', 'hadir-asesor', 'hadir-asesi'], true))) {
+        if (in_array($targetType, ['ak05', 'ak06'], true) || $request->query('source') === 'dynamic' || ($request->query('format') === 'pdf' && in_array($targetType, ['ba', 'hadir-asesor', 'hadir-asesi'], true))) {
             return $this->dynamicService->exportSchedule($schedule, $targetType, $request->boolean('download'));
         }
 

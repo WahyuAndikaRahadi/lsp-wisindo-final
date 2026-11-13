@@ -183,6 +183,14 @@ class MukDynamicDocumentService
                         return $file->getPathname();
                     }
                     break;
+                case 'ak06':
+                case 'frak06':
+                case 'meninjau':
+                case 'tinjauan':
+                    if (str_contains($name, 'ak.06') || str_contains($name, 'ak 06') || str_contains($name, 'ak-06') || str_contains($name, 'meninjau')) {
+                        return $file->getPathname();
+                    }
+                    break;
                 case 'ak07':
                 case 'frak07':
                     if (str_contains($name, 'ak.07') || str_contains($name, 'ak 07') || str_contains($name, 'ak-07')) {
@@ -1649,6 +1657,85 @@ class MukDynamicDocumentService
     }
 
     /**
+     * Build specific payload for FR.AK.06 (Meninjau Proses Asesmen).
+     *
+     * @return array<string, mixed>
+     */
+    public function buildAk06Data(Schedule $schedule): array
+    {
+        $schedule->loadMissing([
+            'scheme.competencyUnits',
+            'assessors.profile',
+            'assessments.assessor.profile',
+            'tuk',
+        ]);
+
+        $scheme = $schedule->scheme;
+        $leadAssessor = $schedule->assessors->first() ?? $schedule->assessments->first()?->assessor;
+        if ($leadAssessor && ! $leadAssessor->relationLoaded('profile')) {
+            $leadAssessor->load('profile');
+        }
+
+        $date = Carbon::parse($schedule->date ?? now());
+        $months = [
+            1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April', 5 => 'Mei', 6 => 'Juni',
+            7 => 'Juli', 8 => 'Agustus', 9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember',
+        ];
+        $formattedDate = $date->format('d').' '.($months[(int) $date->format('m')] ?? $date->format('F')).' '.$date->format('Y');
+
+        $tukName = $schedule->tuk_name ?? ($schedule->tuk?->name ?? 'SMKN 1 Bali');
+
+        // Extract review data from schedule's ak06_review
+        $review = is_array($schedule->ak06_review) ? $schedule->ak06_review : [];
+        if (empty($review['catatan_peninjau']) && ! empty($review['by_assessor']) && is_array($review['by_assessor'])) {
+            $firstAssessorReview = reset($review['by_assessor']);
+            if (is_array($firstAssessorReview)) {
+                $review = array_merge($firstAssessorReview, $review);
+            }
+        }
+
+        $templateType = strtolower((string) ($review['template_type'] ?? 'langsung'));
+        if (! in_array($templateType, ['langsung', 'tidak_langsung'], true)) {
+            $templateType = 'langsung';
+        }
+
+        $defaultCatatan = 'Proses asesmen telah memenuhi seluruh standar mutu penjaminan asesmen BNSP. Keputusan asesmen yang diambil adalah valid, reliabel, fleksibel, dan adil.';
+        $catatanPeninjau = ! empty($review['catatan_peninjau'])
+            ? $review['catatan_peninjau']
+            : ($review['review_notes'] ?? $defaultCatatan);
+
+        // Signature assessor
+        $signatureAssessor = null;
+        if (! empty($leadAssessor?->profile?->signature_data)) {
+            $signatureAssessor = $leadAssessor->profile->signature_data;
+        } elseif (! empty($schedule->assessments->first()?->assessor_signature)) {
+            $signatureAssessor = $schedule->assessments->first()->assessor_signature;
+        } elseif ($leadAssessor?->profile?->signature_path && file_exists(storage_path('app/public/'.$leadAssessor->profile->signature_path))) {
+            $signatureAssessor = storage_path('app/public/'.$leadAssessor->profile->signature_path);
+        }
+
+        $assessorReg = $leadAssessor?->assessor_registration_number
+            ?: ($leadAssessor?->profile?->met_reg_number
+                ?: ($leadAssessor?->profile?->no_reg ?: 'MET.000.001234 2022'));
+
+        return [
+            'skema_nama' => $scheme?->name ?? 'Maintenance Gasoline Engine Injection System',
+            'skema_nomor' => $scheme?->muk_code ?? ($scheme?->code ?? '02/LSP PrO Indo/XI/2025'),
+            'skema_tipe' => strtoupper((string) ($scheme?->scheme_type ?? 'KLASTER')),
+            'tuk_nama' => $tukName,
+            'tuk_tipe' => 'Sewaktu/Tempat Kerja/Mandiri*',
+            'asesor_nama' => $leadAssessor?->full_name ?? 'Randi Ardiansyah',
+            'asesor_no_reg' => $assessorReg,
+            'tanggal' => $formattedDate,
+            'template_type' => $templateType,
+            'catatan_peninjau' => $catatanPeninjau,
+            'rekomendasi_prosedur' => 'Seluruh prosedur asesmen terlaksana secara valid, reliabel, fleksibel dan adil sesuai pedoman BNSP 301.',
+            'rekomendasi_dimensi' => 'MUK yang digunakan sangat komprehensif. Disarankan pembaruan berkelanjutan pada bank soal dan instrumen asesmen.',
+            'signature_asesor' => $signatureAssessor,
+        ];
+    }
+
+    /**
      * Get working python executable for current platform.
      */
     public function getPythonExecutable(): string
@@ -2133,6 +2220,16 @@ class MukDynamicDocumentService
                 }
             }
 
+            if (in_array($normType, ['ak06', 'frak06', 'meninjau', 'tinjauan'], true)) {
+                $script = base_path('tools/render_fr_ak_06.py');
+                if (File::isFile($script)) {
+                    $ak06Payload = $this->buildAk06Data($schedule);
+                    if ($this->runGeneratorWithPayload($python, $script, $ak06Payload, 'muk_ak06', $outputPath, $normType)) {
+                        return $outputPath;
+                    }
+                }
+            }
+
             // 2. Scheme-specific master PDF overlay via PyMuPDF
             $masterPdf = $this->getDynamicFilePath($schedule->scheme, $normType);
             if ($masterPdf && File::isFile($masterPdf)) {
@@ -2174,6 +2271,8 @@ class MukDynamicDocumentService
                 'ak04' => 'tests/Fixtures/muk/FR_AK_04_generated.pdf',
                 'ak05' => 'tests/Fixtures/muk/FR_AK_05_generated.pdf',
                 'frak05' => 'tests/Fixtures/muk/FR_AK_05_generated.pdf',
+                'ak06' => 'tests/Fixtures/muk/FR_AK_06_generated.pdf',
+                'frak06' => 'tests/Fixtures/muk/FR_AK_06_generated.pdf',
                 'ak07' => 'tests/Fixtures/muk/FR_AK_07_generated.pdf',
                 'ia01' => 'tests/Fixtures/muk/FR_IA_01_generated.pdf',
                 'ia03' => 'tests/Fixtures/muk/FR_IA_03_generated.pdf',
