@@ -19,7 +19,7 @@
 
     {{-- 1. Question Banks Package Table --}}
     <div class="space-y-3">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between items-start gap-1">
             <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wider">
                 1. Paket Bank Soal per Skema Sertifikasi
             </h2>

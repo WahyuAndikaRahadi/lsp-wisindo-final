@@ -101,7 +101,7 @@ class AssessmentRevisionsAndWorkflowTest extends TestCase
 
         $response = $this->actingAs($this->asesi)->get(route('asesi.assessment.apl', $this->assessment));
         $response->assertStatus(200);
-        $response->assertSee('Formulir Terkunci &amp; Terkirim', false);
+        $response->assertSee('Menunggu Verifikasi Asesor');
         $response->assertDontSee('✓ Semua K (Kompeten)');
     }
 

@@ -72,7 +72,7 @@
 
     {{-- Competency Units & Elements List --}}
     <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-        <div class="px-6 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+        <div class="px-4 sm:px-6 py-3.5 sm:py-4 bg-slate-50 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center sm:justify-between items-start gap-2">
             <h2 class="text-sm font-bold text-slate-900">
                 Daftar Unit Kompetensi Standar SKKNI ({{ $scheme->competencyUnits->count() }} Unit)
             </h2>
@@ -83,21 +83,21 @@
 
         <div class="divide-y divide-slate-100">
             @forelse($scheme->competencyUnits as $index => $unit)
-                <div class="p-5 hover:bg-slate-50/50 transition" x-data="{ open: false }">
-                    <div class="flex items-start justify-between gap-4">
+                <div class="p-4 sm:p-5 hover:bg-slate-50/50 transition" x-data="{ open: false }">
+                    <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                         <div class="space-y-1 cursor-pointer flex-1" @click="open = !open">
-                            <div class="flex items-center space-x-2">
+                            <div class="flex flex-wrap items-center gap-2">
                                 <span class="px-2 py-0.5 text-xs font-mono font-bold bg-slate-100 text-slate-800 rounded">{{ $unit->code }}</span>
                                 <h3 class="text-sm font-bold text-slate-900">{{ $unit->title }}</h3>
                             </div>
-                            <div class="text-xs text-slate-500 flex items-center space-x-3">
+                            <div class="text-xs text-slate-500 flex flex-wrap items-center gap-2">
                                 <span>{{ $unit->elements->count() }} Elemen Kompetensi</span>
                                 <span>&bull;</span>
                                 <span>Ref: {{ $unit->standard_reference ?? 'SKKNI' }}</span>
                             </div>
                         </div>
 
-                        <div class="flex items-center space-x-2 shrink-0">
+                        <div class="flex flex-wrap items-center gap-1.5 shrink-0 self-start sm:self-auto pt-1 sm:pt-0">
                             <button type="button" @click="openAddElement({ id: {{ $unit->id }}, code: '{{ addslashes($unit->code) }}' })" class="px-2 py-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded border border-emerald-200 transition">
                                 + Elemen
                             </button>
@@ -115,7 +115,7 @@
                                     Hapus
                                 </button>
                             </form>
-                            <button type="button" @click="open = !open" class="text-xs text-brand-600 hover:underline font-semibold ml-2">
+                            <button type="button" @click="open = !open" class="text-xs text-brand-600 hover:underline font-semibold ml-1">
                                 <span x-show="!open">Detail &darr;</span>
                                 <span x-show="open">Tutup &uarr;</span>
                             </button>
@@ -126,11 +126,11 @@
                     <div x-show="open" x-cloak class="mt-4 pt-4 border-t border-slate-100 space-y-3">
                         @forelse($unit->elements as $elIndex => $element)
                             <div class="bg-slate-50 rounded-lg p-3.5 text-xs space-y-2 border border-slate-200">
-                                <div class="flex items-center justify-between pb-2 border-b border-slate-200">
+                                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between items-start gap-2 pb-2 border-b border-slate-200">
                                     <h4 class="font-bold text-slate-800">
                                         Elemen {{ $elIndex + 1 }}: {{ $element->title ?? $element->name }}
                                     </h4>
-                                    <div class="flex items-center space-x-1.5">
+                                    <div class="flex flex-wrap items-center gap-1.5 self-start sm:self-auto">
                                         <button type="button" @click="openAddKuk({ id: {{ $element->id }}, title: '{{ addslashes($element->title) }}' })" class="px-2 py-0.5 text-[10px] font-bold text-emerald-700 bg-white border border-emerald-300 rounded hover:bg-emerald-50">
                                             + Tambah KUK
                                         </button>

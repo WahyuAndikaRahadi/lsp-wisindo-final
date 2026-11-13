@@ -263,20 +263,20 @@
 
         {{-- Section 3: Tanda Tangan Digital --}}
         <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 sm:p-6 space-y-4">
-            <div class="border-b border-slate-100 pb-3 flex items-center justify-between flex-wrap gap-2">
-                <div>
+            <div class="border-b border-slate-100 pb-3 flex flex-col sm:flex-row sm:items-center sm:justify-between items-start gap-2.5">
+                <div class="min-w-0 flex-1">
                     <h2 class="text-sm sm:text-base font-bold text-slate-800">3. Tanda Tangan Digital Asesi</h2>
-                    <p class="text-xs text-slate-400 mt-0.5">
-                        Tanda tangan ini akan dicantumkan secara otomatis pada dokumen MUK (APL.01, APL.02, AK.01, dll)
+                    <p class="text-xs text-slate-500 mt-0.5 leading-relaxed">
+                        Tanda tangan ini akan dicantumkan secara otomatis pada dokumen MUK (APL.01, APL.02, AK.01, dll).
                     </p>
                 </div>
                 @if($p->signature_data)
-                    <span class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                    <span class="inline-flex shrink-0 items-center gap-1.5 px-3 py-1 text-xs font-semibold rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 self-start sm:self-auto">
+                        <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                         TTD Tersimpan
                     </span>
                 @else
-                    <span class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-full bg-amber-50 text-amber-700 border border-amber-200">
+                    <span class="inline-flex shrink-0 items-center gap-1.5 px-3 py-1 text-xs font-semibold rounded-full bg-amber-50 text-amber-700 border border-amber-200 self-start sm:self-auto">
                         Belum Diatur
                     </span>
                 @endif
@@ -284,7 +284,7 @@
 
             @if($p->signature_data)
                 <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl flex flex-col sm:flex-row items-center sm:items-start gap-4">
-                    <div class="w-[340px] max-w-full h-[140px] bg-white rounded-xl border border-slate-300 shadow-xs p-3 flex items-center justify-center shrink-0">
+                    <div class="w-full sm:w-[340px] max-w-full h-[140px] bg-white rounded-xl border border-slate-300 shadow-xs p-3 flex items-center justify-center shrink-0">
                         <img src="{{ $p->signature_data }}" alt="Pratinjau Tanda Tangan Asesi" class="w-full h-full object-contain">
                     </div>
                     <div class="text-xs text-slate-600 space-y-1">
@@ -294,7 +294,7 @@
                 </div>
             @endif
 
-            <div class="max-w-[340px]">
+            <div class="w-full max-w-full sm:max-w-[340px]">
                 <x-signature-pad 
                     name="signature_data" 
                     :value="old('signature_data', $p->signature_data)"

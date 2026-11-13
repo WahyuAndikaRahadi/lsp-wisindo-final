@@ -4,9 +4,9 @@
 
 @section('content')
 <div class="max-w-5xl mx-auto py-6 space-y-6">
-    <div class="flex items-center justify-between no-print">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between items-start gap-2.5 no-print">
         <a href="{{ route('admin.dokumen-muk.index') }}" class="text-xs text-brand-600 hover:text-brand-700 font-semibold">&larr; Kembali ke Dokumen MUK</a>
-        <button onclick="window.print()" class="px-4 py-2 text-xs font-bold bg-brand-600 hover:bg-brand-700 text-white rounded-lg shadow-sm transition">
+        <button onclick="window.print()" class="w-full sm:w-auto px-4 py-2 text-xs font-bold bg-brand-600 hover:bg-brand-700 text-white rounded-lg shadow-sm transition text-center">
             Cetak / Download PDF
         </button>
     </div>

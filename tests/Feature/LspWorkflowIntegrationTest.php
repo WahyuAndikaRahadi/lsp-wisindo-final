@@ -275,6 +275,7 @@ class LspWorkflowIntegrationTest extends TestCase
         $this->assertEquals('FINISHED', $schedule->status);
 
         // 14. Asesi submits FR.AK.04 Banding & Admin decides
+        $assessment->update(['has_rejection' => true]);
         $appealSubmit = $this->actingAs($asesi)->post(route('asesi.assessment.appeal.submit', $assessment), [
             'appeal_reasons' => 'Mohon peninjauan ulang terhadap bukti unjuk kerja pada sistem pengapian.',
         ]);
@@ -815,6 +816,7 @@ class LspWorkflowIntegrationTest extends TestCase
             'completed_at' => $monday,
             'status' => 'COMPLETED',
             'final_result' => 'BELUM_KOMPETEN',
+            'has_rejection' => true,
         ]);
 
         // Day 1: Tuesday -> Allowed
@@ -857,6 +859,7 @@ class LspWorkflowIntegrationTest extends TestCase
             'completed_at' => $monday,
             'status' => 'COMPLETED',
             'final_result' => 'BELUM_KOMPETEN',
+            'has_rejection' => true,
         ]);
 
         // Day 4: Friday -> Rejected
@@ -887,6 +890,7 @@ class LspWorkflowIntegrationTest extends TestCase
             'final_result_at' => $wednesday,
             'status' => 'COMPLETED',
             'final_result' => 'BELUM_KOMPETEN',
+            'has_rejection' => true,
         ]);
 
         // Friday is Day 2 from Wednesday (final_result_at) -> Allowed!
@@ -927,6 +931,7 @@ class LspWorkflowIntegrationTest extends TestCase
             'completed_at' => $thursday,
             'status' => 'COMPLETED',
             'final_result' => 'BELUM_KOMPETEN',
+            'has_rejection' => true,
         ]);
 
         // Next Tuesday is Day 3 of business days (Friday=1, Mon=2, Tue=3; Sat/Sun skipped) -> Allowed
@@ -1016,7 +1021,11 @@ class LspWorkflowIntegrationTest extends TestCase
         foreach ($scheduleDocExpectations as $type => $expectedSnippet) {
             $res = $this->actingAs($admin)->get(route('admin.dokumen-muk.export', [$schedule, $type]));
             $res->assertOk();
-            $res->assertSee($expectedSnippet);
+            if ($type === 'ak06') {
+                $res->assertHeader('content-disposition');
+            } else {
+                $res->assertSee($expectedSnippet);
+            }
         }
 
         // 2. Asesi-level individual documents

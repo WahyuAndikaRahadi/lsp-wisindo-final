@@ -5,12 +5,12 @@
     {{-- Unified Top Lifecycle Navigation --}}
     @include('asesor.partials.schedule-nav', ['schedule' => $assessment->schedule, 'active' => 'ak02'])
 
-    <div class="flex items-center justify-between">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between items-start gap-2.5">
         <div>
             <h1 class="text-2xl font-black text-slate-900 tracking-tight mt-1">FR.AK.02 Rekaman Asesmen Kompetensi (Detail)</h1>
             <p class="text-xs text-slate-500">Rekapitulasi bukti dan penetapan rekomendasi hasil asesmen kompetensi per unit</p>
         </div>
-        <div class="flex items-center space-x-2">
+        <div class="flex items-center space-x-2 shrink-0 self-start sm:self-auto">
             <span class="px-3 py-1 text-xs font-bold rounded-lg border {{ $assessment->final_result === 'KOMPETEN' ? 'bg-emerald-50 text-emerald-700 border-emerald-300' : 'bg-amber-50 text-amber-700 border-amber-300' }}">
                 Status: {{ $assessment->final_result ?? 'BELUM SELESAI' }}
             </span>
@@ -207,16 +207,16 @@
                 <textarea name="final_notes" rows="3" @disabled($assessment->schedule?->is_closed) class="w-full p-3 text-xs rounded-xl border border-slate-300 bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:outline-none transition shadow-2xs {{ $assessment->schedule?->is_closed ? 'bg-slate-50 text-slate-700' : '' }}" placeholder="Catatan objektif mengenai unjuk kerja asesi...">{{ old('final_notes', $assessment->final_notes ?? '') }}</textarea>
             </div>
 
-            <div class="flex items-center justify-between pt-4 border-t border-slate-200">
-                <a href="{{ route('asesor.schedule.ak02', $assessment->schedule_id) }}" class="px-4 py-2 min-h-[40px] inline-flex items-center text-xs font-semibold text-slate-600 hover:text-slate-900">
+            <div class="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between items-stretch gap-2.5 pt-4 border-t border-slate-200">
+                <a href="{{ route('asesor.schedule.ak02', $assessment->schedule_id) }}" class="w-full sm:w-auto px-4 py-2 min-h-[40px] inline-flex items-center justify-center text-xs font-semibold text-slate-600 hover:text-slate-900 border border-slate-200 sm:border-0 rounded-lg text-center">
                     Kembali
                 </a>
                 @if($assessment->schedule?->is_closed)
-                    <button type="button" disabled class="px-6 py-2.5 min-h-[40px] text-xs font-bold text-slate-500 bg-slate-200 rounded-lg cursor-not-allowed">
+                    <button type="button" disabled class="w-full sm:w-auto px-6 py-2.5 min-h-[40px] text-xs font-bold text-slate-500 bg-slate-200 rounded-lg cursor-not-allowed text-center">
                         Jadwal Telah Ditutup (Read-Only)
                     </button>
                 @else
-                    <button type="submit" class="px-6 py-2.5 min-h-[40px] text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 rounded-lg shadow-sm transition">
+                    <button type="submit" class="w-full sm:w-auto px-6 py-2.5 min-h-[40px] text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 rounded-lg shadow-sm transition text-center">
                         Simpan Rekaman FR.AK.02
                     </button>
                 @endif

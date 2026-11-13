@@ -29,7 +29,7 @@
         @csrf
 
         {{-- Section 1: Data Asesor & Akun --}}
-        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 space-y-5">
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 sm:p-6 space-y-5">
             <div class="border-b border-slate-100 pb-3">
                 <h2 class="text-base font-bold text-slate-800">1. Data Registrasi Asesor</h2>
                 <p class="text-xs text-slate-400">Informasi utama identitas dan sertifikasi asesor kompetensi BNSP</p>
@@ -170,7 +170,7 @@
         </div>
 
         {{-- Section 2: Pekerjaan & Institusi Asal Asesor --}}
-        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 space-y-5">
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 sm:p-6 space-y-5">
             <div class="border-b border-slate-100 pb-3">
                 <h2 class="text-base font-bold text-slate-800">2. Data Pekerjaan & Institusi</h2>
                 <p class="text-xs text-slate-400">Informasi instansi asal, industri, atau lembaga tempat asesor bernaung</p>
@@ -216,21 +216,21 @@
         </div>
 
         {{-- Section 3: Master Tanda Tangan Digital Asesor --}}
-        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 space-y-4">
-            <div class="border-b border-slate-100 pb-3 flex items-center justify-between">
-                <div>
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 sm:p-6 space-y-4">
+            <div class="border-b border-slate-100 pb-3 flex flex-col sm:flex-row sm:items-center sm:justify-between items-start gap-2.5">
+                <div class="min-w-0 flex-1">
                     <h2 class="text-base font-bold text-slate-800">3. Master Tanda Tangan Digital Asesor</h2>
-                    <p class="text-xs text-slate-400">
+                    <p class="text-xs text-slate-500 mt-0.5 leading-relaxed">
                         Tanda tangan ini akan otomatis digunakan saat menandatangani persetujuan AK.01, rubrik instrumen uji (IA.01, IA.01B, IA.02, IA.03), serta dokumen ekspor MUK.
                     </p>
                 </div>
                 @if($p->signature_data)
-                    <span class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                    <span class="inline-flex shrink-0 items-center gap-1.5 px-3 py-1 text-xs font-semibold rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 self-start sm:self-auto">
+                        <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                         TTD Tersimpan
                     </span>
                 @else
-                    <span class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-full bg-amber-50 text-amber-700 border border-amber-200">
+                    <span class="inline-flex shrink-0 items-center gap-1.5 px-3 py-1 text-xs font-semibold rounded-full bg-amber-50 text-amber-700 border border-amber-200 self-start sm:self-auto">
                         Belum Diatur
                     </span>
                 @endif
@@ -238,7 +238,7 @@
 
             @if($p->signature_data)
                 <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl flex flex-col sm:flex-row items-center sm:items-start gap-4">
-                    <div class="w-[340px] max-w-full h-[140px] bg-white rounded-xl border border-slate-300 shadow-xs p-3 flex items-center justify-center shrink-0">
+                    <div class="w-full sm:w-[340px] max-w-full h-[140px] bg-white rounded-xl border border-slate-300 shadow-xs p-3 flex items-center justify-center shrink-0">
                         <img src="{{ $p->signature_data }}" alt="Pratinjau Tanda Tangan Asesor" class="w-full h-full object-contain">
                     </div>
                     <div class="text-xs text-slate-600 space-y-1">
@@ -248,7 +248,7 @@
                 </div>
             @endif
 
-            <div class="max-w-[340px]">
+            <div class="w-full max-w-full sm:max-w-[340px]">
                 <x-signature-pad 
                     name="signature_data" 
                     :value="old('signature_data', $p->signature_data)"
@@ -259,12 +259,12 @@
         </div>
 
         {{-- Submit Button --}}
-        <div class="flex items-center justify-end space-x-3 pt-2">
-            <a href="{{ route('asesor.jadwal.index') }}" class="px-5 py-2.5 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition">
+        <div class="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-2.5 sm:gap-3 pt-2">
+            <a href="{{ route('asesor.jadwal.index') }}" class="w-full sm:w-auto text-center px-5 py-2.5 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition">
                 Batal
             </a>
-            <button type="submit" class="px-6 py-2.5 bg-lsp-navy hover:bg-lsp-navy-dark text-white font-bold text-xs uppercase tracking-wider rounded-lg shadow-sm transition">
-                Simpan Biodata & Tanda Tangan
+            <button type="submit" class="w-full sm:w-auto text-center px-6 py-2.5 bg-lsp-navy hover:bg-lsp-navy-dark text-white font-bold text-xs uppercase tracking-wider rounded-lg shadow-sm transition">
+                Simpan Biodata &amp; Tanda Tangan
             </button>
         </div>
     </form>

@@ -185,30 +185,30 @@
                             @endif
                         </div>
 
-                        <div class="mt-5 pt-4 border-t border-slate-100 flex items-center justify-between">
+                        <div class="mt-5 pt-4 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between items-start gap-2.5">
                             <span class="text-[11px] text-slate-400">
                                 Terdaftar: {{ $item->created_at ? $item->created_at->diffForHumans() : '-' }}
                             </span>
 
                             @if($isRejected)
-                                <a href="{{ route('asesi.assessment.apl', $item->id) }}" class="px-4 py-2 text-xs font-bold bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-300 rounded-lg shadow-xs transition inline-flex items-center gap-1">
+                                <a href="{{ route('asesi.assessment.apl', $item->id) }}" class="w-full sm:w-auto px-4 py-2 text-xs font-bold bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-300 rounded-lg shadow-xs transition inline-flex items-center justify-center gap-1 text-center">
                                     <span>✕ Ditolak</span>
                                 </a>
                             @elseif($sch->is_closed || $item->status === 'COMPLETED')
-                                <a href="{{ route('asesi.assessment.ruang-uji', $item->id) }}" class="px-4 py-2 text-xs font-bold bg-slate-800 hover:bg-slate-900 text-white rounded-lg transition flex items-center gap-1.5">
+                                <a href="{{ route('asesi.assessment.ruang-uji', $item->id) }}" class="w-full sm:w-auto px-4 py-2 text-xs font-bold bg-slate-800 hover:bg-slate-900 text-white rounded-lg transition inline-flex items-center justify-center gap-1.5 text-center">
                                     <svg class="w-3.5 h-3.5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                     <span>Ruang Uji &rarr;</span>
                                 </a>
                             @elseif($isResume)
-                                <a href="{{ $actionUrl }}" class="px-4 py-2 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg shadow-sm transition">
+                                <a href="{{ $actionUrl }}" class="w-full sm:w-auto px-4 py-2 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg shadow-sm transition text-center">
                                     Lanjut Uji &rarr;
                                 </a>
                             @elseif($aplStatus === 'REVISION_REQUESTED')
-                                <a href="{{ route('asesi.assessment.apl', $item->id) }}" class="px-4 py-2 text-xs font-bold bg-amber-500 hover:bg-amber-600 text-white rounded-lg shadow-sm transition">
+                                <a href="{{ route('asesi.assessment.apl', $item->id) }}" class="w-full sm:w-auto px-4 py-2 text-xs font-bold bg-amber-500 hover:bg-amber-600 text-white rounded-lg shadow-sm transition text-center">
                                     Revisi APL &rarr;
                                 </a>
                             @else
-                                <a href="{{ route('asesi.assessment.apl', $item->id) }}" class="px-4 py-2 text-xs font-bold bg-brand-600 hover:bg-brand-700 text-white rounded-lg shadow-sm transition">
+                                <a href="{{ route('asesi.assessment.apl', $item->id) }}" class="w-full sm:w-auto px-4 py-2 text-xs font-bold bg-brand-600 hover:bg-brand-700 text-white rounded-lg shadow-sm transition text-center">
                                     Isi APL &rarr;
                                 </a>
                             @endif

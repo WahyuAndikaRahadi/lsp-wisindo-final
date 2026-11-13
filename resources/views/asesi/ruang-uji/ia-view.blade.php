@@ -273,7 +273,7 @@
          @keydown.escape.window="modalOpen = false">
         <div class="relative w-full max-w-5xl bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-200 flex flex-col max-h-[92vh]"
              @click.away="modalOpen = false">
-            <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-slate-50">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between items-start gap-2.5 px-4 sm:px-6 py-3.5 sm:py-4 border-b border-slate-200 bg-slate-50">
                 <div class="flex items-center gap-2 min-w-0">
                     <span class="text-xs font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-brand-100 text-brand-700" x-text="modalType.toUpperCase()"></span>
                     <h3 class="text-sm font-bold text-slate-800 truncate" x-text="modalTitle"></h3>

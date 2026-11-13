@@ -162,12 +162,12 @@
                             <div x-show="showSignModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto" style="background-color: rgba(15, 23, 42, 0.6);">
                                 <div class="flex items-center justify-center min-h-screen p-4">
                                     <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4" @click.away="showSignModal = false">
-                                        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                                            <div>
+                                        <div class="flex items-start justify-between border-b border-slate-100 pb-3 gap-3">
+                                            <div class="flex-1 min-w-0">
                                                 <h3 class="text-base font-black text-slate-900">Tanda Tangan Asesor (Bulk Sign FR.IA.02)</h3>
                                                 <p class="text-xs text-slate-500">Tanda tangan ini akan diterapkan ke seluruh asesi yang Anda centang</p>
                                             </div>
-                                            <button type="button" @click="showSignModal = false" class="text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
+                                            <button type="button" @click="showSignModal = false" class="text-slate-400 hover:text-slate-600 text-xl font-bold p-1 shrink-0">&times;</button>
                                         </div>
 
                                         <div class="space-y-4 text-xs">

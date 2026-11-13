@@ -75,14 +75,14 @@
                              data-qid="{{ $qId }}">
                             
                             {{-- Panel Header --}}
-                            <div class="flex items-center justify-between pb-3 border-b border-slate-100 gap-2">
+                            <div class="flex flex-wrap items-center justify-between pb-3 border-b border-slate-100 gap-2">
                                 <div class="flex items-center gap-2">
                                     <span class="px-3 py-1 bg-brand-50 text-brand-700 text-xs font-bold rounded-lg border border-brand-200 font-mono">
                                         Soal No. {{ $index + 1 }} dari {{ $questions->count() }}
                                     </span>
                                 </div>
 
-                                <div class="flex items-center gap-2">
+                                <div class="flex flex-wrap items-center gap-2">
                                     <a href="#palette-card" class="lg:hidden inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300 transition" title="Lompat ke Daftar Nomor Soal">
                                         <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
                                         <span>Daftar Nomor</span>
@@ -308,9 +308,9 @@
             <div class="p-3 sm:p-5 flex items-center justify-center overflow-auto bg-slate-900/5 min-h-[220px]">
                 <img id="cbtImageModalImg" src="" alt="Pratinjau Gambar" class="max-h-[72vh] w-auto max-w-full rounded-lg object-contain shadow-xs">
             </div>
-            <div class="px-4 py-2.5 border-t border-slate-100 bg-slate-50 flex items-center justify-between text-xs">
+            <div class="px-4 py-2.5 border-t border-slate-100 bg-slate-50 flex flex-col sm:flex-row sm:items-center sm:justify-between items-start gap-1.5 text-xs">
                 <span class="text-[11px] text-slate-500">Ketuk di luar gambar atau tekan tombol silang untuk menutup.</span>
-                <a id="cbtImageModalOpenTab" href="#" target="_blank" class="font-semibold text-brand-600 hover:text-brand-800 hover:underline">Buka Ukuran Asli &rarr;</a>
+                <a id="cbtImageModalOpenTab" href="#" target="_blank" class="font-semibold text-brand-600 hover:text-brand-800 hover:underline shrink-0">Buka Ukuran Asli &rarr;</a>
             </div>
         </div>
     </div>

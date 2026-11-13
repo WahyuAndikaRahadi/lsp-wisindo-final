@@ -41,7 +41,7 @@
 
     {{-- Schedules Table --}}
     <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-        <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+        <div class="px-4 sm:px-6 py-3.5 sm:py-4 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center sm:justify-between items-start gap-1">
             <h2 class="text-sm font-bold text-slate-900">
                 Daftar Jadwal Asesmen ({{ $schedules->total() }})
             </h2>

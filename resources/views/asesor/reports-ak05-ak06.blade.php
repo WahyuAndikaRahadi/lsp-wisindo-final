@@ -442,21 +442,21 @@
             </div>
         @endif
 
-        <div class="flex items-center justify-between pt-4 border-t border-slate-200">
-            <a href="{{ route('asesor.schedule.ruang-uji', $schedule->id) }}" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-900">
+        <div class="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between items-stretch gap-3 pt-4 border-t border-slate-200">
+            <a href="{{ route('asesor.schedule.ruang-uji', $schedule->id) }}" class="w-full sm:w-auto text-center px-4 py-2.5 text-xs font-semibold text-slate-600 hover:text-slate-900 border border-slate-200 sm:border-0 rounded-lg">
                 Kembali
             </a>
             @if($isClosedForMe)
-                <div class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
-                    <svg class="w-4 h-4 text-emerald-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                <div class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 text-center">
+                    <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
                     @if($schedule->is_closed)
-                        <span>Jadwal Telah Resmi Ditutup & Dikunci (Read-Only)</span>
+                        <span>Jadwal Telah Resmi Ditutup &amp; Dikunci (Read-Only)</span>
                     @else
                         <span>Laporan Telah Disimpan (Selesai)</span>
                     @endif
                 </div>
             @else
-                <button type="submit" class="px-6 py-2.5 min-h-[40px] text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 rounded-lg shadow-sm transition inline-flex items-center justify-center"
+                <button type="submit" class="w-full sm:w-auto px-6 py-2.5 min-h-[40px] text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 rounded-lg shadow-sm transition inline-flex items-center justify-center text-center"
                         data-confirm="PERINGATAN KONFIRMASI LAPORAN ASESMEN:
 
 1. Seluruh rekaman penilaian dan rekomendasi asesi akan disimpan.
@@ -477,19 +477,19 @@ Apakah Anda yakin ingin menyimpan laporan FR.AK.05 & FR.AK.06 ini?"
              class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
             <div @click.away="showPenolakanModal = false"
                  class="bg-white rounded-2xl max-w-2xl w-full shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
-                <div class="px-5 py-4 border-b border-slate-200 bg-slate-50/80 flex items-center justify-between">
-                    <div>
+                <div class="px-4 sm:px-5 py-3.5 sm:py-4 border-b border-slate-200 bg-slate-50/80 flex items-start justify-between gap-3">
+                    <div class="flex-1 min-w-0">
                         <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-100 text-rose-800 uppercase">FR.AK.05</span>
                         <h3 class="text-sm sm:text-base font-bold text-slate-900 mt-0.5">Pencatatan Penolakan Hasil Asesmen</h3>
                         <p class="text-[11px] text-slate-500 mt-0.5">Pilih asesi yang menyatakan penolakan atas hasil rekomendasi untuk diberikan hak pengajuan banding resmi (FR.AK.04).</p>
                     </div>
-                    <button type="button" @click="showPenolakanModal = false" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg cursor-pointer">
+                    <button type="button" @click="showPenolakanModal = false" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg cursor-pointer shrink-0">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                     </button>
                 </div>
 
                 <div class="p-4 sm:p-5 overflow-y-auto space-y-3.5">
-                    <div class="flex items-center justify-between pb-2 border-b border-slate-200">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between items-start gap-1 pb-2 border-b border-slate-200">
                         <label class="inline-flex items-center gap-2 cursor-pointer text-xs font-bold text-slate-800">
                             <input type="checkbox"
                                    @change="toggleAllPenolakan($event)"
@@ -543,12 +543,12 @@ Apakah Anda yakin ingin menyimpan laporan FR.AK.05 & FR.AK.06 ini?"
                     @endif
                 </div>
 
-                <div class="px-5 py-3 border-t border-slate-200 bg-slate-50 flex items-center justify-between">
+                <div class="px-4 sm:px-5 py-3 border-t border-slate-200 bg-slate-50 flex flex-col sm:flex-row sm:items-center sm:justify-between items-start gap-2.5">
                     <span class="text-xs text-slate-600">
                         <strong class="text-rose-700" x-text="selectedPenolakan.length"></strong> asesi dipilih mengajukan penolakan.
                     </span>
                     <button type="button" @click="showPenolakanModal = false"
-                            class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-xs font-bold shadow-sm transition cursor-pointer">
+                            class="w-full sm:w-auto px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-xs font-bold shadow-sm transition cursor-pointer text-center">
                         Selesai Memilih
                     </button>
                 </div>

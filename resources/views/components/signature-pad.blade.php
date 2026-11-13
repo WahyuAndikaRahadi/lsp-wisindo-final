@@ -26,7 +26,7 @@
     required: @js((bool) $required)
 })" x-init="initPad()" class="w-full max-w-full sm:max-w-[340px]">
     @if($label)
-        <div class="flex items-center justify-between mb-1.5 w-full max-w-full sm:max-w-[340px]">
+        <div class="flex flex-wrap items-center justify-between gap-1.5 mb-1.5 w-full max-w-full sm:max-w-[340px]">
             <label class="block text-xs sm:text-sm font-semibold text-slate-700">
                 {{ $label }} @if($required && ! $isDisabled)<span class="text-rose-500">*</span>@endif
             </label>

@@ -86,16 +86,16 @@
                 @endphp
                 <div class="p-4 space-y-3">
                     <div class="flex items-start justify-between gap-2">
-                        <div class="flex items-center space-x-3">
+                        <div class="flex items-center space-x-3 min-w-0">
                             <div class="w-9 h-9 rounded-full bg-slate-800 text-white font-bold flex items-center justify-center text-xs shrink-0">
                                 {{ strtoupper(substr($user->full_name, 0, 2)) }}
                             </div>
-                            <div>
-                                <h3 class="font-bold text-slate-900 text-sm leading-snug">{{ $user->full_name }}</h3>
-                                <p class="text-xs font-mono text-slate-500">{{ $user->email }}</p>
+                            <div class="min-w-0">
+                                <h3 class="font-bold text-slate-900 text-sm leading-snug truncate">{{ $user->full_name }}</h3>
+                                <p class="text-xs font-mono text-slate-500 truncate">{{ $user->email }}</p>
                             </div>
                         </div>
-                        <span class="px-2 py-0.5 text-[10px] font-semibold rounded border {{ $statusBadge }}">
+                        <span class="px-2 py-0.5 text-[10px] font-semibold rounded border {{ $statusBadge }} shrink-0">
                             {{ $statusLabel }}
                         </span>
                     </div>

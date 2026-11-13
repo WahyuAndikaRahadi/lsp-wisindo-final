@@ -102,7 +102,7 @@
 
         {{-- Metadata Asesmen Grid --}}
         <div class="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
-            <div class="px-5 py-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+            <div class="px-4 sm:px-5 py-3 bg-slate-50 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center sm:justify-between items-start gap-1">
                 <span class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-2">
                     <svg class="w-4 h-4 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                     <span>Informasi Pelaksanaan Uji Demonstrasi</span>
@@ -205,7 +205,7 @@
 
             {{-- Signature Section --}}
             <div class="border-t border-slate-200 bg-slate-50/50">
-                <div class="px-6 py-3.5 bg-slate-100/80 border-b border-slate-200 flex items-center justify-between">
+                <div class="px-4 sm:px-6 py-3.5 bg-slate-100/80 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center sm:justify-between items-start gap-1">
                     <div>
                         <span class="text-xs font-bold uppercase tracking-wider text-slate-800">Persetujuan &amp; Tanda Tangan Dokumen FR.IA.02</span>
                         <p class="text-[11px] text-slate-500">Persetujuan kedua belah pihak atas pelaksanaan tugas praktik demonstrasi</p>
@@ -284,19 +284,19 @@
         </div>
 
         {{-- Action Footer Bar --}}
-        <div class="bg-white rounded-xl border border-slate-200 shadow-xs p-4 flex items-center justify-between gap-4">
-            <a href="{{ route('asesor.schedule.instrument', ['schedule' => $assessment->schedule_id, 'code' => 'ia02']) }}" class="px-4 py-2.5 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition inline-flex items-center gap-1.5">
+        <div class="bg-white rounded-xl border border-slate-200 shadow-xs p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between items-stretch gap-3">
+            <a href="{{ route('asesor.schedule.instrument', ['schedule' => $assessment->schedule_id, 'code' => 'ia02']) }}" class="w-full sm:w-auto px-4 py-2.5 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition inline-flex items-center justify-center gap-1.5 text-center">
                 <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
                 <span>Kembali ke Daftar Asesi</span>
             </a>
 
             @if($isScheduleClosed)
-                <button type="button" disabled class="px-6 py-2.5 text-xs font-bold text-slate-500 bg-slate-200 border border-slate-300 rounded-lg cursor-not-allowed flex items-center justify-center space-x-2">
+                <button type="button" disabled class="w-full sm:w-auto px-6 py-2.5 text-xs font-bold text-slate-500 bg-slate-200 border border-slate-300 rounded-lg cursor-not-allowed flex items-center justify-center space-x-2 text-center">
                     <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
                     <span>Jadwal Telah Ditutup (Read-Only)</span>
                 </button>
             @else
-                <button type="submit" class="px-6 py-2.5 text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 rounded-lg shadow-sm transition flex items-center justify-center space-x-2">
+                <button type="submit" class="w-full sm:w-auto px-6 py-2.5 text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 rounded-lg shadow-sm transition flex items-center justify-center space-x-2 text-center">
                     <span>{{ $isCompleted ? 'Perbarui Tanda Tangan FR.IA.02' : 'Simpan & Tanda Tangani FR.IA.02' }}</span>
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                 </button>

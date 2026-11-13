@@ -54,8 +54,8 @@ class AsesiRuangUjiFeatureTest extends TestCase
         $response->assertOk();
 
         // Check header and instruments
-        $response->assertSee('Instrumen Asesmen Terpilih');
-        $response->assertSee('Pilih dan kerjakan instrumen asesmen kompetensi yang telah ditetapkan untuk Anda');
+        $response->assertSee('Instrumen Asesmen');
+        $response->assertSee('Daftar instrumen asesmen yang ditetapkan untuk Anda');
 
         // Check self-actionable instruments
         $response->assertSee('FR.IA.05');

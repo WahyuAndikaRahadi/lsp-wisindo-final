@@ -149,12 +149,12 @@
 
                 {{-- a. Data Pribadi --}}
                 <div class="mb-6 bg-slate-50 p-5 rounded-xl border border-slate-200 space-y-4">
-                    <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between items-start gap-2 border-b border-slate-200 pb-2">
                         <div>
                             <h3 class="text-xs font-bold text-slate-800 uppercase tracking-wider">a. Data Pribadi</h3>
                             <p class="text-xs text-slate-500">Nilai data otomatis diambil dari profil akun Anda dan dapat diperbarui langsung.</p>
                         </div>
-                        <span class="text-[11px] font-semibold text-brand-700 bg-brand-50 px-2.5 py-1 rounded-full border border-brand-200">
+                        <span class="shrink-0 text-[11px] font-semibold text-brand-700 bg-brand-50 px-2.5 py-1 rounded-full border border-brand-200 self-start sm:self-auto">
                             Auto-fetch Profil
                         </span>
                     </div>
@@ -299,12 +299,12 @@
 
                 {{-- b. Data Pekerjaan / Sekolah / Institusi --}}
                 <div class="mb-6 bg-slate-50 p-5 rounded-xl border border-slate-200 space-y-4">
-                    <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between items-start gap-2 border-b border-slate-200 pb-2">
                         <div>
                             <h3 class="text-xs font-bold text-slate-800 uppercase tracking-wider">b. Data Pekerjaan / Sekolah / Institusi</h3>
                             <p class="text-xs text-slate-500">Nilai data otomatis diambil dari profil akun Anda dan dapat diperbarui langsung.</p>
                         </div>
-                        <span class="text-[11px] font-semibold text-brand-700 bg-brand-50 px-2.5 py-1 rounded-full border border-brand-200">
+                        <span class="shrink-0 text-[11px] font-semibold text-brand-700 bg-brand-50 px-2.5 py-1 rounded-full border border-brand-200 self-start sm:self-auto">
                             Auto-fetch Profil
                         </span>
                     </div>
@@ -371,9 +371,9 @@
 
                 {{-- Bagian 2 : Data Sertifikasi & Tujuan Asesmen --}}
                 <div class="mb-6">
-                    <div class="flex items-center justify-between mb-2">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between items-start gap-1 mb-2">
                         <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Bagian 2: Data Sertifikasi</h3>
-                        <span class="text-[11px] text-slate-400">Skema & Tujuan Asesmen</span>
+                        <span class="text-[11px] text-slate-400">Skema &amp; Tujuan Asesmen</span>
                     </div>
                     <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 space-y-4">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
@@ -388,7 +388,7 @@
                         </div>
 
                         <div class="border-t border-slate-200/80 pt-3">
-                            <label for="tujuan_asesmen" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+                            <label for="tujuan_asesmen" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5 flex flex-col sm:flex-row sm:items-center sm:justify-between items-start gap-1">
                                 <span>Tujuan Asesmen <span class="text-rose-500">*</span></span>
                                 <span class="text-[11px] text-slate-500 font-normal lowercase">Pilih tujuan asesmen sesuai permohonan</span>
                             </label>
@@ -421,9 +421,9 @@
                 @endphp
                 @if($scheduleAssessors->isNotEmpty())
                     <div class="mt-4 p-4 rounded-xl border border-indigo-100 bg-indigo-50/50 mb-6">
-                        <label class="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+                        <label class="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-1.5 flex flex-col sm:flex-row sm:items-center sm:justify-between items-start gap-1">
                             <span>Pilih Asesor Penguji <span class="text-rose-500">*</span></span>
-                            <span class="text-[11px] text-slate-500 font-normal lowercase">Asesor yang akan memverifikasi berkas & menguji Anda</span>
+                            <span class="text-[11px] text-slate-500 font-normal lowercase">Asesor yang akan memverifikasi berkas &amp; menguji Anda</span>
                         </label>
                         <select name="assessor_id" required class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 bg-white text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none" @disabled($isAplLocked)>
                             <option value="">-- Pilih Salah Satu Asesor Penguji --</option>
@@ -448,13 +448,13 @@
 
                     {{-- Bukti Persyaratan Dasar (Minimal 1 dari 4) --}}
                     <div class="mb-6 p-4 rounded-xl border border-indigo-100 bg-indigo-50/50">
-                        <div class="flex items-center justify-between mb-3">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between items-start gap-2 mb-3">
                             <h4 class="text-sm font-bold text-indigo-900 flex items-center gap-2">
                                 <span class="w-6 h-6 rounded-full bg-indigo-600 text-white text-xs flex items-center justify-center font-bold">1</span>
                                 Bukti Persyaratan Dasar
                             </h4>
-                            <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-800">
-                                Wajib pilih & upload minimal 1 opsi
+                            <span class="shrink-0 text-xs font-semibold px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-800 self-start sm:self-auto">
+                                Wajib pilih &amp; upload minimal 1 opsi
                             </span>
                         </div>
 
@@ -499,12 +499,12 @@
 
                     {{-- Bukti Administratif (Wajib Keduanya) --}}
                     <div class="p-4 rounded-xl border border-amber-100 bg-amber-50/50">
-                        <div class="flex items-center justify-between mb-3">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between items-start gap-2 mb-3">
                             <h4 class="text-sm font-bold text-amber-900 flex items-center gap-2">
                                 <span class="w-6 h-6 rounded-full bg-amber-600 text-white text-xs flex items-center justify-center font-bold">2</span>
                                 Bukti Administratif
                             </h4>
-                            <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800">
+                            <span class="shrink-0 text-xs font-semibold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 self-start sm:self-auto">
                                 Wajib diunggah keduanya
                             </span>
                         </div>

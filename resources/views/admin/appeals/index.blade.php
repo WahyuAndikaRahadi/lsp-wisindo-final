@@ -254,12 +254,12 @@
                             {{-- 4. Cross-Reference Umpan Balik FR.AK.03 Asesi --}}
                             @if($ak03Item)
                                 <div class="p-3.5 rounded-xl bg-indigo-50/70 border border-indigo-200 text-xs space-y-2">
-                                    <div class="flex items-center justify-between">
+                                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between items-start gap-1">
                                         <span class="font-bold text-indigo-950 flex items-center gap-1.5">
-                                            <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                                            <svg class="w-4 h-4 text-indigo-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
                                             <span>Cross-Check: Asesi Mengisi FR.AK.03 (Umpan Balik)</span>
                                         </span>
-                                        <button type="button" @click="activeTab = 'feedbacks'" class="text-[11px] font-bold text-indigo-700 hover:underline">
+                                        <button type="button" @click="activeTab = 'feedbacks'" class="text-[11px] font-bold text-indigo-700 hover:underline shrink-0">
                                             Buka di Tab Umpan Balik &rarr;
                                         </button>
                                     </div>

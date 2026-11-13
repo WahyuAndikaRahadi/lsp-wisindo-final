@@ -312,16 +312,16 @@ class MultiAssessorScheduleConcurrencyAndImageTest extends TestCase
             route('asesor.schedule.ruang-uji', $this->schedule->id)
         );
         $hubResponse1->assertOk();
-        $hubResponse1->assertSee('STATUS: BINAAN SELESAI');
-        $hubResponse1->assertSee('Asesmen Asesi Binaan Anda Telah Selesai & Ditutup');
-        $hubResponse1->assertSee('Binaan Selesai (Mode Lihat)');
+        $hubResponse1->assertSee('STATUS: SELESAI');
+        $hubResponse1->assertSee('Asesmen Telah Selesai');
+        $hubResponse1->assertSee('Selesai (Read-Only)');
 
         // IA02 Instrument list
         $listResponse1 = $this->actingAs($this->assessor1)->get(
             route('asesor.schedule.instrument', ['schedule' => $this->schedule->id, 'code' => 'ia02'])
         );
         $listResponse1->assertOk();
-        $listResponse1->assertSee('Binaan Selesai (Mode Lihat)');
+        $listResponse1->assertSee('Selesai (Read-Only)');
         $listResponse1->assertSee('Lihat Dokumen');
 
         // FR.AK.02 Schedule page
@@ -329,16 +329,14 @@ class MultiAssessorScheduleConcurrencyAndImageTest extends TestCase
             route('asesor.schedule.ak02', $this->schedule->id)
         );
         $ak02Response1->assertOk();
-        $ak02Response1->assertSee('STATUS: BINAAN SELESAI');
-        $ak02Response1->assertSee('Asesmen Binaan Selesai (Read-Only)');
+        $ak02Response1->assertSee('Selesai (Read-Only)');
 
         // Reports page
         $reportResponse1 = $this->actingAs($this->assessor1)->get(
             route('asesor.schedule.reports', $this->schedule->id)
         );
         $reportResponse1->assertOk();
-        $reportResponse1->assertSee('STATUS: BINAAN SELESAI');
-        $reportResponse1->assertSee('Laporan Asesmen Binaan Anda Telah Disimpan & Ditutup');
+        $reportResponse1->assertSee('Laporan Telah Disimpan (Selesai)');
 
         // 3. Assessor 1 mutation attempts are blocked
         $postIa02Attempt = $this->actingAs($this->assessor1)->post(

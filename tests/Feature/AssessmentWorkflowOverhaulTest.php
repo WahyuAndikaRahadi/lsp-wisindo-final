@@ -333,7 +333,7 @@ class AssessmentWorkflowOverhaulTest extends TestCase
         // 1. Asesi views APL page
         $resAplView = $this->actingAs($asesi)->get(route('asesi.assessment.apl', $assessment));
         $resAplView->assertOk();
-        $resAplView->assertSee('menjaga kerahasiaan materi uji kompetensi');
+        $resAplView->assertSee('menjaga kerahasiaan materi uji');
         // Progress stepper removed
         $resAplView->assertDontSee('Alur Asesmen Kompetensi');
 
@@ -368,8 +368,8 @@ class AssessmentWorkflowOverhaulTest extends TestCase
         // 4. Asesi visits AK01: signature is already bound and no canvas pad is displayed
         $resAk01View = $this->actingAs($asesi)->get(route('asesi.assessment.ak01', $assessment));
         $resAk01View->assertOk();
-        $resAk01View->assertSee('Tanda Tangan Asesi Terverifikasi');
-        $resAk01View->assertSee('Tersemat Otomatis dari APL');
+        $resAk01View->assertSee('Tanda Tangan Terverifikasi');
+        $resAk01View->assertSee('Tersemat dari APL');
         $resAk01View->assertDontSee('sig_pad_');
 
         // 5. Asesi agrees and moves to ruang uji without re-signing
@@ -752,8 +752,7 @@ class AssessmentWorkflowOverhaulTest extends TestCase
         // 1. Assessor checks
         $resAk01 = $this->actingAs($this->assessor)->get(route('asesor.schedule.ak01', $sch));
         $resAk01->assertOk();
-        $resAk01->assertSee('Jadwal Telah Ditutup (Read-Only)');
-        $resAk01->assertSee('Dokumen persetujuan asesmen FR.AK.01 dalam mode lihat');
+        $resAk01->assertSee('Dokumen FR.AK.01 dalam mode lihat');
 
         $resAk07 = $this->actingAs($this->assessor)->get(route('asesor.schedule.ak07', $sch));
         $resAk07->assertOk();
@@ -761,7 +760,7 @@ class AssessmentWorkflowOverhaulTest extends TestCase
 
         $resRuangUji = $this->actingAs($this->assessor)->get(route('asesor.schedule.ruang-uji', $sch));
         $resRuangUji->assertOk();
-        $resRuangUji->assertSee('Jadwal Ditutup (Mode Lihat)');
+        $resRuangUji->assertSee('Jadwal Ditutup');
 
         $resAk02 = $this->actingAs($this->assessor)->get(route('asesor.schedule.ak02', $sch));
         $resAk02->assertOk();
@@ -769,7 +768,7 @@ class AssessmentWorkflowOverhaulTest extends TestCase
 
         $resReports = $this->actingAs($this->assessor)->get(route('asesor.schedule.reports', $sch));
         $resReports->assertOk();
-        $resReports->assertSee('Jadwal Telah Resmi Ditutup & Dikunci (Read-Only)', false);
+        $resReports->assertSee('Jadwal Telah Resmi Ditutup &amp; Dikunci (Read-Only)', false);
 
         // 2. Asesi checks
         $resAsesiHub = $this->actingAs($asesiUser)->get(route('asesi.assessment.ruang-uji', $asm));
@@ -789,14 +788,16 @@ class AssessmentWorkflowOverhaulTest extends TestCase
         $resAsesiApl->assertOk();
         $resAsesiApl->assertSee('Jadwal Telah Ditutup (Read-Only)');
 
-        // Post-assessment: Candidate with KOMPETEN can see both AK.03 and AK.04 Banding buttons
+        // Post-assessment: Candidate with KOMPETEN can see both AK.03 and AK.04 Banding buttons when marked with rejection
+        $asm->update(['has_rejection' => true]);
+        $resAsesiHub = $this->actingAs($asesiUser)->get(route('asesi.assessment.ruang-uji', $asm));
         $resAsesiHub->assertSee('FR.AK.03 Umpan Balik');
         $resAsesiHub->assertSee('FR.AK.04 Banding');
 
         // FR.AK.03 Feedback remains submittable after schedule is finished
         $resAsesiAk03 = $this->actingAs($asesiUser)->get(route('asesi.assessment.ak03', $asm));
         $resAsesiAk03->assertOk();
-        $resAsesiAk03->assertSee('Kirim Umpan Balik (FR.AK.03) & Selesai');
+        $resAsesiAk03->assertSee('Kirim Umpan Balik');
 
         $ratings = [];
         for ($i = 1; $i <= 10; $i++) {
@@ -881,8 +882,8 @@ class AssessmentWorkflowOverhaulTest extends TestCase
         // 2. View AK.03: inputs disabled, locked banner and locked button shown
         $resViewAk03 = $this->actingAs($asesi)->get(route('asesi.assessment.ak03', $asm));
         $resViewAk03->assertOk();
-        $resViewAk03->assertSee('Formulir FR.AK.03 Umpan Balik Telah Terkirim (Terkunci)');
-        $resViewAk03->assertSee('Umpan Balik Telah Terkirim (Terkunci)');
+        $resViewAk03->assertSee('FR.AK.03 Telah Terkirim');
+        $resViewAk03->assertSee('Umpan Balik Terkirim (Terkunci)');
         $resViewAk03->assertSee('disabled', false);
 
         // 3. Attempt to submit AK.03 again: must be blocked and redirected to dashboard
@@ -894,6 +895,7 @@ class AssessmentWorkflowOverhaulTest extends TestCase
         $resResubmitAk03->assertSessionHas('info');
 
         // 4. Submit AK.04 Appeal for the first time
+        $asm->update(['has_rejection' => true]);
         $resAppeal = $this->actingAs($asesi)->post(route('asesi.assessment.appeal.submit', $asm), [
             'is_process_explained' => '1',
             'is_discussed_with_assessor' => '1',

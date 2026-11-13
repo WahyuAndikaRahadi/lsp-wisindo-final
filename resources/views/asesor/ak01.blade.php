@@ -193,7 +193,7 @@
                         </p>
                     </div>
                     <div class="md:col-span-8 p-4 md:p-5 bg-white space-y-3">
-                        <div class="flex items-center justify-between pb-2 border-b border-slate-200">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between items-start gap-1 pb-2 border-b border-slate-200">
                             <label class="inline-flex items-center gap-2 {{ $isClosedForMe ? 'cursor-default' : 'cursor-pointer' }} text-xs font-bold text-slate-800">
                                 <input type="checkbox" id="check-all-asesi" checked @disabled($isClosedForMe) class="rounded border-slate-300 text-brand-600 focus:ring-brand-500 w-4 h-4">
                                 <span>Pilih Semua Asesi ({{ $assessments->count() }})</span>
@@ -480,7 +480,7 @@
                     {{-- Left: Asesor Signature --}}
                     <div class="p-5 flex flex-col justify-between space-y-3">
                         <div>
-                            <div class="flex items-center justify-between">
+                            <div class="flex flex-wrap items-center justify-between gap-1.5">
                                 <span class="font-bold text-slate-900 text-xs">Tanda Tangan Asesor</span>
                                 <span class="text-slate-500 text-[11px]">Tanggal: <strong>{{ \Carbon\Carbon::parse($jadwal->date)->isoFormat('D MMMM Y') }}</strong></span>
                             </div>
@@ -505,7 +505,7 @@
                     {{-- Right: Asesi Signature --}}
                     <div class="p-5 flex flex-col justify-between space-y-3">
                         <div>
-                            <div class="flex items-center justify-between">
+                            <div class="flex flex-wrap items-center justify-between gap-1.5">
                                 <span class="font-bold text-slate-900 text-xs">Tanda Tangan Asesi</span>
                                 <span class="text-slate-500 text-[11px]">Tanggal: <strong>{{ \Carbon\Carbon::parse($jadwal->date)->isoFormat('D MMMM Y') }}</strong></span>
                             </div>

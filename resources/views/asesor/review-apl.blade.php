@@ -95,23 +95,23 @@
 
     {{-- BAGIAN 1: FR.APL.01 DATA PEMOHON & BUKTI PENDUKUNG (VIEW ONLY) --}}
     <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-        <div class="bg-gradient-to-r from-slate-800 to-slate-900 px-6 py-4 flex items-center justify-between text-white">
+        <div class="bg-gradient-to-r from-slate-800 to-slate-900 px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between items-start gap-2.5 text-white">
             <div>
                 <h2 class="text-base font-bold flex items-center gap-2">
                     <span class="px-2 py-0.5 rounded bg-white/20 text-xs font-mono">FR.APL.01</span>
                     PERMOHONAN SERTIFIKASI KOMPETENSI
                 </h2>
-                <p class="text-xs text-slate-300">Bagian 1: Rincian Data Pribadi & Administratif Asesi (View Only)</p>
+                <p class="text-xs text-slate-300">Bagian 1: Rincian Data Pribadi &amp; Administratif Asesi (View Only)</p>
             </div>
-            <span class="text-xs bg-white/10 text-slate-200 px-3 py-1 rounded font-semibold border border-white/10">
+            <span class="text-xs bg-white/10 text-slate-200 px-3 py-1 rounded font-semibold border border-white/10 self-start sm:self-auto">
                 Mode Tinjauan Asesor
             </span>
         </div>
 
-        <div class="p-6 space-y-6">
+        <div class="p-4 sm:p-6 space-y-6">
             {{-- a. Data Pribadi --}}
             <div>
-                <div class="flex items-center justify-between mb-2">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between items-start gap-1 mb-2">
                     <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider">a. Data Pribadi</h3>
                     <span class="text-[11px] text-slate-400">Data bersumber dari profil akun asesi</span>
                 </div>
@@ -153,7 +153,7 @@
 
             {{-- b. Data Pekerjaan / Sekolah / Institusi --}}
             <div>
-                <div class="flex items-center justify-between mb-2">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between items-start gap-1 mb-2">
                     <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider">b. Data Pekerjaan / Sekolah / Institusi</h3>
                     <span class="text-[11px] text-slate-400">Data bersumber dari profil akun asesi</span>
                 </div>
@@ -179,9 +179,9 @@
 
             {{-- Data Sertifikasi & Tujuan Asesmen --}}
             <div>
-                <div class="flex items-center justify-between mb-2">
-                    <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Bagian 2: Data Sertifikasi & Tujuan Asesmen</h3>
-                    <span class="text-[11px] text-slate-400">Skema & Pilihan Pemohon</span>
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between items-start gap-1 mb-2">
+                    <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Bagian 2: Data Sertifikasi &amp; Tujuan Asesmen</h3>
+                    <span class="text-[11px] text-slate-400">Skema &amp; Pilihan Pemohon</span>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm bg-slate-50 p-4 rounded-xl border border-slate-200">
                     <div>
@@ -210,12 +210,12 @@
 
                 {{-- 1. Bukti Persyaratan Dasar --}}
                 <div class="mb-6 p-4 rounded-xl border border-indigo-100 bg-indigo-50/40">
-                    <div class="flex items-center justify-between mb-3">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between items-start gap-1.5 mb-3">
                         <h4 class="text-sm font-bold text-indigo-900 flex items-center gap-2">
                             <span class="w-5 h-5 rounded-full bg-indigo-600 text-white text-xs flex items-center justify-center font-bold">1</span>
                             Bukti Persyaratan Dasar (Minimal 1 Opsi Terpenuhi)
                         </h4>
-                        <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-800">
+                        <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-800 self-start sm:self-auto">
                             Persyaratan Kompetensi
                         </span>
                     </div>
@@ -305,12 +305,12 @@
 
                 {{-- 2. Bukti Administratif (KTP & Pas Foto) --}}
                 <div class="p-4 rounded-xl border border-amber-100 bg-amber-50/40">
-                    <div class="flex items-center justify-between mb-3">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between items-start gap-1.5 mb-3">
                         <h4 class="text-sm font-bold text-amber-900 flex items-center gap-2">
                             <span class="w-5 h-5 rounded-full bg-amber-600 text-white text-xs flex items-center justify-center font-bold">2</span>
                             Bukti Administratif (Wajib Dilampirkan)
                         </h4>
-                        <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">
+                        <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 self-start sm:self-auto">
                             Wajib Terpenuhi
                         </span>
                     </div>
@@ -603,12 +603,12 @@
         decision: '{{ in_array($assessment->apl_status, ['APPROVED', 'REVISION_REQUESTED', 'REJECTED']) ? $assessment->apl_status : 'APPROVED' }}',
         notes: '{{ addslashes($assessment->apl_revision_notes ?? '') }}'
     }">
-        <div class="bg-gradient-to-r from-lsp-navy to-lsp-navy-dark px-6 py-4 text-white flex items-center justify-between">
+        <div class="bg-gradient-to-r from-lsp-navy to-lsp-navy-dark px-4 sm:px-6 py-4 text-white flex flex-col sm:flex-row sm:items-center sm:justify-between items-start gap-2">
             <div>
                 <h3 class="text-base font-bold">Formulir Keputusan Review APL (Asesor)</h3>
                 <p class="text-xs text-slate-200">Tetapkan kelayakan asesi untuk mengikuti proses asesmen kompetensi</p>
             </div>
-            <span class="text-xs bg-lsp-red px-2.5 py-1 rounded font-bold text-white shadow-sm">
+            <span class="text-xs bg-lsp-red px-2.5 py-1 rounded font-bold text-white shadow-sm self-start sm:self-auto">
                 Aksi Keputusan
             </span>
         </div>
@@ -746,7 +746,7 @@
                     </div>
                 </template>
             </div>
-            <div class="px-6 py-3 bg-white border-t border-slate-200 flex items-center justify-between">
+            <div class="px-4 sm:px-6 py-3 bg-white border-t border-slate-200 flex flex-col sm:flex-row sm:items-center sm:justify-between items-start gap-2">
                 <span class="text-xs text-slate-500">Pratinjau Langsung Tanpa Tab Baru</span>
                 <div class="flex items-center gap-3">
                     <a :href="modalSrc" target="_blank" class="text-xs font-bold text-indigo-600 hover:text-indigo-800">

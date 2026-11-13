@@ -237,7 +237,7 @@ class IdempotencyAndStatusGuardTest extends TestCase
         $asesi = $f['asesi'];
         $assessment = $f['assessment'];
 
-        $assessment->update(['final_result' => 'BELUM_KOMPETEN']);
+        $assessment->update(['final_result' => 'BELUM_KOMPETEN', 'has_rejection' => true]);
 
         // First appeal succeeds
         $resBk = $this->actingAs($asesi)->post(route('asesi.assessment.appeal.submit', $assessment), [

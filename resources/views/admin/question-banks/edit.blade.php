@@ -59,12 +59,12 @@
             <div>
                 <label class="block text-sm font-semibold text-slate-700 mb-1">Gambar Pendukung Soal (Opsional)</label>
                 @if($questionBank->question_image)
-                    <div class="mb-3 p-3 bg-slate-50 border border-slate-200 rounded-lg flex items-center justify-between gap-4">
-                        <div class="flex items-center space-x-3">
-                            <img src="{{ $questionBank->image_url ?? asset('storage/' . $questionBank->question_image) }}" alt="Preview Soal" class="h-20 w-auto object-contain rounded border border-slate-300">
-                            <span class="text-xs text-slate-600 font-mono">{{ $questionBank->question_image }}</span>
+                    <div class="mb-3 p-3 bg-slate-50 border border-slate-200 rounded-lg flex flex-col sm:flex-row sm:items-center sm:justify-between items-start gap-3">
+                        <div class="flex items-center space-x-3 min-w-0">
+                            <img src="{{ $questionBank->image_url ?? asset('storage/' . $questionBank->question_image) }}" alt="Preview Soal" class="h-20 w-auto object-contain rounded border border-slate-300 shrink-0">
+                            <span class="text-xs text-slate-600 font-mono truncate">{{ $questionBank->question_image }}</span>
                         </div>
-                        <label class="inline-flex items-center space-x-1.5 text-xs font-semibold text-rose-700 cursor-pointer">
+                        <label class="inline-flex items-center space-x-1.5 text-xs font-semibold text-rose-700 cursor-pointer shrink-0">
                             <input type="checkbox" name="remove_image" value="1" class="rounded border-rose-300 text-rose-600 focus:ring-rose-500">
                             <span>Hapus Gambar</span>
                         </label>

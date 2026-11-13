@@ -83,31 +83,31 @@
     {{-- Recent Schedules & Quick Actions --}}
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div class="lg:col-span-2 bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-            <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+            <div class="px-4 sm:px-6 py-4 border-b border-slate-200 flex items-center justify-between gap-3">
                 <div>
                     <h2 class="text-base font-bold text-slate-900">Jadwal Asesmen Terkini</h2>
                     <p class="text-xs text-slate-500">Daftar jadwal aktif terbaru dalam sistem</p>
                 </div>
-                <a href="{{ route('admin.jadwal.index') }}" class="text-xs font-semibold text-brand-600 hover:text-brand-700">
+                <a href="{{ route('admin.jadwal.index') }}" class="text-xs font-semibold text-brand-600 hover:text-brand-700 shrink-0">
                     Lihat Semua &rarr;
                 </a>
             </div>
 
             <div class="divide-y divide-slate-100">
                 @forelse($recentSchedules ?? [] as $sch)
-                    <div class="p-4 hover:bg-slate-50/60 transition flex items-center justify-between gap-4">
+                    <div class="p-4 hover:bg-slate-50/60 transition flex flex-col sm:flex-row sm:items-center sm:justify-between items-start gap-2.5">
                         <div class="space-y-1">
                             <div class="flex items-center space-x-2">
                                 <span class="font-mono text-xs font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-700">{{ $sch->code }}</span>
                                 <h3 class="text-sm font-bold text-slate-900">{{ $sch->name ?? $sch->scheme->name }}</h3>
                             </div>
-                            <div class="text-xs text-slate-500 flex items-center space-x-3">
+                            <div class="text-xs text-slate-500 flex flex-wrap items-center gap-2">
                                 <span>TUK: {{ $sch->tuk_name }}</span>
                                 <span>&bull;</span>
                                 <span>{{ \Carbon\Carbon::parse($sch->date)->isoFormat('D MMM Y') }}</span>
                             </div>
                         </div>
-                        <a href="{{ route('admin.jadwal.show', $sch->id) }}" class="text-xs font-bold text-brand-600 hover:text-brand-700">
+                        <a href="{{ route('admin.jadwal.show', $sch->id) }}" class="text-xs font-bold text-brand-600 hover:text-brand-700 self-end sm:self-auto shrink-0">
                             Kelola &rarr;
                         </a>
                     </div>

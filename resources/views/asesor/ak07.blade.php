@@ -135,7 +135,7 @@
 
         {{-- Meta Table --}}
         <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-            <div class="bg-slate-900 text-white px-6 py-3 border-b border-slate-800 flex items-center justify-between">
+            <div class="bg-slate-900 text-white px-4 sm:px-6 py-3 border-b border-slate-800 flex flex-col sm:flex-row sm:items-center sm:justify-between items-start gap-1">
                 <span class="text-xs font-mono font-bold tracking-wider uppercase text-amber-300">Data Asesmen & Identifikasi Jadwal</span>
                 <span class="text-xs text-slate-300">{{ $jadwal->code }}</span>
             </div>
@@ -155,7 +155,7 @@
 
                 {{-- Pilih Asesi Sasaran (Batch) --}}
                 <div class="mt-4 pt-4 border-t border-slate-200">
-                    <div class="flex items-center justify-between mb-2">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between items-start gap-1 mb-2">
                         <label class="block text-xs font-bold text-slate-800 uppercase tracking-wider">
                             Asesi yang Diberikan Penyesuaian (Pilih Asesi):
                         </label>
@@ -281,7 +281,7 @@
 
         {{-- Tabel 8 Karakteristik Asesi Sesuai Dokumen MUK PDF --}}
         <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-            <div class="bg-slate-900 text-white px-6 py-3 border-b border-slate-800 flex items-center justify-between">
+            <div class="bg-slate-900 text-white px-4 sm:px-6 py-3 border-b border-slate-800 flex flex-col sm:flex-row sm:items-center sm:justify-between items-start gap-1">
                 <h2 class="text-xs font-black uppercase tracking-wider text-amber-300">
                     Mengidentifikasi Persyaratan Modifikasi dan Kontekstualisasi (Karakteristik Asesi)
                 </h2>
