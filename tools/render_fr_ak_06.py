@@ -399,30 +399,53 @@ def render_page_1(c, data):
     c.drawCentredString((sub_cols_t1[2] + sub_cols_t1[3]) / 2, Y(top_t1 + 24.5), "Fleksibel")
     c.drawCentredString((sub_cols_t1[3] + sub_cols_t1[4]) / 2, Y(top_t1 + 24.5), "Adil")
 
-    # Table 1 Items
+    # Table 1 Items: (label, is_bold, disabled_cols)
+    # disabled_cols is list of column indices (0: Validitas, 1: Reliabel, 2: Fleksibel, 3: Adil)
     items_t1 = [
-        ("Prosedur asesmen:", True),
-        ("  • Rencana asesmen", False),
-        ("  • Persiapan asesmen", False),
-        ("  • Implementasi asesmen", False),
-        ("  • Keputusan asesmen", False),
-        ("  • Umpan balik asesmen", False),
+        ("Prosedur asesmen:", True, []),
+        ("  • Rencana asesmen", False, []),
+        ("  • Persiapan asesmen", False, []),
+        ("  • Implementasi asesmen", False, []),
+        ("  • Keputusan asesmen", False, [2]),
+        ("  • Umpan balik asesmen", False, [2]),
     ]
 
     curr_row_y = top_t1 + h_hdr_t1
-    for idx, (label, is_bold) in enumerate(items_t1):
+    for idx, (label, is_bold, disabled_cols) in enumerate(items_t1):
         y_bot = curr_row_y + h_row_t1
-        c.line(x0, Y(y_bot), x1, Y(y_bot))
 
+        # Blacken disabled columns (e.g. Fleksibel on Keputusan & Umpan Balik)
+        for col_idx in disabled_cols:
+            c.saveState()
+            c.setFillColor(HexColor("#262626"))
+            c.rect(
+                sub_cols_t1[col_idx],
+                Y(y_bot),
+                sub_cols_t1[col_idx + 1] - sub_cols_t1[col_idx],
+                h_row_t1,
+                fill=1,
+                stroke=0,
+            )
+            c.restoreState()
+
+        # Grid borders for this row
+        c.setStrokeColor(HexColor("#1a1a1a"))
+        c.setLineWidth(0.6)
+        c.line(x0, Y(y_bot), x1, Y(y_bot))
+        for sc in sub_cols_t1:
+            c.line(sc, Y(curr_row_y), sc, Y(y_bot))
+
+        # Row label
         font_item = "Lib-B" if is_bold else "Lib"
         c.setFont(font_item, 8.2)
         c.drawString(x0 + 8.0, Y(curr_row_y + 11.5), label)
 
-        # Draw 4 checked checkboxes
+        # Draw checkboxes with checkmarks for enabled columns (Validitas, Reliabel, Adil)
         mid_y = curr_row_y + h_row_t1 / 2
         for col_idx in range(4):
-            cx = (sub_cols_t1[col_idx] + sub_cols_t1[col_idx + 1]) / 2
-            draw_cb(c, cx, Y(mid_y), True, sz=8.5)
+            if col_idx not in disabled_cols:
+                cx = (sub_cols_t1[col_idx] + sub_cols_t1[col_idx + 1]) / 2
+                draw_cb(c, cx, Y(mid_y), True, sz=8.5)
 
         curr_row_y = y_bot
 
