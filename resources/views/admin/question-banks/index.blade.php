@@ -154,7 +154,7 @@
             </div>
 
             {{-- Filter & Search Form --}}
-            <form action="{{ route('admin.question-banks.index') }}#daftar-butir" method="GET" class="flex flex-wrap items-center gap-2">
+            <form action="{{ route('admin.question-banks.index') }}#daftar-butir" method="GET" data-ajax-filter="questions" data-no-loading="true" class="flex flex-wrap items-center gap-2">
                 <select name="scheme_id" onchange="this.form.submit()" class="text-xs px-3 py-1.5 rounded-lg border border-slate-300 bg-white text-slate-700 focus:ring-brand-500">
                     <option value="">-- Semua Skema Sertifikasi --</option>
                     @foreach($schemes as $s)
@@ -197,190 +197,15 @@
                     Cari
                 </button>
 
-                @if($selectedSchemeId || $selectedUnitId || $search || ($sort ?? 'asc') !== 'asc' || ($perPage ?? 15) != ($selectedSchemeId ? 50 : 15))
-                    <a href="{{ route('admin.question-banks.index') }}#daftar-butir" class="px-2.5 py-1.5 text-xs text-slate-600 hover:text-slate-900 bg-slate-100 rounded-lg">
-                        Reset Filter
-                    </a>
-                @endif
+                <a href="{{ route('admin.question-banks.index') }}#daftar-butir" data-ajax-reset="questions" class="px-2.5 py-1.5 text-xs text-slate-600 hover:text-slate-900 bg-slate-100 rounded-lg {{ ($selectedSchemeId || $selectedUnitId || $search || ($sort ?? 'asc') !== 'asc' || ($perPage ?? 15) != ($selectedSchemeId ? 50 : 15)) ? '' : 'hidden' }}">
+                    Reset Filter
+                </a>
             </form>
         </div>
 
         {{-- Questions List (Responsive: Cards on Mobile, Table on Desktop) --}}
-        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-            {{-- Mobile Cards (< md) --}}
-            <div class="block md:hidden divide-y divide-slate-100">
-                @forelse($questions as $index => $q)
-                    <div class="p-4 space-y-3">
-                        <div class="flex items-start justify-between gap-2">
-                            <span class="font-mono text-xs font-bold text-slate-500">
-                                #{{ $questions->firstItem() + $index }} <span class="text-[10px] text-slate-400 font-normal">(ID: {{ $q->id }})</span>
-                            </span>
-                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
-                                Kunci: {{ $q->correct_answer }}
-                            </span>
-                        </div>
-
-                        <div class="space-y-2">
-                            <p class="font-semibold text-slate-900 text-xs sm:text-sm leading-relaxed">{{ $q->question_text }}</p>
-                            
-                            @if($q->question_image || $q->option_a_image || $q->option_b_image || $q->option_c_image || $q->option_d_image)
-                                <div class="flex items-center gap-2 flex-wrap">
-                                    @if($q->question_image)
-                                        <a href="{{ $q->image_url ?? asset('storage/' . $q->question_image) }}" target="_blank" class="inline-flex items-center gap-1 text-[11px] font-bold text-purple-700 bg-purple-50 px-2 py-1 rounded border border-purple-200 hover:bg-purple-100">
-                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                                            <span>Lihat Gambar Soal</span>
-                                        </a>
-                                    @endif
-                                    @if($q->option_a_image || $q->option_b_image || $q->option_c_image || $q->option_d_image)
-                                        <span class="inline-flex items-center gap-1 text-[11px] font-bold text-teal-700 bg-teal-50 px-2 py-1 rounded border border-teal-200">
-                                            Opsi Bergambar
-                                        </span>
-                                    @endif
-                                </div>
-                            @endif
-
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-1 text-[11px] text-slate-600 bg-slate-50 p-2.5 rounded-lg border border-slate-100">
-                                <span class="{{ $q->correct_answer === 'A' ? 'font-bold text-emerald-700' : '' }}">A: {{ Str::limit($q->option_a, 50) }}</span>
-                                <span class="{{ $q->correct_answer === 'B' ? 'font-bold text-emerald-700' : '' }}">B: {{ Str::limit($q->option_b, 50) }}</span>
-                                <span class="{{ $q->correct_answer === 'C' ? 'font-bold text-emerald-700' : '' }}">C: {{ Str::limit($q->option_c, 50) }}</span>
-                                <span class="{{ $q->correct_answer === 'D' ? 'font-bold text-emerald-700' : '' }}">D: {{ Str::limit($q->option_d, 50) }}</span>
-                            </div>
-                        </div>
-
-                        <div class="text-[11px] text-slate-500 pt-1 border-t border-slate-100">
-                            <span class="text-slate-400 font-mono">{{ $q->competencyUnit?->code ?? 'Umum' }}:</span>
-                            <span class="text-slate-700 font-medium">{{ Str::limit($q->competencyUnit?->title ?? $q->scheme->name, 45) }}</span>
-                        </div>
-
-                        <div class="grid grid-cols-3 gap-2 pt-1">
-                            <a href="{{ route('admin.question-banks.show', $q->id) }}" class="px-2.5 py-2 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg text-center transition flex items-center justify-center min-h-[38px]">
-                                Detail
-                            </a>
-                            <a href="{{ route('admin.question-banks.edit', $q->id) }}" class="px-2.5 py-2 text-xs font-bold text-brand-700 bg-brand-50 hover:bg-brand-100 border border-brand-200 rounded-lg text-center transition flex items-center justify-center min-h-[38px]">
-                                Edit
-                            </a>
-                            <form action="{{ route('admin.question-banks.destroy', $q->id) }}" method="POST"
-                                  data-confirm="Apakah Anda yakin ingin menghapus butir soal ini?"
-                                  data-confirm-title="Hapus Butir Soal"
-                                  data-confirm-danger="true"
-                                  class="inline w-full">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="w-full px-2.5 py-2 text-xs font-bold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-lg text-center transition flex items-center justify-center min-h-[38px]">
-                                    Hapus
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                @empty
-                    <div class="p-8 text-center text-slate-500 text-xs">
-                        Tidak ada butir soal yang sesuai dengan kriteria pencarian / filter.
-                    </div>
-                @endforelse
-            </div>
-
-            {{-- Desktop Table (md+) --}}
-            <div class="hidden md:block overflow-x-auto">
-                <table class="w-full text-xs">
-                    <thead class="bg-slate-50 text-left text-[11px] font-semibold text-slate-600 uppercase tracking-wider">
-                        <tr>
-                            <th class="px-4 py-3 text-center w-12">No</th>
-                            <th class="px-4 py-3">Teks Pertanyaan</th>
-                            <th class="px-4 py-3">Skema &amp; Unit</th>
-                            <th class="px-3 py-3 text-center w-24">Kunci</th>
-                            <th class="px-4 py-3 text-right w-36">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-100">
-                        @forelse($questions as $index => $q)
-                            <tr class="hover:bg-slate-50/70 transition">
-                                <td class="px-4 py-3 text-center font-mono">
-                                    <div class="font-bold text-slate-800 text-xs">
-                                        {{ $questions->firstItem() + $index }}
-                                    </div>
-                                    <span class="text-[10px] text-slate-400 block font-normal">#{{ $q->id }}</span>
-                                </td>
-                                <td class="px-4 py-3">
-                                    <div class="space-y-1.5">
-                                        <p class="font-semibold text-slate-900 leading-relaxed">{{ $q->question_text }}</p>
-                                        <div class="flex items-center gap-2 flex-wrap">
-                                            @if($q->question_image)
-                                                <span class="inline-flex items-center gap-1 text-[10px] font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded border border-purple-200">
-                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                                                    Gambar Soal
-                                                </span>
-                                                <a href="{{ $q->image_url ?? asset('storage/' . $q->question_image) }}" target="_blank" class="text-[11px] text-brand-600 hover:underline">
-                                                    Lihat Gambar &rarr;
-                                                </a>
-                                            @endif
-                                            @if($q->option_a_image || $q->option_b_image || $q->option_c_image || $q->option_d_image)
-                                                <span class="inline-flex items-center gap-1 text-[10px] font-bold text-teal-700 bg-teal-50 px-2 py-0.5 rounded border border-teal-200">
-                                                    Opsi Bergambar
-                                                </span>
-                                            @endif
-                                        </div>
-                                        <div class="grid grid-cols-2 gap-1 text-[11px] text-slate-600 pt-1">
-                                            <span class="{{ $q->correct_answer === 'A' ? 'font-bold text-emerald-700' : '' }}">A: {{ Str::limit($q->option_a, 40) }}</span>
-                                            <span class="{{ $q->correct_answer === 'B' ? 'font-bold text-emerald-700' : '' }}">B: {{ Str::limit($q->option_b, 40) }}</span>
-                                            <span class="{{ $q->correct_answer === 'C' ? 'font-bold text-emerald-700' : '' }}">C: {{ Str::limit($q->option_c, 40) }}</span>
-                                            <span class="{{ $q->correct_answer === 'D' ? 'font-bold text-emerald-700' : '' }}">D: {{ Str::limit($q->option_d, 40) }}</span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="px-4 py-3 text-slate-600">
-                                    <div class="font-bold text-slate-800">{{ $q->scheme->name ?? '-' }}</div>
-                                    <div class="text-[11px] font-mono text-brand-700 mt-0.5">
-                                        {{ $q->competencyUnit?->code ?? 'Umum / Seluruh Unit' }}
-                                    </div>
-                                    @if($q->competencyUnit?->title)
-                                        <div class="text-[10px] text-slate-500 leading-tight mt-0.5 max-w-xs">
-                                            {{ Str::limit($q->competencyUnit->title, 45) }}
-                                        </div>
-                                    @endif
-                                </td>
-                                <td class="px-3 py-3 text-center">
-                                    <span class="w-7 h-7 rounded-full inline-flex items-center justify-center font-bold text-xs bg-emerald-100 text-emerald-800 border border-emerald-300 shadow-xs">
-                                        {{ $q->correct_answer }}
-                                    </span>
-                                </td>
-                                <td class="px-4 py-3 text-right">
-                                    <div class="flex items-center justify-end space-x-1.5">
-                                        <a href="{{ route('admin.question-banks.show', $q->id) }}" class="px-2 py-1 text-slate-600 hover:text-slate-900 bg-slate-100 rounded hover:bg-slate-200">
-                                            Detail
-                                        </a>
-                                        <a href="{{ route('admin.question-banks.edit', $q->id) }}" class="px-2 py-1 text-brand-700 hover:text-brand-900 bg-brand-50 rounded hover:bg-brand-100">
-                                            Edit
-                                        </a>
-                                        <form action="{{ route('admin.question-banks.destroy', $q->id) }}" method="POST"
-                                              data-confirm="Apakah Anda yakin ingin menghapus butir soal ini?"
-                                              data-confirm-title="Hapus Butir Soal"
-                                              data-confirm-danger="true"
-                                              class="inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="px-2 py-1 text-rose-600 hover:text-rose-800 bg-rose-50 rounded hover:bg-rose-100">
-                                                Hapus
-                                            </button>
-                                        </form>
-                                    </div>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="5" class="px-6 py-8 text-center text-slate-500 text-xs">
-                                    Tidak ada butir soal yang sesuai dengan kriteria pencarian / filter.
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-
-            @if($questions->hasPages())
-                <div class="p-4 border-t border-slate-200">
-                    {{ $questions->links() }}
-                </div>
-            @endif
+        <div id="questions-table-container" data-ajax-container="questions" data-skeleton-cols="5" data-skeleton-rows="6">
+            @include('admin.question-banks._table')
         </div>
     </div>
 </div>

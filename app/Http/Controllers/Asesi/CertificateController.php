@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Asesi;
 
 use App\Http\Controllers\Controller;
 use App\Models\Certificate;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
@@ -15,14 +16,31 @@ class CertificateController extends Controller
     /**
      * Display all certificates issued to the authenticated candidate.
      */
-    public function index(): View
+    public function index(Request $request): View
     {
         $user = auth()->user();
 
-        $certificates = Certificate::with(['scheme', 'schedule', 'assessment.assessor'])
+        $query = Certificate::with(['scheme', 'schedule', 'assessment.assessor'])
             ->where('asesi_id', $user->id)
-            ->latest('issued_date')
-            ->get();
+            ->latest('issued_date');
+
+        if ($request->filled('search')) {
+            $search = trim((string) $request->search);
+            $query->where(function ($q) use ($search) {
+                $q->where('certificate_number', 'like', "%{$search}%")
+                    ->orWhere('blanko_number', 'like', "%{$search}%")
+                    ->orWhereHas('scheme', function ($sq) use ($search) {
+                        $sq->where('name', 'like', "%{$search}%")
+                            ->orWhere('code', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        $certificates = $query->paginate(10)->withQueryString();
+
+        if ($request->ajax()) {
+            return view('asesi.certificates._table', compact('certificates'));
+        }
 
         return view('asesi.certificates.index', compact('certificates'));
     }

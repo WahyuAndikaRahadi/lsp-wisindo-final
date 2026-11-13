@@ -55,6 +55,10 @@ class DokumenMukController extends Controller
             ->paginate(15)
             ->withQueryString();
 
+        if ($request->ajax()) {
+            return view('admin.dokumen-muk._table', compact('schedules', 'search'));
+        }
+
         return view('admin.dokumen-muk.index', compact('schedules', 'search'));
     }
 
@@ -78,6 +82,10 @@ class DokumenMukController extends Controller
         }
 
         $assessments = $assessmentsQuery->paginate(25)->withQueryString();
+
+        if ($request->ajax()) {
+            return view('admin.dokumen-muk._peserta_table', compact('schedule', 'assessments', 'search'));
+        }
 
         return view('admin.dokumen-muk.show', compact('schedule', 'assessments', 'search'));
     }

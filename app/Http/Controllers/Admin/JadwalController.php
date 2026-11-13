@@ -57,6 +57,10 @@ class JadwalController extends Controller
         $schedules = $query->paginate(15)->withQueryString();
         $schemes = Scheme::orderBy('name')->get();
 
+        if ($request->ajax()) {
+            return view('admin.jadwal._table', compact('schedules'));
+        }
+
         return view('admin.jadwal.index', compact('schedules', 'schemes'));
     }
 
@@ -111,11 +115,32 @@ class JadwalController extends Controller
             ->with('success', 'Jadwal berhasil dibuat.');
     }
 
-    public function show(Schedule $jadwal): View
+    public function show(Request $request, Schedule $jadwal): View
     {
-        $jadwal->load('scheme', 'assessors', 'assessments.asesi.profile');
+        $jadwal->load('scheme', 'assessors');
 
-        return view('admin.jadwal.show', compact('jadwal'));
+        $assessmentsQuery = $jadwal->assessments()
+            ->with(['asesi.profile', 'assessor', 'latestAppeal']);
+
+        if ($request->filled('search')) {
+            $search = trim((string) $request->search);
+            $assessmentsQuery->whereHas('asesi', function ($q) use ($search) {
+                $q->where('full_name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhereHas('profile', function ($pq) use ($search) {
+                        $pq->where('nik', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        $assessments = $assessmentsQuery->latest('registered_at')->paginate(15)->withQueryString();
+        $jadwal->setRelation('assessments', $assessments);
+
+        if ($request->ajax()) {
+            return view('admin.jadwal._peserta_table', compact('jadwal', 'assessments'));
+        }
+
+        return view('admin.jadwal.show', compact('jadwal', 'assessments'));
     }
 
     public function edit(Schedule $jadwal): View

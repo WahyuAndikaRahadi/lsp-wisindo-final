@@ -50,6 +50,10 @@ class CertificateController extends Controller
         $schedules = $schedulesQuery->paginate(15)->withQueryString();
         $schemes = Scheme::active()->get();
 
+        if ($request->ajax()) {
+            return view('admin.certificates._table', compact('schedules'));
+        }
+
         return view('admin.certificates.index', compact('schedules', 'schemes', 'search', 'schemeId'));
     }
 
