@@ -3,7 +3,9 @@
 Generator FR.AK.06 (Meninjau Proses Asesmen) - LSP PrO Indo
 Layout meniru template master BNSP secara presisi piksel; 100% tanpa watermark.
 Mendukung input dinamis JSON untuk data jadwal, skema, TUK, asesor, serta
-tipe peninjauan ('langsung' vs 'tidak_langsung') dan catatan komentar peninjau.
+dua tipe peninjauan yang menentukan pemenuhan seluruh 5 dimensi kompetensi:
+1. 'langsung'        -> Bukti Langsung (L / CL): FR.IA.01, FR.IA.02, FR.IA.03 di semua 5 dimensi.
+2. 'tidak_langsung'  -> Bukti Tidak Langsung (TL / CLO & T / PW): FR.IA.08 & FR.IA.09 di semua dimensi.
 """
 
 import os
@@ -110,7 +112,7 @@ def clean_signature_image(raw_bytes_or_path):
         return None
 
 
-def draw_signature(c, sig_data, x_left, y_bottom, max_w=100.0, max_h=45.0):
+def draw_signature(c, sig_data, x_left, y_bottom, max_w=95.0, max_h=46.0):
     """Render digital signature cleanly preserving aspect ratio."""
     if not sig_data:
         return False
@@ -169,7 +171,7 @@ def draw_cb(c, cx, cy, checked, sz=9.0):
     c.restoreState()
 
 
-def draw_kkni_options(c, x, y, font_name="Cal", font_size=11.0, scheme_type="KLASTER"):
+def draw_kkni_options(c, x, y, font_name="Cal", font_size=10.5, scheme_type="KLASTER"):
     """Draw (KKNI/Okupasi/Klaster) with precise strikethrough according to scheme type."""
     st = str(scheme_type or "KLASTER").strip().upper()
     c.saveState()
@@ -265,7 +267,7 @@ def draw_header_kop(c, x0=75.2, x1=565.3):
 
 
 def render_page_1(c, data):
-    """Render Page 1 of FR.AK.06 exactly matching master BNSP template."""
+    """Render Page 1 of FR.AK.06: Table 1 & Table 2 unified on Page 1."""
     x0 = 72.8
     x1 = 573.8
     tbl_w = x1 - x0  # 501.0 pt
@@ -273,13 +275,16 @@ def render_page_1(c, data):
     # 1. Header Kop
     draw_header_kop(c, 75.2, 565.3)
 
-    # 2. Document Title
-    c.setFont("Cal-B", 12.0)
-    c.drawString(x0, Y(110.0), "FR.AK.06.")
-    c.drawString(145.0, Y(110.0), "MENINJAU PROSES ASESMEN")
+    # 2. Document Title (Dinamis: LANGSUNG vs TIDAK LANGSUNG)
+    template_type = str(data.get("template_type") or "langsung").lower()
+    type_label = "(TIDAK LANGSUNG)" if template_type == "tidak_langsung" else "(LANGSUNG)"
 
-    # 3. Meta Grid (Master y: 122.7 to 244.9)
-    r_meta = [122.7, 151.1, 175.3, 198.5, 221.7, 244.9]
+    c.setFont("Cal-B", 11.5)
+    c.drawString(x0, Y(104.0), "FR.AK.06.")
+    c.drawString(138.0, Y(104.0), f"MENINJAU PROSES ASESMEN {type_label}")
+
+    # 3. Meta Grid (y: 118.0 to 238.0)
+    r_meta = [118.0, 146.0, 169.0, 192.0, 215.0, 238.0]
     c.setLineWidth(0.6)
     c.setStrokeColor(black)
     c.rect(x0, Y(r_meta[-1]), tbl_w, r_meta[-1] - r_meta[0])
@@ -291,96 +296,96 @@ def render_page_1(c, data):
     c.line(261.5, Y(r_meta[-1]), 261.5, Y(r_meta[0]))
 
     # Row 1: Skema Sertifikasi
-    c.setFont("Cal", 11.0)
-    c.drawString(x0 + 8.0, Y(135.0), "Skema Sertifikasi")
+    c.setFont("Cal", 10.5)
+    c.drawString(x0 + 8.0, Y(130.0), "Skema Sertifikasi")
     skema_tipe = data.get("skema_tipe") or data.get("scheme_type") or "KLASTER"
-    draw_kkni_options(c, x0 + 8.0, Y(147.0), font_name="Cal", font_size=10.5, scheme_type=skema_tipe)
+    draw_kkni_options(c, x0 + 8.0, Y(142.0), font_name="Cal", font_size=10.0, scheme_type=skema_tipe)
 
     # Row 1 Right: Judul
-    c.setFont("Cal", 11.0)
-    c.drawString(204.9 + 8.0, Y(138.0), "Judul")
-    c.drawCentredString(267.0, Y(138.0), ":")
+    c.setFont("Cal", 10.5)
+    c.drawString(204.9 + 8.0, Y(133.0), "Judul")
+    c.drawCentredString(267.0, Y(133.0), ":")
     skema_judul = str(data.get("skema_nama") or "-")
-    skema_lines = wrap_text(c, skema_judul, "Cal", 10.0, x1 - 275.0)
+    skema_lines = wrap_text(c, skema_judul, "Cal", 9.5, x1 - 275.0)
     if len(skema_lines) == 1:
-        c.drawString(275.0, Y(138.0), skema_lines[0])
+        c.drawString(275.0, Y(133.0), skema_lines[0])
     elif len(skema_lines) >= 2:
-        c.drawString(275.0, Y(134.0), skema_lines[0])
-        c.drawString(275.0, Y(146.0), skema_lines[1])
+        c.drawString(275.0, Y(129.0), skema_lines[0])
+        c.drawString(275.0, Y(140.0), skema_lines[1])
 
     # Row 2 Right: Nomor
-    c.drawString(204.9 + 8.0, Y(165.0), "Nomor")
-    c.drawCentredString(267.0, Y(165.0), ":")
-    c.drawString(275.0, Y(165.0), str(data.get("skema_nomor") or "-"))
+    c.drawString(204.9 + 8.0, Y(159.0), "Nomor")
+    c.drawCentredString(267.0, Y(159.0), ":")
+    c.drawString(275.0, Y(159.0), str(data.get("skema_nomor") or "-"))
 
     # Row 3: TUK
-    c.drawString(x0 + 8.0, Y(188.0), "TUK")
-    c.drawCentredString(267.0, Y(188.0), ":")
+    c.drawString(x0 + 8.0, Y(182.0), "TUK")
+    c.drawCentredString(267.0, Y(182.0), ":")
     tuk_display = str(data.get("tuk_nama") or "")
     if tuk_display and not tuk_display.startswith("Sewaktu"):
         tuk_text = f"Sewaktu/Tempat Kerja/Mandiri* ({tuk_display})"
     else:
         tuk_text = tuk_display or "Sewaktu/Tempat Kerja/Mandiri*"
-    c.drawString(275.0, Y(188.0), tuk_text)
+    c.drawString(275.0, Y(182.0), tuk_text)
 
     # Row 4: Nama Asesor
-    c.drawString(x0 + 8.0, Y(211.5), "Nama Asesor")
-    c.drawCentredString(267.0, Y(211.5), ":")
-    c.setFont("Cal-B", 11.0)
-    c.drawString(275.0, Y(211.5), str(data.get("asesor_nama") or "-"))
+    c.drawString(x0 + 8.0, Y(205.0), "Nama Asesor")
+    c.drawCentredString(267.0, Y(205.0), ":")
+    c.setFont("Cal-B", 10.5)
+    c.drawString(275.0, Y(205.0), str(data.get("asesor_nama") or "-"))
 
     # Row 5: Tanggal
-    c.setFont("Cal", 11.0)
-    c.drawString(x0 + 8.0, Y(235.0), "Tanggal")
-    c.drawCentredString(267.0, Y(235.0), ":")
-    c.drawString(275.0, Y(235.0), str(data.get("tanggal") or "-"))
+    c.setFont("Cal", 10.5)
+    c.drawString(x0 + 8.0, Y(228.0), "Tanggal")
+    c.drawCentredString(267.0, Y(228.0), ":")
+    c.drawString(275.0, Y(228.0), str(data.get("tanggal") or "-"))
 
-    # 4. Penjelasan Block (Master y: 260.0 to 363.1)
-    top_penj = 260.0
-    bot_penj = 363.1
+    # 4. Penjelasan Block (y: 248.0 to 344.0)
+    top_penj = 248.0
+    bot_penj = 344.0
     c.rect(x0, Y(bot_penj), tbl_w, bot_penj - top_penj)
-    c.line(x0, Y(280.3), x1, Y(280.3))
+    c.line(x0, Y(268.0), x1, Y(268.0))
 
-    c.setFont("Cal-B", 11.0)
-    c.drawString(x0 + 8.0, Y(273.5), "Penjelasan:")
+    c.setFont("Cal-B", 10.5)
+    c.drawString(x0 + 8.0, Y(261.0), "Penjelasan:")
 
-    c.setFont("Cal", 10.0)
-    c.drawString(x0 + 8.0, Y(295.0), "1.  Peninjauan dapat dilakukan oleh lead asesor atau asesor yang melaksanakan asesmen.")
-    c.drawString(x0 + 8.0, Y(314.0), "2.  Peninjauan dapat dilakukan secara terpadu dalam skema sertifikasi dan / atau peserta kelompok yang homogen.")
-    c.drawString(x0 + 8.0, Y(333.0), "3.  Isilah pemenuhan dimensi kompetensi dengan menuliskan jenis bukti dan instrumen yang digunakan pada saat")
-    c.drawString(x0 + 22.0, Y(347.0), "asesmen sebagai bukti terpenuhinya dimensi kompetensi.")
+    c.setFont("Cal", 9.5)
+    c.drawString(x0 + 8.0, Y(282.0), "1.  Peninjauan dapat dilakukan oleh lead asesor atau asesor yang melaksanakan asesmen.")
+    c.drawString(x0 + 8.0, Y(299.0), "2.  Peninjauan dapat dilakukan secara terpadu dalam skema sertifikasi dan / atau peserta kelompok yang homogen.")
+    c.drawString(x0 + 8.0, Y(316.0), "3.  Isilah pemenuhan dimensi kompetensi dengan menuliskan jenis bukti dan instrumen yang digunakan pada saat")
+    c.drawString(x0 + 22.0, Y(329.0), "asesmen sebagai bukti terpenuhinya dimensi kompetensi.")
 
-    # 5. Table 1: Kesesuaian dengan Prinsip Asesmen (Master y: 379.4 to 549.7)
-    top_t1 = 379.4
-    bot_t1 = 549.7
+    # 5. Table 1: Kesesuaian dengan Prinsip Asesmen (y: 356.0 to 522.0)
+    top_t1 = 356.0
+    bot_t1 = 522.0
     col_t1_prinsip = 333.2
     sub_cols_t1 = [333.2, 406.9, 463.6, 524.0, x1]
 
     c.rect(x0, Y(bot_t1), tbl_w, bot_t1 - top_t1)
 
     # Header horizontal dividers
-    c.line(x0, Y(418.4), x1, Y(418.4))
-    c.line(col_t1_prinsip, Y(398.6), x1, Y(398.6))
+    c.line(x0, Y(392.0), x1, Y(392.0))
+    c.line(col_t1_prinsip, Y(374.0), x1, Y(374.0))
 
     # Header vertical dividers
-    c.line(col_t1_prinsip, Y(top_t1), col_t1_prinsip, Y(525.2))
+    c.line(col_t1_prinsip, Y(top_t1), col_t1_prinsip, Y(498.0))
     for sc in sub_cols_t1[1:-1]:
-        c.line(sc, Y(398.6), sc, Y(525.2))
+        c.line(sc, Y(374.0), sc, Y(498.0))
 
     # Header text
-    c.setFont("Cal-B", 11.0)
-    c.drawCentredString((x0 + col_t1_prinsip) / 2, Y(402.0), "Aspek yang ditinjau")
-    c.drawCentredString((col_t1_prinsip + x1) / 2, Y(390.5), "Kesesuaian dengan prinsip asesmen")
+    c.setFont("Cal-B", 10.5)
+    c.drawCentredString((x0 + col_t1_prinsip) / 2, Y(378.0), "Aspek yang ditinjau")
+    c.drawCentredString((col_t1_prinsip + x1) / 2, Y(367.0), "Kesesuaian dengan prinsip asesmen")
 
-    c.setFont("Cal-I", 10.5)
-    c.drawCentredString((sub_cols_t1[0] + sub_cols_t1[1]) / 2, Y(411.0), "Validitas")
-    c.drawCentredString((sub_cols_t1[1] + sub_cols_t1[2]) / 2, Y(411.0), "Reliabel")
-    c.drawCentredString((sub_cols_t1[2] + sub_cols_t1[3]) / 2, Y(411.0), "Fleksibel")
-    c.drawCentredString((sub_cols_t1[3] + sub_cols_t1[4]) / 2, Y(411.0), "Adil")
+    c.setFont("Cal-I", 10.0)
+    c.drawCentredString((sub_cols_t1[0] + sub_cols_t1[1]) / 2, Y(386.0), "Validitas")
+    c.drawCentredString((sub_cols_t1[1] + sub_cols_t1[2]) / 2, Y(386.0), "Reliabel")
+    c.drawCentredString((sub_cols_t1[2] + sub_cols_t1[3]) / 2, Y(386.0), "Fleksibel")
+    c.drawCentredString((sub_cols_t1[3] + sub_cols_t1[4]) / 2, Y(386.0), "Adil")
 
-    # Table 1 Items with master row heights:
-    # Row boundaries: 418.4, 435.5, 453.4, 471.4, 489.2, 507.3, 525.2
-    row_y_t1 = [418.4, 435.5, 453.4, 471.4, 489.2, 507.3, 525.2]
+    # Table 1 Items:
+    # 6 rows of data: 392.0 to 498.0 (each ~17.6 pt)
+    row_y_t1 = [392.0, 409.6, 427.2, 444.8, 462.4, 480.0, 498.0]
     for ry in row_y_t1[1:]:
         c.line(x0, Y(ry), x1, Y(ry))
 
@@ -414,7 +419,7 @@ def render_page_1(c, data):
 
         # Text label
         font_item = "Cal-B" if is_bold else "Cal"
-        c.setFont(font_item, 10.0)
+        c.setFont(font_item, 9.5)
         c.drawString(x0 + 8.0, Y(mid_y + 3.0), label)
 
         # Draw checkboxes with checkmarks for enabled columns (Validitas, Reliabel, Adil)
@@ -423,17 +428,17 @@ def render_page_1(c, data):
                 cx = (sub_cols_t1[col_idx] + sub_cols_t1[col_idx + 1]) / 2
                 draw_cb(c, cx, Y(mid_y), True, sz=9.0)
 
-    # Bottom Row of Table 1: Rekomendasi untuk peningkatan (525.2 to 549.7)
-    c.setFont("Cal-B", 10.0)
-    c.drawString(x0 + 8.0, Y(539.0), "Rekomendasi untuk peningkatan :")
+    # Bottom Row of Table 1: Rekomendasi untuk peningkatan (498.0 to 522.0)
+    c.setFont("Cal-B", 9.5)
+    c.drawString(x0 + 8.0, Y(512.0), "Rekomendasi untuk peningkatan :")
     rekom_t1_text = str(data.get("rekomendasi_prosedur") or "Seluruh prosedur asesmen terlaksana secara valid, reliabel, fleksibel dan adil sesuai pedoman BNSP 301.")
-    c.setFont("Cal", 8.5)
-    c.drawString(x0 + 172.0, Y(539.0), rekom_t1_text)
+    c.setFont("Cal", 8.2)
+    c.drawString(x0 + 172.0, Y(512.0), rekom_t1_text)
 
-    # 6. Table 2: Pemenuhan Dimensi Kompetensi (Master y: 564.6 to 779.0)
-    # DIRECTLY ON PAGE 1, COMPLETELY MATCHING MASTER BNSP TEMPLATE!
-    top_t2 = 564.6
-    bot_t2 = 779.0
+    # 6. Table 2: Pemenuhan Dimensi Kompetensi (y: 534.0 to 768.0)
+    # DISESUAIKAN PERSIS DENGAN FORMAT WEB / TEMPLATE RESMI LSP PrO INDO
+    top_t2 = 534.0
+    bot_t2 = 768.0
     c.rect(x0, Y(bot_t2), tbl_w, bot_t2 - top_t2)
 
     # Table 2 Dividers
@@ -441,100 +446,92 @@ def render_page_1(c, data):
     dim_cols = [199.4, 267.0, 339.0, 415.5, 484.1, x1]
 
     # Horizontal lines
-    c.line(div_t2_c1, Y(582.5), x1, Y(582.5))
-    c.line(x0, Y(624.6), x1, Y(624.6))
+    c.line(div_t2_c1, Y(553.0), x1, Y(553.0))
+    c.line(x0, Y(592.0), x1, Y(592.0))
+    c.line(x0, Y(738.0), x1, Y(738.0))  # Divider between content and Table 2 recommendation row
 
     # Vertical lines
-    c.line(div_t2_c1, Y(top_t2), div_t2_c1, Y(bot_t2))
+    c.line(div_t2_c1, Y(top_t2), div_t2_c1, Y(738.0))
     for dc in dim_cols[1:-1]:
-        c.line(dc, Y(582.5), dc, Y(bot_t2))
+        c.line(dc, Y(553.0), dc, Y(738.0))
 
     # Header Table 2
     c.setFont("Cal-B", 10.5)
-    c.drawCentredString((x0 + div_t2_c1) / 2, Y(597.0), "Aspek yang ditinjau")
-    c.drawCentredString((div_t2_c1 + x1) / 2, Y(575.0), "Pemenuhan dimensi kompetensi")
+    c.drawCentredString((x0 + div_t2_c1) / 2, Y(568.0), "Aspek yang ditinjau")
+    c.drawCentredString((div_t2_c1 + x1) / 2, Y(546.0), "Pemenuhan dimensi kompetensi")
 
-    # Dimension Subheaders (Master y: 582.5 to 624.6)
-    c.setFont("Cal-I", 9.5)
+    # Dimension Subheaders (y: 553.0 to 592.0)
+    c.setFont("Cal-I", 9.2)
     # 1. Task Skills
-    c.drawCentredString((dim_cols[0] + dim_cols[1]) / 2, Y(606.0), "Task Skills")
+    c.drawCentredString((dim_cols[0] + dim_cols[1]) / 2, Y(575.0), "Task Skills")
     # 2. Task Management Skills
     cx_tm = (dim_cols[1] + dim_cols[2]) / 2
-    c.drawCentredString(cx_tm, Y(595.0), "Task")
-    c.drawCentredString(cx_tm, Y(606.0), "Management")
-    c.drawCentredString(cx_tm, Y(617.0), "Skills")
+    c.drawCentredString(cx_tm, Y(564.0), "Task")
+    c.drawCentredString(cx_tm, Y(575.0), "Management")
+    c.drawCentredString(cx_tm, Y(586.0), "Skills")
     # 3. Contingency Management Skills
     cx_cm = (dim_cols[2] + dim_cols[3]) / 2
-    c.drawCentredString(cx_cm, Y(595.0), "Contingency")
-    c.drawCentredString(cx_cm, Y(606.0), "Management")
-    c.drawCentredString(cx_cm, Y(617.0), "Skills")
-    # 4. Job Role/ Environment Skills
+    c.drawCentredString(cx_cm, Y(564.0), "Contingency")
+    c.drawCentredString(cx_cm, Y(575.0), "Management")
+    c.drawCentredString(cx_cm, Y(586.0), "Skills")
+    # 4. Job Role / Env Skills
     cx_jr = (dim_cols[3] + dim_cols[4]) / 2
-    c.drawCentredString(cx_jr, Y(595.0), "Job Role/")
-    c.drawCentredString(cx_jr, Y(606.0), "Environment")
-    c.drawCentredString(cx_jr, Y(617.0), "Skills")
+    c.drawCentredString(cx_jr, Y(564.0), "Job Role /")
+    c.drawCentredString(cx_jr, Y(575.0), "Environment")
+    c.drawCentredString(cx_jr, Y(586.0), "Skills")
     # 5. Transfer Skills
-    c.drawCentredString((dim_cols[4] + dim_cols[5]) / 2, Y(606.0), "Transfer Skills")
+    c.drawCentredString((dim_cols[4] + dim_cols[5]) / 2, Y(575.0), "Transfer Skills")
 
-    # Table 2 Content Row (Master y: 624.6 to 779.0)
+    # Table 2 Content Row (y: 592.0 to 738.0)
     # Left Column: Aspek yang ditinjau
-    c.setFont("Cal-B", 10.5)
-    c.drawString(x0 + 6.0, Y(645.0), "Konsistensi keputusan")
-    c.drawString(x0 + 6.0, Y(660.0), "asesmen")
-    c.setFont("Cal", 10.0)
-    c.drawString(x0 + 6.0, Y(680.0), "Bukti dari berbagai")
-    c.drawString(x0 + 6.0, Y(695.0), "asesmen diperiksa")
-    c.drawString(x0 + 6.0, Y(710.0), "untuk konsistensi")
-    c.drawString(x0 + 6.0, Y(725.0), "dimensi kompetensi")
+    c.setFont("Cal-B", 10.0)
+    c.drawString(x0 + 6.0, Y(620.0), "Konsistensi keputusan")
+    c.drawString(x0 + 6.0, Y(633.0), "asesmen")
+    c.setFont("Cal", 9.2)
+    c.drawString(x0 + 6.0, Y(654.0), "Bukti dari berbagai")
+    c.drawString(x0 + 6.0, Y(667.0), "asesmen diperiksa")
+    c.drawString(x0 + 6.0, Y(680.0), "untuk konsistensi")
+    c.drawString(x0 + 6.0, Y(693.0), "dimensi kompetensi")
 
-    # Dimension Columns:
-    template_type = str(data.get("template_type") or "langsung").lower()
-    cx_ts = (dim_cols[0] + dim_cols[1]) / 2
+    # Dimension Columns: Mengikuti 2 pilihan template resmi
     if template_type == "tidak_langsung":
-        # Tidak langsung
-        c.setFont("Cal-B", 10.0)
-        c.drawCentredString(cx_ts, Y(645.0), "TL / CLO")
-        c.setFont("Cal", 9.5)
-        c.drawCentredString(cx_ts, Y(665.0), "FR.IA.08")
-
-        for di in range(1, 5):
+        # FORMAT TIDAK LANGSUNG (TL / CLO & T / PW)
+        for di in range(5):
             cx = (dim_cols[di] + dim_cols[di + 1]) / 2
             if di == 2:
-                # Contingency: Wawancara T / PW
+                # Contingency Management Skills: T / PW
                 c.setFont("Cal-B", 10.0)
-                c.drawCentredString(cx, Y(645.0), "T / PW")
-                c.setFont("Cal", 9.5)
-                c.drawCentredString(cx, Y(665.0), "FR.IA.09")
+                c.drawCentredString(cx, Y(650.0), "T / PW")
+                c.setFont("Cal", 9.0)
+                c.drawCentredString(cx, Y(672.0), "FR.IA 09")
             else:
-                c.setFont("Cal", 11.0)
-                c.drawCentredString(cx, Y(650.0), "………")
-                c.drawCentredString(cx, Y(675.0), "………")
-                c.drawCentredString(cx, Y(700.0), "………")
-                c.drawCentredString(cx, Y(725.0), "………")
+                # Task Skills, Task Management, Job Role/Env, Transfer: TL / CLO
+                c.setFont("Cal-B", 10.0)
+                c.drawCentredString(cx, Y(650.0), "TL / CLO")
+                c.setFont("Cal", 9.0)
+                c.drawCentredString(cx, Y(672.0), "FR.IA 08")
     else:
-        # Langsung (L / CL) - exactly matching master template!
-        c.setFont("Cal-B", 10.5)
-        c.drawCentredString(cx_ts, Y(645.0), "L / CL")
-        c.setFont("Cal", 9.5)
-        c.drawCentredString(cx_ts, Y(665.0), "FR. IA")
-        c.drawCentredString(cx_ts, Y(682.0), "01,02,03,")
-        c.setFont("Cal-B", 9.5)
-        c.drawCentredString(cx_ts, Y(702.0), "T / DPT")
-        c.setFont("Cal", 9.5)
-        c.drawCentredString(cx_ts, Y(720.0), "IA 05")
-
-        # Columns 2, 3, 4, 5: dotted lines matching master
-        for di in range(1, 5):
+        # FORMAT LANGSUNG (L / CL) - Templated ke SEMUA 5 Dimensi
+        for di in range(5):
             cx = (dim_cols[di] + dim_cols[di + 1]) / 2
-            c.setFont("Cal", 11.0)
-            c.drawCentredString(cx, Y(650.0), "………")
-            c.drawCentredString(cx, Y(675.0), "………")
-            c.drawCentredString(cx, Y(700.0), "………")
-            c.drawCentredString(cx, Y(725.0), "………")
+            c.setFont("Cal-B", 10.0)
+            c.drawCentredString(cx, Y(645.0), "L / CL")
+            c.setFont("Cal", 8.8)
+            c.drawCentredString(cx, Y(665.0), "FR.IA 01, FR IA 02,")
+            c.drawCentredString(cx, Y(680.0), "FR IA 03")
+
+    # Bottom row of Table 2: Rekomendasi peningkatan dimensi kompetensi
+    c.setFont("Cal-B", 9.0)
+    c.drawString(x0 + 6.0, Y(750.0), "Rekomendasi untuk")
+    c.drawString(x0 + 6.0, Y(761.0), "peningkatan :")
+
+    rekom_t2_text = str(data.get("rekomendasi_dimensi") or "MUK yang digunakan sangat komprehensif. Disarankan pembaruan berkelanjutan pada bank soal dan instrumen asesmen.")
+    c.setFont("Cal", 8.2)
+    c.drawString(div_t2_c1 + 8.0, Y(755.0), rekom_t2_text)
 
 
 def render_page_2(c, data):
-    """Render Page 2 of FR.AK.06 exactly matching master BNSP template."""
+    """Render Page 2 of FR.AK.06: Lead Assessor Review & Signatures."""
     x0 = 72.8
     x1 = 573.8
     tbl_w = x1 - x0
@@ -542,21 +539,21 @@ def render_page_2(c, data):
     # 1. Header Kop
     draw_header_kop(c, 75.2, 565.3)
 
-    # 2. Rekomendasi Peningkatan Section (Master y: 93.8 to 129.3)
+    # 2. Rekomendasi Peningkatan Section (y: 93.8 to 129.3)
     top_rekom = 93.8
     bot_rekom = 129.3
     c.setLineWidth(0.6)
     c.setStrokeColor(black)
     c.rect(x0, Y(bot_rekom), tbl_w, bot_rekom - top_rekom)
 
-    c.setFont("Cal-B", 11.0)
-    c.drawString(x0 + 8.0, Y(110.0), "Rekomendasi untuk peningkatan:")
+    c.setFont("Cal-B", 10.5)
+    c.drawString(x0 + 8.0, Y(110.0), "Rekomendasi untuk peningkatan :")
 
     catatan_peninjau = str(data.get("catatan_peninjau") or "Proses asesmen telah memenuhi seluruh standar mutu penjaminan asesmen BNSP. Keputusan asesmen yang diambil adalah valid, reliabel, fleksibel, dan adil.")
-    c.setFont("Cal", 9.0)
+    c.setFont("Cal", 8.8)
     c.drawString(x0 + 175.0, Y(110.0), catatan_peninjau[:70] + ("..." if len(catatan_peninjau) > 70 else ""))
 
-    # 3. Signature & Lead Assessor Review Table (Master y: 129.3 to 238.1)
+    # 3. Signature & Lead Assessor Review Table (y: 129.3 to 238.1)
     top_sig = 129.3
     bot_sig = 238.1
     h_hdr_sig = 36.7
@@ -565,7 +562,7 @@ def render_page_2(c, data):
     c.rect(x0, Y(bot_sig), tbl_w, bot_sig - top_sig)
     c.line(x0, Y(y_line_hdr), x1, Y(y_line_hdr))
 
-    # Column dividers (Master: x=198.9, x=303.8)
+    # Column dividers
     col_sig1 = 198.9
     col_sig2 = 303.8
 
