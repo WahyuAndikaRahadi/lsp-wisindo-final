@@ -167,7 +167,7 @@
                                         $pct = $sch->assessments_count > 0 ? round(($sch->ak03_items_count / $sch->assessments_count) * 100) : 0;
                                     @endphp
                                     <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300">
-                                        {{ $sch->ak03_items_count }}/{{ $sch->assessments_count }} Asesi
+                                        {{ $sch->ak03_items_count }}/{{ $sch->assessments_count }}
                                     </span>
                                     <div class="text-[10px] text-amber-700 font-semibold mt-0.5">{{ $pct }}% Mengisi</div>
                                 @else
@@ -181,9 +181,8 @@
                             {{-- 5. Banding (FR.AK.04): Count --}}
                             <td class="px-5 py-4 align-middle text-center">
                                 @if($sch->pending_appeals_count > 0)
-                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-rose-100 text-rose-800 border border-rose-300 shadow-2xs animate-pulse">
-                                        <span>⚠️ {{ $sch->appeals_count }} Banding</span>
-                                        <span class="bg-rose-600 text-white px-1.5 py-0.2 rounded-full text-[10px] font-black">{{ $sch->pending_appeals_count }} Baru</span>
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-rose-100 text-rose-800 border border-rose-300 shadow-2xs">
+                                        <span>{{ $sch->appeals_count }} Banding</span>
                                     </span>
                                     <div class="text-[10px] text-rose-700 font-bold mt-0.5">Perlu Respon Putusan</div>
                                 @elseif($sch->appeals_count > 0)

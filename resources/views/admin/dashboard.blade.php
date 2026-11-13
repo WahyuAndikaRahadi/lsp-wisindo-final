@@ -39,7 +39,6 @@
             <div>
                 <div class="flex items-center gap-2">
                     <span class="text-xs font-bold uppercase tracking-wider text-emerald-900">Token Registrasi Asesi Aktif</span>
-                    <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300">Mingguan</span>
                 </div>
                 <p class="text-xs text-slate-500 mt-0.5">
                     Gunakan token ini untuk pendaftaran calon peserta (asesi). Token diacak ulang secara otomatis setiap minggu.

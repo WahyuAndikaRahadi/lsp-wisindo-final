@@ -85,7 +85,7 @@
                         {{ $schedule->appeals_count }} Pengajuan
                     </span>
                     @if($schedule->pending_appeals_count > 0)
-                        <span class="text-xs font-black px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 border border-rose-300 animate-pulse">
+                        <span class="text-xs font-black px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 border border-rose-300">
                             {{ $schedule->pending_appeals_count }} Perlu Putusan
                         </span>
                     @else

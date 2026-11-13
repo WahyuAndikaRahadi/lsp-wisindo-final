@@ -21,10 +21,9 @@
                 <div>
                     <div class="flex items-center gap-2">
                         <span class="text-xs font-bold text-emerald-900">Token Registrasi Asesi:</span>
-                        <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-300">Aktif Minggu Ini</span>
                     </div>
                     <p class="text-[11px] text-slate-500">
-                        Bagikan token ini kepada calon peserta uji (asesi) yang membuat akun di lokasi asesmen.
+                        Bagikan token ini kepada calon peserta uji (asesi) yang membuat akun di lokasi asesmen. Token ini akan direset otomatis setiap minggu.
                     </p>
                 </div>
             </div>
