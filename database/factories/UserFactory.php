@@ -44,4 +44,19 @@ class UserFactory extends Factory
             'email_verified_at' => null,
         ]);
     }
+
+    /**
+     * Attach a digital signature to the user's profile.
+     */
+    public function withSignature(?string $signature = null): static
+    {
+        return $this->afterCreating(function (User $user) use ($signature) {
+            $user->profile()->updateOrCreate(
+                ['user_id' => $user->id],
+                [
+                    'signature_data' => $signature ?? 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+                ]
+            );
+        });
+    }
 }

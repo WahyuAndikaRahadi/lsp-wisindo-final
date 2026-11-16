@@ -86,17 +86,28 @@
                 </div>
 
                 <div class="mt-5 pt-4 border-t border-slate-100">
-                    @if($isClosedForMe)
-                        <a href="{{ route('asesor.schedule.ruang-uji', $jadwal->id) }}" class="w-full inline-flex items-center justify-center px-4 py-2.5 min-h-[42px] text-xs font-bold uppercase tracking-wider bg-slate-800 hover:bg-slate-900 text-white rounded-lg shadow-sm transition">
-                            <span>Lihat Ruang Uji</span>
-                            <svg class="w-4 h-4 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-                        </a>
+                    @cannot('enter-schedule', $jadwal)
+                        <button type="button" disabled
+                                class="w-full inline-flex items-center justify-center px-4 py-2.5 min-h-[42px] text-xs font-bold uppercase tracking-wider bg-slate-100 text-slate-400 border border-slate-200 rounded-lg cursor-not-allowed transition select-none"
+                                title="Silakan simpan tanda tangan digital pada profil Anda terlebih dahulu untuk masuk ke jadwal">
+                            <svg class="w-4 h-4 mr-1.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m0 0v2m0-2h2m-2 0H10m7-7V7a5 5 0 00-10 0v4h10zM5 11h14a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2z"/>
+                            </svg>
+                            <span>TTD Profil Diperlukan</span>
+                        </button>
                     @else
-                        <a href="{{ route('asesor.schedule.ruang-uji', $jadwal->id) }}" class="w-full inline-flex items-center justify-center px-4 py-2.5 min-h-[42px] text-xs font-bold uppercase tracking-wider bg-brand-600 hover:bg-brand-700 text-white rounded-lg shadow-sm transition">
-                            <span>Masuk Ruang Uji</span>
-                            <svg class="w-4 h-4 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-                        </a>
-                    @endif
+                        @if($isClosedForMe)
+                            <a href="{{ route('asesor.schedule.ruang-uji', $jadwal->id) }}" class="w-full inline-flex items-center justify-center px-4 py-2.5 min-h-[42px] text-xs font-bold uppercase tracking-wider bg-slate-800 hover:bg-slate-900 text-white rounded-lg shadow-sm transition">
+                                <span>Lihat Ruang Uji</span>
+                                <svg class="w-4 h-4 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                            </a>
+                        @else
+                            <a href="{{ route('asesor.schedule.ruang-uji', $jadwal->id) }}" class="w-full inline-flex items-center justify-center px-4 py-2.5 min-h-[42px] text-xs font-bold uppercase tracking-wider bg-brand-600 hover:bg-brand-700 text-white rounded-lg shadow-sm transition">
+                                <span>Masuk Ruang Uji</span>
+                                <svg class="w-4 h-4 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                            </a>
+                        @endif
+                    @endcannot
                 </div>
             </div>
         @endforeach

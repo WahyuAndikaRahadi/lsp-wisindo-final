@@ -95,6 +95,13 @@ class User extends Authenticatable
         return in_array($this->role, ['SUPER_ADMIN', 'ADMIN_LSP']);
     }
 
+    public function hasDigitalSignature(): bool
+    {
+        $profile = $this->relationLoaded('profile') ? $this->profile : $this->profile()->first();
+
+        return ! empty($profile?->signature_data);
+    }
+
     public function isProfileComplete(): bool
     {
         if ($this->role !== 'ASESI') {

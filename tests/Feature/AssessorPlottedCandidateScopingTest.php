@@ -65,6 +65,10 @@ class AssessorPlottedCandidateScopingTest extends TestCase
             'assessor_registration_number' => 'MET.000.222222',
         ]);
 
+        $dummySig = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+        $this->assessor1->profile()->create(['signature_data' => $dummySig]);
+        $this->assessor2->profile()->create(['signature_data' => $dummySig]);
+
         $this->asesiA = User::create([
             'full_name' => 'Asesi Asep Sanjaya',
             'email' => 'asesi_a@test.com',

@@ -38,7 +38,7 @@ class AssessmentWorkflowOverhaulTest extends TestCase
             'status' => 'ACTIVE',
         ]);
 
-        $this->assessor = User::factory()->create([
+        $this->assessor = User::factory()->withSignature()->create([
             'role' => 'ASESOR',
             'status' => 'ACTIVE',
         ]);

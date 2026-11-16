@@ -203,6 +203,23 @@ class UserSeeder extends Seeder
                     'signature_data' => 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
                 ]
             );
+
+            $testAssessor = User::where('role', 'ASESOR')->first();
+            if ($testAssessor) {
+                UserProfile::firstOrCreate(
+                    ['user_id' => $testAssessor->id],
+                    [
+                        'nik' => '3216010000000002',
+                        'tempat_lahir' => 'Jakarta',
+                        'tanggal_lahir' => '1985-05-05',
+                        'jenis_kelamin' => 'L',
+                        'kebangsaan' => 'Indonesia',
+                        'alamat_rumah' => 'Jl. Assessor No. 2, Jakarta',
+                        'kode_pos' => '10110',
+                        'signature_data' => 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+                    ]
+                );
+            }
         }
     }
 }
