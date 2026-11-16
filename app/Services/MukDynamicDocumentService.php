@@ -380,7 +380,7 @@ class MukDynamicDocumentService
                     'no' => $idx + 1,
                     'global_no' => $overallIdx,
                     'nama' => $ass->asesi?->full_name ?? 'Peserta '.$overallIdx,
-                    'institusi' => $assProfile?->nama_institusi_perusahaan ?? ($assProfile?->company_name ?? 'SMK Negeri'),
+                    'institusi' => $assProfile?->nama_institusi_perusahaan ?? ($assProfile?->company_name ?? ($assProfile?->institution ?? 'SMK Negeri')),
                     'alamat' => $assProfile?->alamat_rumah ?? ($assProfile?->address ?? 'Karawang'),
                     'pekerjaan' => $assProfile?->jabatan ?? ($assProfile?->job_title ?? 'Pelajar'),
                     'telp' => $ass->asesi?->phone ?? ($assProfile?->no_telepon_rumah ?? ($assProfile?->phone_number ?? '-')),
@@ -420,8 +420,9 @@ class MukDynamicDocumentService
             $asesorList[] = [
                 'no' => $idx + 1,
                 'nama' => $as->full_name,
-                'no_met' => $as->assessor_registration_number ?? $as->profile?->no_reg ?? 'MET.000.001234 2022',
+                'no_met' => $as->assessor_registration_number ?? $as->profile?->met_number ?? $as->profile?->no_reg ?? 'MET.000.001234 2022',
                 'signature' => $as->profile?->signature_data,
+                'institusi' => $as->profile?->nama_institusi_perusahaan ?? ($as->profile?->company_name ?? ($as->profile?->institution ?? '-')),
             ];
         }
         $payload['asesor'] = $asesorList;

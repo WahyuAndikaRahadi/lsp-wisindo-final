@@ -148,6 +148,59 @@ def to_words(n):
         return f"{kata[n // 10]} Puluh" + (f" {kata[rem]}" if rem else "")
     return str(n)
 
+def wrap_text(text, font_name, font_size, max_w):
+    """Break text into lines that fit within max_w points without truncating."""
+    text = str(text or "").strip()
+    if not text:
+        return []
+    words = text.split()
+    if not words:
+        return []
+    lines = []
+    cur_line = []
+    for w in words:
+        test_line = " ".join(cur_line + [w])
+        if pdfmetrics.stringWidth(test_line, font_name, font_size) <= max_w:
+            cur_line.append(w)
+        else:
+            if cur_line:
+                lines.append(" ".join(cur_line))
+                cur_line = []
+            if pdfmetrics.stringWidth(w, font_name, font_size) <= max_w:
+                cur_line.append(w)
+            else:
+                sub = ""
+                for ch in w:
+                    if pdfmetrics.stringWidth(sub + ch, font_name, font_size) <= max_w:
+                        sub += ch
+                    else:
+                        if sub:
+                            lines.append(sub)
+                        sub = ch
+                if sub:
+                    cur_line.append(sub)
+    if cur_line:
+        lines.append(" ".join(cur_line))
+    return lines
+
+def draw_multiline(c, lines, x, y_mid, leading, font_name, font_size, y_func, align="left", col_right=None):
+    """Draw vertically centered multi-line text inside a table cell."""
+    if not lines:
+        return
+    c.setFont(font_name, font_size)
+    n = len(lines)
+    for i, line in enumerate(lines):
+        line_y_from_top = y_mid - ((n - 1) * leading) / 2.0 + i * leading
+        baseline = y_func(line_y_from_top + font_size * 0.35)
+        if align == "center" and col_right is not None:
+            c.drawCentredString((x + col_right) / 2.0, baseline, line)
+        elif align == "center":
+            c.drawCentredString(x, baseline, line)
+        elif align == "right" and col_right is not None:
+            c.drawRightString(col_right, baseline, line)
+        else:
+            c.drawString(x, baseline, line)
+
 def render_page_1(c, chunk, chunk_offset, batch_idx, total_batches, assessor_info=None):
     PW, PH = 596.0, 842.0
     Y1 = lambda top: PH - top
@@ -181,9 +234,50 @@ def render_page_1(c, chunk, chunk_offset, batch_idx, total_batches, assessor_inf
     cols = [44.1, 84.7, 269.3, 354.7, 476.3, 561.9]
     top_tbl = 285.0
     hdr_h = 28.0
-    row_h = 16.0
     n_rows = 10
-    bot_tbl = top_tbl + hdr_h + n_rows * row_h
+
+    # Calculate row data and dynamic row heights to wrap text
+    row_data_p1 = []
+    row_heights_p1 = []
+    for idx in range(n_rows):
+        p_info = chunk[idx] if idx < len(chunk) else None
+        if p_info:
+            cand_no = str(p_info.get("no") if p_info.get("no") is not None else (chunk_offset + idx + 1))
+            lines_nama = wrap_text(p_info.get("nama", ""), "Lib", 8.5, (cols[2] - cols[1]) - 10.0)
+            res = "K" if p_info.get("hasil") in ("K", "KOMPETEN") else ("BK" if p_info.get("hasil") in ("BK", "BELUM_KOMPETEN") else p_info.get("hasil", ""))
+            lines_rekomendasi = wrap_text(p_info.get("rekomendasi", "Diterbitkan Sertifikat"), "Lib", 8.0, (cols[4] - cols[3]) - 10.0)
+            lines_ket = wrap_text(p_info.get("ket", "Lulus"), "Lib", 8.0, (cols[5] - cols[4]) - 8.0)
+            max_l = max(1, len(lines_nama), len(lines_rekomendasi), len(lines_ket))
+            h = max(16.0, max_l * 9.5 + 4.0)
+            row_data_p1.append({
+                "p_info": p_info,
+                "cand_no": cand_no,
+                "lines_nama": lines_nama,
+                "res": res,
+                "lines_rekomendasi": lines_rekomendasi,
+                "lines_ket": lines_ket,
+            })
+            row_heights_p1.append(h)
+        else:
+            cand_no = str(chunk_offset + idx + 1)
+            row_data_p1.append({
+                "p_info": None,
+                "cand_no": cand_no,
+                "lines_nama": [],
+                "res": "",
+                "lines_rekomendasi": [],
+                "lines_ket": [],
+            })
+            row_heights_p1.append(16.0)
+
+    cur_y = top_tbl + hdr_h
+    row_tops_p1 = []
+    row_mids_p1 = []
+    for h in row_heights_p1:
+        row_tops_p1.append(cur_y)
+        row_mids_p1.append(cur_y + h / 2.0)
+        cur_y += h
+    bot_tbl = cur_y
 
     c.setLineWidth(0.6)
     c.setStrokeColor(black)
@@ -191,8 +285,7 @@ def render_page_1(c, chunk, chunk_offset, batch_idx, total_batches, assessor_inf
     c.line(cols[0], Y1(top_tbl + hdr_h), cols[-1], Y1(top_tbl + hdr_h))
 
     for r in range(1, n_rows):
-        y_r = top_tbl + hdr_h + r * row_h
-        c.line(cols[0], Y1(y_r), cols[-1], Y1(y_r))
+        c.line(cols[0], Y1(row_tops_p1[r]), cols[-1], Y1(row_tops_p1[r]))
 
     for x in cols[1:-1]:
         c.line(x, Y1(top_tbl), x, Y1(bot_tbl))
@@ -206,19 +299,17 @@ def render_page_1(c, chunk, chunk_offset, batch_idx, total_batches, assessor_inf
     c.drawCentredString((cols[3] + cols[4]) / 2, Y1(top_tbl + 22.0), "Tindak Lanjut")
     c.drawCentredString((cols[4] + cols[5]) / 2, Y1(top_tbl + 18.0), "Keterangan")
 
-    c.setFont("Lib", 8.5)
     for idx in range(n_rows):
-        y_mid = top_tbl + hdr_h + idx * row_h + row_h / 2
-        p_info = chunk[idx] if idx < len(chunk) else None
-        cand_no = (p_info.get("no") if p_info and p_info.get("no") is not None else (chunk_offset + idx + 1))
-
-        c.drawCentredString((cols[0] + cols[1]) / 2, Y1(y_mid + 3.0), str(cand_no))
-        if p_info:
-            c.drawString(cols[1] + 6.0, Y1(y_mid + 3.0), p_info.get("nama", ""))
-            res = "K" if p_info.get("hasil") in ("K", "KOMPETEN") else ("BK" if p_info.get("hasil") in ("BK", "BELUM_KOMPETEN") else p_info.get("hasil", ""))
-            c.drawCentredString((cols[2] + cols[3]) / 2, Y1(y_mid + 3.0), res)
-            c.drawString(cols[3] + 6.0, Y1(y_mid + 3.0), p_info.get("rekomendasi", "Diterbitkan Sertifikat"))
-            c.drawCentredString((cols[4] + cols[5]) / 2, Y1(y_mid + 3.0), p_info.get("ket", "Lulus"))
+        rd = row_data_p1[idx]
+        y_mid = row_mids_p1[idx]
+        c.setFont("Lib", 8.5)
+        c.drawCentredString((cols[0] + cols[1]) / 2, Y1(y_mid + 2.5), rd["cand_no"])
+        if rd["p_info"]:
+            draw_multiline(c, rd["lines_nama"], cols[1] + 5.0, y_mid, 9.5, "Lib", 8.5, Y1, align="left")
+            c.setFont("Lib", 8.5)
+            c.drawCentredString((cols[2] + cols[3]) / 2, Y1(y_mid + 2.5), rd["res"])
+            draw_multiline(c, rd["lines_rekomendasi"], cols[3] + 5.0, y_mid, 9.0, "Lib", 8.0, Y1, align="left")
+            draw_multiline(c, rd["lines_ket"], (cols[4] + cols[5]) / 2, y_mid, 9.0, "Lib", 8.0, Y1, align="center")
 
     c.setFont("Lib-I", 8.0)
     c.drawString(cols[0], Y1(bot_tbl + 16.0), "Keterangan : *) Diisi dengan K (Kompeten) atau BK (Belum Kompeten)")
@@ -282,9 +373,53 @@ def render_page_2(c, chunk, chunk_offset, batch_idx, total_batches, assessor_inf
     cols = [62.1, 93.7, 225.2, 327.7, 525.7, 593.3, 674.3, 782.1]
     top_tbl = 160.0
     hdr_h = 24.0
-    row_h = 18.0
     n_rows = 10
-    bot_tbl = top_tbl + hdr_h + n_rows * row_h
+
+    # Calculate row data and dynamic row heights to wrap text for all columns
+    row_data_p2 = []
+    row_heights_p2 = []
+    for idx in range(n_rows):
+        p_info = chunk[idx] if idx < len(chunk) else None
+        if p_info:
+            cand_no = str(p_info.get("no") if p_info.get("no") is not None else (chunk_offset + idx + 1))
+            lines_nama = wrap_text(p_info.get("nama", ""), "Lib", 8.0, (cols[2] - cols[1]) - 8.0)
+            lines_institusi = wrap_text(p_info.get("institusi", ""), "Lib", 7.5, (cols[3] - cols[2]) - 8.0)
+            lines_alamat = wrap_text(p_info.get("alamat", ""), "Lib", 7.5, (cols[4] - cols[3]) - 8.0)
+            lines_pekerjaan = wrap_text(p_info.get("pekerjaan", "Pelajar"), "Lib", 7.5, (cols[5] - cols[4]) - 6.0)
+            lines_telp = wrap_text(str(p_info.get("telp", "-") or "-"), "Lib", 7.5, (cols[6] - cols[5]) - 6.0)
+            max_l = max(1, len(lines_nama), len(lines_institusi), len(lines_alamat), len(lines_pekerjaan), len(lines_telp))
+            h = max(18.0, max_l * 9.0 + 4.0)
+            row_data_p2.append({
+                "p_info": p_info,
+                "cand_no": cand_no,
+                "lines_nama": lines_nama,
+                "lines_institusi": lines_institusi,
+                "lines_alamat": lines_alamat,
+                "lines_pekerjaan": lines_pekerjaan,
+                "lines_telp": lines_telp,
+            })
+            row_heights_p2.append(h)
+        else:
+            cand_no = str(chunk_offset + idx + 1)
+            row_data_p2.append({
+                "p_info": None,
+                "cand_no": cand_no,
+                "lines_nama": [],
+                "lines_institusi": [],
+                "lines_alamat": [],
+                "lines_pekerjaan": [],
+                "lines_telp": [],
+            })
+            row_heights_p2.append(18.0)
+
+    cur_y = top_tbl + hdr_h
+    row_tops_p2 = []
+    row_mids_p2 = []
+    for h in row_heights_p2:
+        row_tops_p2.append(cur_y)
+        row_mids_p2.append(cur_y + h / 2.0)
+        cur_y += h
+    bot_tbl = cur_y
 
     c.setLineWidth(0.6)
     c.setStrokeColor(black)
@@ -292,8 +427,7 @@ def render_page_2(c, chunk, chunk_offset, batch_idx, total_batches, assessor_inf
     c.line(cols[0], Y2(top_tbl + hdr_h), cols[-1], Y2(top_tbl + hdr_h))
 
     for r in range(1, n_rows):
-        y_r = top_tbl + hdr_h + r * row_h
-        c.line(cols[0], Y2(y_r), cols[-1], Y2(y_r))
+        c.line(cols[0], Y2(row_tops_p2[r]), cols[-1], Y2(row_tops_p2[r]))
 
     for x in cols[1:-1]:
         c.line(x, Y2(top_tbl), x, Y2(bot_tbl))
@@ -307,51 +441,60 @@ def render_page_2(c, chunk, chunk_offset, batch_idx, total_batches, assessor_inf
     c.drawCentredString((cols[5] + cols[6]) / 2, Y2(top_tbl + 16.0), "No. Telp/HP")
     c.drawCentredString((cols[6] + cols[7]) / 2, Y2(top_tbl + 16.0), "Tanda Tangan")
 
-    c.setFont("Lib", 8.0)
     for idx in range(n_rows):
-        y_mid = top_tbl + hdr_h + idx * row_h + row_h / 2
-        p_info = chunk[idx] if idx < len(chunk) else None
-        cand_no = (p_info.get("no") if p_info and p_info.get("no") is not None else (chunk_offset + idx + 1))
+        rd = row_data_p2[idx]
+        y_mid = row_mids_p2[idx]
+        this_row_h = row_heights_p2[idx]
+        c.setFont("Lib", 8.0)
+        c.drawCentredString((cols[0] + cols[1]) / 2, Y2(y_mid + 2.5), rd["cand_no"])
 
-        c.drawCentredString((cols[0] + cols[1]) / 2, Y2(y_mid + 3.0), str(cand_no))
-        if p_info:
-            c.drawString(cols[1] + 5.0, Y2(y_mid + 3.0), p_info.get("nama", "")[:24])
-            c.drawString(cols[2] + 5.0, Y2(y_mid + 3.0), p_info.get("institusi", "")[:18])
-            c.drawString(cols[3] + 5.0, Y2(y_mid + 3.0), p_info.get("alamat", "")[:36])
-            c.drawString(cols[4] + 5.0, Y2(y_mid + 3.0), p_info.get("pekerjaan", "")[:12])
-            c.drawString(cols[5] + 5.0, Y2(y_mid + 3.0), p_info.get("telp", ""))
+        if rd["p_info"]:
+            p_info = rd["p_info"]
+            draw_multiline(c, rd["lines_nama"], cols[1] + 4.0, y_mid, 9.0, "Lib", 8.0, Y2, align="left")
+            draw_multiline(c, rd["lines_institusi"], cols[2] + 4.0, y_mid, 8.5, "Lib", 7.5, Y2, align="left")
+            draw_multiline(c, rd["lines_alamat"], cols[3] + 4.0, y_mid, 8.5, "Lib", 7.5, Y2, align="left")
+            draw_multiline(c, rd["lines_pekerjaan"], cols[4] + 4.0, y_mid, 8.5, "Lib", 7.5, Y2, align="left")
+            draw_multiline(c, rd["lines_telp"], cols[5] + 4.0, y_mid, 8.5, "Lib", 7.5, Y2, align="left")
 
-        sig_num = str(cand_no)
-        is_odd = ((idx + 1) % 2 != 0)
-        slot_left = cols[6] + 4.0 if is_odd else (cols[6] + cols[7]) / 2 + 4.0
+            sig_num = rd["cand_no"]
+            is_odd = ((idx + 1) % 2 != 0)
+            slot_left = cols[6] + 4.0 if is_odd else (cols[6] + cols[7]) / 2 + 4.0
+            sig_max_h = min(18.0, this_row_h - 4.0)
 
-        if p_info and p_info.get("signature"):
-            drawn_cand = draw_signature(c, p_info.get("signature"), x_left=slot_left + 14.0, y_bottom=Y2(y_mid + 7.0), max_w=34.0, max_h=15.0)
-            if drawn_cand:
-                c.drawString(slot_left, Y2(y_mid + 3.0), f"{sig_num}.")
+            if p_info.get("signature"):
+                drawn_cand = draw_signature(c, p_info.get("signature"), x_left=slot_left + 14.0, y_bottom=Y2(y_mid + sig_max_h / 2.0), max_w=34.0, max_h=sig_max_h)
+                c.setFont("Lib", 8.0)
+                if drawn_cand:
+                    c.drawString(slot_left, Y2(y_mid + 2.5), f"{sig_num}.")
+                else:
+                    c.drawString(slot_left, Y2(y_mid + 2.5), f"{sig_num}. [Ttd]")
             else:
-                c.drawString(slot_left, Y2(y_mid + 3.0), f"{sig_num}. [Ttd]")
-        elif p_info:
-            c.drawString(slot_left, Y2(y_mid + 3.0), f"{sig_num}. [Ttd]")
+                c.setFont("Lib", 8.0)
+                c.drawString(slot_left, Y2(y_mid + 2.5), f"{sig_num}. [Ttd]")
 
-    y_sig2 = bot_tbl + 25.0
+    sig_block_h = 94.0
+    gap = 20.0
+    if bot_tbl + gap + sig_block_h > 585.0:
+        gap = max(6.0, 585.0 - (bot_tbl + sig_block_h))
+    y_sig2 = bot_tbl + gap
+
     c.setFont("Lib", 8.5)
     c.drawString(cols[0] + 30.0, Y2(y_sig2), f"{DATA.get('tuk_kota', 'Karawang')}, {DATA.get('tanggal_dokumen', '')}")
-    c.drawString(cols[0] + 30.0, Y2(y_sig2 + 16.0), "Asesor :")
+    c.drawString(cols[0] + 30.0, Y2(y_sig2 + 14.0), "Asesor :")
 
     asesor_nama = (assessor_info.get("nama") if assessor_info else None) or DATA.get('asesor_nama', '')
     asesor_no_reg = (assessor_info.get("no_met") or assessor_info.get("no_reg") if assessor_info else None) or DATA.get('asesor_no_reg', '')
     sig_asesor = (assessor_info.get("signature") if assessor_info else None) or DATA.get("signature_asesor")
 
-    c.drawString(cols[0] + 30.0, Y2(y_sig2 + 32.0), f"Nama             :  {asesor_nama}")
-    c.drawString(cols[0] + 30.0, Y2(y_sig2 + 48.0), f"No. Reg          :  {asesor_no_reg}")
-    c.drawString(cols[0] + 30.0, Y2(y_sig2 + 64.0), "Tanda tangan :")
+    c.drawString(cols[0] + 30.0, Y2(y_sig2 + 28.0), f"Nama             :  {asesor_nama}")
+    c.drawString(cols[0] + 30.0, Y2(y_sig2 + 42.0), f"No. Reg          :  {asesor_no_reg}")
+    c.drawString(cols[0] + 30.0, Y2(y_sig2 + 56.0), "Tanda tangan :")
 
-    drawn_asesor_p2 = draw_signature(c, sig_asesor, x_left=cols[0] + 95.0, y_bottom=Y2(y_sig2 + 95.0), max_w=120.0, max_h=34.0)
+    drawn_asesor_p2 = draw_signature(c, sig_asesor, x_left=cols[0] + 95.0, y_bottom=Y2(y_sig2 + 86.0), max_w=110.0, max_h=30.0)
     if not drawn_asesor_p2:
-        c.drawString(cols[0] + 95.0, Y2(y_sig2 + 64.0), "[Ttd Digital]")
+        c.drawString(cols[0] + 95.0, Y2(y_sig2 + 56.0), "[Ttd Digital]")
 
-    c.drawString(cols[0] + 30.0, Y2(y_sig2 + 104.0), "………………………………….")
+    c.drawString(cols[0] + 30.0, Y2(y_sig2 + 94.0), "………………………………….")
 
 def render(dest_path):
     c = canvas.Canvas(dest_path, pagesize=(596.0, 842.0))

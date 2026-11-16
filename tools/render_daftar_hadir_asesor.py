@@ -138,6 +138,59 @@ DATA = {
     "asesor": [],
 }
 
+def wrap_text(text, font_name, font_size, max_w):
+    """Break text into lines that fit within max_w points without truncating."""
+    text = str(text or "").strip()
+    if not text:
+        return []
+    words = text.split()
+    if not words:
+        return []
+    lines = []
+    cur_line = []
+    for w in words:
+        test_line = " ".join(cur_line + [w])
+        if pdfmetrics.stringWidth(test_line, font_name, font_size) <= max_w:
+            cur_line.append(w)
+        else:
+            if cur_line:
+                lines.append(" ".join(cur_line))
+                cur_line = []
+            if pdfmetrics.stringWidth(w, font_name, font_size) <= max_w:
+                cur_line.append(w)
+            else:
+                sub = ""
+                for ch in w:
+                    if pdfmetrics.stringWidth(sub + ch, font_name, font_size) <= max_w:
+                        sub += ch
+                    else:
+                        if sub:
+                            lines.append(sub)
+                        sub = ch
+                if sub:
+                    cur_line.append(sub)
+    if cur_line:
+        lines.append(" ".join(cur_line))
+    return lines
+
+def draw_multiline(c, lines, x, y_mid, leading, font_name, font_size, y_func, align="left", col_right=None):
+    """Draw vertically centered multi-line text inside a table cell."""
+    if not lines:
+        return
+    c.setFont(font_name, font_size)
+    n = len(lines)
+    for i, line in enumerate(lines):
+        line_y_from_top = y_mid - ((n - 1) * leading) / 2.0 + i * leading
+        baseline = y_func(line_y_from_top + font_size * 0.35)
+        if align == "center" and col_right is not None:
+            c.drawCentredString((x + col_right) / 2.0, baseline, line)
+        elif align == "center":
+            c.drawCentredString(x, baseline, line)
+        elif align == "right" and col_right is not None:
+            c.drawRightString(col_right, baseline, line)
+        else:
+            c.drawString(x, baseline, line)
+
 def split_address(addr, max_chars=75):
     if not addr:
         return ["-"]
@@ -153,7 +206,7 @@ def split_address(addr, max_chars=75):
             curr = w
     if curr:
         lines.append(curr)
-    return lines[:2] if lines else ["-"]
+    return lines if lines else ["-"]
 
 def render_page(c, chunk, chunk_offset, batch_idx, total_batches):
     # 1. Header (Kop Surat)
@@ -169,53 +222,96 @@ def render_page(c, chunk, chunk_offset, batch_idx, total_batches):
         c.setFont("Lib", 8.5)
         c.drawCentredString(PAGE_W / 2, Y(145.0), f"(Halaman {batch_idx + 1} dari {total_batches})")
 
-    # 3. Metadata List (1 to 5)
+    # 3. Metadata List (1 to 5) with dynamic line wrapping
     c.setFont("Lib", 9.0)
     x_num = 87.0
     x_lbl = 99.2
     x_col = 177.0
     x_val = 183.1
+    max_val_w = PAGE_W - x_val - 45.0
 
-    # Item 1
-    c.drawString(x_num, Y(165.0), "1.")
-    c.drawString(x_lbl, Y(165.0), "Skema")
-    c.drawString(x_col, Y(165.0), ":")
-    c.drawString(x_val, Y(165.0), DATA.get("skema_nama", ""))
+    skema_lines = wrap_text(DATA.get("skema_nama", ""), "Lib", 9.0, max_val_w) or ["-"]
+    tuk_lines = wrap_text(DATA.get("tuk_nama", ""), "Lib", 9.0, max_val_w) or ["-"]
+    addr_lines = wrap_text(DATA.get("tuk_alamat", ""), "Lib", 9.0, max_val_w) or ["-"]
+    tgl_val = str(DATA.get("tanggal_uji", DATA.get("tanggal_dokumen", "")))
+    jml_val = str(DATA.get("jumlah_asesi", ""))
 
-    # Item 2
-    c.drawString(x_num, Y(180.0), "2.")
-    c.drawString(x_lbl, Y(180.0), "TUK")
-    c.drawString(x_col, Y(180.0), ":")
-    c.drawString(x_val, Y(180.0), DATA.get("tuk_nama", ""))
+    y_curr = 165.0
+    # Item 1: Skema
+    c.drawString(x_num, Y(y_curr), "1.")
+    c.drawString(x_lbl, Y(y_curr), "Skema")
+    c.drawString(x_col, Y(y_curr), ":")
+    for i, line in enumerate(skema_lines):
+        c.drawString(x_val, Y(y_curr + i * 13.0), line)
+    y_curr += max(1, len(skema_lines)) * 13.0 + 2.0
 
-    # Item 3: Alamat (split into up to 2 lines)
-    addr_lines = split_address(DATA.get("tuk_alamat", ""))
-    c.drawString(x_num, Y(195.0), "3.")
-    c.drawString(x_lbl, Y(195.0), "Alamat")
-    c.drawString(x_col, Y(195.0), ":")
-    c.drawString(x_val, Y(195.0), addr_lines[0])
-    if len(addr_lines) > 1:
-        c.drawString(x_val, Y(209.0), addr_lines[1])
+    # Item 2: TUK (Institusi)
+    c.drawString(x_num, Y(y_curr), "2.")
+    c.drawString(x_lbl, Y(y_curr), "TUK")
+    c.drawString(x_col, Y(y_curr), ":")
+    for i, line in enumerate(tuk_lines):
+        c.drawString(x_val, Y(y_curr + i * 13.0), line)
+    y_curr += max(1, len(tuk_lines)) * 13.0 + 2.0
 
-    # Item 4
-    c.drawString(x_num, Y(224.0), "4.")
-    c.drawString(x_lbl, Y(224.0), "Tanggal Uji")
-    c.drawString(x_col, Y(224.0), ":")
-    c.drawString(x_val, Y(224.0), DATA.get("tanggal_uji", DATA.get("tanggal_dokumen", "")))
+    # Item 3: Alamat
+    c.drawString(x_num, Y(y_curr), "3.")
+    c.drawString(x_lbl, Y(y_curr), "Alamat")
+    c.drawString(x_col, Y(y_curr), ":")
+    for i, line in enumerate(addr_lines):
+        c.drawString(x_val, Y(y_curr + i * 13.0), line)
+    y_curr += max(1, len(addr_lines)) * 13.0 + 2.0
 
-    # Item 5
-    c.drawString(x_num, Y(239.0), "5.")
-    c.drawString(x_lbl, Y(239.0), "Jumlah Asesi")
-    c.drawString(x_col, Y(239.0), ":")
-    c.drawString(x_val, Y(239.0), DATA.get("jumlah_asesi", ""))
+    # Item 4: Tanggal Uji
+    c.drawString(x_num, Y(y_curr), "4.")
+    c.drawString(x_lbl, Y(y_curr), "Tanggal Uji")
+    c.drawString(x_col, Y(y_curr), ":")
+    c.drawString(x_val, Y(y_curr), tgl_val)
+    y_curr += 15.0
 
-    # 4. Table Asesor (Fixed 5 rows per standard page)
+    # Item 5: Jumlah Asesi
+    c.drawString(x_num, Y(y_curr), "5.")
+    c.drawString(x_lbl, Y(y_curr), "Jumlah Asesi")
+    c.drawString(x_col, Y(y_curr), ":")
+    c.drawString(x_val, Y(y_curr), jml_val)
+    y_curr += 20.0
+
+    # 4. Table Asesor (Fixed 5 rows per standard page with dynamic row wrapping)
     cols = [50.4, 76.5, 242.3, 391.5, 560.4]
-    top_tbl = 264.3
+    top_tbl = max(264.3, y_curr)
     hdr_h = 23.2
-    row_h = 23.0
     n_rows = 5
-    bot_tbl = top_tbl + hdr_h + n_rows * row_h
+
+    row_data = []
+    row_heights = []
+    for idx in range(n_rows):
+        if idx < len(chunk):
+            as_info = chunk[idx]
+            lines_nama = wrap_text(as_info.get("nama", ""), "Lib", 8.5, (cols[2] - cols[1]) - 12.0)
+            lines_met = wrap_text(as_info.get("no_met", ""), "Lib", 8.5, (cols[3] - cols[2]) - 10.0)
+            max_l = max(1, len(lines_nama), len(lines_met))
+            h = max(23.0, max_l * 10.0 + 4.0)
+            row_data.append({
+                "as_info": as_info,
+                "lines_nama": lines_nama,
+                "lines_met": lines_met,
+            })
+            row_heights.append(h)
+        else:
+            row_data.append({
+                "as_info": None,
+                "lines_nama": [],
+                "lines_met": [],
+            })
+            row_heights.append(23.0)
+
+    cur_y = top_tbl + hdr_h
+    row_tops = []
+    row_mids = []
+    for h in row_heights:
+        row_tops.append(cur_y)
+        row_mids.append(cur_y + h / 2.0)
+        cur_y += h
+    bot_tbl = cur_y
 
     c.setLineWidth(0.6)
     c.setStrokeColor(black)
@@ -223,8 +319,7 @@ def render_page(c, chunk, chunk_offset, batch_idx, total_batches):
     c.line(cols[0], Y(top_tbl + hdr_h), cols[-1], Y(top_tbl + hdr_h))
 
     for r in range(1, n_rows):
-        y_r = top_tbl + hdr_h + r * row_h
-        c.line(cols[0], Y(y_r), cols[-1], Y(y_r))
+        c.line(cols[0], Y(row_tops[r]), cols[-1], Y(row_tops[r]))
 
     for x in cols[1:-1]:
         c.line(x, Y(top_tbl), x, Y(bot_tbl))
@@ -237,23 +332,27 @@ def render_page(c, chunk, chunk_offset, batch_idx, total_batches):
     c.drawCentredString((cols[3] + cols[4]) / 2, Y(top_tbl + 15.0), "Tanda Tangan")
 
     # Rows
-    c.setFont("Lib", 8.5)
     for idx in range(n_rows):
-        y_mid = top_tbl + hdr_h + idx * row_h + row_h / 2
+        rd = row_data[idx]
+        y_mid = row_mids[idx]
+        this_row_h = row_heights[idx]
         global_no = chunk_offset + idx + 1
+        c.setFont("Lib", 8.5)
         c.drawCentredString((cols[0] + cols[1]) / 2, Y(y_mid + 3.0), f"{global_no}.")
 
-        if idx < len(chunk):
-            as_info = chunk[idx]
-            c.drawString(cols[1] + 6.0, Y(y_mid + 3.0), as_info.get("nama", ""))
-            c.drawCentredString((cols[2] + cols[3]) / 2, Y(y_mid + 3.0), as_info.get("no_met", ""))
+        if rd["as_info"]:
+            as_info = rd["as_info"]
+            draw_multiline(c, rd["lines_nama"], cols[1] + 6.0, y_mid, 10.0, "Lib", 8.5, Y, align="left")
+            draw_multiline(c, rd["lines_met"], (cols[2] + cols[3]) / 2.0, y_mid, 10.0, "Lib", 8.5, Y, align="center", col_right=cols[3])
 
             sig_num = str(global_no)
             is_odd = (global_no % 2 != 0)
             slot_left = cols[3] + 6.0 if is_odd else (cols[3] + cols[4]) / 2 + 4.0
+            sig_max_h = min(20.0, this_row_h - 4.0)
 
             sig_data = as_info.get("signature")
-            drawn = draw_signature(c, sig_data, x_left=slot_left + 14.0, y_bottom=Y(y_mid + 10.0), max_w=45.0, max_h=20.0)
+            drawn = draw_signature(c, sig_data, x_left=slot_left + 14.0, y_bottom=Y(y_mid + sig_max_h / 2.0), max_w=45.0, max_h=sig_max_h)
+            c.setFont("Lib", 8.5)
             if drawn:
                 c.drawString(slot_left, Y(y_mid + 3.0), f"{sig_num}.")
             else:

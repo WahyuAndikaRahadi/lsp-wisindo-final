@@ -183,6 +183,8 @@
             border: 1px solid #000;
             padding: 4px 6px;
             vertical-align: middle;
+            word-break: break-word;
+            overflow-wrap: break-word;
         }
         table.bnsp-table th {
             background-color: #f1f5f9;

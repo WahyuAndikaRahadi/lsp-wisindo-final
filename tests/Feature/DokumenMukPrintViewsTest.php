@@ -217,6 +217,57 @@ class DokumenMukPrintViewsTest extends TestCase
         $this->assertEquals('application/pdf', $response->headers->get('Content-Type'));
     }
 
+    public function test_berita_acara_and_attendance_list_wraps_long_institution_and_names(): void
+    {
+        $this->asesi->update(['full_name' => 'Muhammad Rizky Ramadhan Alamsyah Suryokusumo']);
+        $this->asesi->profile()->update([
+            'nama_institusi_perusahaan' => 'SMK Negeri 1 Cikarang Barat Kabupaten Bekasi Jawa Barat',
+            'alamat_rumah' => 'Perumahan Griya Kondang Asri Blok B2 No. 15, RT 04 RW 02, Desa Kondangjaya, Karawang Timur',
+        ]);
+
+        $response = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.export-ba', $this->schedule));
+        $response->assertOk();
+        $this->assertEquals('application/pdf', $response->headers->get('Content-Type'));
+
+        $pdfPath = $response->baseResponse->getFile()->getPathname();
+        $this->assertFileExists($pdfPath);
+
+        $python = base_path('.venv/bin/python');
+        $script = "import pymupdf, sys; doc = pymupdf.open(sys.argv[1]); text = ''.join(p.get_text() for p in doc); print(text)";
+        $extracted = shell_exec(escapeshellarg($python).' -c '.escapeshellarg($script).' '.escapeshellarg($pdfPath));
+
+        $this->assertStringContainsString('SMK Negeri 1 Cikarang', $extracted);
+        $this->assertStringContainsString('Barat Kabupaten Bekasi', $extracted);
+        $this->assertStringContainsString('Jawa Barat', $extracted);
+        $this->assertStringContainsString('Muhammad Rizky Ramadhan', $extracted);
+    }
+
+    public function test_daftar_hadir_asesor_wraps_long_tuk_institution_and_assessor_names(): void
+    {
+        $this->schedule->update([
+            'tuk_name' => 'SMK Negeri 1 Cikarang Barat Kabupaten Bekasi Jawa Barat (TUK Terverifikasi BNSP)',
+            'tuk_address' => 'Jl. Teuku Umar No. 1, Desa Telaga Asih, Kecamatan Cikarang Barat, Kabupaten Bekasi, Provinsi Jawa Barat 17530',
+        ]);
+        $this->asesor->update([
+            'full_name' => 'Prof. Dr. Ir. Raden Mas Sudirman Suryokusumo, S.Pd., M.Pd., M.Kom., IPM., ASEAN Eng.',
+        ]);
+
+        $response = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.export-hadir-asesor', $this->schedule));
+        $response->assertOk();
+        $this->assertEquals('application/pdf', $response->headers->get('Content-Type'));
+
+        $pdfPath = $response->baseResponse->getFile()->getPathname();
+        $this->assertFileExists($pdfPath);
+
+        $python = base_path('.venv/bin/python');
+        $script = "import pymupdf, sys; doc = pymupdf.open(sys.argv[1]); text = ''.join(p.get_text() for p in doc); print(text)";
+        $extracted = shell_exec(escapeshellarg($python).' -c '.escapeshellarg($script).' '.escapeshellarg($pdfPath));
+
+        $this->assertStringContainsString('SMK Negeri 1 Cikarang Barat', $extracted);
+        $this->assertStringContainsString('Raden Mas Sudirman', $extracted);
+        $this->assertStringContainsString('ASEAN Eng.', $extracted);
+    }
+
     public function test_can_render_daftar_hadir_asesi_with_alternating_signatures(): void
     {
         $response = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.export-hadir-asesi', $this->schedule));
