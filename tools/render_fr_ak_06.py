@@ -436,7 +436,7 @@ def render_page_1(c, data):
     c.drawString(x0 + 172.0, Y(512.0), rekom_t1_text)
 
     # 6. Table 2: Pemenuhan Dimensi Kompetensi (y: 534.0 to 768.0)
-    # DISESUAIKAN PERSIS DENGAN FORMAT WEB / TEMPLATE RESMI LSP PrO INDO
+    # DISESUAIKAN PERSIS DENGAN FORMAT WEB / TEMPLATE MASTER BNSP (TANPA BARIS REKOMENDASI GANDA)
     top_t2 = 534.0
     bot_t2 = 768.0
     c.rect(x0, Y(bot_t2), tbl_w, bot_t2 - top_t2)
@@ -448,12 +448,11 @@ def render_page_1(c, data):
     # Horizontal lines
     c.line(div_t2_c1, Y(553.0), x1, Y(553.0))
     c.line(x0, Y(592.0), x1, Y(592.0))
-    c.line(x0, Y(738.0), x1, Y(738.0))  # Divider between content and Table 2 recommendation row
 
     # Vertical lines
-    c.line(div_t2_c1, Y(top_t2), div_t2_c1, Y(738.0))
+    c.line(div_t2_c1, Y(top_t2), div_t2_c1, Y(bot_t2))
     for dc in dim_cols[1:-1]:
-        c.line(dc, Y(553.0), dc, Y(738.0))
+        c.line(dc, Y(553.0), dc, Y(bot_t2))
 
     # Header Table 2
     c.setFont("Cal-B", 10.5)
@@ -482,16 +481,16 @@ def render_page_1(c, data):
     # 5. Transfer Skills
     c.drawCentredString((dim_cols[4] + dim_cols[5]) / 2, Y(575.0), "Transfer Skills")
 
-    # Table 2 Content Row (y: 592.0 to 738.0)
+    # Table 2 Content Row (y: 592.0 to 768.0)
     # Left Column: Aspek yang ditinjau
     c.setFont("Cal-B", 10.0)
-    c.drawString(x0 + 6.0, Y(620.0), "Konsistensi keputusan")
-    c.drawString(x0 + 6.0, Y(633.0), "asesmen")
+    c.drawString(x0 + 6.0, Y(630.0), "Konsistensi keputusan")
+    c.drawString(x0 + 6.0, Y(644.0), "asesmen")
     c.setFont("Cal", 9.2)
-    c.drawString(x0 + 6.0, Y(654.0), "Bukti dari berbagai")
-    c.drawString(x0 + 6.0, Y(667.0), "asesmen diperiksa")
-    c.drawString(x0 + 6.0, Y(680.0), "untuk konsistensi")
-    c.drawString(x0 + 6.0, Y(693.0), "dimensi kompetensi")
+    c.drawString(x0 + 6.0, Y(668.0), "Bukti dari berbagai")
+    c.drawString(x0 + 6.0, Y(681.0), "asesmen diperiksa")
+    c.drawString(x0 + 6.0, Y(694.0), "untuk konsistensi")
+    c.drawString(x0 + 6.0, Y(707.0), "dimensi kompetensi")
 
     # Dimension Columns: Mengikuti 2 pilihan template resmi
     if template_type == "tidak_langsung":
@@ -501,33 +500,24 @@ def render_page_1(c, data):
             if di == 2:
                 # Contingency Management Skills: T / PW
                 c.setFont("Cal-B", 10.0)
-                c.drawCentredString(cx, Y(650.0), "T / PW")
+                c.drawCentredString(cx, Y(660.0), "T / PW")
                 c.setFont("Cal", 9.0)
-                c.drawCentredString(cx, Y(672.0), "FR.IA 09")
+                c.drawCentredString(cx, Y(684.0), "FR.IA 09")
             else:
                 # Task Skills, Task Management, Job Role/Env, Transfer: TL / CLO
                 c.setFont("Cal-B", 10.0)
-                c.drawCentredString(cx, Y(650.0), "TL / CLO")
+                c.drawCentredString(cx, Y(660.0), "TL / CLO")
                 c.setFont("Cal", 9.0)
-                c.drawCentredString(cx, Y(672.0), "FR.IA 08")
+                c.drawCentredString(cx, Y(684.0), "FR.IA 08")
     else:
         # FORMAT LANGSUNG (L / CL) - Templated ke SEMUA 5 Dimensi
         for di in range(5):
             cx = (dim_cols[di] + dim_cols[di + 1]) / 2
             c.setFont("Cal-B", 10.0)
-            c.drawCentredString(cx, Y(645.0), "L / CL")
+            c.drawCentredString(cx, Y(655.0), "L / CL")
             c.setFont("Cal", 8.8)
-            c.drawCentredString(cx, Y(665.0), "FR.IA 01, FR IA 02,")
-            c.drawCentredString(cx, Y(680.0), "FR IA 03")
-
-    # Bottom row of Table 2: Rekomendasi peningkatan dimensi kompetensi
-    c.setFont("Cal-B", 9.0)
-    c.drawString(x0 + 6.0, Y(750.0), "Rekomendasi untuk")
-    c.drawString(x0 + 6.0, Y(761.0), "peningkatan :")
-
-    rekom_t2_text = str(data.get("rekomendasi_dimensi") or "MUK yang digunakan sangat komprehensif. Disarankan pembaruan berkelanjutan pada bank soal dan instrumen asesmen.")
-    c.setFont("Cal", 8.2)
-    c.drawString(div_t2_c1 + 8.0, Y(755.0), rekom_t2_text)
+            c.drawCentredString(cx, Y(678.0), "FR.IA 01, FR IA 02,")
+            c.drawCentredString(cx, Y(694.0), "FR IA 03")
 
 
 def render_page_2(c, data):
@@ -547,11 +537,16 @@ def render_page_2(c, data):
     c.rect(x0, Y(bot_rekom), tbl_w, bot_rekom - top_rekom)
 
     c.setFont("Cal-B", 10.5)
-    c.drawString(x0 + 8.0, Y(110.0), "Rekomendasi untuk peningkatan :")
+    c.drawString(x0 + 8.0, Y(111.0), "Rekomendasi untuk peningkatan :")
 
-    catatan_peninjau = str(data.get("catatan_peninjau") or "Proses asesmen telah memenuhi seluruh standar mutu penjaminan asesmen BNSP. Keputusan asesmen yang diambil adalah valid, reliabel, fleksibel, dan adil.")
+    rekom_p2 = str(data.get("rekomendasi_dimensi") or data.get("rekomendasi_peningkatan") or "MUK yang digunakan sangat komprehensif. Disarankan pembaruan berkelanjutan pada bank soal dan instrumen asesmen.")
     c.setFont("Cal", 8.8)
-    c.drawString(x0 + 175.0, Y(110.0), catatan_peninjau[:70] + ("..." if len(catatan_peninjau) > 70 else ""))
+    rekom_lines = wrap_text(c, rekom_p2, "Cal", 8.8, tbl_w - 185.0)
+    if len(rekom_lines) == 1:
+        c.drawString(x0 + 175.0, Y(111.0), rekom_lines[0])
+    elif len(rekom_lines) >= 2:
+        c.drawString(x0 + 175.0, Y(106.0), rekom_lines[0])
+        c.drawString(x0 + 175.0, Y(118.0), rekom_lines[1])
 
     # 3. Signature & Lead Assessor Review Table (y: 129.3 to 238.1)
     top_sig = 129.3
@@ -612,6 +607,7 @@ def render_page_2(c, data):
     c.setFont("Cal-B", 9.5)
     c.drawString(col_sig2 + 8.0, Y(180.0), "Komentar Peninjau:")
 
+    catatan_peninjau = str(data.get("catatan_peninjau") or "Proses asesmen telah memenuhi seluruh standar mutu penjaminan asesmen BNSP. Keputusan asesmen yang diambil adalah valid, reliabel, fleksibel, dan adil.")
     komentar_lines = wrap_text(c, catatan_peninjau, "Cal", 8.5, (x1 - col_sig2) - 16.0)
     c.setFont("Cal", 8.5)
     k_y = 194.0
