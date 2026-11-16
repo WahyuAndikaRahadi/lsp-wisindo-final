@@ -227,6 +227,62 @@ def draw_kkni_options(c, x, y, font_name="Cal", font_size=10.5, scheme_type="KLA
     c.restoreState()
 
 
+def draw_tuk_options(c, x, y, font_name="Cal", font_size=10.0, tuk_type="Sewaktu"):
+    """Draw Sewaktu/Tempat Kerja/Mandiri* with precise strikethrough leaving only the selected type."""
+    tt = str(tuk_type or "Sewaktu").strip().upper()
+    c.saveState()
+    c.setFont(font_name, font_size)
+    c.setFillColor(black)
+
+    w_sewaktu = pdfmetrics.stringWidth("Sewaktu", font_name, font_size)
+    w_s1 = pdfmetrics.stringWidth("/", font_name, font_size)
+    w_tk = pdfmetrics.stringWidth("Tempat Kerja", font_name, font_size)
+    w_s2 = pdfmetrics.stringWidth("/", font_name, font_size)
+    w_mandiri = pdfmetrics.stringWidth("Mandiri", font_name, font_size)
+
+    curr_x = x
+
+    sewaktu_x = curr_x
+    c.drawString(curr_x, y, "Sewaktu")
+    curr_x += w_sewaktu
+
+    s1_x = curr_x
+    c.drawString(curr_x, y, "/")
+    curr_x += w_s1
+
+    tk_x = curr_x
+    c.drawString(curr_x, y, "Tempat Kerja")
+    curr_x += w_tk
+
+    s2_x = curr_x
+    c.drawString(curr_x, y, "/")
+    curr_x += w_s2
+
+    mandiri_x = curr_x
+    c.drawString(curr_x, y, "Mandiri")
+    curr_x += w_mandiri
+
+    c.drawString(curr_x, y, "*")
+
+    # Strikethrough line (centered on text height)
+    strike_y = y + font_size * 0.32
+    c.setLineWidth(0.7)
+    c.setStrokeColor(black)
+
+    if "TEMPAT" in tt or "KERJA" in tt:
+        # Sisakan Tempat Kerja -> coret Sewaktu/ dan /Mandiri
+        c.line(sewaktu_x - 0.5, strike_y, sewaktu_x + w_sewaktu + w_s1, strike_y)
+        c.line(s2_x - 0.5, strike_y, mandiri_x + w_mandiri + 0.5, strike_y)
+    elif "MANDIRI" in tt:
+        # Sisakan Mandiri -> coret Sewaktu/Tempat Kerja/
+        c.line(sewaktu_x - 0.5, strike_y, tk_x + w_tk + w_s2, strike_y)
+    else:
+        # Default fallback: Sisakan Sewaktu -> coret /Tempat Kerja/Mandiri
+        c.line(s1_x - 0.5, strike_y, mandiri_x + w_mandiri + 0.5, strike_y)
+
+    c.restoreState()
+
+
 DATA = {
     "skema_nama": "Maintenance Gasoline Engine Injection System",
     "skema_nomor": "02/LSP PrO Indo/XI/2025",
@@ -266,7 +322,7 @@ def draw_header_kop(c, x0=75.2, x1=565.3):
     c.drawCentredString((169.6 + x1) / 2, Y(55.0), "Lembaga Sertifikasi Profesi Praktisi Otomotif  LSP-PrO Indo")
 
 
-def render_page_1(c, data):
+def render_page_1(c, data, page_idx=0, total_pages=2):
     """Render Page 1 of FR.AK.06: Table 1 & Table 2 unified on Page 1."""
     x0 = 72.8
     x1 = 573.8
@@ -276,12 +332,22 @@ def render_page_1(c, data):
     draw_header_kop(c, 75.2, 565.3)
 
     # 2. Document Title (Dinamis: LANGSUNG vs TIDAK LANGSUNG)
-    template_type = str(data.get("template_type") or "langsung").lower()
-    type_label = "(TIDAK LANGSUNG)" if template_type == "tidak_langsung" else "(LANGSUNG)"
+    template_type = str(data.get("template_type") or "").strip().lower()
+    is_submitted = bool(data.get("is_submitted")) or (bool(template_type) and template_type in ["langsung", "tidak_langsung"])
+
+    if template_type == "tidak_langsung":
+        type_label = " (TIDAK LANGSUNG)"
+    elif template_type == "langsung":
+        type_label = " (LANGSUNG)"
+    else:
+        type_label = ""
 
     c.setFont("Cal-B", 11.5)
     c.drawString(x0, Y(104.0), "FR.AK.06.")
-    c.drawString(138.0, Y(104.0), f"MENINJAU PROSES ASESMEN {type_label}")
+    c.drawString(138.0, Y(104.0), f"MENINJAU PROSES ASESMEN{type_label}")
+    if total_pages > 1:
+        c.setFont("Cal", 9.0)
+        c.drawRightString(x1, Y(104.0), f"Halaman {page_idx + 1} dari {total_pages}")
 
     # 3. Meta Grid (y: 118.0 to 238.0)
     r_meta = [118.0, 146.0, 169.0, 192.0, 215.0, 238.0]
@@ -321,12 +387,7 @@ def render_page_1(c, data):
     # Row 3: TUK
     c.drawString(x0 + 8.0, Y(182.0), "TUK")
     c.drawCentredString(267.0, Y(182.0), ":")
-    tuk_display = str(data.get("tuk_nama") or "")
-    if tuk_display and not tuk_display.startswith("Sewaktu"):
-        tuk_text = f"Sewaktu/Tempat Kerja/Mandiri* ({tuk_display})"
-    else:
-        tuk_text = tuk_display or "Sewaktu/Tempat Kerja/Mandiri*"
-    c.drawString(275.0, Y(182.0), tuk_text)
+    draw_tuk_options(c, 275.0, Y(182.0), font_name="Cal", font_size=10.0, tuk_type=data.get("tuk_tipe"))
 
     # Row 4: Nama Asesor
     c.drawString(x0 + 8.0, Y(205.0), "Nama Asesor")
@@ -338,7 +399,8 @@ def render_page_1(c, data):
     c.setFont("Cal", 10.5)
     c.drawString(x0 + 8.0, Y(228.0), "Tanggal")
     c.drawCentredString(267.0, Y(228.0), ":")
-    c.drawString(275.0, Y(228.0), str(data.get("tanggal") or "-"))
+    tgl_meta = str(data.get("tanggal") or "").strip()
+    c.drawString(275.0, Y(228.0), tgl_meta if tgl_meta else "-")
 
     # 4. Penjelasan Block (y: 248.0 to 344.0)
     top_penj = 248.0
@@ -426,14 +488,18 @@ def render_page_1(c, data):
         for col_idx in range(4):
             if col_idx not in disabled_cols:
                 cx = (sub_cols_t1[col_idx] + sub_cols_t1[col_idx + 1]) / 2
-                draw_cb(c, cx, Y(mid_y), True, sz=9.0)
+                checked = is_submitted
+                draw_cb(c, cx, Y(mid_y), checked, sz=9.0)
 
     # Bottom Row of Table 1: Rekomendasi untuk peningkatan (498.0 to 522.0)
     c.setFont("Cal-B", 9.5)
     c.drawString(x0 + 8.0, Y(512.0), "Rekomendasi untuk peningkatan :")
-    rekom_t1_text = str(data.get("rekomendasi_prosedur") or "Seluruh prosedur asesmen terlaksana secara valid, reliabel, fleksibel dan adil sesuai pedoman BNSP 301.")
-    c.setFont("Cal", 8.2)
-    c.drawString(x0 + 172.0, Y(512.0), rekom_t1_text)
+    rekom_t1_text = str(data.get("rekomendasi_prosedur") or "").strip()
+    if is_submitted and not rekom_t1_text:
+        rekom_t1_text = "Seluruh prosedur asesmen terlaksana secara valid, reliabel, fleksibel dan adil sesuai pedoman BNSP 301."
+    if rekom_t1_text:
+        c.setFont("Cal", 8.2)
+        c.drawString(x0 + 172.0, Y(512.0), rekom_t1_text)
 
     # 6. Table 2: Pemenuhan Dimensi Kompetensi (y: 534.0 to 768.0)
     # DISESUAIKAN PERSIS DENGAN FORMAT WEB / TEMPLATE MASTER BNSP (TANPA BARIS REKOMENDASI GANDA)
@@ -493,7 +559,7 @@ def render_page_1(c, data):
     c.drawString(x0 + 6.0, Y(707.0), "dimensi kompetensi")
 
     # Dimension Columns: Mengikuti 2 pilihan template resmi
-    if template_type == "tidak_langsung":
+    if is_submitted and template_type == "tidak_langsung":
         # FORMAT TIDAK LANGSUNG (TL / CLO & T / PW)
         for di in range(5):
             cx = (dim_cols[di] + dim_cols[di + 1]) / 2
@@ -509,7 +575,7 @@ def render_page_1(c, data):
                 c.drawCentredString(cx, Y(660.0), "TL / CLO")
                 c.setFont("Cal", 9.0)
                 c.drawCentredString(cx, Y(684.0), "FR.IA 08")
-    else:
+    elif is_submitted and template_type == "langsung":
         # FORMAT LANGSUNG (L / CL) - Templated ke SEMUA 5 Dimensi
         for di in range(5):
             cx = (dim_cols[di] + dim_cols[di + 1]) / 2
@@ -518,9 +584,12 @@ def render_page_1(c, data):
             c.setFont("Cal", 8.8)
             c.drawCentredString(cx, Y(678.0), "FR.IA 01, FR IA 02,")
             c.drawCentredString(cx, Y(694.0), "FR IA 03")
+    else:
+        # Belum disubmit / belum dipilih: Kosongkan seluruh kolom dimensi kompetensi
+        pass
 
 
-def render_page_2(c, data):
+def render_page_2(c, data, page_idx=1, total_pages=2):
     """Render Page 2 of FR.AK.06: Lead Assessor Review & Signatures."""
     x0 = 72.8
     x1 = 573.8
@@ -528,6 +597,10 @@ def render_page_2(c, data):
 
     # 1. Header Kop
     draw_header_kop(c, 75.2, 565.3)
+
+    if total_pages > 1:
+        c.setFont("Cal", 9.0)
+        c.drawRightString(x1, Y(86.0), f"Halaman {page_idx + 1} dari {total_pages}")
 
     # 2. Rekomendasi Peningkatan Section (y: 93.8 to 129.3)
     top_rekom = 93.8
@@ -539,14 +612,19 @@ def render_page_2(c, data):
     c.setFont("Cal-B", 10.5)
     c.drawString(x0 + 8.0, Y(111.0), "Rekomendasi untuk peningkatan :")
 
-    rekom_p2 = str(data.get("rekomendasi_dimensi") or data.get("rekomendasi_peningkatan") or "MUK yang digunakan sangat komprehensif. Disarankan pembaruan berkelanjutan pada bank soal dan instrumen asesmen.")
-    c.setFont("Cal", 8.8)
-    rekom_lines = wrap_text(c, rekom_p2, "Cal", 8.8, tbl_w - 185.0)
-    if len(rekom_lines) == 1:
-        c.drawString(x0 + 175.0, Y(111.0), rekom_lines[0])
-    elif len(rekom_lines) >= 2:
-        c.drawString(x0 + 175.0, Y(106.0), rekom_lines[0])
-        c.drawString(x0 + 175.0, Y(118.0), rekom_lines[1])
+    is_submitted = bool(data.get("is_submitted")) or (bool(data.get("template_type")) and data.get("template_type") in ["langsung", "tidak_langsung"])
+    rekom_p2 = str(data.get("rekomendasi_dimensi") or data.get("rekomendasi_peningkatan") or "").strip()
+    if is_submitted and not rekom_p2:
+        rekom_p2 = "MUK yang digunakan sangat komprehensif. Disarankan pembaruan berkelanjutan pada bank soal dan instrumen asesmen."
+
+    if rekom_p2:
+        c.setFont("Cal", 8.8)
+        rekom_lines = wrap_text(c, rekom_p2, "Cal", 8.8, tbl_w - 185.0)
+        if len(rekom_lines) == 1:
+            c.drawString(x0 + 175.0, Y(111.0), rekom_lines[0])
+        elif len(rekom_lines) >= 2:
+            c.drawString(x0 + 175.0, Y(106.0), rekom_lines[0])
+            c.drawString(x0 + 175.0, Y(118.0), rekom_lines[1])
 
     # 3. Signature & Lead Assessor Review Table (y: 129.3 to 238.1)
     top_sig = 129.3
@@ -586,20 +664,23 @@ def render_page_2(c, data):
     c.drawString(x0 + 8.0, Y(224.0), str(data.get("asesor_no_reg") or "-"))
 
     # Column 2 Content: Tanggal & Tanda Tangan
+    tgl_p2 = str(data.get("tanggal") or "").strip()
     c.setFont("Cal", 8.5)
-    c.drawCentredString((col_sig1 + col_sig2) / 2, Y(178.0), f"Tanggal : {data.get('tanggal') or '-'}")
+    c.drawCentredString((col_sig1 + col_sig2) / 2, Y(178.0), f"Tanggal : {tgl_p2 if tgl_p2 else '-'}")
 
     # Digital Signature
-    sig_drawn = draw_signature(
-        c,
-        data.get("signature_asesor"),
-        col_sig1 + 8.0,
-        Y(bot_sig - 10.0),
-        max_w=88.0,
-        max_h=46.0,
-    )
+    sig_drawn = False
+    if is_submitted and data.get("signature_asesor"):
+        sig_drawn = draw_signature(
+            c,
+            data.get("signature_asesor"),
+            col_sig1 + 8.0,
+            Y(bot_sig - 10.0),
+            max_w=88.0,
+            max_h=46.0,
+        )
 
-    if not sig_drawn:
+    if not sig_drawn and is_submitted:
         c.setFont("Cal-I", 8.0)
         c.drawCentredString((col_sig1 + col_sig2) / 2, Y(210.0), "(Tanda Tangan Digital)")
 
@@ -607,28 +688,56 @@ def render_page_2(c, data):
     c.setFont("Cal-B", 9.5)
     c.drawString(col_sig2 + 8.0, Y(180.0), "Komentar Peninjau:")
 
-    catatan_peninjau = str(data.get("catatan_peninjau") or "Proses asesmen telah memenuhi seluruh standar mutu penjaminan asesmen BNSP. Keputusan asesmen yang diambil adalah valid, reliabel, fleksibel, dan adil.")
-    komentar_lines = wrap_text(c, catatan_peninjau, "Cal", 8.5, (x1 - col_sig2) - 16.0)
-    c.setFont("Cal", 8.5)
-    k_y = 194.0
-    for kl in komentar_lines[:4]:
-        c.drawString(col_sig2 + 8.0, Y(k_y), kl)
-        k_y += 11.0
+    catatan_peninjau = str(data.get("catatan_peninjau") or "").strip()
+    if is_submitted and not catatan_peninjau:
+        catatan_peninjau = "Proses asesmen telah memenuhi seluruh standar mutu penjaminan asesmen BNSP. Keputusan asesmen yang diambil adalah valid, reliabel, fleksibel, dan adil."
+
+    if catatan_peninjau:
+        komentar_lines = wrap_text(c, catatan_peninjau, "Cal", 8.5, (x1 - col_sig2) - 16.0)
+        c.setFont("Cal", 8.5)
+        k_y = 194.0
+        for kl in komentar_lines[:4]:
+            c.drawString(col_sig2 + 8.0, Y(k_y), kl)
+            k_y += 11.0
 
 
 def render(dest_path, payload=None):
-    """Render full FR.AK.06 2-page document."""
+    """Render full FR.AK.06 document per assessor (2 pages per assessor)."""
     data = dict(DATA)
     if payload:
         data.update(payload)
 
+    assessors = data.get("assessors")
+    if not assessors or not isinstance(assessors, list):
+        assessors = [{
+            "asesor_nama": data.get("asesor_nama"),
+            "asesor_no_reg": data.get("asesor_no_reg"),
+            "signature_asesor": data.get("signature_asesor"),
+            "is_submitted": data.get("is_submitted", False),
+            "tanggal": data.get("tanggal", ""),
+            "template_type": data.get("template_type", ""),
+            "catatan_peninjau": data.get("catatan_peninjau", ""),
+            "rekomendasi_prosedur": data.get("rekomendasi_prosedur", ""),
+            "rekomendasi_dimensi": data.get("rekomendasi_dimensi", ""),
+        }]
+
+    total_pages = len(assessors) * 2
     c = canvas.Canvas(dest_path, pagesize=(PAGE_W, PAGE_H))
-    render_page_1(c, data)
-    c.showPage()
-    render_page_2(c, data)
-    c.showPage()
+
+    for as_idx, as_data in enumerate(assessors):
+        merged_data = dict(data)
+        merged_data.update(as_data)
+
+        p1_idx = as_idx * 2
+        render_page_1(c, merged_data, page_idx=p1_idx, total_pages=total_pages)
+        c.showPage()
+
+        p2_idx = as_idx * 2 + 1
+        render_page_2(c, merged_data, page_idx=p2_idx, total_pages=total_pages)
+        c.showPage()
+
     c.save()
-    print(f"OK -> Sukses generate FR.AK.06 Meninjau Proses Asesmen: {dest_path}")
+    print(f"OK -> Sukses generate FR.AK.06 Meninjau Proses Asesmen ({total_pages} halaman, {len(assessors)} asesor): {dest_path}")
 
 
 if __name__ == "__main__":

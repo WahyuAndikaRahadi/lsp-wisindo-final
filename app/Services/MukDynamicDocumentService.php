@@ -1641,11 +1641,6 @@ class MukDynamicDocumentService
         ]);
 
         $scheme = $schedule->scheme;
-        $leadAssessor = $schedule->assessors->first() ?? $schedule->assessments->first()?->assessor;
-        if ($leadAssessor && ! $leadAssessor->relationLoaded('profile')) {
-            $leadAssessor->load('profile');
-        }
-
         $date = Carbon::parse($schedule->date ?? now());
         $months = [
             1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April', 5 => 'Mei', 6 => 'Juni',
@@ -1654,92 +1649,179 @@ class MukDynamicDocumentService
         $formattedDate = $date->format('d').' '.($months[(int) $date->format('m')] ?? $date->format('F')).' '.$date->format('Y');
 
         $tukName = $schedule->tuk_name ?? ($schedule->tuk?->name ?? 'SMKN 1 Bali');
+        $ak01Data = is_array($schedule->ak01_data) ? $schedule->ak01_data : (json_decode((string) $schedule->ak01_data, true) ?: []);
+        $tukType = $ak01Data['tuk_type'] ?? ($schedule->tuk_type ?? 'Sewaktu');
 
-        // Build candidate rows
-        $peserta = [];
-        $assessments = $schedule->assessments;
-        foreach ($assessments as $idx => $ass) {
-            $finalRes = strtoupper((string) ($ass->final_result ?? ''));
-            $status = strtoupper((string) ($ass->status ?? ''));
-
-            $isAbsent = ((bool) ($ass->is_absent ?? false) || $finalRes === 'TIDAK_HADIR' || $status === 'ABSENT');
-            $isK = (! $isAbsent && (in_array($finalRes, ['K', 'KOMPETEN'], true) || ($finalRes === '' && $status === 'COMPLETED')));
-            $isBK = (! $isAbsent && in_array($finalRes, ['BK', 'BELUM_KOMPETEN'], true));
-
-            $keterangan = '';
-            if ($isAbsent) {
-                $keterangan = 'Tidak Hadir';
-            } elseif ($isBK) {
-                $keterangan = 'Perlu uji ulang';
-            } elseif ($isK) {
-                $keterangan = 'Memenuhi seluruh KUK';
-            } else {
-                $keterangan = 'Belum Selesai';
+        $scheduleAssessors = $schedule->assessors;
+        $assessorMap = [];
+        foreach ($scheduleAssessors as $as) {
+            if (! $as->relationLoaded('profile')) {
+                $as->load('profile');
             }
-
-            $peserta[] = [
-                'no' => $idx + 1,
-                'nama' => $ass->asesi?->full_name ?? ('Asesi '.($idx + 1)),
-                'is_k' => $isK,
-                'is_bk' => $isBK,
-                'keterangan' => $keterangan,
+            $assessorMap[$as->id] = [
+                'model' => $as,
+                'assessments' => collect(),
             ];
         }
 
-        // Extract findings from schedule's ak05_report
+        foreach ($schedule->assessments as $ass) {
+            if ($ass->assessor && ! isset($assessorMap[$ass->assessor->id])) {
+                $assAssessor = $ass->assessor;
+                if (! $assAssessor->relationLoaded('profile')) {
+                    $assAssessor->load('profile');
+                }
+                $assessorMap[$assAssessor->id] = [
+                    'model' => $assAssessor,
+                    'assessments' => collect(),
+                ];
+            }
+        }
+
+        $unassigned = collect();
+        foreach ($schedule->assessments as $ass) {
+            $assessorId = $ass->assessor_id;
+            if ($assessorId && isset($assessorMap[$assessorId])) {
+                $assessorMap[$assessorId]['assessments']->push($ass);
+            } else {
+                $unassigned->push($ass);
+            }
+        }
+
+        if ($unassigned->isNotEmpty()) {
+            if (! empty($assessorMap)) {
+                $firstKey = array_key_first($assessorMap);
+                $assessorMap[$firstKey]['assessments'] = $assessorMap[$firstKey]['assessments']->merge($unassigned);
+            } else {
+                $defaultAssessor = $schedule->assessors->first() ?? $schedule->assessments->first()?->assessor;
+                if ($defaultAssessor && ! $defaultAssessor->relationLoaded('profile')) {
+                    $defaultAssessor->load('profile');
+                }
+                $assessorMap[0] = [
+                    'model' => $defaultAssessor,
+                    'assessments' => $unassigned,
+                ];
+            }
+        }
+
+        if (empty($assessorMap)) {
+            $leadAssessor = $schedule->assessors->first() ?? $schedule->assessments->first()?->assessor;
+            if ($leadAssessor && ! $leadAssessor->relationLoaded('profile')) {
+                $leadAssessor->load('profile');
+            }
+            $assessorMap[0] = [
+                'model' => $leadAssessor,
+                'assessments' => collect(),
+            ];
+        }
+
         $report = is_array($schedule->ak05_report) ? $schedule->ak05_report : [];
-        if (empty($report['aspek_positif']) && ! empty($report['by_assessor']) && is_array($report['by_assessor'])) {
-            $firstAssessorReport = reset($report['by_assessor']);
-            if (is_array($firstAssessorReport)) {
-                $report = array_merge($firstAssessorReport, $report);
+        $assessorsPayload = [];
+        $allPesertaFlat = [];
+
+        foreach ($assessorMap as $asId => $grp) {
+            $assessor = $grp['model'];
+            $assessorAssessments = $grp['assessments'];
+
+            $peserta = [];
+            foreach ($assessorAssessments as $idx => $ass) {
+                $finalRes = strtoupper((string) ($ass->final_result ?? ''));
+                $status = strtoupper((string) ($ass->status ?? ''));
+
+                $isAbsent = ((bool) ($ass->is_absent ?? false) || $finalRes === 'TIDAK_HADIR' || $status === 'ABSENT');
+                $isK = (! $isAbsent && (in_array($finalRes, ['K', 'KOMPETEN'], true) || ($finalRes === '' && $status === 'COMPLETED')));
+                $isBK = (! $isAbsent && in_array($finalRes, ['BK', 'BELUM_KOMPETEN'], true));
+
+                $keterangan = '';
+                if ($isAbsent) {
+                    $keterangan = 'Tidak Hadir';
+                } elseif ($isBK) {
+                    $keterangan = 'Perlu uji ulang';
+                } elseif ($isK) {
+                    $keterangan = 'Memenuhi seluruh KUK';
+                } else {
+                    $keterangan = 'Belum Selesai';
+                }
+
+                $pData = [
+                    'no' => $idx + 1,
+                    'nama' => $ass->asesi?->full_name ?? ('Asesi '.($idx + 1)),
+                    'is_k' => $isK,
+                    'is_bk' => $isBK,
+                    'keterangan' => $keterangan,
+                ];
+                $peserta[] = $pData;
+                $allPesertaFlat[] = $pData;
             }
-        }
 
-        $aspekNegatif = $report['aspek_negatif'] ?? $report['negative_aspects'] ?? 'Tidak ditemukan kendala signifikan selama proses asesmen berlangsung.';
-        $aspekPositif = $report['aspek_positif'] ?? $report['positive_aspects'] ?? 'Sarana dan prasarana bengkel TUK lengkap, ketersediaan alat ukur dan APD sesuai standar K3, asesi hadir tepat waktu.';
-        $hasPenolakan = ! empty($report['has_penolakan']) || ! empty($report['penolakan_assessment_ids']);
-        $rejectionNotes = $report['rejection_notes'] ?? $report['penolakan_catatan'] ?? $report['ada_penolakan'] ?? $report['penolakan'] ?? null;
-        if ($hasPenolakan || ($rejectionNotes && ! str_contains(strtolower($rejectionNotes), 'tidak ada penolakan'))) {
-            $adaPenolakan = 'Ada Penolakan / Permohonan Banding dari Asesi';
-            if ($rejectionNotes && ! str_contains($rejectionNotes, 'Ada Penolakan')) {
-                $adaPenolakan .= ': '.$rejectionNotes;
+            $assessorReport = [];
+            if (! empty($report['by_assessor'][$asId]) && is_array($report['by_assessor'][$asId])) {
+                $assessorReport = $report['by_assessor'][$asId];
             }
-        } else {
-            $adaPenolakan = $report['ada_penolakan'] ?? $report['rejection_notes'] ?? 'Tidak ada penolakan dari asesi atas keputusan asesmen.';
-        }
-        $saranPerbaikan = $report['saran_perbaikan'] ?? $report['rekomendasi'] ?? $report['improvement_suggestions'] ?? 'Mempertahankan konsistensi kalibrasi peralatan tangan dan SST serta peningkatan durasi praktik mandiri.';
-        $catatan = $report['catatan'] ?? 'Laporan asesmen ini dibuat berdasarkan seluruh bukti langsung, tidak langsung, dan tambahan yang dihimpun selama proses asesmen berlangsung di TUK.';
 
-        // Signature assessor
-        $signatureAssessor = null;
-        if (! empty($leadAssessor?->profile?->signature_data)) {
-            $signatureAssessor = $leadAssessor->profile->signature_data;
-        } elseif (! empty($schedule->assessments->first()?->assessor_signature)) {
-            $signatureAssessor = $schedule->assessments->first()->assessor_signature;
-        } elseif ($leadAssessor?->profile?->signature_path && file_exists(storage_path('app/public/'.$leadAssessor->profile->signature_path))) {
-            $signatureAssessor = storage_path('app/public/'.$leadAssessor->profile->signature_path);
+            $aspekNegatif = $assessorReport['aspek_negatif'] ?? $assessorReport['negative_aspects'] ?? ($report['aspek_negatif'] ?? ($report['negative_aspects'] ?? 'Tidak ditemukan kendala signifikan selama proses asesmen berlangsung.'));
+            $aspekPositif = $assessorReport['aspek_positif'] ?? $assessorReport['positive_aspects'] ?? ($report['aspek_positif'] ?? ($report['positive_aspects'] ?? 'Sarana dan prasarana bengkel TUK lengkap, ketersediaan alat ukur dan APD sesuai standar K3, asesi hadir tepat waktu.'));
+
+            $hasPenolakan = ! empty($assessorReport['has_penolakan']) || ! empty($assessorReport['penolakan_assessment_ids']) || ! empty($report['has_penolakan']);
+            $rejectionNotes = $assessorReport['rejection_notes'] ?? ($assessorReport['penolakan_catatan'] ?? ($assessorReport['ada_penolakan'] ?? ($assessorReport['penolakan'] ?? ($report['rejection_notes'] ?? ($report['penolakan_catatan'] ?? null)))));
+
+            if ($hasPenolakan || ($rejectionNotes && ! str_contains(strtolower($rejectionNotes), 'tidak ada penolakan'))) {
+                $adaPenolakan = 'Ada Penolakan / Permohonan Banding dari Asesi';
+                if ($rejectionNotes && ! str_contains($rejectionNotes, 'Ada Penolakan')) {
+                    $adaPenolakan .= ': '.$rejectionNotes;
+                }
+            } else {
+                $adaPenolakan = $assessorReport['ada_penolakan'] ?? ($report['ada_penolakan'] ?? 'Tidak ada penolakan dari asesi atas keputusan asesmen.');
+            }
+
+            $saranPerbaikan = $assessorReport['saran_perbaikan'] ?? ($assessorReport['rekomendasi'] ?? ($assessorReport['improvement_suggestions'] ?? ($report['saran_perbaikan'] ?? ($report['rekomendasi'] ?? 'Mempertahankan konsistensi kalibrasi peralatan tangan dan SST serta peningkatan durasi praktik mandiri.'))));
+            $catatan = $assessorReport['catatan'] ?? ($report['catatan'] ?? 'Laporan asesmen ini dibuat berdasarkan seluruh bukti langsung, tidak langsung, dan tambahan yang dihimpun selama proses asesmen berlangsung di TUK.');
+
+            $signatureAssessor = null;
+            if (! empty($assessor?->profile?->signature_data)) {
+                $signatureAssessor = $assessor->profile->signature_data;
+            } elseif (! empty($assessorAssessments->firstWhere('assessor_signature', '!=', null)?->assessor_signature)) {
+                $signatureAssessor = $assessorAssessments->firstWhere('assessor_signature', '!=', null)->assessor_signature;
+            } elseif ($assessor?->profile?->signature_path && file_exists(storage_path('app/public/'.$assessor->profile->signature_path))) {
+                $signatureAssessor = storage_path('app/public/'.$assessor->profile->signature_path);
+            }
+
+            $assessorReg = $assessor?->assessor_registration_number
+                ?: ($assessor?->profile?->met_reg_number
+                    ?: ($assessor?->profile?->no_reg ?: 'MET.000.001234 2022'));
+
+            $assessorsPayload[] = [
+                'asesor_id' => $asId,
+                'asesor_nama' => $assessor?->full_name ?? 'Asesor LSP PrO Indo',
+                'asesor_no_reg' => $assessorReg,
+                'signature_asesor' => $signatureAssessor,
+                'peserta' => $peserta,
+                'aspek_negatif' => $aspekNegatif,
+                'aspek_positif' => $aspekPositif,
+                'ada_penolakan' => $adaPenolakan,
+                'saran_perbaikan' => $saranPerbaikan,
+                'catatan' => $catatan,
+            ];
         }
 
-        $assessorReg = $leadAssessor?->assessor_registration_number
-            ?: ($leadAssessor?->profile?->met_reg_number
-                ?: ($leadAssessor?->profile?->no_reg ?: 'MET.000.001234 2022'));
+        $firstAssessor = reset($assessorsPayload);
 
         return [
             'skema_nama' => $scheme?->name ?? 'Maintenance Gasoline Engine Injection System',
             'skema_nomor' => $scheme?->muk_code ?? ($scheme?->code ?? '02/LSP PrO Indo/XI/2025'),
             'skema_tipe' => strtoupper((string) ($scheme?->scheme_type ?? 'KLASTER')),
             'tuk_nama' => $tukName,
-            'tuk_tipe' => 'Sewaktu/Tempat Kerja/Mandiri*',
-            'asesor_nama' => $leadAssessor?->full_name ?? 'Randi Ardiansyah',
-            'asesor_no_reg' => $assessorReg,
+            'tuk_tipe' => $tukType,
+            'asesor_nama' => $firstAssessor['asesor_nama'],
+            'asesor_no_reg' => $firstAssessor['asesor_no_reg'],
+            'signature_asesor' => $firstAssessor['signature_asesor'],
             'tanggal' => $formattedDate,
-            'peserta' => $peserta,
-            'aspek_negatif' => $aspekNegatif,
-            'aspek_positif' => $aspekPositif,
-            'ada_penolakan' => $adaPenolakan,
-            'saran_perbaikan' => $saranPerbaikan,
-            'catatan' => $catatan,
-            'signature_asesor' => $signatureAssessor,
+            'peserta' => $allPesertaFlat,
+            'aspek_negatif' => $firstAssessor['aspek_negatif'],
+            'aspek_positif' => $firstAssessor['aspek_positif'],
+            'ada_penolakan' => $firstAssessor['ada_penolakan'],
+            'saran_perbaikan' => $firstAssessor['saran_perbaikan'],
+            'catatan' => $firstAssessor['catatan'],
+            'assessors' => $assessorsPayload,
         ];
     }
 
@@ -1758,11 +1840,6 @@ class MukDynamicDocumentService
         ]);
 
         $scheme = $schedule->scheme;
-        $leadAssessor = $schedule->assessors->first() ?? $schedule->assessments->first()?->assessor;
-        if ($leadAssessor && ! $leadAssessor->relationLoaded('profile')) {
-            $leadAssessor->load('profile');
-        }
-
         $date = Carbon::parse($schedule->date ?? now());
         $months = [
             1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April', 5 => 'Mei', 6 => 'Juni',
@@ -1771,54 +1848,142 @@ class MukDynamicDocumentService
         $formattedDate = $date->format('d').' '.($months[(int) $date->format('m')] ?? $date->format('F')).' '.$date->format('Y');
 
         $tukName = $schedule->tuk_name ?? ($schedule->tuk?->name ?? 'SMKN 1 Bali');
+        $ak01Data = is_array($schedule->ak01_data) ? $schedule->ak01_data : (json_decode((string) $schedule->ak01_data, true) ?: []);
+        $tukType = $ak01Data['tuk_type'] ?? ($schedule->tuk_type ?? 'Sewaktu');
 
-        // Extract review data from schedule's ak06_review
-        $review = is_array($schedule->ak06_review) ? $schedule->ak06_review : [];
-        if (empty($review['catatan_peninjau']) && ! empty($review['by_assessor']) && is_array($review['by_assessor'])) {
-            $firstAssessorReview = reset($review['by_assessor']);
-            if (is_array($firstAssessorReview)) {
-                $review = array_merge($firstAssessorReview, $review);
+        $scheduleAssessors = $schedule->assessors;
+        $assessorMap = [];
+        foreach ($scheduleAssessors as $as) {
+            if (! $as->relationLoaded('profile')) {
+                $as->load('profile');
+            }
+            $assessorMap[$as->id] = $as;
+        }
+
+        foreach ($schedule->assessments as $ass) {
+            if ($ass->assessor && ! isset($assessorMap[$ass->assessor->id])) {
+                $assAssessor = $ass->assessor;
+                if (! $assAssessor->relationLoaded('profile')) {
+                    $assAssessor->load('profile');
+                }
+                $assessorMap[$assAssessor->id] = $assAssessor;
             }
         }
 
-        $templateType = strtolower((string) ($review['template_type'] ?? 'langsung'));
-        if (! in_array($templateType, ['langsung', 'tidak_langsung'], true)) {
-            $templateType = 'langsung';
+        if (empty($assessorMap)) {
+            $defaultAssessor = $schedule->assessments->first()?->assessor;
+            if ($defaultAssessor) {
+                if (! $defaultAssessor->relationLoaded('profile')) {
+                    $defaultAssessor->load('profile');
+                }
+                $assessorMap[$defaultAssessor->id] = $defaultAssessor;
+            }
         }
 
+        $review = is_array($schedule->ak06_review) ? $schedule->ak06_review : [];
         $defaultCatatan = 'Proses asesmen telah memenuhi seluruh standar mutu penjaminan asesmen BNSP. Keputusan asesmen yang diambil adalah valid, reliabel, fleksibel, dan adil.';
-        $catatanPeninjau = ! empty($review['catatan_peninjau'])
-            ? $review['catatan_peninjau']
-            : ($review['review_notes'] ?? $defaultCatatan);
 
-        // Signature assessor
-        $signatureAssessor = null;
-        if (! empty($leadAssessor?->profile?->signature_data)) {
-            $signatureAssessor = $leadAssessor->profile->signature_data;
-        } elseif (! empty($schedule->assessments->first()?->assessor_signature)) {
-            $signatureAssessor = $schedule->assessments->first()->assessor_signature;
-        } elseif ($leadAssessor?->profile?->signature_path && file_exists(storage_path('app/public/'.$leadAssessor->profile->signature_path))) {
-            $signatureAssessor = storage_path('app/public/'.$leadAssessor->profile->signature_path);
+        $assessorsPayload = [];
+        foreach ($assessorMap as $asId => $assessor) {
+            $hasReview = false;
+            $assessorReview = [];
+            if (! empty($review['by_assessor'][$asId]) && is_array($review['by_assessor'][$asId])) {
+                $assessorReview = $review['by_assessor'][$asId];
+                $hasReview = true;
+            } elseif (empty($review['by_assessor']) && ! empty($review['template_type'])) {
+                $reviewerId = $review['reviewer_id'] ?? null;
+                if ($reviewerId === null || (int) $reviewerId === (int) $asId) {
+                    $assessorReview = $review;
+                    $hasReview = true;
+                }
+            }
+
+            if ($hasReview) {
+                $templateType = strtolower((string) ($assessorReview['template_type'] ?? 'langsung'));
+                if (! in_array($templateType, ['langsung', 'tidak_langsung'], true)) {
+                    $templateType = 'langsung';
+                }
+
+                $catatanPeninjau = ! empty($assessorReview['catatan_peninjau'])
+                    ? $assessorReview['catatan_peninjau']
+                    : ($assessorReview['review_notes'] ?? $defaultCatatan);
+
+                $rekomendasiProsedur = $assessorReview['rekomendasi_prosedur'] ?? 'Seluruh prosedur asesmen terlaksana secara valid, reliabel, fleksibel dan adil sesuai pedoman BNSP 301.';
+                $rekomendasiDimensi = $assessorReview['rekomendasi_dimensi'] ?? 'MUK yang digunakan sangat komprehensif. Disarankan pembaruan berkelanjutan pada bank soal dan instrumen asesmen.';
+
+                $signatureAssessor = null;
+                if (! empty($assessor?->profile?->signature_data)) {
+                    $signatureAssessor = $assessor->profile->signature_data;
+                } elseif (! empty($schedule->assessments->where('assessor_id', $asId)->firstWhere('assessor_signature', '!=', null)?->assessor_signature)) {
+                    $signatureAssessor = $schedule->assessments->where('assessor_id', $asId)->firstWhere('assessor_signature', '!=', null)->assessor_signature;
+                } elseif ($assessor?->profile?->signature_path && file_exists(storage_path('app/public/'.$assessor->profile->signature_path))) {
+                    $signatureAssessor = storage_path('app/public/'.$assessor->profile->signature_path);
+                }
+
+                $revDate = ! empty($assessorReview['reviewed_at'])
+                    ? Carbon::parse($assessorReview['reviewed_at'])
+                    : $date;
+                $assessorTanggal = $revDate->format('d').' '.($months[(int) $revDate->format('m')] ?? $revDate->format('F')).' '.$revDate->format('Y');
+            } else {
+                $templateType = '';
+                $catatanPeninjau = '';
+                $rekomendasiProsedur = '';
+                $rekomendasiDimensi = '';
+                $signatureAssessor = null;
+                $assessorTanggal = '';
+            }
+
+            $assessorReg = $assessor?->assessor_registration_number
+                ?: ($assessor?->profile?->met_reg_number
+                    ?: ($assessor?->profile?->no_reg ?: ''));
+
+            $assessorsPayload[] = [
+                'asesor_id' => $asId,
+                'asesor_nama' => $assessor?->full_name ?? 'Asesor LSP PrO Indo',
+                'asesor_no_reg' => $assessorReg,
+                'signature_asesor' => $signatureAssessor,
+                'is_submitted' => $hasReview,
+                'tanggal' => $assessorTanggal,
+                'template_type' => $templateType,
+                'catatan_peninjau' => $catatanPeninjau,
+                'rekomendasi_prosedur' => $rekomendasiProsedur,
+                'rekomendasi_dimensi' => $rekomendasiDimensi,
+            ];
         }
 
-        $assessorReg = $leadAssessor?->assessor_registration_number
-            ?: ($leadAssessor?->profile?->met_reg_number
-                ?: ($leadAssessor?->profile?->no_reg ?: 'MET.000.001234 2022'));
+        if (empty($assessorsPayload)) {
+            $assessorsPayload[] = [
+                'asesor_id' => 0,
+                'asesor_nama' => '',
+                'asesor_no_reg' => '',
+                'signature_asesor' => null,
+                'is_submitted' => false,
+                'tanggal' => '',
+                'template_type' => '',
+                'catatan_peninjau' => '',
+                'rekomendasi_prosedur' => '',
+                'rekomendasi_dimensi' => '',
+            ];
+        }
+
+        $firstAssessor = reset($assessorsPayload);
 
         return [
             'skema_nama' => $scheme?->name ?? 'Maintenance Gasoline Engine Injection System',
             'skema_nomor' => $scheme?->muk_code ?? ($scheme?->code ?? '02/LSP PrO Indo/XI/2025'),
             'skema_tipe' => strtoupper((string) ($scheme?->scheme_type ?? 'KLASTER')),
             'tuk_nama' => $tukName,
-            'tuk_tipe' => 'Sewaktu/Tempat Kerja/Mandiri*',
-            'asesor_nama' => $leadAssessor?->full_name ?? 'Randi Ardiansyah',
-            'asesor_no_reg' => $assessorReg,
-            'tanggal' => $formattedDate,
-            'template_type' => $templateType,
-            'catatan_peninjau' => $catatanPeninjau,
-            'rekomendasi_prosedur' => 'Seluruh prosedur asesmen terlaksana secara valid, reliabel, fleksibel dan adil sesuai pedoman BNSP 301.',
-            'rekomendasi_dimensi' => 'MUK yang digunakan sangat komprehensif. Disarankan pembaruan berkelanjutan pada bank soal dan instrumen asesmen.',
-            'signature_asesor' => $signatureAssessor,
+            'tuk_tipe' => $tukType,
+            'asesor_nama' => $firstAssessor['asesor_nama'] ?? '',
+            'asesor_no_reg' => $firstAssessor['asesor_no_reg'] ?? '',
+            'signature_asesor' => $firstAssessor['signature_asesor'] ?? null,
+            'tanggal' => $firstAssessor['tanggal'] ?? '',
+            'is_submitted' => $firstAssessor['is_submitted'] ?? false,
+            'template_type' => $firstAssessor['template_type'] ?? '',
+            'catatan_peninjau' => $firstAssessor['catatan_peninjau'] ?? '',
+            'rekomendasi_prosedur' => $firstAssessor['rekomendasi_prosedur'] ?? '',
+            'rekomendasi_dimensi' => $firstAssessor['rekomendasi_dimensi'] ?? '',
+            'assessors' => $assessorsPayload,
         ];
     }
 

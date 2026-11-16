@@ -610,4 +610,63 @@ class DynamicMukExportTest extends TestCase
         $responseAsesi->assertOk();
         $this->assertInstanceOf(BinaryFileResponse::class, $responseAsesi->baseResponse);
     }
+
+    public function test_admin_exports_ak06_pdf_empty_when_assessor_has_not_submitted_reports(): void
+    {
+        $this->schedule->update(['ak06_review' => null]);
+
+        $response = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.dynamic', [
+            'schedule' => $this->schedule->id,
+            'type' => 'ak06',
+        ]));
+
+        $response->assertOk();
+        $filePath = $response->baseResponse->getFile()->getPathname();
+        $this->assertFileExists($filePath);
+
+        $python = app(MukDynamicDocumentService::class)->getPythonExecutable();
+        $extractScript = 'import fitz, sys; doc = fitz.open(sys.argv[1]); [sys.stdout.buffer.write(p.get_text().encode()) for p in doc]';
+        $pdfText = shell_exec(escapeshellarg($python).' -c '.escapeshellarg($extractScript).' '.escapeshellarg($filePath)) ?? '';
+
+        $this->assertStringContainsString('MENINJAU PROSES ASESMEN', $pdfText);
+        $this->assertStringNotContainsString('(LANGSUNG)', $pdfText);
+        $this->assertStringNotContainsString('(TIDAK LANGSUNG)', $pdfText);
+        $this->assertStringNotContainsString('FR IA 03', $pdfText);
+        $this->assertStringNotContainsString('FR.IA 08', $pdfText);
+        $this->assertStringNotContainsString('(Tanda Tangan Digital)', $pdfText);
+    }
+
+    public function test_admin_exports_ak06_pdf_filled_per_assessor_when_submitted(): void
+    {
+        $this->schedule->update([
+            'ak06_review' => [
+                'by_assessor' => [
+                    $this->asesor->id => [
+                        'template_type' => 'langsung',
+                        'catatan_peninjau' => 'Proses sangat baik dan memenuhi standar BNSP secara sempurna.',
+                        'reviewer_id' => $this->asesor->id,
+                        'reviewed_at' => '2026-11-16T10:00:00Z',
+                    ],
+                ],
+            ],
+        ]);
+
+        $response = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.dynamic', [
+            'schedule' => $this->schedule->id,
+            'type' => 'ak06',
+        ]));
+
+        $response->assertOk();
+        $filePath = $response->baseResponse->getFile()->getPathname();
+        $this->assertFileExists($filePath);
+
+        $python = app(MukDynamicDocumentService::class)->getPythonExecutable();
+        $extractScript = 'import fitz, sys; doc = fitz.open(sys.argv[1]); [sys.stdout.buffer.write(p.get_text().encode()) for p in doc]';
+        $pdfText = shell_exec(escapeshellarg($python).' -c '.escapeshellarg($extractScript).' '.escapeshellarg($filePath)) ?? '';
+
+        $this->assertStringContainsString('MENINJAU PROSES ASESMEN (LANGSUNG)', $pdfText);
+        $this->assertStringContainsString('FR IA 03', $pdfText);
+        $this->assertStringContainsString('Proses sangat baik dan memenuhi standar BNSP secara sempurna.', $pdfText);
+        $this->assertStringContainsString('(Tanda Tangan Digital)', $pdfText);
+    }
 }
