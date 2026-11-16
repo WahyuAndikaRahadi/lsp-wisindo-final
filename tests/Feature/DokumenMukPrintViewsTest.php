@@ -240,6 +240,15 @@ class DokumenMukPrintViewsTest extends TestCase
         $this->assertStringContainsString('Barat Kabupaten Bekasi', $extracted);
         $this->assertStringContainsString('Jawa Barat', $extracted);
         $this->assertStringContainsString('Muhammad Rizky Ramadhan', $extracted);
+
+        // Verify letterhead is centered on both pages (Berita Acara and Attendance List)
+        $centerScript = "import pymupdf, sys, json; doc = pymupdf.open(sys.argv[1]); res = [{'left': page.get_image_rects(page.get_images()[0][0])[0].x0, 'right': page.rect.width - page.get_image_rects(page.get_images()[0][0])[0].x1} for page in doc if page.get_images()]; print(json.dumps(res))";
+        $centerJson = shell_exec(escapeshellarg($python).' -c '.escapeshellarg($centerScript).' '.escapeshellarg($pdfPath));
+        $centerData = json_decode($centerJson, true);
+        $this->assertIsArray($centerData);
+        $this->assertGreaterThanOrEqual(2, count($centerData));
+        // Page 2 (Daftar Hadir / Attendance list)
+        $this->assertEqualsWithDelta($centerData[1]['left'], $centerData[1]['right'], 1.0, 'Page 2 attendance list letterhead should be centered.');
     }
 
     public function test_daftar_hadir_asesor_wraps_long_tuk_institution_and_assessor_names(): void
@@ -266,6 +275,14 @@ class DokumenMukPrintViewsTest extends TestCase
         $this->assertStringContainsString('SMK Negeri 1 Cikarang Barat', $extracted);
         $this->assertStringContainsString('Raden Mas Sudirman', $extracted);
         $this->assertStringContainsString('ASEAN Eng.', $extracted);
+
+        // Verify letterhead is centered horizontally on assessor attendance list
+        $centerScript = "import pymupdf, sys, json; doc = pymupdf.open(sys.argv[1]); res = [{'left': page.get_image_rects(page.get_images()[0][0])[0].x0, 'right': page.rect.width - page.get_image_rects(page.get_images()[0][0])[0].x1} for page in doc if page.get_images()]; print(json.dumps(res))";
+        $centerJson = shell_exec(escapeshellarg($python).' -c '.escapeshellarg($centerScript).' '.escapeshellarg($pdfPath));
+        $centerData = json_decode($centerJson, true);
+        $this->assertIsArray($centerData);
+        $this->assertNotEmpty($centerData);
+        $this->assertEqualsWithDelta($centerData[0]['left'], $centerData[0]['right'], 1.0, 'Daftar hadir asesor letterhead should be centered.');
     }
 
     public function test_can_render_daftar_hadir_asesi_with_alternating_signatures(): void
@@ -603,5 +620,63 @@ class DokumenMukPrintViewsTest extends TestCase
         $hadirHtml->assertSee('Dr. Hendra Gunawan, M.T.');
         $hadirHtml->assertSee('Rian Kurniawan');
         $hadirHtml->assertSee('Dimas Pratama');
+    }
+
+    public function test_surat_pernyataan_pdf_export_matches_schedule_tuk_wraps_long_name_blanks_numbers_and_displays_signature(): void
+    {
+        $longTukName = 'SMK Negeri 1 Cikarang Barat Kabupaten Bekasi Jawa Barat (Tempat Uji Kompetensi Terverifikasi BNSP)';
+        $this->schedule->update([
+            'tuk_name' => $longTukName,
+        ]);
+
+        $sampleSignature = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJYAAAA8CAYAAACEhkNqAAABkElEQVR4nO3c4Y2DMAyGYe5myBDsP80N0R3oj+okhEIhJNifzfsMUDn2h6Oq3E0TAAAAAAAAACC2UuallHnxrgMfP94F9KqF6fX6C3+u6MIO4Mx2ImB+fr0LaFW78vYCxNXoJ8wTffbK42rUIN/wK0HZ21QEzI5so3s3D+HyJdfk0VcZV6MPmQbfGQC2lz33xlptFMJly62pXlcUV2OfUublTL/MG6owWLZXu3XPpIKlEKg1wnWsp0ePv3rU6/Mwoie3NTDSwNhe43tg8u0rwoCeGq675jWsaVEDtZXlHN9YPETdH5RxEFm3l+Ws+KlkR5ZweZ2j+cOzB2or6nm96+56WyBCg0eIsr2U6rwULLWGWlAa2pbiQ98ULO9iFagMUTno0yTwdkNEnkNVCfYRuYKisAyX+naqkS0sCusXFJXDtBaiSHUjN0rE7VQTqlhlvYGIvJ1qwhauqiUgWbZTTfgDKDoKTLbtVJPqMErO/nl/tkD9S3koJU/YTnDC/+4CAAAAAAAAAAAAAAAAAABAfm/ikyAKkwlsyAAAAABJRU5ErkJggg==';
+
+        $this->assessment->update([
+            'asesi_signature' => $sampleSignature,
+        ]);
+
+        $response = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.export-asesi', [
+            'assessment' => $this->assessment->id,
+            'type' => 'pernyataan',
+            'format' => 'pdf',
+        ]));
+
+        $response->assertOk();
+        $this->assertEquals('application/pdf', $response->headers->get('Content-Type'));
+
+        $pdfPath = $response->baseResponse->getFile()->getPathname();
+        $this->assertFileExists($pdfPath);
+
+        $python = base_path('.venv/bin/python');
+        $script = <<<'PY'
+import pymupdf, sys, json
+doc = pymupdf.open(sys.argv[1])
+page = doc[0]
+text = page.get_text()
+images = page.get_images()
+res = {
+    'text': text,
+    'has_signature_image': len(images) >= 2,
+    'images_count': len(images),
+}
+print(json.dumps(res))
+PY;
+        $output = shell_exec(escapeshellarg($python).' -c '.escapeshellarg($script).' '.escapeshellarg($pdfPath));
+        $data = json_decode($output, true);
+
+        $this->assertIsArray($data);
+        // 1. TUK name matches schedule and is wrapped across lines
+        $this->assertStringContainsString('SMK Negeri 1', $data['text']);
+        $this->assertStringContainsString('Cikarang Barat Kabupaten Bekasi', $data['text']);
+        $this->assertStringContainsString('Tempat Uji Kompetensi Terverifikasi BNSP', $data['text']);
+
+        // 2. Dummy numbers BLK- and CERT- are removed, fields are blank
+        $this->assertStringNotContainsString('BLK-', $data['text']);
+        $this->assertStringNotContainsString('CERT-', $data['text']);
+        $this->assertMatchesRegularExpression('/No\.Blanko\s*:\s*\n/m', $data['text']);
+        $this->assertMatchesRegularExpression('/No\.\s*Sertifikat\s*:\s*\n/m', $data['text']);
+
+        // 3. Assessee signature image is embedded in the PDF
+        $this->assertTrue($data['has_signature_image'], 'Assessee signature should be embedded in the PDF document.');
     }
 }

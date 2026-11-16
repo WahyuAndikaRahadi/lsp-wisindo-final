@@ -207,7 +207,10 @@ def render_page_1(c, chunk, chunk_offset, batch_idx, total_batches, assessor_inf
 
     kop_file = os.path.join(ASSETS, "kop_surat.png")
     if os.path.exists(kop_file):
-        c.drawImage(kop_file, 33.0, Y1(29.8 + 89.2), 528.0, 89.2, mask="auto")
+        kop_w = 528.0
+        kop_h = 89.2
+        kop_x = (PW - kop_w) / 2.0
+        c.drawImage(kop_file, kop_x, Y1(29.8 + kop_h), kop_w, kop_h, mask="auto")
 
     c.setFont("Lib-B", 12.0)
     c.setFillColor(black)
@@ -357,7 +360,10 @@ def render_page_2(c, chunk, chunk_offset, batch_idx, total_batches, assessor_inf
 
     kop_file = os.path.join(ASSETS, "kop_surat.png")
     if os.path.exists(kop_file):
-        c.drawImage(kop_file, 73.5, Y2(22.0 + 68.4), 480.0, 68.4, mask="auto")
+        kop_w = 480.0
+        kop_h = 68.4
+        kop_x = (PW - kop_w) / 2.0
+        c.drawImage(kop_file, kop_x, Y2(22.0 + kop_h), kop_w, kop_h, mask="auto")
 
     c.setFont("Lib-B", 12.0)
     c.setFillColor(black)

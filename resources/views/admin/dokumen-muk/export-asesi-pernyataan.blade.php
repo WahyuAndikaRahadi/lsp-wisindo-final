@@ -46,12 +46,12 @@
             <tr>
                 <td>No. Blanko</td>
                 <td>:</td>
-                <td>{{ $assessment->blanko_number ?? '........................................' }}</td>
+                <td>{{ $assessment->blanko_number ?? '' }}</td>
             </tr>
             <tr>
                 <td>No. Sertifikat</td>
                 <td>:</td>
-                <td>{{ $assessment->certificate_number ?? '........................................' }}</td>
+                <td>{{ $assessment->certificate_number ?? '' }}</td>
             </tr>
         </table>
     </div>

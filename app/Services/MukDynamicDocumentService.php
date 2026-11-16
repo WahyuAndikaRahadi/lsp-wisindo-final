@@ -257,14 +257,26 @@ class MukDynamicDocumentService
         $monthName = $months[(int) $date->format('m')] ?? $date->format('F');
         $formattedDate = $date->format('d').' '.$monthName.' '.$date->format('Y');
 
+        $tukName = $schedule->tuk_name ?? $schedule->tuk?->name ?? 'TUK Otomotif Mandiri';
+        $tukAddress = $schedule->tuk_address ?? $schedule->tuk?->address;
+        $tukKota = $schedule->tuk_city ?? ($tukAddress ? (explode(',', $tukAddress)[0] ?? 'Karawang') : 'Karawang');
+
         $payload = [
             'skema_nama' => $schedule->scheme?->name ?? 'Skema Sertifikasi LSP PrO Indo',
             'skema_nomor' => $schedule->scheme?->code ?? 'SKM/LSP-PRO/2026',
-            'tuk_nama' => $schedule->tuk_name ?? $schedule->tuk?->name ?? 'TUK Otomotif Mandiri',
-            'tuk_kota' => $schedule->tuk?->address ? (explode(',', $schedule->tuk->address)[0] ?? 'Karawang') : 'Karawang',
-            'tuk_alamat' => $schedule->tuk?->address ?? 'Karawang, Jawa Barat',
+            'tuk_nama' => $tukName,
+            'tuk_kota' => $tukKota,
+            'tuk_alamat' => $tukAddress ?? 'Karawang, Jawa Barat',
             'hari_tanggal' => "{$dayName}, {$formattedDate}",
             'tanggal' => $formattedDate,
+            'hari' => $dayName,
+            'bulan' => $monthName,
+            'tahun' => $date->format('Y'),
+            'tempat' => $tukName,
+            'no_blanko' => '',
+            'no_sertifikat' => '',
+            'kota_ttd' => $tukKota,
+            'tanggal_ttd' => $formattedDate,
             'waktu' => ($schedule->start_time ?? '08:00').' - '.($schedule->end_time ?? '12:00').' WIB',
             'asesor_nama' => $leadAssessor?->full_name ?? 'Asesor LSP PrO Indo',
             'asesor_no_reg' => $leadAssessor?->assessor_registration_number ?? $leadAssessor?->profile?->no_reg ?? 'MET.000.001234 2022',
@@ -283,7 +295,10 @@ class MukDynamicDocumentService
             $jk = strtoupper(substr((string) ($profile?->jenis_kelamin ?? $profile?->gender ?? 'L'), 0, 1));
 
             $payload['asesi_nama'] = $asesi?->full_name ?? 'Nama Asesi';
+            $payload['nama'] = $asesi?->full_name ?? 'Nama Asesi';
             $payload['asesi_nik'] = $profile?->nik ?? '-';
+            $payload['nik'] = $profile?->nik ?? '-';
+            $payload['skema'] = $schedule->scheme?->name ?? 'Skema Sertifikasi LSP PrO Indo';
             $payload['asesi_ttl'] = "{$tempatLahir}, {$tglLahir}";
             $payload['asesi_gender'] = in_array($jk, ['P', 'W'], true) ? 'Perempuan' : 'Laki-laki';
             $payload['asesi_kebangsaan'] = $profile?->kebangsaan ?? ($profile?->nationality ?? 'Indonesia');
@@ -295,7 +310,13 @@ class MukDynamicDocumentService
             $payload['asesi_jabatan'] = $profile?->jabatan ?? ($profile?->job_title ?? 'Pelajar');
             $payload['rekomendasi'] = $isK ? 'K' : 'BK';
             $payload['final_result'] = $isK ? 'KOMPETEN' : 'BELUM KOMPETEN';
-            $payload['signature_asesi'] = $assessment->asesi_signature ?? $profile?->signature_data;
+
+            $asesiSignature = $assessment->asesi_signature ?? $profile?->signature_data;
+            if (empty($asesiSignature) && ! empty($profile?->signature_path) && file_exists(storage_path('app/public/'.$profile->signature_path))) {
+                $asesiSignature = storage_path('app/public/'.$profile->signature_path);
+            }
+            $payload['signature_asesi'] = $asesiSignature;
+            $payload['asesi_signature'] = $asesiSignature;
             $payload['signature_asesor'] = $assessment->assessor_signature ?? $leadAssessor?->profile?->signature_data;
         }
 
@@ -428,6 +449,61 @@ class MukDynamicDocumentService
         $payload['asesor'] = $asesorList;
 
         return $payload;
+    }
+
+    /**
+     * Build specific payload for Surat Pernyataan Pemegang Sertifikat Kompetensi.
+     *
+     * @return array<string, mixed>
+     */
+    public function buildPernyataanData(Schedule $schedule, ?Assessment $assessment = null): array
+    {
+        $asesi = $assessment?->asesi;
+        $profile = $asesi?->profile;
+        $date = Carbon::parse($schedule->date ?? now());
+
+        $days = [
+            'Sunday' => 'Minggu', 'Monday' => 'Senin', 'Tuesday' => 'Selasa',
+            'Wednesday' => 'Rabu', 'Thursday' => 'Kamis', 'Friday' => 'Jumat', 'Saturday' => 'Sabtu',
+        ];
+        $months = [
+            1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April', 5 => 'Mei', 6 => 'Juni',
+            7 => 'Juli', 8 => 'Agustus', 9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember',
+        ];
+
+        $dayName = $days[$date->format('l')] ?? $date->format('l');
+        $monthName = $months[(int) $date->format('m')] ?? $date->format('F');
+        $formattedDate = $date->format('d').' '.$monthName.' '.$date->format('Y');
+
+        $tukName = $schedule->tuk_name ?? $schedule->tuk?->name ?? 'TUK Otomotif Mandiri';
+        $tukAddress = $schedule->tuk_address ?? $schedule->tuk?->address;
+        $tukKota = $schedule->tuk_city ?? ($tukAddress ? (explode(',', $tukAddress)[0] ?? 'Karawang') : 'Karawang');
+
+        $asesiSignature = $assessment?->asesi_signature ?? $profile?->signature_data;
+        if (empty($asesiSignature) && ! empty($profile?->signature_path) && file_exists(storage_path('app/public/'.$profile->signature_path))) {
+            $asesiSignature = storage_path('app/public/'.$profile->signature_path);
+        }
+
+        return [
+            'hari' => $dayName,
+            'tanggal' => $date->format('d'),
+            'bulan' => $monthName,
+            'tahun' => $date->format('Y'),
+            'tempat' => $tukName,
+            'tuk_nama' => $tukName,
+            'nama' => $asesi?->full_name ?? 'Nama Asesi',
+            'asesi_nama' => $asesi?->full_name ?? 'Nama Asesi',
+            'nik' => $profile?->nik ?? '-',
+            'asesi_nik' => $profile?->nik ?? '-',
+            'skema' => $schedule->scheme?->name ?? 'Skema Sertifikasi LSP PrO Indo',
+            'skema_nama' => $schedule->scheme?->name ?? 'Skema Sertifikasi LSP PrO Indo',
+            'no_blanko' => '',
+            'no_sertifikat' => '',
+            'kota_ttd' => $tukKota,
+            'tanggal_ttd' => $formattedDate,
+            'signature_asesi' => $asesiSignature,
+            'asesi_signature' => $asesiSignature,
+        ];
     }
 
     /**
@@ -2194,8 +2270,12 @@ class MukDynamicDocumentService
 
             if ($normType === 'pernyataan') {
                 $script = base_path('tools/render_surat_pernyataan.py');
-                if (File::isFile($script) && $this->runPythonScript($python, $script, [$tempJson, $outputPath], $outputPath, $normType)) {
-                    return $outputPath;
+                if (File::isFile($script)) {
+                    $targetAssessment = $assessment ?? $schedule->assessments->first();
+                    $pernyataanPayload = $this->buildPernyataanData($schedule, $targetAssessment);
+                    if ($this->runGeneratorWithPayload($python, $script, $pernyataanPayload, 'muk_pernyataan', $outputPath, $normType)) {
+                        return $outputPath;
+                    }
                 }
             }
 
