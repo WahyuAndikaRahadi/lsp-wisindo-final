@@ -232,7 +232,7 @@ class DokumenMukPrintViewsTest extends TestCase
         $pdfPath = $response->baseResponse->getFile()->getPathname();
         $this->assertFileExists($pdfPath);
 
-        $python = base_path('.venv/bin/python');
+        $python = app(\App\Services\MukDynamicDocumentService::class)->getPythonExecutable();
         $script = "import pymupdf, sys; doc = pymupdf.open(sys.argv[1]); text = ''.join(p.get_text() for p in doc); print(text)";
         $extracted = shell_exec(escapeshellarg($python).' -c '.escapeshellarg($script).' '.escapeshellarg($pdfPath));
 
@@ -259,7 +259,7 @@ class DokumenMukPrintViewsTest extends TestCase
         $pdfPath = $response->baseResponse->getFile()->getPathname();
         $this->assertFileExists($pdfPath);
 
-        $python = base_path('.venv/bin/python');
+        $python = app(\App\Services\MukDynamicDocumentService::class)->getPythonExecutable();
         $script = "import pymupdf, sys; doc = pymupdf.open(sys.argv[1]); text = ''.join(p.get_text() for p in doc); print(text)";
         $extracted = shell_exec(escapeshellarg($python).' -c '.escapeshellarg($script).' '.escapeshellarg($pdfPath));
 
