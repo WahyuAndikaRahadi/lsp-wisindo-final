@@ -11,8 +11,8 @@
         </div>
         <h3 class="text-sm font-bold text-slate-700">Belum Ada Penugasan</h3>
         <p class="text-xs text-slate-500 mt-1">
-            @if(request()->filled('search'))
-                Tidak ada jadwal asesmen yang cocok dengan pencarian "{{ request('search') }}". <a href="{{ route('asesor.jadwal.index') }}" data-ajax-reset="asesor-jadwal" class="text-brand-600 font-bold hover:underline">Reset</a>
+            @if(request()->filled('search') || (request()->filled('status') && request('status') !== 'all') || request()->filled('start_date') || request()->filled('end_date') || (request()->filled('sort') && request('sort') !== 'date_desc'))
+                Tidak ada jadwal asesmen yang cocok dengan kriteria filter atau pencarian Anda. <a href="{{ route('asesor.jadwal.index') }}" data-ajax-reset="asesor-jadwal" class="text-brand-600 font-bold hover:underline">Reset Filter</a>
             @else
                 Anda belum ditugaskan pada jadwal asesmen mana pun.
             @endif

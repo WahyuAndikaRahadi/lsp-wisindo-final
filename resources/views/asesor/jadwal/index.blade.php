@@ -67,30 +67,108 @@
         </div>
     @endif
 
-    {{-- Filter & Search Form --}}
+    {{-- Quick Filter Chips --}}
+    @php
+        $currentStatus = request('status', 'all');
+        $hasFilter = request()->filled('search') 
+            || (request()->filled('status') && request('status') !== 'all') 
+            || request()->filled('start_date') 
+            || request()->filled('end_date')
+            || (request()->filled('sort') && request('sort') !== 'date_desc');
+    @endphp
+
+    <div class="flex items-center gap-2 overflow-x-auto text-xs pb-1">
+        <a href="{{ route('asesor.jadwal.index', array_merge(request()->except(['status', 'page']), ['status' => 'all'])) }}"
+           class="px-3.5 py-1.5 rounded-lg border font-bold transition whitespace-nowrap {{ $currentStatus === 'all' || empty($currentStatus) ? 'bg-slate-900 text-white border-slate-900 shadow-xs' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50' }}">
+            Semua Jadwal ({{ $counts['total'] ?? $schedules->total() }})
+        </a>
+        <a href="{{ route('asesor.jadwal.index', array_merge(request()->except(['status', 'page']), ['status' => 'active'])) }}"
+           class="px-3.5 py-1.5 rounded-lg border font-bold transition whitespace-nowrap flex items-center gap-1.5 {{ $currentStatus === 'active' ? 'bg-blue-600 text-white border-blue-600 shadow-xs' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50' }}">
+            <span class="w-2 h-2 rounded-full {{ $currentStatus === 'active' ? 'bg-white' : 'bg-blue-500' }}"></span>
+            <span>Jadwal Aktif ({{ $counts['active'] ?? 0 }})</span>
+        </a>
+        <a href="{{ route('asesor.jadwal.index', array_merge(request()->except(['status', 'page']), ['status' => 'completed'])) }}"
+           class="px-3.5 py-1.5 rounded-lg border font-bold transition whitespace-nowrap flex items-center gap-1.5 {{ in_array($currentStatus, ['completed', 'finished', 'selesai']) ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50' }}">
+            <span class="w-2 h-2 rounded-full {{ in_array($currentStatus, ['completed', 'finished', 'selesai']) ? 'bg-white' : 'bg-emerald-500' }}"></span>
+            <span>Jadwal Selesai ({{ $counts['completed'] ?? 0 }})</span>
+        </a>
+    </div>
+
+    {{-- Filter, Search & Sort Form --}}
     <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
-        <form action="{{ route('asesor.jadwal.index') }}" method="GET" data-ajax-filter="asesor-jadwal" data-no-loading="true" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 text-xs">
-            <div class="relative flex-1">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                    </svg>
+        <form action="{{ route('asesor.jadwal.index') }}" method="GET" data-ajax-filter="asesor-jadwal" data-no-loading="true" class="space-y-3">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 items-end text-xs">
+                {{-- Search Bar: Nama Jadwal, Kode, TUK --}}
+                <div class="col-span-1 sm:col-span-2 lg:col-span-4">
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Cari Jadwal</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                        </div>
+                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Nama jadwal, kode, atau TUK..."
+                            class="w-full pl-9 pr-3.5 py-2 text-xs rounded-lg border border-slate-300 bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:outline-none text-slate-900 placeholder:text-slate-400 transition shadow-2xs">
+                    </div>
                 </div>
-                <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama jadwal, kode, atau TUK..."
-                    class="w-full pl-9 pr-3.5 py-2.5 text-xs rounded-xl border border-slate-300 bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:outline-none text-slate-900 placeholder:text-slate-400 transition shadow-2xs">
+
+                {{-- Status Filter --}}
+                <div class="col-span-1 sm:col-span-1 lg:col-span-2">
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Status</label>
+                    <select name="status" class="w-full py-2 px-3 text-xs rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:outline-none bg-white text-slate-800 shadow-2xs">
+                        <option value="all" {{ request('status', 'all') === 'all' ? 'selected' : '' }}>Semua Status</option>
+                        <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Aktif</option>
+                        <option value="completed" {{ in_array(request('status'), ['completed', 'finished', 'selesai']) ? 'selected' : '' }}>Selesai</option>
+                    </select>
+                </div>
+
+                {{-- Dari Tanggal --}}
+                <div class="col-span-1 sm:col-span-1 lg:col-span-2">
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Dari Tanggal</label>
+                    <input type="date" name="start_date" value="{{ request('start_date') }}"
+                        class="w-full py-2 px-3 text-xs rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:outline-none bg-white text-slate-800 shadow-2xs">
+                </div>
+
+                {{-- Sampai Tanggal --}}
+                <div class="col-span-1 sm:col-span-1 lg:col-span-2">
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Sampai Tanggal</label>
+                    <input type="date" name="end_date" value="{{ request('end_date') }}"
+                        class="w-full py-2 px-3 text-xs rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:outline-none bg-white text-slate-800 shadow-2xs">
+                </div>
+
+                {{-- Urutkan (Sort) --}}
+                <div class="col-span-1 sm:col-span-1 lg:col-span-2">
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Urutan</label>
+                    <select name="sort" class="w-full py-2 px-3 text-xs rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:outline-none bg-white text-slate-800 shadow-2xs">
+                        <option value="date_desc" {{ request('sort', 'date_desc') === 'date_desc' ? 'selected' : '' }}>Tanggal Terbaru</option>
+                        <option value="date_asc" {{ request('sort') === 'date_asc' ? 'selected' : '' }}>Tanggal Terlama</option>
+                        <option value="name_asc" {{ request('sort') === 'name_asc' ? 'selected' : '' }}>Nama Jadwal (A-Z)</option>
+                        <option value="name_desc" {{ request('sort') === 'name_desc' ? 'selected' : '' }}>Nama Jadwal (Z-A)</option>
+                    </select>
+                </div>
             </div>
 
-            <div class="flex items-center gap-2">
-                <button type="submit" class="px-4 py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-lg transition text-xs shadow-sm flex items-center justify-center gap-1.5 whitespace-nowrap min-h-[38px]">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                    </svg>
-                    <span>Cari</span>
-                </button>
+            <div class="flex items-center justify-between pt-2 border-t border-slate-100 text-xs">
+                <div class="text-slate-500 text-[11px]">
+                    @if($hasFilter)
+                        <span>Menampilkan hasil penyortiran & filter</span>
+                    @else
+                        <span>Menampilkan seluruh jadwal penugasan</span>
+                    @endif
+                </div>
 
-                <a href="{{ route('asesor.jadwal.index') }}" data-ajax-reset="asesor-jadwal" class="px-3.5 py-2.5 text-slate-600 hover:bg-slate-100 rounded-lg transition text-xs border border-slate-200 whitespace-nowrap min-h-[38px] flex items-center justify-center {{ request()->filled('search') ? '' : 'hidden' }}">
-                    Reset
-                </a>
+                <div class="flex items-center gap-2">
+                    <a href="{{ route('asesor.jadwal.index') }}" data-ajax-reset="asesor-jadwal" class="px-3.5 py-1.5 text-slate-600 hover:bg-slate-100 rounded-lg transition text-xs border border-slate-200 whitespace-nowrap min-h-[34px] flex items-center justify-center {{ $hasFilter ? '' : 'hidden' }}">
+                        Reset Filter
+                    </a>
+
+                    <button type="submit" class="px-4 py-1.5 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-lg transition text-xs shadow-sm flex items-center justify-center gap-1.5 whitespace-nowrap min-h-[34px]">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+                        </svg>
+                        <span>Terapkan Filter</span>
+                    </button>
+                </div>
             </div>
         </form>
     </div>

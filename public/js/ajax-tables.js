@@ -143,7 +143,7 @@
                 e.preventDefault();
                 const form = document.querySelector(`form[data-ajax-filter="${resetTarget}"]`);
                 if (form) {
-                    form.querySelectorAll('input[type="text"], input[type="search"]').forEach(function (inp) {
+                    form.querySelectorAll('input[type="text"], input[type="search"], input[type="date"]').forEach(function (inp) {
                         inp.value = '';
                     });
                     form.querySelectorAll('select').forEach(function (sel) {
