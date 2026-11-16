@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Assessment;
 use App\Models\Schedule;
+use App\Models\Scheme;
 use App\Services\MukDynamicDocumentService;
 use App\Services\MukExportService;
 use App\Services\MukFixedDocumentService;
@@ -22,6 +23,9 @@ class DokumenMukController extends Controller
     public function index(Request $request): View
     {
         $search = trim((string) $request->query('search', ''));
+        $schemeId = $request->query('scheme_id');
+        $startDate = $request->query('start_date');
+        $endDate = $request->query('end_date');
 
         $query = Schedule::with(['scheme', 'assessors'])
             ->withCount('assessments');
@@ -51,15 +55,31 @@ class DokumenMukController extends Controller
             });
         }
 
+        if (! empty($schemeId)) {
+            $query->where('scheme_id', $schemeId);
+        }
+
+        if (! empty($startDate) && ! empty($endDate)) {
+            $from = min($startDate, $endDate);
+            $to = max($startDate, $endDate);
+            $query->whereBetween('date', [$from, $to]);
+        } elseif (! empty($startDate)) {
+            $query->whereDate('date', '>=', $startDate);
+        } elseif (! empty($endDate)) {
+            $query->whereDate('date', '<=', $endDate);
+        }
+
         $schedules = $query->latest('date')
             ->paginate(15)
             ->withQueryString();
 
+        $schemes = Scheme::orderBy('name')->get();
+
         if ($request->ajax()) {
-            return view('admin.dokumen-muk._table', compact('schedules', 'search'));
+            return view('admin.dokumen-muk._table', compact('schedules', 'search', 'schemeId', 'startDate', 'endDate'));
         }
 
-        return view('admin.dokumen-muk.index', compact('schedules', 'search'));
+        return view('admin.dokumen-muk.index', compact('schedules', 'schemes', 'search', 'schemeId', 'startDate', 'endDate'));
     }
 
     public function show(Schedule $schedule, Request $request): View

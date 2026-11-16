@@ -24,6 +24,8 @@ class CertificateController extends Controller
     {
         $search = $request->query('search');
         $schemeId = $request->query('scheme_id');
+        $startDate = $request->query('start_date');
+        $endDate = $request->query('end_date');
 
         $schedulesQuery = Schedule::with(['scheme', 'tuk'])
             ->withCount([
@@ -47,14 +49,24 @@ class CertificateController extends Controller
             });
         }
 
-        $schedules = $schedulesQuery->paginate(15)->withQueryString();
-        $schemes = Scheme::active()->get();
-
-        if ($request->ajax()) {
-            return view('admin.certificates._table', compact('schedules'));
+        if (! empty($startDate) && ! empty($endDate)) {
+            $from = min($startDate, $endDate);
+            $to = max($startDate, $endDate);
+            $schedulesQuery->whereBetween('date', [$from, $to]);
+        } elseif (! empty($startDate)) {
+            $schedulesQuery->whereDate('date', '>=', $startDate);
+        } elseif (! empty($endDate)) {
+            $schedulesQuery->whereDate('date', '<=', $endDate);
         }
 
-        return view('admin.certificates.index', compact('schedules', 'schemes', 'search', 'schemeId'));
+        $schedules = $schedulesQuery->paginate(15)->withQueryString();
+        $schemes = Scheme::active()->orderBy('name')->get();
+
+        if ($request->ajax()) {
+            return view('admin.certificates._table', compact('schedules', 'search', 'schemeId', 'startDate', 'endDate'));
+        }
+
+        return view('admin.certificates.index', compact('schedules', 'schemes', 'search', 'schemeId', 'startDate', 'endDate'));
     }
 
     /**

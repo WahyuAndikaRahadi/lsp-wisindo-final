@@ -232,7 +232,7 @@ class DokumenMukPrintViewsTest extends TestCase
         $pdfPath = $response->baseResponse->getFile()->getPathname();
         $this->assertFileExists($pdfPath);
 
-        $python = app(\App\Services\MukDynamicDocumentService::class)->getPythonExecutable();
+        $python = app(MukDynamicDocumentService::class)->getPythonExecutable();
         $script = "import pymupdf, sys; doc = pymupdf.open(sys.argv[1]); text = ''.join(p.get_text() for p in doc); print(text)";
         $extracted = shell_exec(escapeshellarg($python).' -c '.escapeshellarg($script).' '.escapeshellarg($pdfPath));
 
@@ -268,7 +268,7 @@ class DokumenMukPrintViewsTest extends TestCase
         $pdfPath = $response->baseResponse->getFile()->getPathname();
         $this->assertFileExists($pdfPath);
 
-        $python = app(\App\Services\MukDynamicDocumentService::class)->getPythonExecutable();
+        $python = app(MukDynamicDocumentService::class)->getPythonExecutable();
         $script = "import pymupdf, sys; doc = pymupdf.open(sys.argv[1]); text = ''.join(p.get_text() for p in doc); print(text)";
         $extracted = shell_exec(escapeshellarg($python).' -c '.escapeshellarg($script).' '.escapeshellarg($pdfPath));
 
@@ -647,7 +647,7 @@ class DokumenMukPrintViewsTest extends TestCase
         $pdfPath = $response->baseResponse->getFile()->getPathname();
         $this->assertFileExists($pdfPath);
 
-        $python = base_path('.venv/bin/python');
+        $python = file_exists(base_path('venv/bin/python')) ? base_path('venv/bin/python') : (file_exists(base_path('.venv/bin/python')) ? base_path('.venv/bin/python') : 'python3');
         $script = <<<'PY'
 import pymupdf, sys, json
 doc = pymupdf.open(sys.argv[1])

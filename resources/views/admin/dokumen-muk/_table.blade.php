@@ -1,10 +1,13 @@
 <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+    @php
+        $hasFilter = request()->filled('search') || request()->filled('scheme_id') || request()->filled('start_date') || request()->filled('end_date') || !empty($search) || !empty($schemeId) || !empty($startDate) || !empty($endDate);
+    @endphp
     <div class="px-4 sm:px-6 py-3.5 sm:py-4 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center sm:justify-between items-start gap-1">
         <h2 class="text-sm font-bold text-slate-900">
             Daftar Jadwal Asesmen ({{ $schedules->total() }})
         </h2>
-        @if(!empty($search))
-            <span class="text-xs text-slate-500">Hasil pencarian untuk: <strong class="text-slate-800">"{{ $search }}"</strong></span>
+        @if($hasFilter)
+            <span class="text-xs text-slate-500">Menampilkan hasil penyaringan filter jadwal</span>
         @endif
     </div>
 
@@ -15,15 +18,15 @@
             </svg>
             <div class="text-slate-600 font-semibold text-sm">Tidak ada jadwal asesmen ditemukan</div>
             <p class="text-xs text-slate-400 mt-1">
-                @if(!empty($search))
-                    Tidak ditemukan jadwal dengan kata kunci pencarian "{{ $search }}". Silakan coba kata kunci lain.
+                @if($hasFilter)
+                    Tidak ditemukan jadwal dengan kriteria filter atau pencarian Anda. Silakan coba kriteria lain.
                 @else
                     Belum ada jadwal asesmen tersedia untuk ekspor dokumen MUK.
                 @endif
             </p>
-            @if(!empty($search))
+            @if($hasFilter)
                 <a href="{{ route('admin.dokumen-muk.index') }}" data-ajax-reset="muk" class="inline-block mt-4 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition">
-                    Reset Pencarian
+                    Reset Filter
                 </a>
             @endif
         </div>
