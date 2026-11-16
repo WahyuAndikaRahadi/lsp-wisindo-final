@@ -502,9 +502,10 @@ class MukDynamicDocumentService
             ? Carbon::parse($assessment->admin_approved_at)->locale('id')->translatedFormat('d F Y')
             : ($schedule->date ? Carbon::parse($schedule->date)->locale('id')->translatedFormat('d F Y') : ($assessment->approved_at ? Carbon::parse($assessment->approved_at)->locale('id')->translatedFormat('d F Y') : $tglPemohon));
 
-        $adminUser = $assessment->admin ?? $assessment->admin_reviewer ?? User::where('role', 'ADMIN_LSP')->first();
+        $superAdmin = User::where('role', 'SUPER_ADMIN')->first();
+        $adminUser = $assessment->admin ?? $assessment->admin_reviewer ?? User::where('role', 'ADMIN_LSP')->first() ?? $superAdmin;
         $namaAdmin = $adminUser?->full_name ?? 'Admin LSP';
-        $signatureAdmin = $adminUser?->profile?->signature_data;
+        $signatureAdmin = $superAdmin?->profile?->signature_data ?? $adminUser?->profile?->signature_data;
 
         $isAccepted = ($assessment->admin_status === 'APPROVED' || $assessment->apl_status === 'APPROVED' || $assessment->status === 'ACTIVE' || $assessment->status === 'COMPLETED');
 
