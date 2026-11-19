@@ -442,6 +442,19 @@
                     <h3 class="text-base font-bold text-slate-800 mb-1">Upload Bukti Kelengkapan Pemohon</h3>
                     <p class="text-xs text-slate-500 mb-4">Unggah dokumen pendukung untuk diverifikasi oleh asesor kompetensi.</p>
 
+                    {{-- Panduan Upload Khusus Pengguna HP / Android --}}
+                    <div class="mb-4 p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-start gap-2.5 shadow-xs">
+                        <svg class="w-5 h-5 text-amber-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                        <div class="space-y-1">
+                            <p class="font-bold text-amber-950">Tips Khusus Pengguna HP (Mengatasi Error "File tidak diketahui / lokasi file sudah dipindahkan"):</p>
+                            <ul class="list-disc pl-4 space-y-0.5 text-amber-800 leading-relaxed">
+                                <li><strong>Foto berkas terlebih dahulu</strong> menggunakan aplikasi Kamera bawaan HP Anda sebelum menekan tombol upload.</li>
+                                <li>Saat memilih file, buka melalui <strong>"Galeri"</strong> atau <strong>"File Manager"</strong> (<strong>hindari</strong> memilih dari menu pintasan <em>"Terbaru / Recent"</em>).</li>
+                                <li>Jika foto berasal dari <strong>WhatsApp / Google Drive</strong>, simpan (download) terlebih dahulu ke galeri lokal ponsel.</li>
+                            </ul>
+                        </div>
+                    </div>
+
                     @php
                         $existingProofs = $assessment->proofs->keyBy('proof_type');
                     @endphp
@@ -462,7 +475,7 @@
                             {{-- Opsi A --}}
                             <div class="bg-white p-3 rounded-lg border border-slate-200">
                                 <label class="block text-xs font-bold text-slate-700 mb-1">A. Ijazah SMK Otomotif</label>
-                                <input type="file" name="proofs[IJAZAH_SMK]" accept=".jpg,.jpeg,.png,.pdf" class="block w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" @disabled($isAplLocked)>
+                                <input type="file" name="proofs[IJAZAH_SMK]" accept="image/jpeg,image/png,image/jpg,image/webp,application/pdf,.jpg,.jpeg,.png,.webp,.pdf" class="block w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" @disabled($isAplLocked)>
                                 @if(isset($existingProofs['IJAZAH_SMK']))
                                     <span class="text-xs text-emerald-600 font-medium mt-1 inline-block">✓ Terunggah: {{ $existingProofs['IJAZAH_SMK']->original_filename }}</span>
                                 @endif
@@ -471,7 +484,7 @@
                             {{-- Opsi B --}}
                             <div class="bg-white p-3 rounded-lg border border-slate-200">
                                 <label class="block text-xs font-bold text-slate-700 mb-1">B. Surat Keterangan Siswa Aktif SMK</label>
-                                <input type="file" name="proofs[SURAT_SISWA_AKTIF]" accept=".jpg,.jpeg,.png,.pdf" class="block w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" @disabled($isAplLocked)>
+                                <input type="file" name="proofs[SURAT_SISWA_AKTIF]" accept="image/jpeg,image/png,image/jpg,image/webp,application/pdf,.jpg,.jpeg,.png,.webp,.pdf" class="block w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" @disabled($isAplLocked)>
                                 @if(isset($existingProofs['SURAT_SISWA_AKTIF']))
                                     <span class="text-xs text-emerald-600 font-medium mt-1 inline-block">✓ Terunggah: {{ $existingProofs['SURAT_SISWA_AKTIF']->original_filename }}</span>
                                 @endif
@@ -480,7 +493,7 @@
                             {{-- Opsi C --}}
                             <div class="bg-white p-3 rounded-lg border border-slate-200">
                                 <label class="block text-xs font-bold text-slate-700 mb-1">C. Ijazah SMA + Sertifikat Pelatihan Otomotif</label>
-                                <input type="file" name="proofs[IJAZAH_SMA_SERTIFIKAT]" accept=".jpg,.jpeg,.png,.pdf" class="block w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" @disabled($isAplLocked)>
+                                <input type="file" name="proofs[IJAZAH_SMA_SERTIFIKAT]" accept="image/jpeg,image/png,image/jpg,image/webp,application/pdf,.jpg,.jpeg,.png,.webp,.pdf" class="block w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" @disabled($isAplLocked)>
                                 @if(isset($existingProofs['IJAZAH_SMA_SERTIFIKAT']))
                                     <span class="text-xs text-emerald-600 font-medium mt-1 inline-block">✓ Terunggah: {{ $existingProofs['IJAZAH_SMA_SERTIFIKAT']->original_filename }}</span>
                                 @endif
@@ -489,7 +502,7 @@
                             {{-- Opsi D --}}
                             <div class="bg-white p-3 rounded-lg border border-slate-200">
                                 <label class="block text-xs font-bold text-slate-700 mb-1">D. Surat Pengalaman Kerja Bengkel Otomotif</label>
-                                <input type="file" name="proofs[PENGALAMAN_KERJA]" accept=".jpg,.jpeg,.png,.pdf" class="block w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" @disabled($isAplLocked)>
+                                <input type="file" name="proofs[PENGALAMAN_KERJA]" accept="image/jpeg,image/png,image/jpg,image/webp,application/pdf,.jpg,.jpeg,.png,.webp,.pdf" class="block w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" @disabled($isAplLocked)>
                                 @if(isset($existingProofs['PENGALAMAN_KERJA']))
                                     <span class="text-xs text-emerald-600 font-medium mt-1 inline-block">✓ Terunggah: {{ $existingProofs['PENGALAMAN_KERJA']->original_filename }}</span>
                                 @endif
@@ -512,7 +525,7 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div class="bg-white p-3 rounded-lg border border-slate-200">
                                 <label class="block text-xs font-bold text-slate-700 mb-1">Fotokopi KTP / Identitas Diri <span class="text-rose-500">*</span></label>
-                                <input type="file" name="proofs[KTP]" accept=".jpg,.jpeg,.png,.pdf" class="block w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100" @disabled($isAplLocked)>
+                                <input type="file" name="proofs[KTP]" accept="image/jpeg,image/png,image/jpg,image/webp,application/pdf,.jpg,.jpeg,.png,.webp,.pdf" class="block w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100" @disabled($isAplLocked)>
                                 @if(isset($existingProofs['KTP']))
                                     <span class="text-xs text-emerald-600 font-medium mt-1 inline-block">✓ Terunggah: {{ $existingProofs['KTP']->original_filename }}</span>
                                 @endif
@@ -520,7 +533,7 @@
 
                             <div class="bg-white p-3 rounded-lg border border-slate-200">
                                 <label class="block text-xs font-bold text-slate-700 mb-1">Pas Foto 3x4 (Latar Belakang Merah) <span class="text-rose-500">*</span></label>
-                                <input type="file" name="proofs[PAS_FOTO]" accept=".jpg,.jpeg,.png,.pdf" class="block w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100" @disabled($isAplLocked)>
+                                <input type="file" name="proofs[PAS_FOTO]" accept="image/jpeg,image/png,image/jpg,image/webp,application/pdf,.jpg,.jpeg,.png,.webp,.pdf" class="block w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100" @disabled($isAplLocked)>
                                 @if(isset($existingProofs['PAS_FOTO']))
                                     <span class="text-xs text-emerald-600 font-medium mt-1 inline-block">✓ Terunggah: {{ $existingProofs['PAS_FOTO']->original_filename }}</span>
                                 @endif

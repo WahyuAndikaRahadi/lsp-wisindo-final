@@ -237,8 +237,8 @@ class SecurityHardeningTest extends TestCase
         ]);
         $resSh->assertSessionHasErrors(['proofs.PAS_FOTO']);
 
-        // 3. Oversized file (> 5MB) rejected
-        $oversized = UploadedFile::fake()->create('huge_portfolio.pdf', 6000, 'application/pdf');
+        // 3. Oversized file (> 15MB) rejected
+        $oversized = UploadedFile::fake()->create('huge_portfolio.pdf', 16000, 'application/pdf');
         $resLarge = $this->actingAs($asesi)->post(route('asesi.assessment.apl.store', $assessment), [
             'proofs' => ['IJAZAH_SMK' => $oversized],
         ]);

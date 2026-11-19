@@ -62,18 +62,20 @@ class AplController extends Controller
         $request->validate([
             'tujuan_asesmen' => ['nullable', 'string', 'in:Sertifikasi,Pengakuan Kompetensi Terkini (PKT),Rekognisi Pembelajaran Lampau (RPL),Lainnya'],
             'proofs' => 'nullable|array',
-            'proofs.*' => 'nullable|file|mimes:pdf,jpg,jpeg,png,webp|max:5120',
-            'ktp' => 'nullable|file|mimes:pdf,jpg,jpeg,png,webp|max:5120',
-            'pas_foto' => 'nullable|file|mimes:jpeg,jpg,png,webp|max:3072',
-            'ijazah_smk' => 'nullable|file|mimes:pdf,jpg,jpeg,png,webp|max:5120',
-            'surat_siswa_aktif' => 'nullable|file|mimes:pdf,jpg,jpeg,png,webp|max:5120',
-            'ijazah_sma_sertifikat' => 'nullable|file|mimes:pdf,jpg,jpeg,png,webp|max:5120',
-            'pengalaman_kerja' => 'nullable|file|mimes:pdf,jpg,jpeg,png,webp|max:5120',
+            'proofs.*' => 'nullable|file|mimes:pdf,jpg,jpeg,png,webp|max:15360',
+            'ktp' => 'nullable|file|mimes:pdf,jpg,jpeg,png,webp|max:15360',
+            'pas_foto' => 'nullable|file|mimes:jpeg,jpg,png,webp|max:10240',
+            'ijazah_smk' => 'nullable|file|mimes:pdf,jpg,jpeg,png,webp|max:15360',
+            'surat_siswa_aktif' => 'nullable|file|mimes:pdf,jpg,jpeg,png,webp|max:15360',
+            'ijazah_sma_sertifikat' => 'nullable|file|mimes:pdf,jpg,jpeg,png,webp|max:15360',
+            'pengalaman_kerja' => 'nullable|file|mimes:pdf,jpg,jpeg,png,webp|max:15360',
         ], [
             'proofs.*.mimes' => 'Format file bukti harus berupa PDF, JPG, PNG, atau WEBP.',
-            'proofs.*.max' => 'Ukuran file bukti maksimal 5 MB.',
+            'proofs.*.max' => 'Ukuran file bukti maksimal 15 MB.',
             'ktp.mimes' => 'Format KTP harus berupa PDF, JPG, PNG, atau WEBP.',
+            'ktp.max' => 'Ukuran file KTP maksimal 15 MB.',
             'pas_foto.mimes' => 'Format Pas Foto harus berupa JPG, PNG, atau WEBP.',
+            'pas_foto.max' => 'Ukuran Pas Foto maksimal 10 MB.',
         ]);
 
         $proofCategories = [

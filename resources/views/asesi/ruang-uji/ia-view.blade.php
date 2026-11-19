@@ -246,14 +246,18 @@
                                 Pilih Berkas Foto / Scan PDF Lembar Report Sheet:
                             @endif
                         </label>
+                        <div class="p-3 rounded-lg bg-amber-50 border border-amber-200 text-xs text-amber-900 mb-2">
+                            <p class="font-bold text-amber-950 mb-0.5">⚠️ Tips Upload via HP / Android (Atasi Error "File tidak diketahui / lokasi file dipindahkan"):</p>
+                            <p class="text-amber-800 leading-relaxed">Foto lembar fisik terlebih dahulu memakai kamera HP Anda. Saat menekan tombol pilih file, buka melalui menu <strong>"Galeri"</strong> atau <strong>"File Manager"</strong> (<strong>hindari</strong> memilih dari tab <em>"Terbaru / Recent"</em>).</p>
+                        </div>
                         <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-                            <input type="file" name="evidence_image" accept="image/*,application/pdf" required
+                            <input type="file" name="evidence_image" accept="image/jpeg,image/png,image/jpg,image/webp,application/pdf,.jpg,.jpeg,.png,.webp,.pdf" required
                                 class="block w-full text-xs text-slate-600 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-slate-100 file:text-slate-800 hover:file:bg-slate-200 border border-slate-300 rounded-lg p-1 bg-white cursor-pointer">
                             <button type="submit" class="px-5 py-2.5 text-xs font-bold uppercase tracking-wider {{ $isRevisionRequested ? 'bg-rose-600 hover:bg-rose-700' : 'bg-brand-600 hover:bg-brand-700' }} text-white rounded-lg shadow-sm transition shrink-0 cursor-pointer">
                                 {{ $isRevisionRequested ? 'Unggah Berkas Revisi ↑' : 'Unggah Berkas Fisik ↑' }}
                             </button>
                         </div>
-                        <p class="text-[11px] text-slate-500">Format yang didukung: JPG, JPEG, PNG, WEBP, atau scan PDF (Maksimal 10 MB).</p>
+                        <p class="text-[11px] text-slate-500">Format yang didukung: JPG, JPEG, PNG, WEBP, atau scan PDF (Maksimal 15 MB).</p>
                     </form>
                 @endif
             </div>
