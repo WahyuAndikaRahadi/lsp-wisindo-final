@@ -34,12 +34,19 @@ class SecureFileController extends Controller
             ? $response->data_json
             : (json_decode($response->data_json ?? '[]', true) ?: []);
 
-        $path = $data['evidence_image_path'] ?? null;
+        $historyIndex = $request->query('history_index');
+        if ($historyIndex !== null && isset($data['evidence_history'][$historyIndex])) {
+            $hItem = $data['evidence_history'][$historyIndex];
+            $path = $hItem['path'] ?? null;
+            $filename = $hItem['original_name'] ?? ($path ? basename($path) : 'file_revisi_sebelumnya.jpg');
+        } else {
+            $path = $data['evidence_image_path'] ?? null;
+            $filename = $data['evidence_original_name'] ?? ($path ? basename($path) : null);
+        }
+
         if (! $path) {
             return $this->serveMissingFileFallback('bukti_observasi.jpg', 'Berkas bukti observasi/praktik belum diunggah.');
         }
-
-        $filename = $data['evidence_original_name'] ?? basename($path);
 
         return $this->serveFile($path, $filename);
     }

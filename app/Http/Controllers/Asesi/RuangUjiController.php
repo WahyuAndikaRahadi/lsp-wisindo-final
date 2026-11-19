@@ -213,13 +213,35 @@ class RuangUjiController extends Controller
                 $meta['action_button_class'] = ($hasEvaluated || $schedule->is_closed) ? 'bg-slate-800 hover:bg-slate-900 text-white' : 'bg-slate-700 hover:bg-slate-800 text-white';
             } elseif ($codeUpper === 'IA01B') {
                 $hasEvidence = ! empty($resp?->data_json['evidence_image_path']);
-                $meta['status_label'] = ($hasEvidence || $schedule->is_closed) ? '✓ Lembar Fisik Diunggah' : 'Unggah Lembar Fisik';
-                $meta['status_badge_class'] = ($hasEvidence || $schedule->is_closed) ? 'text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200' : 'text-cyan-700 bg-cyan-50 px-2 py-0.5 rounded border border-cyan-200';
-                $meta['progress_percent'] = ($hasEvidence || $schedule->is_closed) ? 100 : 0;
-                $meta['progress_bar_color'] = ($hasEvidence || $schedule->is_closed) ? 'bg-emerald-600' : 'bg-blue-500';
-                $meta['progress_text'] = ($hasEvidence || $schedule->is_closed) ? '1 / 1 Terunggah' : '0 / 1 Belum Diunggah';
-                $meta['action_label'] = ($hasEvidence || $schedule->is_closed) ? 'Lihat Lembar Pemeriksaan' : 'Unggah Lembar Fisik';
-                $meta['action_button_class'] = ($hasEvidence || $schedule->is_closed) ? 'bg-slate-800 hover:bg-slate-900 text-white' : 'bg-brand-600 hover:bg-brand-700 text-white';
+                $isRevisionRequested = ! empty($resp?->data_json['revision_requested']) || ($resp?->data_json['revision_status'] ?? '') === 'REVISION_REQUESTED';
+                $isSignedByAssessor = ! empty($resp?->assessor_signed_at);
+                $isResubmitted = ($resp?->data_json['revision_status'] ?? '') === 'RESUBMITTED';
+
+                if ($isRevisionRequested && ! $schedule->is_closed) {
+                    $meta['status_label'] = '⚠️ Perlu Revisi Berkas';
+                    $meta['status_badge_class'] = 'text-rose-700 bg-rose-50 px-2 py-0.5 rounded border border-rose-200';
+                    $meta['progress_percent'] = 50;
+                    $meta['progress_bar_color'] = 'bg-rose-500';
+                    $meta['progress_text'] = 'Perlu Unggah Ulang';
+                    $meta['action_label'] = 'Unggah Berkas Revisi';
+                    $meta['action_button_class'] = 'bg-rose-600 hover:bg-rose-700 text-white';
+                } elseif ($isResubmitted && ! $isSignedByAssessor) {
+                    $meta['status_label'] = 'Revisi Menunggu Asesor';
+                    $meta['status_badge_class'] = 'text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200';
+                    $meta['progress_percent'] = 75;
+                    $meta['progress_bar_color'] = 'bg-blue-600';
+                    $meta['progress_text'] = 'Menunggu Evaluasi';
+                    $meta['action_label'] = 'Lihat Lembar Pemeriksaan';
+                    $meta['action_button_class'] = 'bg-brand-600 hover:bg-brand-700 text-white';
+                } else {
+                    $meta['status_label'] = ($hasEvidence || $schedule->is_closed) ? '✓ Lembar Fisik Diunggah' : 'Unggah Lembar Fisik';
+                    $meta['status_badge_class'] = ($hasEvidence || $schedule->is_closed) ? 'text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200' : 'text-cyan-700 bg-cyan-50 px-2 py-0.5 rounded border border-cyan-200';
+                    $meta['progress_percent'] = ($hasEvidence || $schedule->is_closed) ? 100 : 0;
+                    $meta['progress_bar_color'] = ($hasEvidence || $schedule->is_closed) ? 'bg-emerald-600' : 'bg-blue-500';
+                    $meta['progress_text'] = ($hasEvidence || $schedule->is_closed) ? '1 / 1 Terunggah' : '0 / 1 Belum Diunggah';
+                    $meta['action_label'] = ($hasEvidence || $schedule->is_closed) ? 'Lihat Lembar Pemeriksaan' : 'Unggah Lembar Fisik';
+                    $meta['action_button_class'] = ($hasEvidence || $schedule->is_closed) ? 'bg-slate-800 hover:bg-slate-900 text-white' : 'bg-brand-600 hover:bg-brand-700 text-white';
+                }
             } elseif ($codeUpper === 'IA03') {
                 $hasEvaluated = (bool) $resp?->assessor_signed_at || ! empty($resp?->assessor_notes);
                 $meta['status_label'] = ($hasEvaluated || $schedule->is_closed) ? '✓ Telah Dievaluasi Asesor' : 'Tanya Jawab (PMO)';
@@ -470,9 +492,29 @@ class RuangUjiController extends Controller
             ]);
             $folder = strtolower($code) === 'ia01b' ? 'ia01b_evidence' : 'ia02_evidence';
             $path = $request->file('evidence_image')->store($folder, 'local');
+
+            $isRevision = ! empty($dataJson['revision_requested']) || ($dataJson['revision_status'] ?? '') === 'REVISION_REQUESTED';
+            if ($isRevision && ! empty($dataJson['evidence_image_path'])) {
+                $history = $dataJson['evidence_history'] ?? [];
+                $history[] = [
+                    'path' => $dataJson['evidence_image_path'],
+                    'original_name' => $dataJson['evidence_original_name'] ?? 'Berkas Sebelumnya',
+                    'uploaded_at' => $dataJson['evidence_uploaded_at'] ?? null,
+                    'revision_notes' => $dataJson['revision_notes'] ?? null,
+                    'replaced_at' => now()->toIso8601String(),
+                ];
+                $dataJson['evidence_history'] = $history;
+            }
+
             $dataJson['evidence_image_path'] = $path;
             $dataJson['evidence_uploaded_at'] = now()->toIso8601String();
             $dataJson['evidence_original_name'] = $request->file('evidence_image')->getClientOriginalName();
+
+            if ($isRevision) {
+                $dataJson['revision_requested'] = false;
+                $dataJson['revision_status'] = 'RESUBMITTED';
+                $dataJson['revision_resubmitted_at'] = now()->toIso8601String();
+            }
         }
 
         $response->data_json = $dataJson;
@@ -537,14 +579,38 @@ class RuangUjiController extends Controller
             ? $response->data_json
             : (json_decode($response->data_json ?? '[]', true) ?: []);
 
+        $isRevision = ! empty($dataJson['revision_requested']) || ($dataJson['revision_status'] ?? '') === 'REVISION_REQUESTED';
+
+        if ($isRevision && ! empty($dataJson['evidence_image_path'])) {
+            $history = $dataJson['evidence_history'] ?? [];
+            $history[] = [
+                'path' => $dataJson['evidence_image_path'],
+                'original_name' => $dataJson['evidence_original_name'] ?? 'Berkas Sebelumnya',
+                'uploaded_at' => $dataJson['evidence_uploaded_at'] ?? null,
+                'revision_notes' => $dataJson['revision_notes'] ?? null,
+                'replaced_at' => now()->toIso8601String(),
+            ];
+            $dataJson['evidence_history'] = $history;
+        }
+
         $dataJson['evidence_image_path'] = $path;
         $dataJson['evidence_uploaded_at'] = now()->toIso8601String();
         $dataJson['evidence_original_name'] = $request->file('evidence_image')->getClientOriginalName();
 
+        if ($isRevision) {
+            $dataJson['revision_requested'] = false;
+            $dataJson['revision_status'] = 'RESUBMITTED';
+            $dataJson['revision_resubmitted_at'] = now()->toIso8601String();
+        }
+
         $response->data_json = $dataJson;
         $response->save();
 
-        return back()->with('success', 'Foto bukti lembar kerja fisik berhasil diunggah.');
+        $successMessage = $isRevision
+            ? 'Berkas revisi lembar Report Sheet berhasil diunggah ulang dan siap diperiksa kembali oleh asesor.'
+            : 'Foto bukti lembar kerja fisik berhasil diunggah.';
+
+        return back()->with('success', $successMessage);
     }
 
     public function finish(Assessment $assessment): RedirectResponse

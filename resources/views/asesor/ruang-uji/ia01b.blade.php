@@ -1,6 +1,13 @@
 @php
     $isCompleted = (bool) ($response?->assessor_signed_at || ! empty($response?->assessor_signature));
     $isScheduleClosed = (bool) ($assessment->schedule?->isClosedForAssessor());
+    $isRevisionRequested = ! empty($response?->data_json['revision_requested']) || ($response?->data_json['revision_status'] ?? '') === 'REVISION_REQUESTED';
+    $revisionNotes = $response?->data_json['revision_notes'] ?? null;
+    $revisionTime = $response?->data_json['revision_requested_at'] ?? null;
+    $revisionByName = $response?->data_json['revision_requested_by_name'] ?? ($assessment->assessor?->full_name ?? 'Asesor');
+    $isResubmitted = ($response?->data_json['revision_status'] ?? '') === 'RESUBMITTED';
+    $resubmittedTime = $response?->data_json['revision_resubmitted_at'] ?? null;
+    $evidenceHistory = $response?->data_json['evidence_history'] ?? [];
 @endphp
 @extends('layouts.app', ['title' => 'FR.IA.01B - Lembar Pemeriksaan Teknis (Report Sheet)'])
 
@@ -11,6 +18,7 @@
     modalSrc: '',
     modalTitle: '',
     modalType: 'pdf',
+    revisionModalOpen: false,
     viewDocument(src, title, type = 'pdf') {
         this.modalSrc = src;
         this.modalTitle = title;
@@ -73,6 +81,63 @@
         </div>
     @endif
 
+    {{-- Banner Status Revisi --}}
+    @if($isRevisionRequested)
+        <div class="bg-rose-50 border-2 border-rose-300 rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xs">
+            <div class="flex items-start gap-3">
+                <span class="w-8 h-8 rounded-full bg-rose-600 text-white flex items-center justify-center font-bold text-sm shrink-0">⚠️</span>
+                <div class="space-y-1">
+                    <div class="text-xs font-bold text-rose-950 uppercase tracking-wide">Status: Menunggu Pengunggahan Revisi dari Asesi</div>
+                    <p class="text-xs text-rose-900 leading-relaxed">
+                        Anda telah meminta asesi <strong>{{ $assessment->asesi->full_name }}</strong> untuk merevisi berkas Report Sheet fisik ini.
+                    </p>
+                    <div class="mt-2 text-xs bg-white/95 p-3 rounded-lg border border-rose-200 text-slate-800 shadow-2xs">
+                        <strong class="text-rose-700 block mb-0.5">Catatan Instruksi Revisi untuk Asesi:</strong>
+                        <span class="whitespace-pre-line">{{ $revisionNotes }}</span>
+                    </div>
+                    @if($revisionTime)
+                        <div class="text-[11px] text-rose-700 font-mono mt-1">
+                            Diminta pada: {{ \Carbon\Carbon::parse($revisionTime)->isoFormat('D MMMM Y, HH:mm') }} WIB &bull; Oleh: {{ $revisionByName }}
+                        </div>
+                    @endif
+                </div>
+            </div>
+            @if(! $isScheduleClosed)
+                <div class="flex items-center gap-2 shrink-0 self-end sm:self-center">
+                    <button type="button" @click="revisionModalOpen = true" class="px-3.5 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-xs font-bold transition shadow-xs cursor-pointer">
+                        Ubah Catatan Revisi
+                    </button>
+                    <form action="{{ route('asesor.assessment.ia01b.cancel-revision', $assessment->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin membatalkan permintaan revisi ini?');">
+                        @csrf
+                        <button type="submit" class="px-3.5 py-2 bg-white hover:bg-slate-100 text-rose-700 border border-rose-300 rounded-lg text-xs font-bold transition shadow-2xs cursor-pointer">
+                            Batalkan Revisi
+                        </button>
+                    </form>
+                </div>
+            @endif
+        </div>
+    @elseif($isResubmitted)
+        <div class="bg-blue-50 border-2 border-blue-300 rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xs">
+            <div class="flex items-center gap-3">
+                <span class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-sm shrink-0">✓</span>
+                <div>
+                    <div class="text-xs font-bold text-blue-950 uppercase tracking-wide">Berkas Hasil Revisi Telah Diunggah Asesi</div>
+                    <p class="text-xs text-blue-800 mt-0.5 leading-relaxed">
+                        Asesi telah mengunggah berkas perbaikan terbaru. Silakan periksa kembali hasil pengukuran fisik di bawah dan simpan penilaian akhir Anda.
+                    </p>
+                    @if($resubmittedTime)
+                        <div class="text-[11px] text-blue-700 font-mono mt-1">
+                            Diunggah ulang pada: {{ \Carbon\Carbon::parse($resubmittedTime)->isoFormat('D MMMM Y, HH:mm') }} WIB
+                        </div>
+                    @endif
+                </div>
+            </div>
+            <span class="px-3 py-1.5 text-xs font-bold bg-blue-600 text-white rounded-lg shrink-0 shadow-xs">
+                Menunggu Penilaian Ulang
+            </span>
+        </div>
+    @endif
+
     <form action="{{ route('asesor.ruang-uji.ia01b.store', $assessment->id) }}" method="POST" class="space-y-6">
         @csrf
 
@@ -91,7 +156,15 @@
                     </span>
                     <span class="text-xs font-bold uppercase tracking-wider text-white">Lembar Pemeriksaan Teknis Fisik (Report Sheet Unggahan Asesi)</span>
                 </div>
-                @if($evidencePath)
+                @if($isRevisionRequested)
+                    <span class="px-2.5 py-0.5 text-[11px] font-bold bg-rose-500 text-white rounded">
+                        ⚠️ Menunggu Revisi Asesi
+                    </span>
+                @elseif($isResubmitted)
+                    <span class="px-2.5 py-0.5 text-[11px] font-bold bg-blue-500 text-white rounded">
+                        ✓ Berkas Revisi Diunggah Asesi
+                    </span>
+                @elseif($evidencePath)
                     <span class="px-2.5 py-0.5 text-[11px] font-bold bg-emerald-500 text-white rounded">
                         ✓ Lembar Fisik Telah Diunggah Asesi
                     </span>
@@ -104,63 +177,88 @@
 
             <div class="p-6">
                 @if($evidencePath)
-                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                    @php
+                        $isPdf = str_ends_with(strtolower($evidencePath), '.pdf');
+                        $fileType = $isPdf ? 'pdf' : (preg_match('/\.(docx?)$/i', $evidencePath) ? 'doc' : 'image');
+                    @endphp
+                    <div class="flex flex-col md:flex-row items-center gap-6 p-4 bg-slate-50 rounded-xl border border-slate-200">
                         {{-- Preview Box --}}
-                        <div class="lg:col-span-5 bg-slate-50 rounded-xl p-4 border border-slate-200 space-y-3">
-                            @php
-                                $isPdf = str_ends_with(strtolower($evidencePath), '.pdf');
-                                $fileType = $isPdf ? 'pdf' : (preg_match('/\.(docx?)$/i', $evidencePath) ? 'doc' : 'image');
-                            @endphp
-                            <div class="relative group rounded-lg overflow-hidden border border-slate-300 bg-white aspect-4/3 flex items-center justify-center cursor-pointer shadow-xs"
-                                 @click="viewDocument('{{ $evidenceUrl }}', '{{ addslashes($evidenceName) }}', '{{ $fileType }}')">
-                                @if($isPdf)
-                                    <div class="text-center p-6 space-y-2">
-                                        <span class="text-4xl text-rose-600 font-black block">📄</span>
-                                        <div class="text-xs font-bold text-slate-800 truncate max-w-[200px]">{{ $evidenceName }}</div>
-                                        <div class="text-[11px] text-slate-500">Dokumen PDF Report Sheet</div>
-                                    </div>
-                                @elseif($fileType === 'doc')
-                                    <div class="text-center p-6 space-y-2">
-                                        <span class="text-4xl text-blue-600 font-black block">📝</span>
-                                        <div class="text-xs font-bold text-slate-800 truncate max-w-[200px]">{{ $evidenceName }}</div>
-                                        <div class="text-[11px] text-slate-500">Dokumen Word / Docx</div>
-                                    </div>
-                                @else
-                                    <img src="{{ $evidenceUrl }}" alt="Report Sheet Fisik Asesi" class="w-full h-full object-contain transition duration-200 group-hover:scale-105">
-                                @endif
-                                <div class="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                                    <span class="px-3 py-1.5 bg-white/95 text-slate-900 rounded-lg text-xs font-bold shadow">🔍 Perbesar Dokumen</span>
+                        <div class="w-full md:w-64 h-48 bg-white rounded-lg overflow-hidden border border-slate-300 flex items-center justify-center relative group cursor-pointer shrink-0 shadow-xs"
+                             @click="viewDocument('{{ $evidenceUrl }}', '{{ addslashes($evidenceName) }}', '{{ $fileType }}')">
+                            @if($isPdf)
+                                <div class="text-center p-4">
+                                    <span class="text-4xl text-rose-600 font-black block mb-1">📄</span>
+                                    <div class="text-xs font-bold text-slate-800 truncate max-w-[200px]">{{ $evidenceName }}</div>
+                                    <div class="text-[11px] text-slate-500">Dokumen PDF Report Sheet</div>
                                 </div>
-                            </div>
-                            <div class="pt-1 flex flex-col sm:flex-row gap-2">
-                                <button type="button" @click="viewDocument('{{ $evidenceUrl }}', '{{ addslashes($evidenceName) }}', '{{ $fileType }}')" class="flex-1 text-center px-3 py-2 text-xs font-bold uppercase tracking-wider bg-brand-600 hover:bg-brand-700 text-white rounded-lg shadow-sm transition inline-flex items-center justify-center gap-1.5">
-                                    <span>🔍 Pratinjau (Modal)</span>
-                                </button>
-                                <a href="{{ $evidenceUrl }}" target="_blank" class="px-3 py-2 text-xs font-bold uppercase tracking-wider bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-lg shadow-xs transition inline-flex items-center justify-center gap-1">
-                                    <span>Tab Baru</span>
-                                    <span>&nearr;</span>
-                                </a>
+                            @elseif($fileType === 'doc')
+                                <div class="text-center p-4">
+                                    <span class="text-4xl text-blue-600 font-black block mb-1">📝</span>
+                                    <div class="text-xs font-bold text-slate-800 truncate max-w-[200px]">{{ $evidenceName }}</div>
+                                    <div class="text-[11px] text-slate-500">Dokumen Word / Docx</div>
+                                </div>
+                            @else
+                                <img src="{{ $evidenceUrl }}" alt="Report Sheet Fisik Asesi" class="w-full h-full object-contain transition duration-200 group-hover:scale-105">
+                            @endif
+                            <div class="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <span class="px-3 py-1.5 bg-white/95 text-slate-900 rounded-lg text-xs font-bold shadow">🔍 Perbesar Dokumen</span>
                             </div>
                         </div>
 
-                        {{-- Metadata & Instruction --}}
-                        <div class="lg:col-span-7 space-y-4 text-xs">
-                            <div class="border border-slate-200 rounded-lg p-4 bg-slate-50/80 space-y-2">
-                                <div class="font-bold text-slate-900 text-sm">Informasi Berkas Unggahan Asesi:</div>
-                                <div class="text-slate-700">Nama Asesi: <strong class="text-slate-900">{{ $assessment->asesi->full_name }}</strong></div>
-                                <div class="text-slate-700">Waktu Unggah: <span class="font-mono font-semibold text-slate-900">{{ \Carbon\Carbon::parse($evidenceTime)->isoFormat('D MMMM Y, HH:mm') }} WIB</span></div>
-                                <div class="text-slate-700">Nama File: <span class="font-mono text-slate-700">{{ $evidenceName }}</span></div>
+                        {{-- Actions & File Info --}}
+                        <div class="flex-1 space-y-3 w-full">
+                            <div>
+                                <div class="text-sm font-bold text-slate-900 truncate">{{ $evidenceName }}</div>
+                                <div class="text-xs text-slate-500 mt-0.5">
+                                    Diunggah pada <span class="font-mono font-semibold text-slate-700">{{ \Carbon\Carbon::parse($evidenceTime)->isoFormat('D MMMM Y, HH:mm') }} WIB</span>
+                                </div>
                             </div>
 
-                            <div class="p-4 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-950 text-xs leading-relaxed space-y-1">
-                                <div class="font-bold flex items-center gap-1.5 text-emerald-900">
-                                    <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                    <span>Verifikasi Hasil Pengukuran Fisik:</span>
-                                </div>
-                                <p class="text-emerald-900">
-                                    Asesi telah mengunggah lembar pemeriksaan teknis (Report Sheet) fisik di samping. Silakan teliti isian pengukuran teknis yang dibuat asesi dan lakukan penandatanganan verifikasi Anda di bawah.
-                                </p>
+                            <div class="flex flex-wrap items-center gap-2.5 pt-1">
+                                <button type="button" @click="viewDocument('{{ $evidenceUrl }}', '{{ addslashes($evidenceName) }}', '{{ $fileType }}')" class="px-4 py-2 text-xs font-bold uppercase tracking-wider bg-brand-600 hover:bg-brand-700 text-white rounded-lg shadow-sm transition inline-flex items-center justify-center gap-1.5 cursor-pointer">
+                                    <span>🔍 Pratinjau Dokumen</span>
+                                </button>
+                                <a href="{{ $evidenceUrl }}" target="_blank" class="px-4 py-2 text-xs font-bold uppercase tracking-wider bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 rounded-lg shadow-xs transition inline-flex items-center justify-center gap-1">
+                                    <span>Buka Tab Baru ↗</span>
+                                </a>
+                                @if(! $isScheduleClosed)
+                                    <button type="button" @click="revisionModalOpen = true" class="px-4 py-2 text-xs font-bold uppercase tracking-wider {{ $isRevisionRequested ? 'bg-amber-500 hover:bg-amber-600' : 'bg-rose-600 hover:bg-rose-700' }} text-white rounded-lg shadow-xs transition inline-flex items-center justify-center gap-1.5 cursor-pointer">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                                        <span>{{ $isRevisionRequested ? 'Ubah Catatan Revisi' : 'Minta Revisi / Unggah Ulang' }}</span>
+                                    </button>
+                                @endif
                             </div>
+
+                            @if(count($evidenceHistory) > 0)
+                                <div class="pt-2 border-t border-slate-200" x-data="{ openHistory: false }">
+                                    <button type="button" @click="openHistory = !openHistory" class="text-xs font-bold text-slate-600 hover:text-brand-600 inline-flex items-center gap-1.5 cursor-pointer">
+                                        <span>📁 Riwayat Berkas Sebelumnya ({{ count($evidenceHistory) }})</span>
+                                        <span class="text-[10px] text-slate-400 font-mono" x-text="openHistory ? '▲ Sembunyikan' : '▼ Buka'"></span>
+                                    </button>
+                                    <div x-show="openHistory" x-cloak class="mt-2 space-y-1.5">
+                                        @foreach($evidenceHistory as $hIdx => $hItem)
+                                            @php
+                                                $hUrl = route('secure-file.evidence', ['response' => $response, 'history_index' => $hIdx]);
+                                                $hIsPdf = str_ends_with(strtolower($hItem['path'] ?? ''), '.pdf');
+                                                $hType = $hIsPdf ? 'pdf' : (preg_match('/\.(docx?)$/i', $hItem['path'] ?? '') ? 'doc' : 'image');
+                                            @endphp
+                                            <div class="p-2 bg-white rounded-lg border border-slate-200 text-[11px] flex items-center justify-between gap-2">
+                                                <div class="min-w-0 flex-1">
+                                                    <span class="font-bold text-slate-800">{{ $hItem['original_name'] ?? 'Berkas Revisi #'.($hIdx + 1) }}</span>
+                                                    <span class="text-slate-400 mx-1">&bull;</span>
+                                                    <span class="text-slate-500">Diunggah: {{ !empty($hItem['uploaded_at']) ? \Carbon\Carbon::parse($hItem['uploaded_at'])->isoFormat('D MMM Y, HH:mm') : '-' }}</span>
+                                                    @if(!empty($hItem['revision_notes']))
+                                                        <div class="text-rose-700 italic text-[10px] mt-0.5">Catatan: {{ $hItem['revision_notes'] }}</div>
+                                                    @endif
+                                                </div>
+                                                <button type="button" @click="viewDocument('{{ $hUrl }}', '{{ addslashes($hItem['original_name'] ?? 'Berkas Sebelumnya') }}', '{{ $hType }}')" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded text-slate-700 text-[10px] font-bold cursor-pointer">
+                                                    Lihat
+                                                </button>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endif
                         </div>
                     </div>
                 @else
@@ -168,7 +266,7 @@
                         <div class="w-12 h-12 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center mx-auto">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                         </div>
-                        <div class="max-w-md mx-auto">
+                        <div class="max-w-md mx-auto space-y-1">
                             <h3 class="text-sm font-bold text-amber-950">Menunggu Asesi Mengunggah Lembar Report Sheet Fisik</h3>
                             <p class="text-xs text-amber-800 mt-1 leading-relaxed">
                                 Asesi <strong>{{ $assessment->asesi->full_name }}</strong> belum mengunggah foto / scan berkas lembar kerja pemeriksaan fisik (FR.IA.01B). Asesi dapat mengunggahnya secara mandiri melalui akun portal asesi.
@@ -376,6 +474,57 @@
                     </div>
                 </template>
             </div>
+        </div>
+    </div>
+
+    {{-- Modal Permintaan Revisi Lembar Report Sheet --}}
+    <div x-show="revisionModalOpen" x-cloak
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         class="fixed inset-0 z-50 overflow-y-auto bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-4"
+         @keydown.escape.window="revisionModalOpen = false">
+        <div class="relative w-full max-w-lg bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-200"
+             @click.away="revisionModalOpen = false">
+            <form action="{{ route('asesor.assessment.ia01b.request-revision', $assessment->id) }}" method="POST">
+                @csrf
+                <div class="px-6 py-4 bg-slate-900 text-white flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-full bg-rose-600 text-white flex items-center justify-center font-bold text-xs">⚠️</span>
+                        <h3 class="text-sm font-bold">Minta Revisi Lembar Report Sheet (FR.IA.01B)</h3>
+                    </div>
+                    <button type="button" @click="revisionModalOpen = false" class="text-slate-400 hover:text-white transition cursor-pointer">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+
+                <div class="p-6 space-y-4">
+                    <div class="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-900 leading-relaxed">
+                        Dengan meminta revisi, asesi <strong>{{ $assessment->asesi->full_name }}</strong> akan diberitahu pada akun portalnya untuk memperbaiki dan mengunggah ulang foto / scan berkas Report Sheet fisik ini.
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-bold text-slate-800 uppercase tracking-wider">
+                            Catatan / Instruksi Perbaikan untuk Asesi <span class="text-rose-500">*</span>
+                        </label>
+                        <textarea name="revision_notes" rows="4" required class="w-full text-xs rounded-lg border border-slate-300 p-3 focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="Tuliskan alasan mengapa lembar kerja perlu direvisi (misal: Foto buram pada bagian toleransi pengukuran rem, data pengukuran belum lengkap, formulir salah halaman, dsb)...">{{ $revisionNotes ?? '' }}</textarea>
+                        <p class="text-[11px] text-slate-500">Catatan ini akan tampil secara jelas di portal asesi saat membuka instrumen FR.IA.01B.</p>
+                    </div>
+                </div>
+
+                <div class="px-6 py-3.5 bg-slate-50 border-t border-slate-200 flex items-center justify-end gap-2.5">
+                    <button type="button" @click="revisionModalOpen = false" class="px-4 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-100 transition cursor-pointer">
+                        Batal
+                    </button>
+                    <button type="submit" class="px-4 py-2 text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white rounded-lg shadow-sm transition flex items-center gap-1.5 cursor-pointer">
+                        <span>Kirim Permintaan Revisi</span>
+                        <span>&rarr;</span>
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

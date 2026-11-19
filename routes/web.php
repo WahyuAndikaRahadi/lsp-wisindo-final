@@ -304,12 +304,16 @@ Route::middleware(['auth', 'role:ASESOR'])->prefix('asesor')->name('asesor.')->g
     Route::get('/assessment/{assessment}/instrument/{code}', [Asesor\InstrumentController::class, 'instrumentShow'])->name('assessment.instrument');
     Route::post('/assessment/{assessment}/instrument/{code}', [Asesor\InstrumentController::class, 'instrumentStore'])->name('assessment.instrument.store');
     Route::post('/assessment/{assessment}/instrument/ia05/reset', [Asesor\InstrumentController::class, 'resetIa05Status'])->name('assessment.ia05.reset');
+    Route::post('/assessment/{assessment}/instrument/ia01b/request-revision', [Asesor\InstrumentController::class, 'requestIa01bRevision'])->name('assessment.ia01b.request-revision');
+    Route::post('/assessment/{assessment}/instrument/ia01b/cancel-revision', [Asesor\InstrumentController::class, 'cancelIa01bRevision'])->name('assessment.ia01b.cancel-revision');
 
     Route::get('/ruang-uji/{assessment}/ia01', fn (Assessment $assessment) => app()->call([app(Asesor\InstrumentController::class), 'instrumentShow'], ['assessment' => $assessment, 'code' => 'ia01']))->name('ruang-uji.ia01');
     Route::post('/ruang-uji/{assessment}/ia01', fn (Assessment $assessment, Request $req) => app(Asesor\InstrumentController::class)->instrumentStore($assessment, 'ia01', $req))->name('ruang-uji.ia01.store');
 
     Route::get('/ruang-uji/{assessment}/ia01b', fn (Assessment $assessment) => app()->call([app(Asesor\InstrumentController::class), 'instrumentShow'], ['assessment' => $assessment, 'code' => 'ia01b']))->name('ruang-uji.ia01b');
     Route::post('/ruang-uji/{assessment}/ia01b', fn (Assessment $assessment, Request $req) => app(Asesor\InstrumentController::class)->instrumentStore($assessment, 'ia01b', $req))->name('ruang-uji.ia01b.store');
+    Route::post('/ruang-uji/{assessment}/ia01b/request-revision', fn (Assessment $assessment, Request $req) => app(Asesor\InstrumentController::class)->requestIa01bRevision($assessment, $req))->name('ruang-uji.ia01b.request-revision');
+    Route::post('/ruang-uji/{assessment}/ia01b/cancel-revision', fn (Assessment $assessment) => app(Asesor\InstrumentController::class)->cancelIa01bRevision($assessment))->name('ruang-uji.ia01b.cancel-revision');
 
     Route::get('/ruang-uji/{assessment}/ia02', fn (Assessment $assessment) => app()->call([app(Asesor\InstrumentController::class), 'instrumentShow'], ['assessment' => $assessment, 'code' => 'ia02']))->name('ruang-uji.ia02');
     Route::post('/ruang-uji/{assessment}/ia02', fn (Assessment $assessment, Request $req) => app(Asesor\InstrumentController::class)->instrumentStore($assessment, 'ia02', $req))->name('ruang-uji.ia02.store');
