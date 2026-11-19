@@ -291,23 +291,40 @@
                                     </div>
                                 </td>
                                 <td class="px-0 md:px-6 py-0 md:py-4 text-left md:text-right whitespace-nowrap pt-1 md:pt-0">
-                                    <a href="{{ $item->inspect_url }}"
-                                       class="w-full md:w-auto inline-flex items-center justify-center space-x-1.5 px-4 py-2.5 md:py-2 text-xs font-bold {{ $item->is_completed || $isClosedForMe ? 'bg-slate-800 hover:bg-slate-900 text-white' : 'bg-brand-600 hover:bg-brand-700 text-white' }} rounded-lg shadow-sm transition min-h-[40px]">
-                                        <span>
-                                            @if($isClosedForMe)
-                                                {{ $isApl ? 'Lihat Berkas APL' : 'Lihat Dokumen' }}
-                                            @elseif($isApl)
-                                                {{ $item->is_completed ? 'Tinjau APL' : 'Verifikasi APL' }}
-                                            @elseif($isIa02)
-                                                {{ $item->is_completed ? 'Tinjau TTD' : 'TTD FR.IA.02' }}
-                                            @else
-                                                {{ $item->is_completed ? 'Tinjau' : 'Periksa' }}
-                                            @endif
-                                        </span>
-                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                                        </svg>
-                                    </a>
+                                    <div class="flex items-center justify-start md:justify-end gap-2 flex-wrap">
+                                        @if($codeUpper === 'IA05' && $item->is_completed && ! $isClosedForMe)
+                                            <form action="{{ route('asesor.assessment.ia05.reset', $item->assessment) }}" method="POST" class="inline"
+                                                  data-confirm="Apakah Anda yakin ingin me-reset status ujian CBT (FR.IA.05) asesi {{ $item->asesi->full_name }}? Asesi dapat mengerjakan remedial CBT tanpa mereset progress asesmen lainnya."
+                                                  data-confirm-title="Konfirmasi Reset CBT / Remedial"
+                                                  data-confirm-ok="Ya, Reset untuk Remedial"
+                                                  data-confirm-danger="false">
+                                                @csrf
+                                                <button type="submit" class="inline-flex items-center justify-center space-x-1 px-3 py-2 text-xs font-bold bg-amber-500 hover:bg-amber-600 text-white rounded-lg shadow-sm transition min-h-[40px]" title="Reset status CBT untuk remedial">
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                                                    </svg>
+                                                    <span>Reset CBT</span>
+                                                </button>
+                                            </form>
+                                        @endif
+                                        <a href="{{ $item->inspect_url }}"
+                                           class="w-full md:w-auto inline-flex items-center justify-center space-x-1.5 px-4 py-2.5 md:py-2 text-xs font-bold {{ $item->is_completed || $isClosedForMe ? 'bg-slate-800 hover:bg-slate-900 text-white' : 'bg-brand-600 hover:bg-brand-700 text-white' }} rounded-lg shadow-sm transition min-h-[40px]">
+                                            <span>
+                                                @if($isClosedForMe)
+                                                    {{ $isApl ? 'Lihat Berkas APL' : 'Lihat Dokumen' }}
+                                                @elseif($isApl)
+                                                    {{ $item->is_completed ? 'Tinjau APL' : 'Verifikasi APL' }}
+                                                @elseif($isIa02)
+                                                    {{ $item->is_completed ? 'Tinjau TTD' : 'TTD FR.IA.02' }}
+                                                @else
+                                                    {{ $item->is_completed ? 'Tinjau' : 'Periksa' }}
+                                                @endif
+                                            </span>
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                            </svg>
+                                        </a>
+                                    </div>
                                 </td>
                             </tr>
                         @endforeach

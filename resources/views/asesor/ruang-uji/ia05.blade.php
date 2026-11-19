@@ -8,7 +8,22 @@
             <h1 class="text-2xl font-black text-slate-900 tracking-tight mt-1">FR.IA.05 – Hasil Ujian Tertulis Pilihan Ganda (CBT)</h1>
             <p class="text-sm text-slate-500">Asesi: <strong>{{ $assessment->asesi->full_name }}</strong> | Skema: <strong>{{ $assessment->schedule->scheme->name }}</strong></p>
         </div>
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-2 flex-wrap">
+            @if(! ($assessment->schedule?->is_closed))
+                <form action="{{ route('asesor.assessment.ia05.reset', $assessment) }}" method="POST" class="inline"
+                      data-confirm="Apakah Anda yakin ingin me-reset status ujian CBT (FR.IA.05) asesi {{ $assessment->asesi->full_name }}? Asesi dapat mengerjakan remedial CBT tanpa mereset data asesmen lainnya."
+                      data-confirm-title="Konfirmasi Reset CBT / Remedial"
+                      data-confirm-ok="Ya, Reset untuk Remedial"
+                      data-confirm-danger="false">
+                    @csrf
+                    <button type="submit" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-600 text-white shadow-xs transition" title="Buka kembali ujian CBT agar asesi dapat melakukan remedial">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                        </svg>
+                        <span>Reset Status / Remedial CBT</span>
+                    </button>
+                </form>
+            @endif
             <a href="{{ route('admin.dokumen-muk.asesi-dynamic', ['assessment' => $assessment->id, 'type' => 'ia05c']) }}" target="_blank"
                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-cyan-50 text-cyan-800 border border-cyan-300 hover:bg-cyan-100 transition shadow-xs"
                title="Lihat Lembar Jawaban FR.IA.05.C">

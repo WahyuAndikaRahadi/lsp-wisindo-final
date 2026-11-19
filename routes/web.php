@@ -303,6 +303,7 @@ Route::middleware(['auth', 'role:ASESOR'])->prefix('asesor')->name('asesor.')->g
     // Instrument aliases for IA01, IA02, IA03, IA05
     Route::get('/assessment/{assessment}/instrument/{code}', [Asesor\InstrumentController::class, 'instrumentShow'])->name('assessment.instrument');
     Route::post('/assessment/{assessment}/instrument/{code}', [Asesor\InstrumentController::class, 'instrumentStore'])->name('assessment.instrument.store');
+    Route::post('/assessment/{assessment}/instrument/ia05/reset', [Asesor\InstrumentController::class, 'resetIa05Status'])->name('assessment.ia05.reset');
 
     Route::get('/ruang-uji/{assessment}/ia01', fn (Assessment $assessment) => app()->call([app(Asesor\InstrumentController::class), 'instrumentShow'], ['assessment' => $assessment, 'code' => 'ia01']))->name('ruang-uji.ia01');
     Route::post('/ruang-uji/{assessment}/ia01', fn (Assessment $assessment, Request $req) => app(Asesor\InstrumentController::class)->instrumentStore($assessment, 'ia01', $req))->name('ruang-uji.ia01.store');
@@ -371,6 +372,7 @@ Route::middleware(['auth', 'role:SUPER_ADMIN,ADMIN_LSP,KOMITE_TEKNIS,TUK_ADMIN']
         Route::post('/assessment/{assessment}/assign-assessor', [Admin\JadwalController::class, 'assignAssessor'])->name('assessment.assign-assessor');
         Route::post('/jadwal/{jadwal}/batch-review-registration', [Admin\JadwalController::class, 'batchReviewRegistration'])->name('jadwal.batch-review-registration');
         Route::post('/assessment/{assessment}/mark-absent', [Admin\JadwalController::class, 'markAbsent'])->name('assessment.mark-absent');
+        Route::delete('/jadwal/{jadwal}/peserta/{assessment}', [Admin\JadwalController::class, 'removeCandidate'])->name('jadwal.remove-candidate');
 
         // Appeal Decision
         Route::post('/appeals/{appeal}/decide', [Admin\AppealController::class, 'decide'])->name('appeals.decide');

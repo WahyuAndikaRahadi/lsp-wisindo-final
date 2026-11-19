@@ -14,6 +14,7 @@ use App\Services\SchemeInstrumentService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
@@ -666,5 +667,70 @@ class InstrumentController extends Controller
 
         return redirect()->route('asesor.schedule.instrument', ['schedule' => $schedule->id, 'code' => 'ia02'])
             ->with('success', "Sebanyak {$signedCount} asesi berhasil ditandatangani dokumen FR.IA.02 secara massal.");
+    }
+
+    /**
+     * Reset status pengerjaan CBT (FR.IA.05) asesi agar dapat mengikuti ujian ulang / remedial.
+     */
+    public function resetIa05Status(Assessment $assessment): RedirectResponse
+    {
+        $this->authorizeAssessorAssessment($assessment);
+
+        if ($assessment->schedule && $assessment->schedule->is_closed) {
+            return back()->with('error', 'Jadwal asesmen sudah resmi ditutup. Status ujian tidak dapat di-reset.');
+        }
+
+        $response = AssessmentIaResponse::where('assessment_id', $assessment->id)
+            ->where('instrument_code', 'IA05')
+            ->first();
+
+        if (! $response) {
+            return back()->with('info', 'Belum ada data pengerjaan CBT (FR.IA.05) untuk asesi ini.');
+        }
+
+        $asesiName = $assessment->asesi?->full_name ?? "Asesi #{$assessment->id}";
+
+        DB::transaction(function () use ($assessment, $response) {
+            $currentData = is_array($response->data_json)
+                ? $response->data_json
+                : (json_decode($response->data_json ?? '[]', true) ?: []);
+
+            // Set status to DRAFT so CBT is unlocked for the asesi
+            $currentData['status'] = 'DRAFT';
+
+            $response->update([
+                'score' => null,
+                'asesi_signed_at' => null,
+                'asesi_signature' => null,
+                'assessor_signed_at' => null,
+                'assessor_signature' => null,
+                'data_json' => $currentData,
+            ]);
+
+            // Revert final recommendation to IN_PROGRESS if already marked COMPLETED or BELUM_KOMPETEN
+            if ($assessment->final_result === 'BELUM_KOMPETEN' || $assessment->status === 'COMPLETED') {
+                $assessment->update([
+                    'status' => 'IN_PROGRESS',
+                    'final_result' => 'BELUM_SELESAI',
+                    'final_result_at' => null,
+                    'completed_at' => null,
+                ]);
+            }
+
+            // Invalidate cached MUK PDF for IA.05 and schedule summaries
+            $cacheDir = storage_path('app/muk-cache');
+            if (File::isDirectory($cacheDir)) {
+                $filesToDelete = array_merge(
+                    File::glob($cacheDir."/dyn_{$assessment->schedule_id}_{$assessment->id}_ia05*.pdf") ?: [],
+                    File::glob($cacheDir."/dyn_{$assessment->schedule_id}_sch_ak05*.pdf") ?: [],
+                    File::glob($cacheDir."/dyn_{$assessment->schedule_id}_sch_ak06*.pdf") ?: []
+                );
+                foreach ($filesToDelete as $f) {
+                    File::delete($f);
+                }
+            }
+        });
+
+        return back()->with('success', "Status pengerjaan CBT (FR.IA.05) untuk asesi {$asesiName} berhasil di-reset. Asesi sekarang dapat mengerjakan remedial ujian CBT.");
     }
 }

@@ -10,6 +10,9 @@ use App\Models\User;
 use App\Services\AkWorkflowService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
@@ -284,5 +287,65 @@ class JadwalController extends Controller
         app(AkWorkflowService::class)->markCandidateAbsent($assessment, $notes, auth()->id());
 
         return back()->with('success', "Asesi {$assessment->asesi->full_name} berhasil ditandai TIDAK HADIR.");
+    }
+
+    /**
+     * Keluarkan asesi dari jadwal dan bersihkan seluruh data pengerjaan asesmen terkait.
+     */
+    public function removeCandidate(Schedule $jadwal, Assessment $assessment): RedirectResponse
+    {
+        if ($assessment->schedule_id !== $jadwal->id) {
+            abort(404, 'Data asesi tidak ditemukan pada jadwal ini.');
+        }
+
+        $asesiName = $assessment->asesi?->full_name ?? "Asesi #{$assessment->id}";
+
+        DB::transaction(function () use ($jadwal, $assessment) {
+            // 1. Delete uploaded proof files
+            foreach ($assessment->proofs as $proof) {
+                if (! empty($proof->file_path) && Storage::disk('local')->exists($proof->file_path)) {
+                    Storage::disk('local')->delete($proof->file_path);
+                }
+            }
+            $assessment->proofs()->delete();
+
+            // 2. Delete IA evidence files (e.g. IA01B report sheet evidence)
+            foreach ($assessment->iaResponses as $ia) {
+                $evidencePath = $ia->data_json['evidence_image_path'] ?? null;
+                if ($evidencePath && Storage::disk('local')->exists($evidencePath)) {
+                    Storage::disk('local')->delete($evidencePath);
+                }
+            }
+            $assessment->iaResponses()->delete();
+
+            // 3. Delete other child records
+            $assessment->apl02Items()->delete();
+            $assessment->ak02Items()->delete();
+            $assessment->ak03Items()->delete();
+            $assessment->ak07Items()->delete();
+            $assessment->appeals()->delete();
+
+            // 4. Delete certificate if any
+            if ($assessment->certificate) {
+                if (! empty($assessment->certificate->file_path) && Storage::disk('local')->exists($assessment->certificate->file_path)) {
+                    Storage::disk('local')->delete($assessment->certificate->file_path);
+                }
+                $assessment->certificate()->delete();
+            }
+
+            // 5. Delete assessment record
+            $assessment->delete();
+
+            // 6. Invalidate schedule MUK PDF cache so BA, attendance lists, etc. regenerate without this candidate
+            $cacheDir = storage_path('app/muk-cache');
+            if (File::isDirectory($cacheDir)) {
+                $pattern = $cacheDir."/dyn_{$jadwal->id}_*";
+                foreach (File::glob($pattern) ?: [] as $cachedFile) {
+                    File::delete($cachedFile);
+                }
+            }
+        });
+
+        return back()->with('success', "Asesi {$asesiName} berhasil dikeluarkan dari jadwal.");
     }
 }

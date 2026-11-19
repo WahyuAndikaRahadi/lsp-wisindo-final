@@ -50,6 +50,16 @@
                 <p class="text-xs text-emerald-800 mt-0.5 leading-relaxed">Seluruh lembar ujian CBT berada dalam mode lihat (read-only). Jawaban telah tersimpan secara permanen.</p>
             </div>
         </div>
+    @elseif(! $isSubmitted && ! empty($draftAnswers))
+        <div class="p-4 bg-amber-50 border-2 border-amber-300 rounded-2xl text-amber-950 flex flex-col sm:flex-row items-start sm:items-center gap-3 shadow-xs">
+            <span class="text-2xl shrink-0">🔄</span>
+            <div>
+                <div class="font-bold text-sm text-amber-900">Ujian CBT Dibuka Kembali Untuk Remedial / Perbaikan</div>
+                <p class="text-xs text-amber-800 mt-0.5 leading-relaxed">
+                    Asesor telah membuka kembali status ujian CBT Anda. Jawaban Anda sebelumnya tetap tersimpan. Silakan periksa kembali jawaban Anda, perbaiki nomor yang belum tepat, lalu kirimkan kembali lembar ujian.
+                </p>
+            </div>
+        </div>
     @endif
 
     @if($questions->isEmpty())
