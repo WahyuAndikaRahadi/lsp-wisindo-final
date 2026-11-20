@@ -246,15 +246,6 @@
                                 Pilih Berkas Foto / Scan PDF Lembar Report Sheet:
                             @endif
                         </label>
-                        <div class="p-3.5 rounded-xl bg-indigo-50 border border-indigo-200 text-xs text-indigo-950 mb-2 space-y-1">
-                            <div class="flex items-center gap-2">
-                                <svg class="w-4 h-4 text-indigo-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                                <span class="font-bold text-indigo-900">Ketentuan Upload di HP: Berkas Dokumen PDF (.pdf)</span>
-                            </div>
-                            <p class="text-indigo-800 leading-relaxed">
-                                Tombol di bawah diarahkan ke <strong>Pengelola Berkas / Dokumen / Unduhan</strong> di ponsel Anda (bukan galeri foto). Pastikan lembar kerja Anda sudah tersimpan sebagai file <strong>PDF</strong> (misalnya hasil scan CamScanner, Adobe Scan, Google Drive, atau dokumen tersimpan).
-                            </p>
-                        </div>
                         <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                             <input type="file" name="evidence_image" accept="application/pdf,.pdf" required
                                 class="block w-full text-xs text-slate-600 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-slate-100 file:text-slate-800 hover:file:bg-slate-200 border border-slate-300 rounded-lg p-1 bg-white cursor-pointer">
