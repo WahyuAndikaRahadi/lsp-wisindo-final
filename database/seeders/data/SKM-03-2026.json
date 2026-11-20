@@ -701,63 +701,78 @@
     "pmo": [
         {
             "number": "1",
-            "question": "Seorang teknisi akan melakukan pengukuran tegangan pada baterai kendaraan",
-            "expected_answer": "Menjelaskan prosedur dan tindakan teknis sesuai pedoman reparasi resmi."
+            "question": "Seorang teknisi akan melakukan pengukuran tegangan pada baterai kendaraan listrik yang memiliki sistem 400V. Manakah kombinasi alat pelindung diri (APD) dan alat ukur yang paling tepat untuk menjamin keamanan teknisi tersebut?",
+            "expected_answer": "Menggunakan sarung tangan isolasi tegangan tinggi (Class 0 / 1000V) berstandar ASTM/IEC dengan pelindung kulit, face shield anti-arc flash, safety shoes berisolasi, dan multimeter CAT III 1000V / CAT IV 600V terkalibrasi."
         },
         {
             "number": "2",
-            "question": "Saat melakukan pemeriksaan pada baterai traksi (HV battery), Anda",
-            "expected_answer": "Menjelaskan prosedur dan tindakan teknis sesuai pedoman reparasi resmi."
+            "question": "Saat melakukan pemeriksaan pada baterai traksi (HV battery), Anda menemukan adanya kenaikan suhu yang tidak merata antar sel. Langkah analisis apa yang paling tepat untuk menentukan penyebab masalah ini?",
+            "expected_answer": "Membaca parameter live data resistansi internal dan voltase individual sel melalui diagnostic tool, memeriksa sistem pendingin baterai (coolant/fan), dan koneksi modul busbar."
         },
         {
-            "number": "1",
-            "question": "Sebelum memulai pekerjaan pada sistem tegangan tinggi (High Voltage),",
-            "expected_answer": "Menjelaskan prosedur dan tindakan teknis sesuai pedoman reparasi resmi."
+            "number": "3",
+            "question": "Apa yang anda lakukan Jika Tegangan baterai dibawah angka standar ?",
+            "expected_answer": "Memeriksa state of charge (SoC), melakukan penelusuran apakah ada arus parasitik/bocor, memeriksa charger/BMS, dan melakukan pengisian daya sesuai prosedur rekomendasi pabrikan."
         },
         {
-            "number": "2",
-            "question": "Sebuah mobil listrik mengalami penurunan efisiensi pengereman regeneratif.",
-            "expected_answer": "Menjelaskan prosedur dan tindakan teknis sesuai pedoman reparasi resmi."
+            "number": "4",
+            "question": "Sebelum memulai pekerjaan pada sistem tegangan tinggi (High Voltage), teknisi harus melepas Service Plug/Manual Disconnect. Mengapa prosedur ini wajib diikuti dengan pengukuran tegangan menggunakan multimeter?",
+            "expected_answer": "Untuk memastikan tegangan nol (zero voltage verification) dan mengonfirmasi kapasitor pada inverter telah benar-benar terlucuti (discharged) demi keselamatan jiwa sebelum menyentuh sirkuit HV."
         },
         {
-            "number": "1",
-            "question": "Saat memeriksa port pengisian daya (Charging Port), Anda menemukan",
-            "expected_answer": "Menjelaskan prosedur dan tindakan teknis sesuai pedoman reparasi resmi."
+            "number": "5",
+            "question": "Sebuah mobil listrik mengalami penurunan efisiensi pengereman regeneratif. Hasil analisis menunjukkan suhu motor listrik seringkali terlalu tinggi. Komponen mana yang paling mungkin memerlukan pemeliharaan intensif?",
+            "expected_answer": "Sistem pendingin motor listrik dan inverter (water pump inverter/radiator motor), sirkulasi coolant, atau sensor suhu pendingin motor penggerak."
         },
         {
-            "number": "2",
-            "question": "Dalam pemeriksaan sistem pendingin baterai, ditemukan volume coolant",
-            "expected_answer": "Menjelaskan prosedur dan tindakan teknis sesuai pedoman reparasi resmi."
+            "number": "6",
+            "question": "Ceritakan Bagai mana anda menghubungkan alat scanner dengan On Board Diagnosis (OBD) sesuai prosedur ?",
+            "expected_answer": "Memastikan saklar kontak kendaraan OFF, menghubungkan konektor DLC/OBD-II 16-pin secara presisi tanpa memaksakan pin, mengaktifkan kendaraan ke mode READY/ON, lalu menginisiasi komunikasi scanner."
         },
         {
-            "number": "1",
-            "question": "Seorang teknisi akan melakukan pengisian cairan pendingin setelah mengganti",
-            "expected_answer": "Menjelaskan prosedur dan tindakan teknis sesuai pedoman reparasi resmi."
+            "number": "7",
+            "question": "Saat memeriksa port pengisian daya (Charging Port), Anda menemukan adanya residu karbon (jelaga) tipis pada pin terminal DC. Apa kesimpulan analisis yang paling logis dari temuan ini?",
+            "expected_answer": "Terjadi fenomena arcing mikro (loncatan bunga api) akibat kontak pin yang longgar, aus, atau kotoran saat proses penancapan/pencabutan konektor DC fast charging berdaya tinggi."
         },
         {
-            "number": "2",
-            "question": "Dua mobil listrik identik menempuh rute yang sama. Mobil A menggunakan",
-            "expected_answer": "Menjelaskan prosedur dan tindakan teknis sesuai pedoman reparasi resmi."
+            "number": "8",
+            "question": "Dalam pemeriksaan sistem pendingin baterai, ditemukan volume coolant berkurang secara drastis. Apa prosedur yang harus dilakukan teknisi sebelum menambah cairan?",
+            "expected_answer": "Melakukan uji kebocoran tekanan (pressure leak test) pada sirkuit pendingin baterai dan memeriksa visual kebocoran di modul baterai sebelum menambah cairan coolant khusus dielektrik non-konduktif."
         },
         {
-            "number": "1",
-            "question": "Sebuah mobil listrik berperforma tinggi sering mengalami getaran pada",
-            "expected_answer": "Menjelaskan prosedur dan tindakan teknis sesuai pedoman reparasi resmi."
+            "number": "9",
+            "question": "Seorang teknisi akan melakukan pengisian cairan pendingin setelah mengganti pompa air elektrik pada mobil listrik. Alat khusus apa yang paling tepat digunakan untuk memastikan tidak ada udara yang terjebak di dalam sistem?",
+            "expected_answer": "Menggunakan vacuum coolant refiller / bleeder kit untuk menarik udara hingga hampa sebelum menyedot cairan pendingin masuk ke sirkuit tanpa gelembung udara (air pocket)."
         },
         {
-            "number": "2",
-            "question": "Setelah melakukan penggantian tie-rod end, Anda harus memastikan posisi",
-            "expected_answer": "Menjelaskan prosedur dan tindakan teknis sesuai pedoman reparasi resmi."
+            "number": "10",
+            "question": "Dua mobil listrik identik menempuh rute yang sama. Mobil A menggunakan ban dengan low rolling resistance sesuai standar pabrikan, sedangkan Mobil B menggunakan ban sport umum dengan tapak lebih lebar. Hasilnya, Mobil B memiliki jarak tempuh 15% lebih rendah, mengapa perubahan pada komponen mekanis (ban) memberikan dampak signifikan pada konsumsi energi listrik dibandingkan pada mobil bensin?",
+            "expected_answer": "Torsi instan mobil listrik menghasilkan hambatan gelinding (rolling resistance) dan serapan energi mekanis yang lebih besar, serta efisiensi powertrain listrik yang sangat tinggi (~90%) membuat setiap kerugian mekanis ban langsung terlihat pada penurunan persentase SoC baterai."
         },
         {
-            "number": "1",
-            "question": "Bagaimana cara yang benar dalam menerapkan pengisian daya untuk menjaga",
-            "expected_answer": "Menjelaskan prosedur dan tindakan teknis sesuai pedoman reparasi resmi."
+            "number": "11",
+            "question": "Sebuah mobil listrik berperforma tinggi sering mengalami getaran pada kemudi hanya beberapa minggu setelah dilakukan wheel balance. Hasil inspeksi ulang menunjukkan bahwa posisi bobot penyeimbang (balance weight) tipe tempel (adhesive) telah bergeser dari posisi semula di dalam velg, mengapa fenomena ini lebih rentan terjadi pada mobil listrik dibandingkan mobil konvensional!",
+            "expected_answer": "Mobil listrik memiliki torsi instan maksimum sejak rpm nol dan bobot kendaraan yang lebih berat akibat baterai, menghasilkan gaya sentrifugal dan akselerasi tangensial yang jauh lebih kuat pada roda."
         },
         {
-            "number": "2",
-            "question": "Seorang pemilik mobil listrik jarang menggunakan kendaraannya dan",
-            "expected_answer": "Menjelaskan prosedur dan tindakan teknis sesuai pedoman reparasi resmi."
+            "number": "12",
+            "question": "Setelah melakukan penggantian tie-rod end, Anda harus memastikan posisi roda depan tetap sejajar. Prosedur perawatan apa yang wajib dilakukan selanjutnya?",
+            "expected_answer": "Melakukan wheel alignment (spooring) menggunakan mesin 4-wheel aligner untuk menyetel sudut toe, camber, dan caster sesuai spesifikasi standar pabrikan."
+        },
+        {
+            "number": "13",
+            "question": "Apa yang anda lakukan jika Sistem Suspensi  bekerja tidak normal ?",
+            "expected_answer": "Melakukan inspeksi fisik kebocoran oli shock absorber, memeriksa keausan bushing arm, ball joint, strut mount, dan menguji ayunan suspensi pada rig/uji jalan."
+        },
+        {
+            "number": "14",
+            "question": "Bagaimana cara yang benar dalam menerapkan pengisian daya untuk menjaga kesehatan jangka panjang baterai Lithium-ion pada mobil listrik?",
+            "expected_answer": "Menjaga persentase pengisian harian antara 20% hingga 80%, membatasi penggunaan DC Ultra Fast Charging berlebihan, dan menghindari membiarkan baterai pada kondisi 0% dalam waktu lama."
+        },
+        {
+            "number": "15",
+            "question": "Seorang pemilik mobil listrik jarang menggunakan kendaraannya dan berencana menyimpannya selama 2 bulan. Saran pemeliharaan apa yang harus diterapkan?",
+            "expected_answer": "Menyimpan kendaraan dengan kondisi baterai sekitar 50% SoC di tempat yang sejuk/teduh, memutuskan suplai aki tambahan 12V jika perlu, atau mengaktifkan mode storage/hibernation pada kendaraan."
         }
     ],
     "report_sheet": [

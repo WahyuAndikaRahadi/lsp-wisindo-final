@@ -7,6 +7,7 @@ use App\Models\Scheme;
 use App\Models\User;
 use App\Services\RegistrationTokenService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
 class AuthSecurityHardeningTest extends TestCase
@@ -140,5 +141,26 @@ class AuthSecurityHardeningTest extends TestCase
             'schedule_id' => $schedule->id,
         ]);
         $throttledResponse->assertStatus(429);
+    }
+
+    public function test_multiple_different_users_from_same_ip_can_login_concurrently(): void
+    {
+        // Simulate a classroom / TUK with 15 students on the same IP (NAT)
+        for ($i = 1; $i <= 15; $i++) {
+            $user = User::factory()->create([
+                'email' => "student{$i}@school.id",
+                'password' => Hash::make('Kompeten86'),
+                'role' => 'ASESI',
+                'status' => 'ACTIVE',
+            ]);
+
+            $response = $this->post('/login', [
+                'email' => "student{$i}@school.id",
+                'password' => 'Kompeten86',
+            ]);
+
+            $response->assertRedirect();
+            $this->app['auth']->guard()->logout();
+        }
     }
 }

@@ -170,7 +170,7 @@
 
             <div class="p-4 sm:p-6 space-y-4">
                 <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 text-xs text-slate-700 leading-relaxed">
-                    <strong>Petunjuk:</strong> Selesaikan pemeriksaan teknis pada unit kendaraan di bengkel TUK dan catat seluruh hasil pengukuran pada formulir Report Sheet fisik. Ambil foto atau pindai berkas fisik lembar Report Sheet tersebut secara jelas dan tegak lurus, kemudian unggah melalui tombol di bawah agar asesor dapat memverifikasi hasil pekerjaan Anda.
+                    <strong>Petunjuk:</strong> Selesaikan pemeriksaan teknis pada unit kendaraan di bengkel TUK dan catat seluruh hasil pengukuran pada formulir Report Sheet fisik. Pindai/scan berkas lembar Report Sheet tersebut menjadi berkas dokumen PDF (misalnya menggunakan aplikasi CamScanner, Adobe Scan, Google Drive, atau scanner dokumen), kemudian unggah melalui formulir di bawah agar asesor dapat memverifikasi hasil pekerjaan Anda.
                 </div>
 
                 @if($evidencePath)
@@ -202,7 +202,7 @@
                         </div>
                         <div class="flex-1 space-y-2 text-xs">
                             <div class="flex items-center gap-2">
-                                <span class="font-bold text-slate-900 text-sm">Foto Lembar Report Sheet Fisik Asesi</span>
+                                <span class="font-bold text-slate-900 text-sm">Dokumen Lembar Report Sheet Asesi (FR.IA.01B)</span>
                                 @if($isRevisionRequested)
                                     <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-200 text-rose-900 border border-rose-300">
                                         Perlu Direvisi
@@ -247,13 +247,13 @@
                             @endif
                         </label>
                         <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-                            <input type="file" name="evidence_image" accept="image/*,application/pdf" required
+                            <input type="file" name="evidence_image" accept="application/pdf,.pdf" required
                                 class="block w-full text-xs text-slate-600 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-slate-100 file:text-slate-800 hover:file:bg-slate-200 border border-slate-300 rounded-lg p-1 bg-white cursor-pointer">
                             <button type="submit" class="px-5 py-2.5 text-xs font-bold uppercase tracking-wider {{ $isRevisionRequested ? 'bg-rose-600 hover:bg-rose-700' : 'bg-brand-600 hover:bg-brand-700' }} text-white rounded-lg shadow-sm transition shrink-0 cursor-pointer">
                                 {{ $isRevisionRequested ? 'Unggah Berkas Revisi ↑' : 'Unggah Berkas Fisik ↑' }}
                             </button>
                         </div>
-                        <p class="text-[11px] text-slate-500">Format yang didukung: JPG, JPEG, PNG, WEBP, atau scan PDF (Maksimal 10 MB).</p>
+                        <p class="text-[11px] text-slate-500">Format yang didukung: Dokumen PDF (.pdf) &bull; Maksimal 15 MB.</p>
                     </form>
                 @endif
             </div>
