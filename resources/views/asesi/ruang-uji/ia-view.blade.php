@@ -170,7 +170,7 @@
 
             <div class="p-4 sm:p-6 space-y-4">
                 <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 text-xs text-slate-700 leading-relaxed">
-                    <strong>Petunjuk:</strong> Selesaikan pemeriksaan teknis pada unit kendaraan di bengkel TUK dan catat seluruh hasil pengukuran pada formulir Report Sheet fisik. Ambil foto atau pindai berkas fisik lembar Report Sheet tersebut secara jelas dan tegak lurus, kemudian unggah melalui tombol di bawah agar asesor dapat memverifikasi hasil pekerjaan Anda.
+                    <strong>Petunjuk:</strong> Selesaikan pemeriksaan teknis pada unit kendaraan di bengkel TUK dan catat seluruh hasil pengukuran pada formulir Report Sheet fisik. Pindai/scan berkas lembar Report Sheet tersebut menjadi berkas dokumen PDF (misalnya menggunakan aplikasi CamScanner, Adobe Scan, Google Drive, atau scanner dokumen), kemudian unggah melalui formulir di bawah agar asesor dapat memverifikasi hasil pekerjaan Anda.
                 </div>
 
                 @if($evidencePath)
@@ -202,7 +202,7 @@
                         </div>
                         <div class="flex-1 space-y-2 text-xs">
                             <div class="flex items-center gap-2">
-                                <span class="font-bold text-slate-900 text-sm">Foto Lembar Report Sheet Fisik Asesi</span>
+                                <span class="font-bold text-slate-900 text-sm">Dokumen Lembar Report Sheet Asesi (FR.IA.01B)</span>
                                 @if($isRevisionRequested)
                                     <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-200 text-rose-900 border border-rose-300">
                                         Perlu Direvisi
@@ -246,18 +246,23 @@
                                 Pilih Berkas Foto / Scan PDF Lembar Report Sheet:
                             @endif
                         </label>
-                        <div class="p-3 rounded-lg bg-amber-50 border border-amber-200 text-xs text-amber-900 mb-2">
-                            <p class="font-bold text-amber-950 mb-0.5">⚠️ Tips Upload via HP / Android (Atasi Error "File tidak diketahui / lokasi file dipindahkan"):</p>
-                            <p class="text-amber-800 leading-relaxed">Foto lembar fisik terlebih dahulu memakai kamera HP Anda. Saat menekan tombol pilih file, buka melalui menu <strong>"Galeri"</strong> atau <strong>"File Manager"</strong> (<strong>hindari</strong> memilih dari tab <em>"Terbaru / Recent"</em>).</p>
+                        <div class="p-3.5 rounded-xl bg-indigo-50 border border-indigo-200 text-xs text-indigo-950 mb-2 space-y-1">
+                            <div class="flex items-center gap-2">
+                                <svg class="w-4 h-4 text-indigo-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                <span class="font-bold text-indigo-900">Ketentuan Upload di HP: Berkas Dokumen PDF (.pdf)</span>
+                            </div>
+                            <p class="text-indigo-800 leading-relaxed">
+                                Tombol di bawah diarahkan ke <strong>Pengelola Berkas / Dokumen / Unduhan</strong> di ponsel Anda (bukan galeri foto). Pastikan lembar kerja Anda sudah tersimpan sebagai file <strong>PDF</strong> (misalnya hasil scan CamScanner, Adobe Scan, Google Drive, atau dokumen tersimpan).
+                            </p>
                         </div>
                         <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-                            <input type="file" name="evidence_image" accept="image/jpeg,image/png,image/jpg,image/webp,application/pdf,.jpg,.jpeg,.png,.webp,.pdf" required
+                            <input type="file" name="evidence_image" accept="application/pdf,.pdf" required
                                 class="block w-full text-xs text-slate-600 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-slate-100 file:text-slate-800 hover:file:bg-slate-200 border border-slate-300 rounded-lg p-1 bg-white cursor-pointer">
                             <button type="submit" class="px-5 py-2.5 text-xs font-bold uppercase tracking-wider {{ $isRevisionRequested ? 'bg-rose-600 hover:bg-rose-700' : 'bg-brand-600 hover:bg-brand-700' }} text-white rounded-lg shadow-sm transition shrink-0 cursor-pointer">
                                 {{ $isRevisionRequested ? 'Unggah Berkas Revisi ↑' : 'Unggah Berkas Fisik ↑' }}
                             </button>
                         </div>
-                        <p class="text-[11px] text-slate-500">Format yang didukung: JPG, JPEG, PNG, WEBP, atau scan PDF (Maksimal 15 MB).</p>
+                        <p class="text-[11px] text-slate-500">Format yang didukung: Dokumen PDF (.pdf) &bull; Maksimal 15 MB.</p>
                     </form>
                 @endif
             </div>

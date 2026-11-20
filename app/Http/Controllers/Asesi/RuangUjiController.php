@@ -563,10 +563,10 @@ class RuangUjiController extends Controller
         }
 
         $request->validate([
-            'evidence_image' => 'required|file|mimes:jpeg,jpg,png,webp,pdf|max:15360',
+            'evidence_image' => 'required|file|mimes:pdf,jpeg,jpg,png,webp|max:15360',
         ], [
-            'evidence_image.required' => 'Pilih berkas foto atau scan PDF lembar fisik terlebih dahulu.',
-            'evidence_image.mimes' => 'Format berkas harus berupa JPG, JPEG, PNG, WEBP, atau PDF.',
+            'evidence_image.required' => 'Pilih berkas dokumen PDF Report Sheet terlebih dahulu.',
+            'evidence_image.mimes' => 'Format berkas harus berupa dokumen PDF (.pdf).',
             'evidence_image.max' => 'Ukuran berkas maksimal 15 MB.',
         ]);
 
