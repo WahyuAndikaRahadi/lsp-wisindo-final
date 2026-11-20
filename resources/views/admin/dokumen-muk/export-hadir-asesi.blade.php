@@ -46,9 +46,9 @@
         @endphp
 
         <div style="{{ $gIdx > 0 ? 'page-break-before: always; margin-top: 30px;' : '' }}">
-            @if($totalGroups > 1)
+            @if($totalGroups > 1 && $currentAssessor)
                 <div style="text-align: center; font-size: 9pt; font-weight: bold; color: #475569; margin-bottom: 12px;">
-                    (Bagian {{ $gIdx + 1 }} dari {{ $totalGroups }} - Asesor: {{ $currentAssessor?->full_name }})
+                    (Asesor: {{ $currentAssessor->full_name }})
                 </div>
             @endif
 

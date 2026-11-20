@@ -216,10 +216,6 @@ def render_page_1(c, chunk, chunk_offset, batch_idx, total_batches, assessor_inf
     c.setFillColor(black)
     c.drawCentredString(PW / 2, Y1(133.0), "BERITA ACARA PELAKSANAAN UJI KOMPETENSI")
 
-    if total_batches > 1:
-        c.setFont("Lib", 8.5)
-        c.drawCentredString(PW / 2, Y1(147.0), f"(Bagian {batch_idx + 1} dari {total_batches})")
-
     c.setFont("Lib", 9.5)
     intro_p1 = f"Pada hari ini, Hari/Tanggal : {DATA.get('hari_tanggal', '')}  Waktu : {DATA.get('waktu', '')} bertempat di {DATA.get('tuk_nama', '')},"
     intro_p2 = f"telah dilaksanakan proses asesmen Skema Sertifikasi {DATA.get('skema_nama', '')} dengan perincian sebagai berikut :"
@@ -244,8 +240,8 @@ def render_page_1(c, chunk, chunk_offset, batch_idx, total_batches, assessor_inf
     row_heights_p1 = []
     for idx in range(n_rows):
         p_info = chunk[idx] if idx < len(chunk) else None
+        cand_no = str(idx + 1)
         if p_info:
-            cand_no = str(p_info.get("no") if p_info.get("no") is not None else (chunk_offset + idx + 1))
             lines_nama = wrap_text(p_info.get("nama", ""), "Lib", 8.5, (cols[2] - cols[1]) - 10.0)
             res = "K" if p_info.get("hasil") in ("K", "KOMPETEN") else ("BK" if p_info.get("hasil") in ("BK", "BELUM_KOMPETEN") else p_info.get("hasil", ""))
             lines_rekomendasi = wrap_text(p_info.get("rekomendasi", "Diterbitkan Sertifikat"), "Lib", 8.0, (cols[4] - cols[3]) - 10.0)
@@ -262,7 +258,6 @@ def render_page_1(c, chunk, chunk_offset, batch_idx, total_batches, assessor_inf
             })
             row_heights_p1.append(h)
         else:
-            cand_no = str(chunk_offset + idx + 1)
             row_data_p1.append({
                 "p_info": None,
                 "cand_no": cand_no,
@@ -368,9 +363,6 @@ def render_page_2(c, chunk, chunk_offset, batch_idx, total_batches, assessor_inf
     c.setFont("Lib-B", 12.0)
     c.setFillColor(black)
     c.drawCentredString(PW / 2, Y2(105.0), "DAFTAR HADIR")
-    if total_batches > 1:
-        c.setFont("Lib", 8.5)
-        c.drawCentredString(PW / 2, Y2(118.0), f"(Bagian {batch_idx + 1} dari {total_batches})")
 
     c.setFont("Lib", 9.0)
     c.drawString(62.1, Y2(128.0), f"Hari / tanggal :  {DATA.get('hari_tanggal', '')}")
@@ -386,8 +378,8 @@ def render_page_2(c, chunk, chunk_offset, batch_idx, total_batches, assessor_inf
     row_heights_p2 = []
     for idx in range(n_rows):
         p_info = chunk[idx] if idx < len(chunk) else None
+        cand_no = str(idx + 1)
         if p_info:
-            cand_no = str(p_info.get("no") if p_info.get("no") is not None else (chunk_offset + idx + 1))
             lines_nama = wrap_text(p_info.get("nama", ""), "Lib", 8.0, (cols[2] - cols[1]) - 8.0)
             lines_institusi = wrap_text(p_info.get("institusi", ""), "Lib", 7.5, (cols[3] - cols[2]) - 8.0)
             lines_alamat = wrap_text(p_info.get("alamat", ""), "Lib", 7.5, (cols[4] - cols[3]) - 8.0)
@@ -406,7 +398,6 @@ def render_page_2(c, chunk, chunk_offset, batch_idx, total_batches, assessor_inf
             })
             row_heights_p2.append(h)
         else:
-            cand_no = str(chunk_offset + idx + 1)
             row_data_p2.append({
                 "p_info": None,
                 "cand_no": cand_no,
@@ -477,6 +468,12 @@ def render_page_2(c, chunk, chunk_offset, batch_idx, total_batches, assessor_inf
             else:
                 c.setFont("Lib", 8.0)
                 c.drawString(slot_left, Y2(y_mid + 2.5), f"{sig_num}. [Ttd]")
+        else:
+            sig_num = rd["cand_no"]
+            is_odd = ((idx + 1) % 2 != 0)
+            slot_left = cols[6] + 4.0 if is_odd else (cols[6] + cols[7]) / 2 + 4.0
+            c.setFont("Lib", 8.0)
+            c.drawString(slot_left, Y2(y_mid + 2.5), f"{sig_num}. ………")
 
     sig_block_h = 94.0
     gap = 20.0

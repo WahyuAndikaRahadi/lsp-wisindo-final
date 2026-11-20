@@ -398,7 +398,8 @@ class MukDynamicDocumentService
                 $assProfile = $ass->asesi?->profile;
                 $assIsK = in_array($ass->final_result, ['K', 'KOMPETEN'], true);
                 $pData = [
-                    'no' => $idx + 1,
+                    'no' => ($idx % 10) + 1,
+                    'group_no' => $idx + 1,
                     'global_no' => $overallIdx,
                     'nama' => $ass->asesi?->full_name ?? 'Peserta '.$overallIdx,
                     'institusi' => $assProfile?->nama_institusi_perusahaan ?? ($assProfile?->company_name ?? ($assProfile?->institution ?? 'SMK Negeri')),

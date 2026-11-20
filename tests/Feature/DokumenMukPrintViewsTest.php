@@ -679,4 +679,85 @@ PY;
         // 3. Assessee signature image is embedded in the PDF
         $this->assertTrue($data['has_signature_image'], 'Assessee signature should be embedded in the PDF document.');
     }
+
+    public function test_berita_acara_and_daftar_hadir_numbering_restarts_from_1_to_10_on_each_batch(): void
+    {
+        // Add 14 more assessees to the schedule (total 15 assessees with $this->asesi)
+        for ($i = 2; $i <= 15; $i++) {
+            $user = User::create([
+                'full_name' => "Peserta Tambahan {$i}",
+                'email' => "peserta{$i}@test.com",
+                'phone' => '08123456780'.$i,
+                'role' => 'ASESI',
+                'status' => 'ACTIVE',
+                'password' => Hash::make('password'),
+            ]);
+            $user->profile()->create([
+                'nik' => '321501000000000'.$i,
+                'nama_institusi_perusahaan' => 'SMK Negeri 1 Karawang',
+                'alamat_rumah' => 'Karawang',
+            ]);
+            Assessment::create([
+                'asesi_id' => $user->id,
+                'schedule_id' => $this->schedule->id,
+                'assessor_id' => $this->asesor->id,
+                'admin_status' => 'APPROVED',
+                'apl_status' => 'APPROVED',
+                'status' => 'COMPLETED',
+                'final_result' => 'KOMPETEN',
+            ]);
+        }
+
+        $response = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.export-ba', $this->schedule));
+        $response->assertOk();
+        $this->assertEquals('application/pdf', $response->headers->get('Content-Type'));
+
+        $pdfPath = $response->baseResponse->getFile()->getPathname();
+        $this->assertFileExists($pdfPath);
+
+        $python = file_exists(base_path('venv/bin/python')) ? base_path('venv/bin/python') : (file_exists(base_path('.venv/bin/python')) ? base_path('.venv/bin/python') : 'python3');
+        $script = <<<'PY'
+import pymupdf, sys, json
+doc = pymupdf.open(sys.argv[1])
+pages_data = []
+for p in doc:
+    lines = [line.strip() for line in p.get_text().split('\n') if line.strip()]
+    pages_data.append({
+        'has_1': '1' in lines,
+        'has_10': '10' in lines,
+        'has_11': '11' in lines,
+        'has_12': '12' in lines,
+        'has_15': '15' in lines,
+        'has_bagian': any('Bagian' in line for line in lines),
+    })
+print(json.dumps({'total_pages': len(doc), 'pages': pages_data}))
+PY;
+        $output = shell_exec(escapeshellarg($python).' -c '.escapeshellarg($script).' '.escapeshellarg($pdfPath));
+        $res = json_decode($output, true);
+
+        $this->assertIsArray($res);
+        $this->assertEquals(4, $res['total_pages'], '15 candidates should produce 4 pages (2 batches of BA and Daftar Hadir).');
+
+        // Check Page 1 (BA Batch 1) & Page 2 (Daftar Hadir Batch 1)
+        $this->assertTrue($res['pages'][0]['has_1']);
+        $this->assertTrue($res['pages'][0]['has_10']);
+        $this->assertFalse($res['pages'][0]['has_11']);
+        $this->assertFalse($res['pages'][0]['has_bagian'], 'Page 1 (BA Batch 1) must not contain the "(Bagian x dari x)" subtitle.');
+
+        $this->assertTrue($res['pages'][1]['has_1']);
+        $this->assertTrue($res['pages'][1]['has_10']);
+        $this->assertFalse($res['pages'][1]['has_11']);
+        $this->assertFalse($res['pages'][1]['has_bagian'], 'Page 2 (Daftar Hadir Batch 1) must not contain the "(Bagian x dari x)" subtitle.');
+
+        // Check Page 3 (BA Batch 2) & Page 4 (Daftar Hadir Batch 2): numbering restarts from 1 to 10
+        $this->assertTrue($res['pages'][2]['has_1']);
+        $this->assertTrue($res['pages'][2]['has_10']);
+        $this->assertFalse($res['pages'][2]['has_11'], 'Page 3 should not have row 11; numbering must restart from 1 to 10.');
+        $this->assertFalse($res['pages'][2]['has_bagian'], 'Page 3 (BA Batch 2) must not contain the "(Bagian x dari x)" subtitle.');
+
+        $this->assertTrue($res['pages'][3]['has_1']);
+        $this->assertTrue($res['pages'][3]['has_10']);
+        $this->assertFalse($res['pages'][3]['has_11'], 'Page 4 should not have row 11; numbering must restart from 1 to 10.');
+        $this->assertFalse($res['pages'][3]['has_bagian'], 'Page 4 (Daftar Hadir Batch 2) must not contain the "(Bagian x dari x)" subtitle.');
+    }
 }
