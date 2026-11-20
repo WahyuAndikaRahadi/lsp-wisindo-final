@@ -244,8 +244,20 @@ def render_page_1(c, chunk, chunk_offset, batch_idx, total_batches, assessor_inf
         if p_info:
             lines_nama = wrap_text(p_info.get("nama", ""), "Lib", 8.5, (cols[2] - cols[1]) - 10.0)
             res = "K" if p_info.get("hasil") in ("K", "KOMPETEN") else ("BK" if p_info.get("hasil") in ("BK", "BELUM_KOMPETEN") else p_info.get("hasil", ""))
-            lines_rekomendasi = wrap_text(p_info.get("rekomendasi", "Diterbitkan Sertifikat"), "Lib", 8.0, (cols[4] - cols[3]) - 10.0)
-            lines_ket = wrap_text(p_info.get("ket", "Lulus"), "Lib", 8.0, (cols[5] - cols[4]) - 8.0)
+            if res == "K":
+                rek_text = "direkomendasikan"
+            elif res == "BK":
+                rek_text = "belum kompeten"
+            else:
+                raw_rek = p_info.get("rekomendasi", "")
+                if raw_rek in ("Diterbitkan Sertifikat", "Direkomendasikan", "direkomendasikan"):
+                    rek_text = "direkomendasikan"
+                elif raw_rek in ("Tidak Diterbitkan", "Belum Kompeten", "belum kompeten"):
+                    rek_text = "belum kompeten"
+                else:
+                    rek_text = raw_rek
+            lines_rekomendasi = wrap_text(rek_text, "Lib", 8.0, (cols[4] - cols[3]) - 10.0)
+            lines_ket = wrap_text(p_info.get("ket", "Lulus" if res == "K" else "Belum Lulus"), "Lib", 8.0, (cols[5] - cols[4]) - 8.0)
             max_l = max(1, len(lines_nama), len(lines_rekomendasi), len(lines_ket))
             h = max(16.0, max_l * 9.5 + 4.0)
             row_data_p1.append({
@@ -342,11 +354,10 @@ def render_page_1(c, chunk, chunk_offset, batch_idx, total_batches, assessor_inf
     c.drawString(330.0, Y1(y_sig + 60.0), "Jabatan")
     c.drawString(405.0, Y1(y_sig + 60.0), f": {DATA.get('penanggungjawab_jabatan', '')}")
     c.drawString(330.0, Y1(y_sig + 75.0), "Tanda tangan")
+    c.drawString(405.0, Y1(y_sig + 75.0), ":")
 
     sig_pic = DATA.get("signature_penanggungjawab")
-    drawn_pic = draw_signature(c, sig_pic, x_left=405.0, y_bottom=Y1(y_sig + 106.0), max_w=120.0, max_h=34.0)
-    if not drawn_pic:
-        c.drawString(405.0, Y1(y_sig + 75.0), ": [Ttd Digital]")
+    drawn_pic = draw_signature(c, sig_pic, x_left=415.0, y_bottom=Y1(y_sig + 106.0), max_w=120.0, max_h=34.0)
     c.drawString(330.0, Y1(y_sig + 115.0), "………………………………….")
 
 def render_page_2(c, chunk, chunk_offset, batch_idx, total_batches, assessor_info=None):

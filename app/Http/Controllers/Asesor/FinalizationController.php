@@ -64,6 +64,17 @@ class FinalizationController extends Controller
             ];
         })->values();
 
+        // Preset collective evidence methods from existing saved items or defaults
+        $firstSavedItem = $myAssessments->flatMap->ak02Items->first();
+        $savedMethods = $firstSavedItem?->methods_json;
+
+        $collectiveMethods = [
+            'observasi_demonstrasi' => $savedMethods ? ! empty($savedMethods['observasi_demonstrasi']) : true,
+            'tulis' => $savedMethods ? ! empty($savedMethods['tulis']) : true,
+            'lisan' => $savedMethods ? ! empty($savedMethods['lisan']) : true,
+            'portofolio' => $savedMethods ? ! empty($savedMethods['portofolio']) : false,
+        ];
+
         $meta = [
             'code' => 'FR.AK.02',
             'title' => 'Rekaman Asesmen Kompetensi',
@@ -79,6 +90,7 @@ class FinalizationController extends Controller
         return view('asesor.ruang-uji.schedule-ak02', compact(
             'schedule',
             'asesiList',
+            'collectiveMethods',
             'meta',
             'codeUpper',
             'codeLower'
@@ -113,12 +125,15 @@ class FinalizationController extends Controller
         $now = now();
         $savedCount = 0;
 
+        $hasMethodsInput = $request->has('methods');
         $methods = [
-            'observasi_demonstrasi' => (bool) $request->input('methods.observasi_demonstrasi', true),
-            'portofolio' => (bool) $request->input('methods.portofolio', true),
+            'observasi_demonstrasi' => $hasMethodsInput ? $request->boolean('methods.observasi_demonstrasi') : true,
+            'portofolio' => $hasMethodsInput ? $request->boolean('methods.portofolio') : false,
             'pihak_ketiga' => false,
-            'lisan' => (bool) $request->input('methods.lisan', true),
-            'tulis' => (bool) $request->input('methods.tulis', true),
+            'lisan' => $hasMethodsInput ? $request->boolean('methods.lisan') : true,
+            'tulis' => $hasMethodsInput ? $request->boolean('methods.tulis') : true,
+            'proyek' => false,
+            'lainnya' => false,
         ];
 
         $assessorSignature = $user->profile?->signature_data;

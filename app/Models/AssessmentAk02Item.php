@@ -36,4 +36,39 @@ class AssessmentAk02Item extends Model
     {
         return $this->belongsTo(CompetencyUnit::class);
     }
+
+    public function getIsObservasiAttribute(): bool
+    {
+        return ! empty($this->methods_json['observasi_demonstrasi']);
+    }
+
+    public function getIsPortofolioAttribute(): bool
+    {
+        return ! empty($this->methods_json['portofolio']);
+    }
+
+    public function getIsPihakKetigaAttribute(): bool
+    {
+        return ! empty($this->methods_json['pihak_ketiga']);
+    }
+
+    public function getIsLisanAttribute(): bool
+    {
+        return ! empty($this->methods_json['lisan']);
+    }
+
+    public function getIsTulisAttribute(): bool
+    {
+        return ! empty($this->methods_json['tulis']);
+    }
+
+    public function getIsProyekAttribute(): bool
+    {
+        return ! empty($this->methods_json['proyek']);
+    }
+
+    public function getIsLainnyaAttribute(): bool
+    {
+        return ! empty($this->methods_json['lainnya']);
+    }
 }

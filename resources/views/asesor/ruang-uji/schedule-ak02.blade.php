@@ -87,19 +87,19 @@
                         <span class="font-bold text-slate-800 shrink-0">Metode Pengumpulan Bukti Terpilih (Kolektif):</span>
                         <div class="flex items-center gap-4 flex-wrap text-slate-700">
                             <label class="inline-flex items-center gap-1.5 cursor-pointer">
-                                <input type="checkbox" name="methods[observasi_demonstrasi]" value="1" checked class="rounded border-slate-300 text-brand-600 focus:ring-brand-500 w-4 h-4">
+                                <input type="checkbox" name="methods[observasi_demonstrasi]" value="1" {{ !empty($collectiveMethods['observasi_demonstrasi'] ?? true) ? 'checked' : '' }} class="rounded border-slate-300 text-brand-600 focus:ring-brand-500 w-4 h-4">
                                 <span>Observasi Praktik</span>
                             </label>
                             <label class="inline-flex items-center gap-1.5 cursor-pointer">
-                                <input type="checkbox" name="methods[tulis]" value="1" checked class="rounded border-slate-300 text-brand-600 focus:ring-brand-500 w-4 h-4">
-                                <span>Pertanyaan Tulis (CBT)</span>
+                                <input type="checkbox" name="methods[tulis]" value="1" {{ !empty($collectiveMethods['tulis'] ?? true) ? 'checked' : '' }} class="rounded border-slate-300 text-brand-600 focus:ring-brand-500 w-4 h-4">
+                                <span>Pertanyaan Tulis (DPT)</span>
                             </label>
                             <label class="inline-flex items-center gap-1.5 cursor-pointer">
-                                <input type="checkbox" name="methods[lisan]" value="1" checked class="rounded border-slate-300 text-brand-600 focus:ring-brand-500 w-4 h-4">
-                                <span>Pertanyaan Lisan (PMO)</span>
+                                <input type="checkbox" name="methods[lisan]" value="1" {{ !empty($collectiveMethods['lisan'] ?? true) ? 'checked' : '' }} class="rounded border-slate-300 text-brand-600 focus:ring-brand-500 w-4 h-4">
+                                <span>Pertanyaan Lisan (PW)</span>
                             </label>
                             <label class="inline-flex items-center gap-1.5 cursor-pointer">
-                                <input type="checkbox" name="methods[portofolio]" value="1" checked class="rounded border-slate-300 text-brand-600 focus:ring-brand-500 w-4 h-4">
+                                <input type="checkbox" name="methods[portofolio]" value="1" {{ !empty($collectiveMethods['portofolio'] ?? false) ? 'checked' : '' }} class="rounded border-slate-300 text-brand-600 focus:ring-brand-500 w-4 h-4">
                                 <span>Verifikasi Portofolio</span>
                             </label>
                         </div>
@@ -306,6 +306,20 @@
                 rowCheckboxes.forEach(cb => {
                     const asmId = cb.getAttribute('data-asm-id');
                     if (asmId) setCandidateResult(asmId, 'BELUM_KOMPETEN');
+                });
+            });
+        }
+
+        const bulkForm = document.getElementById('bulkAk02Form');
+        if (bulkForm) {
+            bulkForm.addEventListener('submit', function() {
+                rowCheckboxes.forEach(cb => {
+                    const asmId = cb.getAttribute('data-asm-id');
+                    if (asmId && !cb.checked) {
+                        bulkForm.querySelectorAll(`[name^="results[${asmId}]"]`).forEach(el => {
+                            el.disabled = true;
+                        });
+                    }
                 });
             });
         }

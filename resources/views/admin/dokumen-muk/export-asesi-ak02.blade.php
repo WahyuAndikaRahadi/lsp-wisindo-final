@@ -260,14 +260,15 @@
             @foreach($schemeUnits as $idx => $u)
                 @php
                     $item = $ak02Indexed->get($u->id);
+                    $methods = $item?->methods_json ?? [];
                     $dummyFallback = $defaultUnitItems[$idx % count($defaultUnitItems)];
-                    $isObs = $item ? $item->is_observasi : $dummyFallback['obs'];
-                    $isPort = $item ? $item->is_portofolio : $dummyFallback['port'];
-                    $isP3 = $item ? $item->is_pihak_ketiga : $dummyFallback['p3'];
-                    $isLisan = $item ? $item->is_lisan : $dummyFallback['lisan'];
-                    $isTulis = $item ? $item->is_tulis : $dummyFallback['tulis'];
-                    $isProyek = $item ? $item->is_proyek : $dummyFallback['proyek'];
-                    $isLain = $item ? $item->is_lainnya : $dummyFallback['lain'];
+                    $isObs = $item ? (! empty($methods['observasi_demonstrasi']) || $item->is_observasi) : $dummyFallback['obs'];
+                    $isPort = $item ? (! empty($methods['portofolio']) || $item->is_portofolio) : $dummyFallback['port'];
+                    $isP3 = $item ? (! empty($methods['pihak_ketiga']) || $item->is_pihak_ketiga) : $dummyFallback['p3'];
+                    $isLisan = $item ? (! empty($methods['lisan']) || $item->is_lisan) : $dummyFallback['lisan'];
+                    $isTulis = $item ? (! empty($methods['tulis']) || $item->is_tulis) : $dummyFallback['tulis'];
+                    $isProyek = $item ? (! empty($methods['proyek']) || $item->is_proyek) : $dummyFallback['proyek'];
+                    $isLain = $item ? (! empty($methods['lainnya']) || $item->is_lainnya) : $dummyFallback['lain'];
                 @endphp
                 <tr>
                     <td style="padding: 4px 6px; font-size: 10pt;">

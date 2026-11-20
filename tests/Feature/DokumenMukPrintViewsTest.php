@@ -760,4 +760,63 @@ PY;
         $this->assertFalse($res['pages'][3]['has_11'], 'Page 4 should not have row 11; numbering must restart from 1 to 10.');
         $this->assertFalse($res['pages'][3]['has_bagian'], 'Page 4 (Daftar Hadir Batch 2) must not contain the "(Bagian x dari x)" subtitle.');
     }
+
+    public function test_berita_acara_pdf_rekomendasi_values_and_no_digital_signature_on_kepala_tuk(): void
+    {
+        // 1 competent ($this->asesi is KOMPETEN) and 1 not competent candidate
+        $asesiBk = User::create([
+            'full_name' => 'Fajar Pratama BK',
+            'email' => 'fajar.bk@test.com',
+            'phone' => '081299990001',
+            'role' => 'ASESI',
+            'status' => 'ACTIVE',
+            'password' => Hash::make('password'),
+        ]);
+        $asesiBk->profile()->create([
+            'nik' => '3215019999990099',
+            'nama_institusi_perusahaan' => 'SMK Negeri 2 Karawang',
+            'alamat_rumah' => 'Karawang Barat',
+        ]);
+        Assessment::create([
+            'asesi_id' => $asesiBk->id,
+            'schedule_id' => $this->schedule->id,
+            'assessor_id' => $this->asesor->id,
+            'admin_status' => 'APPROVED',
+            'apl_status' => 'APPROVED',
+            'status' => 'COMPLETED',
+            'final_result' => 'BELUM_KOMPETEN',
+        ]);
+
+        $response = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.export-ba', $this->schedule));
+        $response->assertOk();
+        $pdfPath = $response->baseResponse->getFile()->getPathname();
+        $this->assertFileExists($pdfPath);
+
+        $python = file_exists(base_path('venv/bin/python')) ? base_path('venv/bin/python') : (file_exists(base_path('.venv/bin/python')) ? base_path('.venv/bin/python') : 'python3');
+        $script = <<<'PY'
+import pymupdf, sys, json
+doc = pymupdf.open(sys.argv[1])
+p1 = doc[0]
+text_p1 = p1.get_text()
+
+# Check blocks on page 1 under Penanggungjawab (right side of signature block)
+blocks = p1.get_text("blocks")
+right_side_blocks = [b[4] for b in blocks if b[0] > 300 and b[1] > 500]
+right_text = "".join(right_side_blocks)
+
+print(json.dumps({
+    'full_p1': text_p1,
+    'right_side_sig_text': right_text,
+    'has_direkomendasikan': 'direkomendasikan' in text_p1,
+    'has_belum_kompeten': 'belum kompeten' in text_p1,
+}))
+PY;
+        $output = shell_exec(escapeshellarg($python).' -c '.escapeshellarg($script).' '.escapeshellarg($pdfPath));
+        $res = json_decode($output, true);
+
+        $this->assertIsArray($res);
+        $this->assertTrue($res['has_direkomendasikan'], 'Berita Acara must show "direkomendasikan" for competent asesi.');
+        $this->assertTrue($res['has_belum_kompeten'], 'Berita Acara must show "belum kompeten" for not competent asesi.');
+        $this->assertStringNotContainsString('Ttd Digital', $res['right_side_sig_text'], 'Kepala TUK field must not contain the phrase "ttd digital".');
+    }
 }

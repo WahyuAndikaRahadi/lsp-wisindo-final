@@ -303,6 +303,61 @@ class AssessmentWorkflowOverhaulTest extends TestCase
         $this->assertCount($unitCount, AssessmentAk02Item::where('assessment_id', $asm1->id)->get());
         $this->assertTrue(AssessmentAk02Item::where('assessment_id', $asm1->id)->first()->is_competent);
         $this->assertFalse(AssessmentAk02Item::where('assessment_id', $asm2->id)->first()->is_competent);
+        $this->assertTrue(AssessmentAk02Item::where('assessment_id', $asm1->id)->first()->is_portofolio);
+    }
+
+    public function test_assessor_bulk_save_ak02_respects_collective_evidence_methods_and_portfolio_defaults_unchecked(): void
+    {
+        $asesi = User::factory()->create(['role' => 'ASESI']);
+        $asm = Assessment::create([
+            'schedule_id' => $this->schedule->id,
+            'asesi_id' => $asesi->id,
+            'assessor_id' => $this->assessor->id,
+            'apl_status' => 'APPROVED',
+        ]);
+
+        // 1. Submit collective bulk save with portofolio UNCHECKED (omitted from methods)
+        $payload = [
+            'results' => [
+                $asm->id => [
+                    'final_result' => 'KOMPETEN',
+                    'follow_up_action' => 'Diusulkan sertifikat BNSP',
+                    'final_notes' => 'Kompeten pada seluruh unit',
+                ],
+            ],
+            'methods' => [
+                'observasi_demonstrasi' => 1,
+                'tulis' => 1,
+                'lisan' => 1,
+                // 'portofolio' omitted (unchecked in browser)
+            ],
+        ];
+
+        $res = $this->actingAs($this->assessor)->post(
+            route('asesor.schedule.ak02.bulk', $this->schedule->id),
+            $payload
+        );
+        $res->assertRedirect(route('asesor.schedule.ak02', $this->schedule->id));
+
+        $item = AssessmentAk02Item::where('assessment_id', $asm->id)->first();
+        $this->assertNotNull($item);
+        $this->assertTrue($item->is_observasi);
+        $this->assertTrue($item->is_tulis);
+        $this->assertTrue($item->is_lisan);
+        $this->assertFalse($item->is_portofolio, 'Portofolio must be false when unchecked in collective methods.');
+        $this->assertFalse($item->methods_json['portofolio']);
+
+        // 2. Schedule page renders collective methods reflecting the saved state
+        $resSchedule = $this->actingAs($this->assessor)->get(route('asesor.schedule.ak02', $this->schedule->id));
+        $resSchedule->assertOk();
+        $resSchedule->assertViewHas('collectiveMethods', function ($methods) {
+            return $methods['observasi_demonstrasi'] === true && $methods['portofolio'] === false;
+        });
+
+        // 3. Individual assessment page shows + Portofolio button
+        $resIndividual = $this->actingAs($this->assessor)->get(route('asesor.assessment.ak02', $asm->id));
+        $resIndividual->assertOk();
+        $resIndividual->assertSee('+ Portofolio');
     }
 
     public function test_asesi_apl_submission_establishes_confidentiality_and_signature_without_resign_in_ak01(): void

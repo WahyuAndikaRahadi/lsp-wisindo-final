@@ -46,7 +46,6 @@ class AkWorkflowService
             $assessment,
             $units,
             $hasDemonstration,
-            $hasProofs,
             $hasOral,
             $hasWritten,
             $iaResponses,
@@ -56,7 +55,7 @@ class AkWorkflowService
             foreach ($units as $unit) {
                 $methods = [
                     'observasi_demonstrasi' => $hasDemonstration,
-                    'portofolio' => $hasProofs,
+                    'portofolio' => false,
                     'pihak_ketiga' => false,
                     'lisan' => $hasOral,
                     'tulis' => $hasWritten,

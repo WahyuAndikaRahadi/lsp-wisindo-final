@@ -407,7 +407,7 @@ class MukDynamicDocumentService
                     'pekerjaan' => $assProfile?->jabatan ?? ($assProfile?->job_title ?? 'Pelajar'),
                     'telp' => $ass->asesi?->phone ?? ($assProfile?->no_telepon_rumah ?? ($assProfile?->phone_number ?? '-')),
                     'hasil' => $assIsK ? 'K' : 'BK',
-                    'rekomendasi' => $assIsK ? 'Diterbitkan Sertifikat' : 'Tidak Diterbitkan',
+                    'rekomendasi' => $assIsK ? 'direkomendasikan' : 'belum kompeten',
                     'ket' => $assIsK ? 'Lulus' : 'Belum Lulus',
                     'signature' => $ass->asesi_signature ?? $assProfile?->signature_data,
                     'assessor_id' => $grp['id'],

@@ -91,10 +91,10 @@
                                     $keterangan = $assessment->final_notes ?: 'Peserta Tidak Hadir';
                                 } elseif (in_array($assessment->final_result, ['K', 'KOMPETEN'], true) || ($assessment->final_result === null && $assessment->status === 'COMPLETED')) {
                                     $res = 'K';
-                                    $keterangan = $assessment->assessor_notes ?: 'Direkomendasikan Kompeten';
+                                    $keterangan = 'direkomendasikan';
                                 } elseif (in_array($assessment->final_result, ['BK', 'BELUM_KOMPETEN'], true)) {
                                     $res = 'BK';
-                                    $keterangan = $assessment->assessor_notes ?: 'Perlu Asesmen Ulang';
+                                    $keterangan = 'belum kompeten';
                                 } else {
                                     $res = ($assessment->status === 'IN_PROGRESS') ? '-' : 'BELUM_KOMPETEN';
                                     $keterangan = $assessment->assessor_notes ?: '-';

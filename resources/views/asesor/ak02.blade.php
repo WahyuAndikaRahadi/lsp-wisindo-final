@@ -76,10 +76,13 @@
                         + Observasi
                     </button>
                     <button type="button" @click="toggleMethod('tulis')" class="px-2.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded text-xs font-medium transition">
-                        + Tulis (CBT)
+                        + Tulis (DPT)
                     </button>
                     <button type="button" @click="toggleMethod('lisan')" class="px-2.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded text-xs font-medium transition">
-                        + Lisan (PMO)
+                        + Lisan (PW)
+                    </button>
+                    <button type="button" @click="toggleMethod('portofolio')" class="px-2.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded text-xs font-medium transition">
+                        + Portofolio
                     </button>
                 </div>
             </div>
@@ -92,8 +95,8 @@
                             <th class="px-4 py-3 text-left min-w-[200px]">Kode & Judul Unit Kompetensi</th>
                             <th class="px-2 py-3 text-center">Observasi Praktik</th>
                             <th class="px-2 py-3 text-center">Portofolio</th>
-                            <th class="px-2 py-3 text-center">Lisan (PMO)</th>
-                            <th class="px-2 py-3 text-center">Tulis (CBT)</th>
+                            <th class="px-2 py-3 text-center">Lisan (PW)</th>
+                            <th class="px-2 py-3 text-center">Tulis (DPT)</th>
                             <th class="px-2 py-3 text-center">Pihak Ketiga</th>
                             <th class="px-3 py-3 text-center w-32">Hasil Unit</th>
                         </tr>
@@ -130,11 +133,11 @@
                                             </label>
                                             <label class="flex items-center space-x-2 text-slate-700 cursor-pointer">
                                                 <input type="checkbox" name="units[{{ $unit->id }}][lisan]" value="1" {{ !empty($methods['lisan']) ? 'checked' : '' }} class="w-4 h-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500">
-                                                <span class="text-[11px]">Lisan (PMO)</span>
+                                                <span class="text-[11px]">Lisan (PW)</span>
                                             </label>
                                             <label class="flex items-center space-x-2 text-slate-700 cursor-pointer">
                                                 <input type="checkbox" name="units[{{ $unit->id }}][tulis]" value="1" {{ !empty($methods['tulis']) ? 'checked' : '' }} class="w-4 h-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500">
-                                                <span class="text-[11px]">Tulis (CBT)</span>
+                                                <span class="text-[11px]">Tulis (DPT)</span>
                                             </label>
                                             <label class="flex items-center space-x-2 text-slate-700 cursor-pointer col-span-2">
                                                 <input type="checkbox" name="units[{{ $unit->id }}][pihak_ketiga]" value="1" {{ !empty($methods['pihak_ketiga']) ? 'checked' : '' }} class="w-4 h-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500">

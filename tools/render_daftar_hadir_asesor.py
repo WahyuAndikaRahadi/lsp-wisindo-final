@@ -374,11 +374,10 @@ def render_page(c, chunk, chunk_offset, batch_idx, total_batches):
     c.drawString(324.0, Y(y_sig + 54.0), "Jabatan")
     c.drawString(396.0, Y(y_sig + 54.0), f": {DATA.get('penanggungjawab_jabatan', '')}")
     c.drawString(324.0, Y(y_sig + 69.0), "Tanda tangan")
+    c.drawString(396.0, Y(y_sig + 69.0), ":")
 
     sig_pic = DATA.get("signature_penanggungjawab")
-    drawn_pic = draw_signature(c, sig_pic, x_left=396.0, y_bottom=Y(y_sig + 100.0), max_w=120.0, max_h=34.0)
-    if not drawn_pic:
-        c.drawString(396.0, Y(y_sig + 69.0), f": [Ttd Digital]")
+    drawn_pic = draw_signature(c, sig_pic, x_left=406.0, y_bottom=Y(y_sig + 100.0), max_w=120.0, max_h=34.0)
 
     c.drawString(324.0, Y(y_sig + 120.0), "………………………………….")
 
