@@ -22,6 +22,18 @@
         $savedOrangRelevan = [];
     }
 
+    $savedStandarIndustri = old('standar_industri_opt', isset($mapaData['standar_industri'])
+        ? array_keys(array_filter($mapaData['standar_industri'], fn($item) => !empty($item['checked'])))
+        : ['standar_kompetensi', 'spesifikasi_kinerja']);
+    if (!is_array($savedStandarIndustri)) {
+        $savedStandarIndustri = [];
+    }
+
+    $savedStandarKompetensiVal = old('standar_kompetensi_val', $mapaData['standar_industri']['standar_kompetensi']['text'] ?? 'SKKNI Nomor 97 Tahun 2018');
+    $savedSpesifikasiKinerjaVal = old('spesifikasi_kinerja_val', $mapaData['standar_industri']['spesifikasi_kinerja']['text'] ?? 'Repair Manual');
+    $savedSpesifikasiProdukVal = old('spesifikasi_produk_val', $mapaData['standar_industri']['spesifikasi_produk']['text'] ?? '');
+    $savedPedomanKhususVal = old('pedoman_khusus_val', $mapaData['standar_industri']['pedoman_khusus']['text'] ?? '');
+
     $savedStandar = old('standar_tolok_ukur', $mapaData['standar_tolok_ukur'] ?? 'Standar Kompetensi: SKKNI');
 
     // Sub 3 Defaults
@@ -71,6 +83,18 @@
                 <span><strong>{{ $jadwal->is_closed ? 'Jadwal Ditutup:' : 'Asesmen Selesai:' }}</strong> Dokumen FR.MAPA.01 dalam mode lihat (read-only).</span>
             </div>
             <span class="font-bold font-mono text-[11px] bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded border border-emerald-300 shrink-0">STATUS: READ-ONLY</span>
+        </div>
+    @endif
+
+    @if(isset($selectedAssessment) && $selectedAssessment)
+        <div class="p-3.5 bg-amber-50 border border-amber-300 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-amber-900">
+            <div class="flex items-center space-x-2">
+                <svg class="w-4 h-4 text-amber-600 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg>
+                <span><strong>Mode Data Khusus Asesi:</strong> Meninjau dan menyetel formulir MAPA.01 khusus untuk <strong>{{ $selectedAssessment->asesi?->full_name }}</strong>.</span>
+            </div>
+            <a href="{{ route('asesor.schedule.mapa', $jadwal->id) }}" class="font-bold text-amber-900 underline hover:text-amber-700 shrink-0">
+                &larr; Terapkan untuk Seluruh Jadwal
+            </a>
         </div>
     @endif
 
@@ -196,13 +220,84 @@
                         </select>
                     </div>
 
-                    <div class="space-y-1.5">
-                        <label class="block text-xs font-bold text-slate-800">
-                            Standar Industri atau Tempat Kerja (Tolok Ukur)
+                {{-- Standar Industri atau Tempat Kerja (Checkboxes) --}}
+                <div class="space-y-2.5 pt-2 border-t border-slate-100">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-900">
+                            Standar Industri atau Tempat Kerja
                         </label>
-                        <input type="text" name="standar_tolok_ukur" value="{{ $savedStandar }}" @disabled($isClosedForMe)
-                               placeholder="Contoh: Standar Kompetensi: SKKNI Nomor 97 Tahun 2018"
-                               class="w-full text-xs rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 focus:outline-none transition">
+                        <p class="text-[11px] text-slate-500">Pilih tolok ukur standar yang digunakan sebagai acuan asesmen.</p>
+                    </div>
+
+                    <div class="space-y-2 bg-slate-50/60 p-3 rounded-xl border border-slate-200">
+                        {{-- 1. Standar Kompetensi --}}
+                        <div class="flex flex-col sm:flex-row sm:items-center gap-2 p-2 rounded-lg border border-slate-200 bg-white">
+                            <label class="inline-flex items-center gap-2 text-xs font-semibold text-slate-800 cursor-pointer shrink-0">
+                                <input type="checkbox" name="standar_industri_opt[]" value="standar_kompetensi"
+                                       @disabled($isClosedForMe)
+                                       {{ in_array('standar_kompetensi', $savedStandarIndustri) ? 'checked' : '' }}
+                                       class="rounded border-slate-300 text-brand-600 focus:ring-brand-500 w-4 h-4">
+                                <span>Standar Kompetensi:</span>
+                            </label>
+                            <input type="text" name="standar_kompetensi_val" value="{{ $savedStandarKompetensiVal }}"
+                                   placeholder="Contoh: SKKNI Nomor 97 Tahun 2018"
+                                   @disabled($isClosedForMe)
+                                   class="flex-1 text-xs rounded-md border border-slate-300 bg-white px-2.5 py-1.5 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 focus:outline-none transition">
+                        </div>
+
+                        {{-- 2. Kriteria asesmen dari kurikulum pelatihan --}}
+                        <label class="flex items-center gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:bg-slate-50 transition text-xs">
+                            <input type="checkbox" name="standar_industri_opt[]" value="kurikulum_pelatihan"
+                                   @disabled($isClosedForMe)
+                                   {{ in_array('kurikulum_pelatihan', $savedStandarIndustri) ? 'checked' : '' }}
+                                   class="rounded border-slate-300 text-brand-600 focus:ring-brand-500 w-4 h-4">
+                            <span class="text-slate-800 font-semibold">Kriteria asesmen dari kurikulum pelatihan</span>
+                        </label>
+
+                        {{-- 3. Spesifikasi kinerja suatu perusahaan atau industri --}}
+                        <div class="flex flex-col sm:flex-row sm:items-center gap-2 p-2 rounded-lg border border-slate-200 bg-white">
+                            <label class="inline-flex items-center gap-2 text-xs font-semibold text-slate-800 cursor-pointer shrink-0">
+                                <input type="checkbox" name="standar_industri_opt[]" value="spesifikasi_kinerja"
+                                       @disabled($isClosedForMe)
+                                       {{ in_array('spesifikasi_kinerja', $savedStandarIndustri) ? 'checked' : '' }}
+                                       class="rounded border-slate-300 text-brand-600 focus:ring-brand-500 w-4 h-4">
+                                <span>Spesifikasi kinerja suatu perusahaan atau industri:</span>
+                            </label>
+                            <input type="text" name="spesifikasi_kinerja_val" value="{{ $savedSpesifikasiKinerjaVal }}"
+                                   placeholder="Contoh: Repair Manual"
+                                   @disabled($isClosedForMe)
+                                   class="flex-1 text-xs rounded-md border border-slate-300 bg-white px-2.5 py-1.5 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 focus:outline-none transition">
+                        </div>
+
+                        {{-- 4. Spesifikasi Produk --}}
+                        <div class="flex flex-col sm:flex-row sm:items-center gap-2 p-2 rounded-lg border border-slate-200 bg-white">
+                            <label class="inline-flex items-center gap-2 text-xs font-semibold text-slate-800 cursor-pointer shrink-0">
+                                <input type="checkbox" name="standar_industri_opt[]" value="spesifikasi_produk"
+                                       @disabled($isClosedForMe)
+                                       {{ in_array('spesifikasi_produk', $savedStandarIndustri) ? 'checked' : '' }}
+                                       class="rounded border-slate-300 text-brand-600 focus:ring-brand-500 w-4 h-4">
+                                <span>Spesifikasi Produk:</span>
+                            </label>
+                            <input type="text" name="spesifikasi_produk_val" value="{{ $savedSpesifikasiProdukVal }}"
+                                   placeholder="Tuliskan spesifikasi produk bila ada..."
+                                   @disabled($isClosedForMe)
+                                   class="flex-1 text-xs rounded-md border border-slate-300 bg-white px-2.5 py-1.5 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 focus:outline-none transition">
+                        </div>
+
+                        {{-- 5. Pedoman khusus --}}
+                        <div class="flex flex-col sm:flex-row sm:items-center gap-2 p-2 rounded-lg border border-slate-200 bg-white">
+                            <label class="inline-flex items-center gap-2 text-xs font-semibold text-slate-800 cursor-pointer shrink-0">
+                                <input type="checkbox" name="standar_industri_opt[]" value="pedoman_khusus"
+                                       @disabled($isClosedForMe)
+                                       {{ in_array('pedoman_khusus', $savedStandarIndustri) ? 'checked' : '' }}
+                                       class="rounded border-slate-300 text-brand-600 focus:ring-brand-500 w-4 h-4">
+                                <span>Pedoman khusus:</span>
+                            </label>
+                            <input type="text" name="pedoman_khusus_val" value="{{ $savedPedomanKhususVal }}"
+                                   placeholder="Tuliskan pedoman khusus bila ada..."
+                                   @disabled($isClosedForMe)
+                                   class="flex-1 text-xs rounded-md border border-slate-300 bg-white px-2.5 py-1.5 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 focus:outline-none transition">
+                        </div>
                     </div>
                 </div>
 
@@ -226,23 +321,13 @@
             </div>
 
             {{-- 2. Mempersiapkan Rencana Asesmen --}}
-            <div class="p-5 space-y-4 border-b border-slate-200 bg-slate-50/50">
+            <div class="p-5 space-y-2 border-b border-slate-200 bg-slate-50/50">
                 <div class="flex items-start justify-between gap-3">
                     <div>
                         <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wide">2. Mempersiapkan Rencana Asesmen</h2>
-                        <p class="text-xs text-slate-500 mt-0.5">Penetapan instrumen materi uji (CL, DPT, PMO, TPD) dan bukti uji.</p>
+                        <p class="text-xs text-slate-500 mt-0.5">Rincian unit kompetensi, instrumen, dan bukti asesmen ditentukan di FR.AK.01.</p>
                     </div>
-                    <span class="text-[11px] font-bold text-brand-700 bg-brand-50 border border-brand-200 px-2.5 py-1 rounded">Terintegrasi di FR.AK.01</span>
-                </div>
-
-                <div class="p-3.5 bg-white border border-slate-200 rounded-lg text-xs space-y-2 text-slate-700">
-                    <div class="font-semibold text-slate-900">Ketentuan Rencana Asesmen &amp; Instrumen:</div>
-                    <p class="leading-relaxed">
-                        Sesuai format terpadu LSP PrO Indo, rincian unit kompetensi, pemilihan jenis bukti (<strong class="font-bold">L, TL, T</strong>), serta penugasan materi uji (<strong class="font-bold">FR.IA.01, FR.IA.01B, FR.IA.02, FR.IA.03, FR.IA.05</strong>) ditentukan pada formulir tahap berikutnya: <strong class="text-brand-700">FR.AK.01 (Persetujuan Asesmen dan Rencana Asesmen)</strong>.
-                    </p>
-                    <div class="pt-1 text-[11px] text-slate-500">
-                        Skema ini memuat <strong>{{ $jadwal->scheme?->competencyUnits?->count() ?? 0 }} unit kompetensi</strong> terdaftar.
-                    </div>
+                    <span class="text-[11px] font-bold text-slate-700 bg-slate-200/70 border border-slate-300 px-2.5 py-1 rounded">Ditentukan di FR.AK.01</span>
                 </div>
             </div>
 
@@ -422,28 +507,64 @@
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 pb-2 border-b border-slate-200">
                     <div>
                         <span class="text-xs font-bold text-slate-900 block">Terapkan Perencanaan MAPA.01 untuk Asesi:</span>
-                        <p class="text-[11px] text-slate-500 mt-0.5">Secara baku, perencanaan ini berlaku untuk seluruh asesi binaan Anda.</p>
+                        <p class="text-[11px] text-slate-500 mt-0.5 leading-relaxed">
+                            Pilih asesi yang akan diterapkan perencanaan MAPA.01 ini. Jika terdapat asesi dengan penyesuaian khusus, Anda dapat mengaturnya secara spesifik.
+                        </p>
                     </div>
-                    <label class="inline-flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
-                        <input type="checkbox" id="check-all-mapa-asesi" checked @disabled($isClosedForMe)
+                    <label class="inline-flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer shrink-0">
+                        <input type="checkbox" id="check-all-mapa-asesi" {{ empty($selectedAssessmentId) ? 'checked' : '' }} @disabled($isClosedForMe)
                                class="rounded border-slate-300 text-brand-600 focus:ring-brand-500 w-4 h-4"
                                onclick="document.querySelectorAll('.mapa-asesi-item').forEach(el => el.checked = this.checked)">
-                        <span>Pilih Semua Asesi ({{ $assessments->count() }})</span>
+                        <span>Pilih Semua ({{ $assessments->count() }})</span>
                     </label>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 max-h-60 overflow-y-auto pr-1">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 max-h-80 overflow-y-auto pr-1">
                     @foreach($assessments as $asm)
-                        <label class="flex items-center space-x-2.5 p-2.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 transition cursor-pointer text-xs">
-                            <input type="checkbox" name="assessment_ids[]" value="{{ $asm->id }}"
-                                   class="mapa-asesi-item rounded border-slate-300 text-brand-600 focus:ring-brand-500 w-4 h-4 shrink-0"
-                                   @disabled($isClosedForMe)
-                                   {{ empty(old('assessment_ids')) || in_array($asm->id, old('assessment_ids', [])) || (string)$selectedAssessmentId === (string)$asm->id ? 'checked' : '' }}>
-                            <div class="truncate">
-                                <span class="font-bold text-slate-900 block truncate">{{ $asm->asesi?->full_name }}</span>
-                                <span class="text-[10px] text-slate-500 block font-mono">NIK: {{ $asm->asesi?->profile?->nik ?? '-' }}</span>
+                        @php
+                            $hasCustomMapa = !empty($asm->mapa01_data);
+                            $isSelected = (string)$selectedAssessmentId === (string)$asm->id;
+                            $isChecked = empty(old('assessment_ids')) 
+                                ? (empty($selectedAssessmentId) || $isSelected)
+                                : in_array($asm->id, old('assessment_ids', []));
+                        @endphp
+                        <div class="p-3 rounded-xl border-2 transition shadow-2xs flex flex-col justify-between {{ $hasCustomMapa ? 'bg-amber-50/80 border-amber-300 hover:border-amber-400' : 'bg-white border-slate-200 hover:border-slate-300' }}">
+                            <div class="flex items-start justify-between gap-2">
+                                <label class="flex items-start space-x-2.5 {{ $isClosedForMe ? 'cursor-default' : 'cursor-pointer' }} flex-1 min-w-0">
+                                    <input type="checkbox" name="assessment_ids[]" value="{{ $asm->id }}"
+                                           class="mapa-asesi-item rounded border-slate-400 text-brand-600 focus:ring-brand-500 w-4 h-4 mt-0.5 shrink-0"
+                                           @disabled($isClosedForMe)
+                                           {{ $isChecked ? 'checked' : '' }}>
+                                    <div class="truncate text-xs">
+                                        <span class="font-bold text-slate-900 block truncate">{{ $asm->asesi?->full_name }}</span>
+                                        <span class="text-[10px] text-slate-500 block font-mono mt-0.5">NIK: {{ $asm->asesi?->profile?->nik ?? '-' }}</span>
+                                    </div>
+                                </label>
+                                @if($hasCustomMapa)
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300 shrink-0">
+                                        Data Khusus
+                                    </span>
+                                @elseif(!empty($schedule->mapa01_data))
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 shrink-0">
+                                        Sesuai Jadwal
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-300 shrink-0">
+                                        Belum Disimpan
+                                    </span>
+                                @endif
                             </div>
-                        </label>
+
+                            <div class="mt-2.5 pt-2 border-t {{ $hasCustomMapa ? 'border-amber-200' : 'border-slate-100' }} flex items-center justify-between text-[11px]">
+                                <span class="text-[10px] text-slate-500">
+                                    {{ $hasCustomMapa ? 'Memiliki data MAPA tersendiri' : 'Mengikuti master jadwal' }}
+                                </span>
+                                <a href="{{ route('asesor.schedule.mapa', ['schedule' => $jadwal->id, 'assessment' => $asm->id]) }}"
+                                   class="font-bold text-brand-700 hover:text-brand-900 transition">
+                                    {{ $isSelected ? 'Sedang Dipilih' : 'Tinjau Asesi' }} &rarr;
+                                </a>
+                            </div>
+                        </div>
                     @endforeach
                 </div>
             </div>

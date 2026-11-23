@@ -26,9 +26,10 @@ class MapaController extends Controller
         $schedule->load(['scheme.competencyUnits', 'assessments.asesi.profile', 'assessors']);
         $assessments = $schedule->assessorAssessments();
         $selectedAssessmentId = $request->query('assessment');
+        $selectedAssessment = $selectedAssessmentId ? $assessments->firstWhere('id', (int) $selectedAssessmentId) : null;
 
-        // Existing saved MAPA data
-        $mapaData = $schedule->mapa01_data ?? [];
+        // Existing saved MAPA data (prefer candidate specific if in assessment view)
+        $mapaData = $selectedAssessment?->mapa01_data ?? $schedule->mapa01_data ?? [];
 
         // Exact options from BNSP FR.MAPA.01 standard
         $pendekatanOptions = [
@@ -88,6 +89,7 @@ class MapaController extends Controller
             'schedule',
             'assessments',
             'selectedAssessmentId',
+            'selectedAssessment',
             'mapaData',
             'pendekatanOptions',
             'tujuanOptions',
@@ -136,6 +138,51 @@ class MapaController extends Controller
             ? array_values(array_filter(array_map('trim', (array) $request->input('integrated_tasks', []))))
             : [];
 
+        // Standar Industri atau Tempat Kerja Checkboxes
+        $standarOpts = (array) $request->input('standar_industri_opt', []);
+        $standarIndustri = [
+            'standar_kompetensi' => [
+                'checked' => in_array('standar_kompetensi', $standarOpts),
+                'text' => $request->input('standar_kompetensi_val', 'SKKNI Nomor 97 Tahun 2018'),
+            ],
+            'kurikulum_pelatihan' => [
+                'checked' => in_array('kurikulum_pelatihan', $standarOpts),
+                'text' => 'Kriteria asesmen dari kurikulum pelatihan',
+            ],
+            'spesifikasi_kinerja' => [
+                'checked' => in_array('spesifikasi_kinerja', $standarOpts),
+                'text' => $request->input('spesifikasi_kinerja_val', 'Repair Manual'),
+            ],
+            'spesifikasi_produk' => [
+                'checked' => in_array('spesifikasi_produk', $standarOpts),
+                'text' => $request->input('spesifikasi_produk_val', ''),
+            ],
+            'pedoman_khusus' => [
+                'checked' => in_array('pedoman_khusus', $standarOpts),
+                'text' => $request->input('pedoman_khusus_val', ''),
+            ],
+        ];
+
+        $summaryParts = [];
+        if ($standarIndustri['standar_kompetensi']['checked']) {
+            $summaryParts[] = 'Standar Kompetensi: '.$standarIndustri['standar_kompetensi']['text'];
+        }
+        if ($standarIndustri['kurikulum_pelatihan']['checked']) {
+            $summaryParts[] = 'Kriteria asesmen dari kurikulum pelatihan';
+        }
+        if ($standarIndustri['spesifikasi_kinerja']['checked']) {
+            $summaryParts[] = 'Spesifikasi kinerja suatu perusahaan atau industri: '.$standarIndustri['spesifikasi_kinerja']['text'];
+        }
+        if ($standarIndustri['spesifikasi_produk']['checked'] && ! empty($standarIndustri['spesifikasi_produk']['text'])) {
+            $summaryParts[] = 'Spesifikasi Produk: '.$standarIndustri['spesifikasi_produk']['text'];
+        }
+        if ($standarIndustri['pedoman_khusus']['checked'] && ! empty($standarIndustri['pedoman_khusus']['text'])) {
+            $summaryParts[] = 'Pedoman khusus: '.$standarIndustri['pedoman_khusus']['text'];
+        }
+        $standarTolokUkur = ! empty($summaryParts)
+            ? implode('; ', $summaryParts)
+            : ($request->input('standar_tolok_ukur') ?? $schedule->scheme?->name);
+
         $mapaData = [
             // 1. Menentukan Pendekatan Asesmen
             'pendekatan_asesi' => $request->input('pendekatan_asesi'),
@@ -145,7 +192,8 @@ class MapaController extends Controller
             'hubungan_standar' => $request->input('hubungan_standar'),
             'pelaksana_asesmen' => $request->input('pelaksana_asesmen'),
             'orang_relevan' => (array) $request->input('orang_relevan', []),
-            'standar_tolok_ukur' => $request->input('standar_tolok_ukur') ?? $schedule->scheme?->name,
+            'standar_industri' => $standarIndustri,
+            'standar_tolok_ukur' => $standarTolokUkur,
 
             // 2. Rencana Asesmen link note
             'rencana_asesmen_note' => 'Rencana asesmen dan pemilihan instrumen terintegrasi pada FR.AK.01',
