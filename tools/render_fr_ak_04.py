@@ -6,6 +6,7 @@ Layout meniru template aslinya secara presisi piksel; tanpa watermark sesuai ins
 
 import os
 import sys
+import json
 from reportlab.pdfgen import canvas
 from reportlab.lib.colors import black, HexColor
 from reportlab.pdfbase import pdfmetrics
@@ -159,4 +160,21 @@ if __name__ == "__main__":
     out_dir = os.path.join(os.path.dirname(__file__), "..", "tests", "Fixtures", "muk")
     os.makedirs(out_dir, exist_ok=True)
     out_file = os.path.join(out_dir, "FR_AK_04_generated.pdf")
+
+    if len(sys.argv) > 1 and sys.argv[1] != "-":
+        payload_arg = sys.argv[1]
+        if os.path.isfile(payload_arg):
+            with open(payload_arg, "r", encoding="utf-8") as f:
+                DATA.update(json.load(f))
+        else:
+            try:
+                DATA.update(json.loads(payload_arg))
+            except Exception:
+                pass
+    elif len(sys.argv) > 1 and sys.argv[1] == "-":
+        DATA.update(json.load(sys.stdin))
+
+    if len(sys.argv) > 2:
+        out_file = sys.argv[2]
+
     render(out_file)

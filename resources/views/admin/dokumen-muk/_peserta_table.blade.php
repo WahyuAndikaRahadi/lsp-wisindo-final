@@ -84,10 +84,20 @@
                                         @endif
                                     </td>
                                     <td class="px-0 md:px-4 py-0 md:py-3 text-left md:text-right whitespace-nowrap pt-1 md:pt-0">
-                                        <div class="flex items-center justify-end gap-1.5">
+                                        <div class="flex items-center justify-end gap-1.5 flex-wrap">
+                                            <a href="{{ route('admin.dokumen-muk.asesi-dynamic', ['assessment' => $assessment->id, 'type' => 'all-muk']) }}" 
+                                               target="_blank" 
+                                               class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold rounded-md bg-emerald-600 hover:bg-emerald-700 text-white shadow-2xs transition min-h-[32px]" 
+                                               title="Cetak & Satukan Seluruh Dokumen MUK Asesi (1 File PDF)">
+                                                <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+                                                </svg>
+                                                <span>Print Semua MUK</span>
+                                            </a>
+
                                             <a href="{{ route('admin.dokumen-muk.asesi-dynamic', ['assessment' => $assessment->id, 'type' => 'ak02']) }}" 
                                                target="_blank" 
-                                               class="inline-flex items-center px-2.5 py-1 text-xs font-semibold rounded-md bg-brand-50 hover:bg-brand-100 text-brand-700 border border-brand-200 transition min-h-[32px]" 
+                                               class="inline-flex items-center px-2 py-1 text-xs font-semibold rounded-md bg-brand-50 hover:bg-brand-100 text-brand-700 border border-brand-200 transition min-h-[32px]" 
                                                title="Lihat FR.AK.02 Rekaman Asesmen Langsung">
                                                 AK.02
                                             </a>
@@ -127,7 +137,24 @@
                                                     </div>
 
                                                     {{-- Scrollable List of Groups --}}
-                                                    <div class="p-2 space-y-3 max-h-[290px] overflow-y-auto">
+                                                    <div class="p-2 space-y-3 max-h-[320px] overflow-y-auto">
+                                                        {{-- Group 0: Print Seluruh MUK --}}
+                                                        <div class="p-1 bg-emerald-50/90 rounded-lg border border-emerald-200">
+                                                            <a href="{{ route('admin.dokumen-muk.asesi-dynamic', ['assessment' => $assessment->id, 'type' => 'all-muk']) }}" target="_blank"
+                                                               class="flex items-center justify-between px-2.5 py-2 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white transition text-xs font-bold shadow-2xs">
+                                                                <div class="flex items-center gap-2 overflow-hidden text-left">
+                                                                    <svg class="w-4 h-4 shrink-0 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+                                                                    </svg>
+                                                                    <div class="truncate">
+                                                                        <div>Print Semua MUK (1 File)</div>
+                                                                        <div class="text-[10px] font-normal text-emerald-100">Satukan APL, MAPA, AK, FRIA, dll</div>
+                                                                    </div>
+                                                                </div>
+                                                                <svg class="w-3.5 h-3.5 text-emerald-200 shrink-0 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                                            </a>
+                                                        </div>
+
                                                         {{-- Group 1: Permohonan & Persetujuan --}}
                                                         <div>
                                                             <div class="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
@@ -147,6 +174,22 @@
                                                                     <div class="flex items-center gap-2 overflow-hidden">
                                                                         <span class="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 group-hover:bg-brand-100 group-hover:text-brand-700 text-slate-600 shrink-0">FR.APL.02</span>
                                                                         <span class="truncate">Asesmen Mandiri</span>
+                                                                    </div>
+                                                                    <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-brand-600 shrink-0 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                                                </a>
+                                                                <a href="{{ route('admin.dokumen-muk.asesi-dynamic', ['assessment' => $assessment->id, 'type' => 'mapa01']) }}" target="_blank"
+                                                                   class="flex items-center justify-between px-2.5 py-1.5 rounded-lg hover:bg-brand-50 text-slate-700 hover:text-brand-700 transition group text-xs">
+                                                                    <div class="flex items-center gap-2 overflow-hidden">
+                                                                        <span class="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 group-hover:bg-brand-100 group-hover:text-brand-700 text-slate-600 shrink-0">FR.MAPA.01</span>
+                                                                        <span class="truncate">Merencanakan Aktivitas</span>
+                                                                    </div>
+                                                                    <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-brand-600 shrink-0 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                                                </a>
+                                                                <a href="{{ route('admin.dokumen-muk.fixed', ['schedule' => $schedule->id, 'type' => 'mapa02']) }}" target="_blank"
+                                                                   class="flex items-center justify-between px-2.5 py-1.5 rounded-lg hover:bg-brand-50 text-slate-700 hover:text-brand-700 transition group text-xs">
+                                                                    <div class="flex items-center gap-2 overflow-hidden">
+                                                                        <span class="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 group-hover:bg-brand-100 group-hover:text-brand-700 text-slate-600 shrink-0">FR.MAPA.02</span>
+                                                                        <span class="truncate">Peta Instrumen Asesmen</span>
                                                                     </div>
                                                                     <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-brand-600 shrink-0 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                                                                 </a>

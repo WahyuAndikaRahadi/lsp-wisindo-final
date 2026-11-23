@@ -166,7 +166,7 @@ class DokumenMukController extends Controller
             }
         }
 
-        if (in_array($targetType, ['ak05', 'ak06'], true) || $request->query('source') === 'dynamic' || ($request->query('format') === 'pdf' && in_array($targetType, ['ba', 'hadir-asesor', 'hadir-asesi'], true))) {
+        if (in_array($targetType, ['ak05', 'ak06', 'mapa', 'mapa01'], true) || $request->query('source') === 'dynamic' || ($request->query('format') === 'pdf' && in_array($targetType, ['ba', 'hadir-asesor', 'hadir-asesi', 'mapa', 'mapa01'], true))) {
             return $this->dynamicService->exportSchedule($schedule, $targetType, $request->boolean('download'));
         }
 
@@ -242,12 +242,16 @@ class DokumenMukController extends Controller
         ];
         $targetType = $aliasMap[$normalizedType] ?? $normalizedType;
 
+        if (in_array($targetType, ['all-muk', 'all', 'allmuk', 'semua-muk', 'semuamuk', 'print-semua', 'cetak-semua'], true)) {
+            return $this->dynamicService->exportUnifiedAsesiMuk($assessment, $request->boolean('download'));
+        }
+
         if (in_array($targetType, ['excel-biodata', 'excel', 'xls', 'biodata-excel', 'asesi-excel'], true)) {
             return $this->exporter->exportAssessmentAsesiXls($assessment);
         }
 
-        $dynamicTypes = ['apl01', 'apl02', 'ak01', 'ak02', 'ak03', 'ak04', 'ak05', 'ak07', 'ia01', 'ia01b', 'ia02', 'ia03', 'ia05a', 'ia05c', 'pernyataan'];
-        if (in_array($targetType, ['ia01b', 'ak05'], true) || $request->query('source') === 'dynamic' || ($request->query('format') === 'pdf' && in_array($targetType, $dynamicTypes, true))) {
+        $dynamicTypes = ['apl01', 'apl02', 'ak01', 'ak02', 'ak03', 'ak04', 'ak05', 'ak07', 'ia01', 'ia01b', 'ia02', 'ia03', 'ia05a', 'ia05c', 'pernyataan', 'mapa', 'mapa01', 'frmapa01'];
+        if (in_array($targetType, ['ia01b', 'ak05', 'mapa', 'mapa01', 'frmapa01'], true) || $request->query('source') === 'dynamic' || ($request->query('format') === 'pdf' && in_array($targetType, $dynamicTypes, true))) {
             return $this->dynamicService->exportAssessment($assessment, $targetType, $request->boolean('download'));
         }
 
@@ -337,6 +341,10 @@ class DokumenMukController extends Controller
         }
 
         $download = $request->boolean('download', false);
+        $normType = strtolower(str_replace(['_', ' ', '-', '.'], '', $type));
+        if (in_array($normType, ['all', 'allmuk', 'semuamuk'], true)) {
+            return $this->dynamicService->exportUnifiedAsesiMuk($assessment, $download);
+        }
 
         return $this->dynamicService->exportAssessment($assessment, $type, $download);
     }

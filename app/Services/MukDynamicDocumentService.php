@@ -944,6 +944,94 @@ class MukDynamicDocumentService
     }
 
     /**
+     * Build specific payload for FR.AK.04 (Banding Asesmen).
+     */
+    public function buildAk04Data(Schedule $schedule, Assessment $assessment): array
+    {
+        $asesi = $assessment->asesi;
+        $assessor = $assessment->assessor ?? $schedule->assessors->first();
+        $scheme = $assessment->scheme ?? $schedule->scheme;
+        $appeal = $assessment->latestAppeal;
+
+        $dateAsesmen = Carbon::parse($schedule->date ?? now())->format('d/m/Y');
+
+        return [
+            'asesi_nama' => $asesi?->full_name ?? '',
+            'asesor_nama' => $assessor?->full_name ?? '',
+            'tanggal_asesmen' => $dateAsesmen,
+            'pertanyaan_1_ya' => (bool) ($appeal?->is_process_explained ?? true),
+            'pertanyaan_2_ya' => (bool) ($appeal?->is_discussed_with_assessor ?? true),
+            'pertanyaan_3_ya' => (bool) ($appeal?->involves_other_person ?? false),
+            'skema_nama' => $scheme?->name ?? '',
+            'skema_nomor' => $scheme?->code ?? '',
+            'alasan_banding' => $appeal?->appeal_reasons ?? '',
+            'tanggal_tanda_tangan' => $dateAsesmen,
+        ];
+    }
+
+    /**
+     * Build specific payload for FR.MAPA.01 (Merencanakan Aktivitas dan Proses Asesmen).
+     * Sourced from assessor's input (mapa01_data).
+     */
+    public function buildMapa01Data(Schedule $schedule, ?Assessment $assessment = null): array
+    {
+        $mapaData = $assessment?->mapa01_data ?? $schedule->mapa01_data ?? [];
+        $scheme = $assessment?->scheme ?? $schedule->scheme;
+        $assessor = $assessment?->assessor ?? $schedule->assessors->first();
+        $assessorProfile = $assessor?->profile;
+
+        $tglStr = $schedule->date
+            ? Carbon::parse($schedule->date)->locale('id')->translatedFormat('d F Y')
+            : Carbon::now()->locale('id')->translatedFormat('d F Y');
+
+        $sigAsesor = $assessorProfile?->signature_data ?? $assessment?->assessor_signature;
+        $noMet = $assessorProfile?->met_number ?? $assessorProfile?->no_reg ?? '000.008265 2025';
+
+        return [
+            'skema_nama' => $scheme?->name ?? '',
+            'skema_nomor' => $scheme?->code ?? '',
+            'asesor_nama' => $assessor?->full_name ?? '',
+            'asesor_met' => $noMet,
+            'signature_asesor' => $sigAsesor,
+            'tanggal' => $tglStr,
+            'tuk_nama' => $schedule->tuk_name ?? '',
+            'pendekatan_asesi' => $mapaData['pendekatan_asesi'] ?? 'Hasil pelatihan dan / atau pendidikan, dimana Kurikulum dan fasilitas praktek mampu telusur terhadap standar kompetensi',
+            'tujuan_asesmen' => $mapaData['tujuan_asesmen'] ?? 'Sertifikasi',
+            'konteks_lingkungan' => $mapaData['konteks_lingkungan'] ?? 'Tempat kerja simulasi',
+            'peluang_bukti' => $mapaData['peluang_bukti'] ?? 'Tersedia',
+            'hubungan_standar' => $mapaData['hubungan_standar'] ?? 'Bukti untuk mendukung asesmen',
+            'pelaksana_asesmen' => $mapaData['pelaksana_asesmen'] ?? 'Lembaga Sertifikasi LSP Praktisi Otomotif Indonesia',
+            'orang_relevan' => $mapaData['orang_relevan'] ?? ['Manajer sertifikasi', 'Master Asesor / Master Trainer / Lead Asesor Kompetensi'],
+            'standar_industri' => $mapaData['standar_industri'] ?? [
+                'standar_kompetensi' => ['checked' => true, 'text' => 'SKKNI Nomor 97 Tahun 2018'],
+                'kurikulum_pelatihan' => ['checked' => false, 'text' => ''],
+                'spesifikasi_kinerja' => ['checked' => true, 'text' => 'Repair Manual'],
+                'spesifikasi_produk' => ['checked' => false, 'text' => ''],
+                'pedoman_khusus' => ['checked' => false, 'text' => ''],
+            ],
+            'standar_tolok_ukur' => $mapaData['standar_tolok_ukur'] ?? 'Standar Kompetensi: SKKNI',
+            'has_karakteristik' => (bool) ($mapaData['has_karakteristik'] ?? false),
+            'karakteristik_detail' => $mapaData['karakteristik_detail'] ?? '',
+            'has_kontekstualisasi' => (bool) ($mapaData['has_kontekstualisasi'] ?? false),
+            'kontekstualisasi_detail' => $mapaData['kontekstualisasi_detail'] ?? '',
+            'has_saran' => (bool) ($mapaData['has_saran'] ?? false),
+            'saran_detail' => $mapaData['saran_detail'] ?? '',
+            'has_penyesuaian' => (bool) ($mapaData['has_penyesuaian'] ?? false),
+            'penyesuaian_detail' => $mapaData['penyesuaian_detail'] ?? '',
+            'has_terintegrasi' => isset($mapaData['has_terintegrasi']) ? (bool) $mapaData['has_terintegrasi'] : true,
+            'terintegrasi_detail' => $mapaData['terintegrasi_detail'] ?? '',
+            'integrated_tasks' => $mapaData['integrated_tasks'] ?? [
+                'Melaksanakan Keselamatan dan Kesehatan Kerja',
+                'Menggunakan Peralatan dan Perlengkapan Tempat Kerja',
+                'Membaca Gambar Teknik',
+                'Menggunakan Alat Ukur',
+                'Melaksanakan Diagnosis',
+            ],
+            'is_filled' => ! empty($mapaData),
+        ];
+    }
+
+    /**
      * Build specific payload for FR.AK.07 (Ceklis Penyesuaian yang Wajar dan Beralasan).
      */
     public function buildAk07Data(Schedule $schedule, Assessment $assessment): array
@@ -2326,6 +2414,17 @@ class MukDynamicDocumentService
                 }
             }
 
+            if (in_array($normType, ['mapa', 'mapa01', 'frmapa01', 'frmapa'], true)) {
+                $script = base_path('tools/render_fr_mapa_01.py');
+                if (File::isFile($script)) {
+                    $mapaPayload = $this->buildMapa01Data($schedule, $assessment);
+                    $masterPdf = app(MukFixedDocumentService::class)->getFixedFilePath($schedule->scheme, 'mapa01');
+                    if ($this->runGeneratorWithPayload($python, $script, $mapaPayload, 'muk_mapa01', $outputPath, $normType, $masterPdf)) {
+                        return $outputPath;
+                    }
+                }
+            }
+
             if ($normType === 'ak01') {
                 $script = base_path('tools/render_fr_ak_01.py');
                 if (File::isFile($script)) {
@@ -2361,6 +2460,19 @@ class MukDynamicDocumentService
                         : $this->buildPayload($schedule, null);
                     $masterPdf = $this->getDynamicFilePath($schedule->scheme, 'ak03');
                     if ($this->runGeneratorWithPayload($python, $script, $ak03Payload, 'muk_ak03', $outputPath, $normType, $masterPdf)) {
+                        return $outputPath;
+                    }
+                }
+            }
+
+            if (in_array($normType, ['ak04', 'frak04'], true)) {
+                $script = base_path('tools/render_fr_ak_04.py');
+                if (File::isFile($script)) {
+                    $targetAssessment = $assessment ?? $schedule->assessments->first();
+                    $ak04Payload = $targetAssessment
+                        ? $this->buildAk04Data($schedule, $targetAssessment)
+                        : $this->buildPayload($schedule, null);
+                    if ($this->runGeneratorWithPayload($python, $script, $ak04Payload, 'muk_ak04', $outputPath, $normType)) {
                         return $outputPath;
                     }
                 }
@@ -2522,6 +2634,9 @@ class MukDynamicDocumentService
             $fixtureMap = [
                 'apl01' => 'tests/Fixtures/muk/FR_APL_01_generated.pdf',
                 'apl02' => 'tests/Fixtures/muk/FR_APL_02_generated.pdf',
+                'mapa01' => 'tests/Fixtures/muk/FR_MAPA_01_generated.pdf',
+                'mapa' => 'tests/Fixtures/muk/FR_MAPA_01_generated.pdf',
+                'frmapa01' => 'tests/Fixtures/muk/FR_MAPA_01_generated.pdf',
                 'ak01' => 'tests/Fixtures/muk/FR_AK_01_generated.pdf',
                 'ak02' => 'tests/Fixtures/muk/FR_AK_02_generated.pdf',
                 'ak03' => 'tests/Fixtures/muk/FR_AK_03_generated.pdf',
@@ -2650,6 +2765,10 @@ class MukDynamicDocumentService
     public function exportAssessment(Assessment $assessment, string $docType, bool $download = false): BinaryFileResponse|View
     {
         $normType = strtolower(str_replace(['_', ' ', '-', '.'], '', $docType));
+        if (in_array($normType, ['all', 'allmuk', 'semuamuk'], true)) {
+            return $this->exportUnifiedAsesiMuk($assessment, $download);
+        }
+
         if (in_array($normType, ['ia01b', 'fria01b'], true)) {
             return $this->exportUploadedIa01b($assessment, $download);
         }
@@ -2662,6 +2781,224 @@ class MukDynamicDocumentService
         return response()->file($filePath, [
             'Content-Type' => 'application/pdf',
             'Content-Disposition' => ($download ? 'attachment' : 'inline').'; filename="'.$filename.'"',
+        ]);
+    }
+
+    /**
+     * Generate unified MUK document package for an individual candidate (asesi).
+     * Combines: APL.01, APL.02, MAPA, AK.01, AK.07, FR.IA (01, 01B, 02, 03, 05A, 05C),
+     * AK.02, AK.03, AK.04, and Surat Pernyataan into a single unified PDF file.
+     */
+    public function generateUnifiedAsesiMukPdf(Assessment $assessment): string
+    {
+        $assessment->loadMissing([
+            'schedule.scheme.competencyUnits',
+            'schedule.assessors',
+            'asesi.profile',
+            'assessor',
+            'iaResponses',
+            'ak03Item',
+            'latestAppeal',
+        ]);
+
+        $schedule = $assessment->schedule;
+        $scheme = $assessment->scheme ?? $schedule->scheme;
+        $fixedService = app(MukFixedDocumentService::class);
+
+        $filesToMerge = [];
+
+        // 1. FR.APL.01 - Permohonan Sertifikasi Kompetensi
+        try {
+            $filesToMerge[] = $this->generateDynamicPdf('apl01', $schedule, $assessment);
+        } catch (\Throwable $e) {
+            Log::warning("Unified MUK: Gagal generate APL.01: {$e->getMessage()}");
+        }
+
+        // 2. FR.APL.02 - Asesmen Mandiri
+        try {
+            $filesToMerge[] = $this->generateDynamicPdf('apl02', $schedule, $assessment);
+        } catch (\Throwable $e) {
+            Log::warning("Unified MUK: Gagal generate APL.02: {$e->getMessage()}");
+        }
+
+        // 3. FR.MAPA - Merencanakan Aktivitas dan Proses Asesmen (MAPA.01 & MAPA.02)
+        try {
+            $filesToMerge[] = $this->generateDynamicPdf('mapa01', $schedule, $assessment);
+        } catch (\Throwable $e) {
+            Log::warning("Unified MUK: Gagal generate MAPA.01 dinamis: {$e->getMessage()}");
+            $mapa01Path = $fixedService->getFixedFilePath($scheme, 'mapa01');
+            if ($mapa01Path && File::isFile($mapa01Path)) {
+                $filesToMerge[] = $mapa01Path;
+            }
+        }
+
+        try {
+            $mapa02Path = $fixedService->getFixedFilePath($scheme, 'mapa02');
+            if ($mapa02Path && File::isFile($mapa02Path)) {
+                $filesToMerge[] = $mapa02Path;
+            }
+        } catch (\Throwable $e) {
+            Log::info("Unified MUK: MAPA.02 dilewati untuk skema {$scheme->name}");
+        }
+
+        // 4. FR.AK.01 - Persetujuan Asesmen dan Kerahasiaan
+        try {
+            $filesToMerge[] = $this->generateDynamicPdf('ak01', $schedule, $assessment);
+        } catch (\Throwable $e) {
+            Log::warning("Unified MUK: Gagal generate AK.01: {$e->getMessage()}");
+        }
+
+        // 5. FR.AK.07 - Penyesuaian Yang Wajar
+        try {
+            $filesToMerge[] = $this->generateDynamicPdf('ak07', $schedule, $assessment);
+        } catch (\Throwable $e) {
+            Log::warning("Unified MUK: Gagal generate AK.07: {$e->getMessage()}");
+        }
+
+        // 6. FR.IA milik asesi
+        // 6a. FR.IA.01 - Ceklis Observasi
+        try {
+            $filesToMerge[] = $this->generateDynamicPdf('ia01', $schedule, $assessment);
+        } catch (\Throwable $e) {
+            Log::warning("Unified MUK: Gagal generate IA.01: {$e->getMessage()}");
+        }
+
+        // 6b. FR.IA.01B - Report Sheet
+        try {
+            $uploadedIa01b = $this->getUploadedIa01bPath($assessment);
+            if ($uploadedIa01b && File::isFile($uploadedIa01b)) {
+                $filesToMerge[] = $uploadedIa01b;
+            } else {
+                $ia01bTpl = $this->getDynamicFilePath($scheme, 'ia01b') ?? $fixedService->getFixedFilePath($scheme, 'ia01b');
+                if ($ia01bTpl && File::isFile($ia01bTpl)) {
+                    $filesToMerge[] = $ia01bTpl;
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::warning("Unified MUK: Gagal memuat IA.01B: {$e->getMessage()}");
+        }
+
+        // 6c. FR.IA.02 - Tugas Praktik Demonstrasi
+        try {
+            $filesToMerge[] = $this->generateDynamicPdf('ia02', $schedule, $assessment);
+        } catch (\Throwable $e) {
+            $ia02Fixed = $fixedService->getFixedFilePath($scheme, 'ia02');
+            if ($ia02Fixed && File::isFile($ia02Fixed)) {
+                $filesToMerge[] = $ia02Fixed;
+            } else {
+                Log::warning("Unified MUK: Gagal generate IA.02: {$e->getMessage()}");
+            }
+        }
+
+        // 6d. FR.IA.03 - Pertanyaan Lisan
+        try {
+            $filesToMerge[] = $this->generateDynamicPdf('ia03', $schedule, $assessment);
+        } catch (\Throwable $e) {
+            Log::warning("Unified MUK: Gagal generate IA.03: {$e->getMessage()}");
+        }
+
+        // 6e. FR.IA.05.A - Lembar Soal Pilihan Ganda (jika ada pada skema)
+        try {
+            $ia05aPath = $fixedService->getFixedFilePath($scheme, 'ia05a');
+            if ($ia05aPath && File::isFile($ia05aPath)) {
+                $filesToMerge[] = $ia05aPath;
+            } else {
+                $dynIa05a = $this->generateDynamicPdf('ia05a', $schedule, $assessment);
+                if ($dynIa05a && File::isFile($dynIa05a)) {
+                    $filesToMerge[] = $dynIa05a;
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::info("Unified MUK: IA.05.A dilewati untuk skema {$scheme->name}");
+        }
+
+        // 6f. FR.IA.05.C - Lembar Jawaban CBT Asesi (jika ada pada skema)
+        try {
+            $dynIa05c = $this->generateDynamicPdf('ia05c', $schedule, $assessment);
+            if ($dynIa05c && File::isFile($dynIa05c)) {
+                $filesToMerge[] = $dynIa05c;
+            }
+        } catch (\Throwable $e) {
+            Log::info("Unified MUK: IA.05.C dilewati untuk skema {$scheme->name}");
+        }
+
+        // 7. FR.AK.02 - Rekaman Asesmen Kompetensi
+        try {
+            $filesToMerge[] = $this->generateDynamicPdf('ak02', $schedule, $assessment);
+        } catch (\Throwable $e) {
+            Log::warning("Unified MUK: Gagal generate AK.02: {$e->getMessage()}");
+        }
+
+        // 8. FR.AK.03 - Umpan Balik Asesi
+        try {
+            $filesToMerge[] = $this->generateDynamicPdf('ak03', $schedule, $assessment);
+        } catch (\Throwable $e) {
+            Log::warning("Unified MUK: Gagal generate AK.03: {$e->getMessage()}");
+        }
+
+        // 9. FR.AK.04 - Banding Asesmen
+        try {
+            $filesToMerge[] = $this->generateDynamicPdf('ak04', $schedule, $assessment);
+        } catch (\Throwable $e) {
+            Log::warning("Unified MUK: Gagal generate AK.04: {$e->getMessage()}");
+        }
+
+        // 10. Surat Pernyataan Pemegang Sertifikat
+        try {
+            $filesToMerge[] = $this->generateDynamicPdf('pernyataan', $schedule, $assessment);
+        } catch (\Throwable $e) {
+            Log::warning("Unified MUK: Gagal generate Surat Pernyataan: {$e->getMessage()}");
+        }
+
+        // Filter file unik dan pastikan file ada
+        $validFiles = [];
+        foreach ($filesToMerge as $f) {
+            if ($f && File::isFile($f) && ! in_array($f, $validFiles, true)) {
+                $validFiles[] = $f;
+            }
+        }
+
+        if (empty($validFiles)) {
+            abort(404, 'Tidak ada dokumen MUK yang dapat digabungkan.');
+        }
+
+        $cleanAsesi = preg_replace('/[^A-Za-z0-9_-]/', '_', $assessment->asesi?->full_name ?? 'Asesi');
+        $outputPath = $this->cacheDir."/MUK_LENGKAP_{$schedule->id}_{$assessment->id}_{$cleanAsesi}.pdf";
+
+        // Eksekusi merge_pdfs.py
+        $python = $this->getPythonExecutable();
+        $mergeScript = base_path('tools/merge_pdfs.py');
+        $tempJson = $this->cacheDir.'/muk_merge_'.uniqid().'.json';
+        File::put($tempJson, json_encode($validFiles, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+
+        try {
+            $success = $this->runPythonScript($python, $mergeScript, [$tempJson, $outputPath], $outputPath, 'unified_muk_merge');
+            if ($success && File::isFile($outputPath)) {
+                return $outputPath;
+            }
+        } finally {
+            if (File::isFile($tempJson)) {
+                @unlink($tempJson);
+            }
+        }
+
+        return reset($validFiles);
+    }
+
+    /**
+     * Export unified MUK document package for an individual candidate.
+     */
+    public function exportUnifiedAsesiMuk(Assessment $assessment, bool $download = false): BinaryFileResponse
+    {
+        $filePath = $this->generateUnifiedAsesiMukPdf($assessment);
+        $cleanAsesi = preg_replace('/[^A-Za-z0-9_-]/', '_', $assessment->asesi?->full_name ?? 'Asesi');
+        $filename = "DOKUMEN-MUK-LENGKAP-{$cleanAsesi}.pdf";
+
+        $disposition = ($download ? 'attachment' : 'inline').'; filename="'.$filename.'"';
+
+        return response()->file($filePath, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => $disposition,
         ]);
     }
 }
