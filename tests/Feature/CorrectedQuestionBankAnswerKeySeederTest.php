@@ -2,8 +2,12 @@
 
 namespace Tests\Feature;
 
+use App\Models\Assessment;
+use App\Models\AssessmentIaResponse;
 use App\Models\QuestionBank;
+use App\Models\Schedule;
 use App\Models\Scheme;
+use App\Models\User;
 use Database\Seeders\CorrectedQuestionBankAnswerKeySeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -71,5 +75,79 @@ class CorrectedQuestionBankAnswerKeySeederTest extends TestCase
             $this->assertEquals('Penggantian', $q7[14]->option_b, 'Skema 7 No 15 option B must be Penggantian');
             $this->assertEquals('B', $q7[51]->correct_answer, 'Skema 7 No 52 must be B');
         }
+    }
+
+    public function test_seeder_recalculates_submitted_ia05_cbt_responses(): void
+    {
+        $scheme = Scheme::where('code', 'SKM-03-2026')->first();
+        $admin = User::where('role', 'SUPER_ADMIN')->first();
+        $asesor = User::where('role', 'ASESOR')->first();
+        $asesi = User::factory()->create(['role' => 'ASESI']);
+
+        $schedule = Schedule::create([
+            'code' => 'SCH-RECALC-'.uniqid(),
+            'name' => 'Jadwal Recalc Test',
+            'scheme_id' => $scheme->id,
+            'tuk_name' => 'TUK Mandiri',
+            'date' => now()->toDateString(),
+            'start_time' => '08:00',
+            'end_time' => '17:00',
+            'status' => 'FINISHED',
+            'is_closed' => true,
+            'created_by' => $admin->id,
+            'selected_instruments' => ['AK01', 'IA01', 'IA05'],
+        ]);
+
+        $assessment = Assessment::create([
+            'schedule_id' => $schedule->id,
+            'scheme_id' => $scheme->id,
+            'asesi_id' => $asesi->id,
+            'assessor_id' => $asesor->id,
+            'apl_status' => 'APPROVED',
+            'status' => 'COMPLETED',
+        ]);
+
+        $questions = QuestionBank::where('scheme_id', $scheme->id)->orderBy('id')->get();
+        $this->assertNotEmpty($questions);
+
+        // Simulate an asesi response submitted with old wrong answer keys (score: 0)
+        // Suppose the asesi answered with the new correct keys:
+        $answers = [];
+        $expectedCorrect = [
+            1 => 'A', 2 => 'B', 3 => 'D', 4 => 'C', 5 => 'C', 6 => 'D', 7 => 'A',
+            8 => 'A', 9 => 'B', 10 => 'D', 11 => 'A', 12 => 'A', 13 => 'D', 14 => 'D',
+            15 => 'A', 16 => 'A', 17 => 'B', 18 => 'D', 19 => 'A', 20 => 'B', 21 => 'A',
+            22 => 'C', 23 => 'B', 24 => 'D', 25 => 'D', 26 => 'A', 27 => 'B', 28 => 'B',
+            29 => 'B', 30 => 'A',
+        ];
+
+        foreach ($questions as $idx => $q) {
+            $answers[$q->id] = $expectedCorrect[$idx + 1] ?? 'A';
+        }
+
+        // Initially create response with old bad score of 15.00
+        $ia05 = AssessmentIaResponse::create([
+            'assessment_id' => $assessment->id,
+            'instrument_code' => 'IA05',
+            'score' => 15.00,
+            'data_json' => [
+                'answers' => $answers,
+                'breakdown' => [],
+                'status' => 'SUBMITTED',
+            ],
+            'asesi_signed_at' => now(),
+        ]);
+
+        // Run the seeder
+        (new CorrectedQuestionBankAnswerKeySeeder)->run();
+
+        // Refresh and verify recalculation
+        $ia05->refresh();
+        $this->assertEquals(100.00, (float) $ia05->score);
+        $this->assertNotEmpty($ia05->data_json['breakdown']);
+
+        $firstQ = $questions->first();
+        $this->assertTrue($ia05->data_json['breakdown'][$firstQ->id]['is_correct']);
+        $this->assertEquals('A', $ia05->data_json['breakdown'][$firstQ->id]['correct_answer']);
     }
 }

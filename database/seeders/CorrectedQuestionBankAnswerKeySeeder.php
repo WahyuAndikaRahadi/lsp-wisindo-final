@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\AssessmentIaResponse;
 use App\Models\QuestionBank;
 use App\Models\Scheme;
 use Illuminate\Database\Seeder;
@@ -19,7 +20,82 @@ class CorrectedQuestionBankAnswerKeySeeder extends Seeder
         $this->seedSkema6();
         $this->seedSkema7();
 
-        $this->command?->info('FR.IA.05 Question Bank answer key corrections seeded successfully.');
+        $recalculated = $this->recalculateIa05Responses();
+
+        $this->command?->info("FR.IA.05 Question Bank answer key corrections seeded successfully. Recalculated {$recalculated} submitted CBT response(s).");
+    }
+
+    /**
+     * Recalculate scores and breakdowns for all submitted IA05 CBT responses
+     * to reflect the updated question bank answer keys.
+     */
+    public function recalculateIa05Responses(): int
+    {
+        $responses = AssessmentIaResponse::with(['assessment.schedule'])->where('instrument_code', 'IA05')->get();
+        $count = 0;
+
+        foreach ($responses as $resp) {
+            $assessment = $resp->assessment;
+            if (! $assessment || ! $assessment->schedule) {
+                continue;
+            }
+
+            $data = is_array($resp->data_json)
+                ? $resp->data_json
+                : (json_decode($resp->data_json, true) ?: []);
+
+            $answers = $data['answers'] ?? [];
+            if (empty($answers) || ! is_array($answers)) {
+                continue;
+            }
+
+            $questionIds = $assessment->schedule->getCbtQuestionIds();
+            $questions = ! empty($questionIds)
+                ? QuestionBank::whereIn('id', $questionIds)->get()
+                : QuestionBank::where('scheme_id', $assessment->schedule->scheme_id)->get();
+
+            $total = $questions->count();
+            if ($total === 0) {
+                continue;
+            }
+
+            $correct = 0;
+            $breakdown = [];
+
+            foreach ($questions as $q) {
+                $ans = $answers[$q->id] ?? null;
+                $isCorrect = ($ans !== null && strtoupper((string) $ans) === $q->correct_answer);
+                if ($isCorrect) {
+                    $correct++;
+                }
+
+                $breakdown[$q->id] = [
+                    'question_id' => $q->id,
+                    'question' => $q->question_text,
+                    'question_image' => $q->question_image,
+                    'answer' => $ans,
+                    'user_answer' => $ans,
+                    'correct_answer' => $q->correct_answer,
+                    'is_correct' => $isCorrect,
+                ];
+            }
+
+            $newScore = round(($correct / $total) * 100, 2);
+            $oldScore = $resp->score !== null ? (float) $resp->score : null;
+
+            $data['breakdown'] = $breakdown;
+
+            $resp->update([
+                'score' => $newScore,
+                'data_json' => $data,
+            ]);
+
+            if ($oldScore === null || abs($newScore - $oldScore) > 0.01) {
+                $count++;
+            }
+        }
+
+        return $count;
     }
 
     /**
