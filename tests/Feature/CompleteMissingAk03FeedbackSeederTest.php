@@ -136,4 +136,72 @@ class CompleteMissingAk03FeedbackSeederTest extends TestCase
         $response2->assertDontSeeText('Pilih Semua "Ya"');
         $response2->assertSeeText('FR.AK.03 Telah Terkirim');
     }
+
+    public function test_asesi_can_access_and_submit_ak03_when_schedule_is_closed(): void
+    {
+        $scheme = Scheme::first();
+        $admin = User::where('role', 'SUPER_ADMIN')->first();
+        $asesor = User::where('role', 'ASESOR')->first();
+        $asesi = User::factory()->create(['role' => 'ASESI']);
+
+        $schedule = Schedule::create([
+            'code' => 'SCH-CLOSED-'.uniqid(),
+            'name' => 'Jadwal Ditutup Test',
+            'scheme_id' => $scheme->id,
+            'tuk_name' => 'TUK Mandiri',
+            'date' => now()->toDateString(),
+            'start_time' => '08:00',
+            'end_time' => '17:00',
+            'status' => 'FINISHED',
+            'is_closed' => true,
+            'created_by' => $admin->id,
+            'selected_instruments' => ['AK01', 'IA01', 'IA05'],
+        ]);
+
+        $asm = Assessment::create([
+            'schedule_id' => $schedule->id,
+            'scheme_id' => $scheme->id,
+            'asesi_id' => $asesi->id,
+            'assessor_id' => $asesor->id,
+            'apl_status' => 'APPROVED',
+            'status' => 'COMPLETED',
+        ]);
+
+        // 1. Visit Ruang Uji hub: Banner closed is shown, but AK03 is unlocked and ready to fill
+        $hubResponse = $this->actingAs($asesi)->get(route('asesi.assessment.ruang-uji', $asm));
+        $hubResponse->assertOk();
+        $hubResponse->assertSeeText('Jadwal Asesmen Telah Resmi Ditutup & Dikunci');
+        $hubResponse->assertSeeText('FR.AK.03 Umpan Balik dan Catatan Asesmen');
+        $hubResponse->assertSeeText('Isi Umpan Balik Sekarang');
+
+        // 2. Open AK.03 view: Can access even though schedule is closed
+        $viewResponse = $this->actingAs($asesi)->get(route('asesi.assessment.ak03', $asm));
+        $viewResponse->assertOk();
+        $viewResponse->assertSeeText('Pilih Semua "Ya"');
+        $viewResponse->assertSeeText('Kirim Umpan Balik');
+
+        // 3. Submit AK.03 feedback: Form accepts submission successfully
+        $ratings = [];
+        for ($i = 1; $i <= 10; $i++) {
+            $ratings[$i] = ['value' => 'YA', 'comment' => ''];
+        }
+
+        $submitResponse = $this->actingAs($asesi)->post(route('asesi.assessment.ak03.submit', $asm), [
+            'ratings' => $ratings,
+            'general_notes' => 'Pelaksanaan asesmen sangat baik',
+        ]);
+
+        $submitResponse->assertRedirect(route('asesi.dashboard'));
+        $submitResponse->assertSessionHas('success');
+
+        // 4. Verify data in DB
+        $asm->refresh();
+        $this->assertTrue($asm->ak03Item()->exists());
+        $this->assertEquals('Pelaksanaan asesmen sangat baik', $asm->ak03Item->general_notes);
+
+        // 5. Open AK.03 view after submission: Locked in read-only mode
+        $readonlyResponse = $this->actingAs($asesi)->get(route('asesi.assessment.ak03', $asm));
+        $readonlyResponse->assertOk();
+        $readonlyResponse->assertSeeText('Umpan Balik Terkirim (Terkunci)');
+    }
 }
