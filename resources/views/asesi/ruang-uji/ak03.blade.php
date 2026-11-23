@@ -82,9 +82,20 @@
         @csrf
 
         <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-            <div class="px-4 sm:px-6 py-4 bg-slate-50 border-b border-slate-200">
-                <h2 class="text-sm font-bold text-slate-900">Komponen Penilaian Asesmen</h2>
-                <p class="text-xs text-slate-500 mt-0.5">Pilih YA jika sesuai atau TIDAK jika tidak terpenuhi</p>
+            <div class="px-4 sm:px-6 py-3.5 bg-slate-50 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                <div>
+                    <h2 class="text-sm font-bold text-slate-900">Komponen Penilaian Asesmen</h2>
+                    <p class="text-xs text-slate-500 mt-0.5">Pilih YA jika sesuai atau TIDAK jika tidak terpenuhi</p>
+                </div>
+                @if(!$ak03)
+                    <button type="button" 
+                            onclick="document.querySelectorAll('input[type=radio][value=YA]').forEach(el => el.checked = true)"
+                            class="self-start sm:self-auto inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-emerald-800 bg-emerald-100 hover:bg-emerald-200 border border-emerald-300 shadow-2xs transition cursor-pointer"
+                            title="Klik untuk memilih Ya pada seluruh 10 pernyataan evaluasi sekaligus">
+                        <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                        <span>Pilih Semua "Ya"</span>
+                    </button>
+                @endif
             </div>
 
             <div class="p-3 sm:p-0 overflow-x-auto md:overflow-x-visible">

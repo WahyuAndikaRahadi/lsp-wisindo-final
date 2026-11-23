@@ -266,7 +266,7 @@ class RuangUjiController extends Controller
         }
 
         // AK.03 Container Box (Umpan Balik Asesi) ditampilkan langsung di Ruang Uji
-        if ($assessment->hasAk01Completed()) {
+        if ($assessment->hasAk01Completed() || $assessment->canAsesiAccessAk03()) {
             $ak03Item = $assessment->ak03Item;
             $isAk03Unlocked = $assessment->canAsesiAccessAk03();
 
