@@ -246,18 +246,23 @@ def render_page_1(c, chunk, chunk_offset, batch_idx, total_batches, assessor_inf
             res = "K" if p_info.get("hasil") in ("K", "KOMPETEN") else ("BK" if p_info.get("hasil") in ("BK", "BELUM_KOMPETEN") else p_info.get("hasil", ""))
             if res == "K":
                 rek_text = "direkomendasikan"
+                ket_text = "Kompeten"
             elif res == "BK":
-                rek_text = "belum kompeten"
+                rek_text = "belum direkomendasikan"
+                ket_text = "belum kompeten"
             else:
                 raw_rek = p_info.get("rekomendasi", "")
                 if raw_rek in ("Diterbitkan Sertifikat", "Direkomendasikan", "direkomendasikan"):
                     rek_text = "direkomendasikan"
-                elif raw_rek in ("Tidak Diterbitkan", "Belum Kompeten", "belum kompeten"):
-                    rek_text = "belum kompeten"
+                    ket_text = "Kompeten"
+                elif raw_rek in ("Tidak Diterbitkan", "Belum Kompeten", "belum kompeten", "Belum Direkomendasikan", "belum direkomendasikan"):
+                    rek_text = "belum direkomendasikan"
+                    ket_text = "belum kompeten"
                 else:
                     rek_text = raw_rek
+                    ket_text = p_info.get("ket", "")
             lines_rekomendasi = wrap_text(rek_text, "Lib", 8.0, (cols[4] - cols[3]) - 10.0)
-            lines_ket = wrap_text(p_info.get("ket", "Lulus" if res == "K" else "Belum Lulus"), "Lib", 8.0, (cols[5] - cols[4]) - 8.0)
+            lines_ket = wrap_text(p_info.get("ket") if p_info.get("ket") in ("Kompeten", "belum kompeten") else ket_text, "Lib", 8.0, (cols[5] - cols[4]) - 8.0)
             max_l = max(1, len(lines_nama), len(lines_rekomendasi), len(lines_ket))
             h = max(16.0, max_l * 9.5 + 4.0)
             row_data_p1.append({

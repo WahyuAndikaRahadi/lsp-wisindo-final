@@ -88,19 +88,24 @@
                             if ($assessment) {
                                 if ($assessment->final_result === 'TIDAK_HADIR') {
                                     $res = 'Tidak Hadir';
-                                    $keterangan = $assessment->final_notes ?: 'Peserta Tidak Hadir';
+                                    $rekomendasi = $assessment->final_notes ?: 'Peserta Tidak Hadir';
+                                    $keterangan = '-';
                                 } elseif (in_array($assessment->final_result, ['K', 'KOMPETEN'], true) || ($assessment->final_result === null && $assessment->status === 'COMPLETED')) {
                                     $res = 'K';
-                                    $keterangan = 'direkomendasikan';
+                                    $rekomendasi = 'direkomendasikan';
+                                    $keterangan = 'Kompeten';
                                 } elseif (in_array($assessment->final_result, ['BK', 'BELUM_KOMPETEN'], true)) {
                                     $res = 'BK';
+                                    $rekomendasi = 'belum direkomendasikan';
                                     $keterangan = 'belum kompeten';
                                 } else {
                                     $res = ($assessment->status === 'IN_PROGRESS') ? '-' : 'BELUM_KOMPETEN';
-                                    $keterangan = $assessment->assessor_notes ?: '-';
+                                    $rekomendasi = 'belum direkomendasikan';
+                                    $keterangan = 'belum kompeten';
                                 }
                             } else {
                                 $res = '';
+                                $rekomendasi = '';
                                 $keterangan = '';
                             }
                         @endphp
@@ -119,12 +124,10 @@
                                 @endif
                             </td>
                             <td>
-                                {{ $keterangan }}
+                                {{ $rekomendasi }}
                             </td>
                             <td>
-                                @if($assessment)
-                                    {{ $scheme->name }}
-                                @endif
+                                {{ $keterangan }}
                             </td>
                         </tr>
                     @endfor

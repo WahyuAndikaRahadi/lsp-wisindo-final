@@ -808,6 +808,8 @@ print(json.dumps({
     'full_p1': text_p1,
     'right_side_sig_text': right_text,
     'has_direkomendasikan': 'direkomendasikan' in text_p1,
+    'has_belum_direkomendasikan': 'belum direkomendasikan' in text_p1,
+    'has_kompeten': 'Kompeten' in text_p1,
     'has_belum_kompeten': 'belum kompeten' in text_p1,
 }))
 PY;
@@ -815,8 +817,10 @@ PY;
         $res = json_decode($output, true);
 
         $this->assertIsArray($res);
-        $this->assertTrue($res['has_direkomendasikan'], 'Berita Acara must show "direkomendasikan" for competent asesi.');
-        $this->assertTrue($res['has_belum_kompeten'], 'Berita Acara must show "belum kompeten" for not competent asesi.');
+        $this->assertTrue($res['has_direkomendasikan'], 'Berita Acara must show "direkomendasikan" in Rekomendasi/Tindak Lanjut for competent asesi.');
+        $this->assertTrue($res['has_belum_direkomendasikan'], 'Berita Acara must show "belum direkomendasikan" in Rekomendasi/Tindak Lanjut for not competent asesi.');
+        $this->assertTrue($res['has_kompeten'], 'Berita Acara must show "Kompeten" in Keterangan for competent asesi.');
+        $this->assertTrue($res['has_belum_kompeten'], 'Berita Acara must show "belum kompeten" in Keterangan for not competent asesi.');
         $this->assertStringNotContainsString('Ttd Digital', $res['right_side_sig_text'], 'Kepala TUK field must not contain the phrase "ttd digital".');
     }
 }
