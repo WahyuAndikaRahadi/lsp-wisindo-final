@@ -102,7 +102,7 @@ class RuangUjiController extends Controller
                 ->with('warning', 'Ruang Uji baru dapat diakses setelah permohonan APL Anda disetujui.');
         }
 
-        $assessment->load('schedule.scheme', 'schedule.assessors', 'iaResponses', 'assessor');
+        $assessment->load('schedule.scheme', 'schedule.assessors', 'iaResponses', 'assessor', 'ak03Item');
         $schedule = $assessment->schedule;
         $responses = $assessment->iaResponses->keyBy('instrument_code');
 
@@ -263,6 +263,65 @@ class RuangUjiController extends Controller
             }
 
             $instruments[] = $meta;
+        }
+
+        // AK.03 Container Box (Umpan Balik Asesi) ditampilkan langsung di Ruang Uji
+        if ($assessment->hasAk01Completed()) {
+            $ak03Item = $assessment->ak03Item;
+            $isAk03Unlocked = $assessment->canAsesiAccessAk03();
+
+            if ($ak03Item) {
+                $instruments[] = [
+                    'code' => 'FR.AK.03',
+                    'title' => 'FR.AK.03 Umpan Balik dan Catatan Asesmen',
+                    'desc' => 'Kuesioner evaluasi dan umpan balik pelaksanaan asesmen dari asesi terhadap asesor dan TUK.',
+                    'badge' => 'Umpan Balik',
+                    'badge_color' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                    'status_label' => '✓ Umpan Balik Terkirim',
+                    'status_badge_class' => 'text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200',
+                    'progress_percent' => 100,
+                    'progress_bar_color' => 'bg-emerald-600',
+                    'progress_text' => '1 / 1 Terkirim',
+                    'action_label' => 'Lihat Umpan Balik',
+                    'action_button_class' => 'bg-slate-800 hover:bg-slate-900 text-white',
+                    'action_url' => route('asesi.assessment.ak03', $assessment),
+                    'is_locked' => false,
+                ];
+            } elseif ($isAk03Unlocked) {
+                $instruments[] = [
+                    'code' => 'FR.AK.03',
+                    'title' => 'FR.AK.03 Umpan Balik dan Catatan Asesmen',
+                    'desc' => 'Kuesioner evaluasi dan umpan balik pelaksanaan asesmen dari asesi terhadap asesor dan TUK.',
+                    'badge' => 'Umpan Balik',
+                    'badge_color' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                    'status_label' => 'Siap Diisi',
+                    'status_badge_class' => 'text-emerald-700 bg-emerald-100 font-bold px-2 py-0.5 rounded border border-emerald-300 animate-pulse',
+                    'progress_percent' => 0,
+                    'progress_bar_color' => 'bg-emerald-500',
+                    'progress_text' => '0 / 1 Siap Diisi',
+                    'action_label' => 'Isi Umpan Balik Sekarang',
+                    'action_button_class' => 'bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-md ring-2 ring-emerald-500/20',
+                    'action_url' => route('asesi.assessment.ak03', $assessment),
+                    'is_locked' => false,
+                ];
+            } else {
+                $instruments[] = [
+                    'code' => 'FR.AK.03',
+                    'title' => 'FR.AK.03 Umpan Balik dan Catatan Asesmen',
+                    'desc' => 'Kuesioner evaluasi dan umpan balik pelaksanaan asesmen dari asesi terhadap asesor dan TUK.',
+                    'badge' => 'Umpan Balik',
+                    'badge_color' => 'bg-slate-50 text-slate-600 border-slate-200',
+                    'status_label' => '🔒 Terkunci',
+                    'status_badge_class' => 'text-slate-500 bg-slate-100 px-2 py-0.5 rounded border border-slate-200',
+                    'progress_percent' => 0,
+                    'progress_bar_color' => 'bg-slate-300',
+                    'progress_text' => 'Terkunci (Selesaikan Asesmen)',
+                    'action_label' => 'Terkunci (Belum Aktif)',
+                    'action_button_class' => 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed',
+                    'action_url' => '#',
+                    'is_locked' => true,
+                ];
+            }
         }
 
         return view('asesi.ruang-uji.hub', compact('assessment', 'schedule', 'instruments', 'responses'));
@@ -636,9 +695,14 @@ class RuangUjiController extends Controller
             ->with('success', 'Asesmen teknis selesai. Harap mengisi formulir FR.AK.03 (Umpan Balik Asesi).');
     }
 
-    public function showAk03(Assessment $assessment): View
+    public function showAk03(Assessment $assessment): View|RedirectResponse
     {
         abort_if($assessment->asesi_id !== auth()->id(), 403);
+
+        if (! $assessment->canAsesiAccessAk03()) {
+            return redirect()->route('asesi.assessment.ruang-uji', $assessment)
+                ->with('warning', 'Formulir FR.AK.03 (Umpan Balik Asesi) masih terkunci. Anda harus menyelesaikan seluruh rangkaian asesmen di Ruang Uji terlebih dahulu.');
+        }
 
         $assessment->load('schedule.scheme', 'assessor', 'ak03Item');
         $ak03 = $assessment->ak03Item;
@@ -665,6 +729,11 @@ class RuangUjiController extends Controller
             'ratings.min' => 'Seluruh 10 butir pernyataan evaluasi wajib dipilih.',
             'ratings.*.value.required' => 'Setiap butir pertanyaan evaluasi wajib dipilih (Ya atau Tidak).',
         ]);
+
+        if (! $assessment->canAsesiAccessAk03()) {
+            return redirect()->route('asesi.assessment.ruang-uji', $assessment)
+                ->with('error', 'Formulir FR.AK.03 (Umpan Balik Asesi) belum dapat dikirim karena rangkaian asesmen belum selesai.');
+        }
 
         DB::transaction(function () use ($assessment, $validated) {
             app(AkWorkflowService::class)->submitAk03Feedback($assessment, $validated['ratings'], $validated['general_notes'] ?? null);

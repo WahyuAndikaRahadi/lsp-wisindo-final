@@ -5,9 +5,9 @@
     {{-- Header & Navigasi Terstruktur --}}
     <div class="space-y-3 pb-2 border-b border-slate-200/80">
         <div class="flex items-center justify-between gap-3">
-            <a href="{{ route('asesi.dashboard') }}" class="inline-flex items-center gap-1.5 text-xs font-bold text-brand-600 hover:text-brand-800 transition py-1">
+            <a href="{{ route('asesi.assessment.ruang-uji', $assessment) }}" class="inline-flex items-center gap-1.5 text-xs font-bold text-brand-600 hover:text-brand-800 transition py-1">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-                <span>Kembali ke Dashboard</span>
+                <span>Kembali ke Ruang Uji</span>
             </a>
             @if($ak03)
                 <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
@@ -34,8 +34,8 @@
                     <span class="text-xs text-emerald-800 mt-0.5 leading-relaxed">Tersimpan pada {{ \Carbon\Carbon::parse($ak03->created_at)->isoFormat('D MMMM Y, HH:mm') }} WIB.</span>
                 </div>
             </div>
-            <a href="{{ route('asesi.dashboard') }}" class="w-full sm:w-auto shrink-0 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl transition shadow-xs text-center">
-                Ke Dashboard &rarr;
+            <a href="{{ route('asesi.assessment.ruang-uji', $assessment) }}" class="w-full sm:w-auto shrink-0 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl transition shadow-xs text-center">
+                Ke Ruang Uji &rarr;
             </a>
         </div>
     @endif

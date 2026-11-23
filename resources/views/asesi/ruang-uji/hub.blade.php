@@ -107,13 +107,24 @@
 
                 {{-- Action Buttons --}}
                 <div class="pt-5 mt-4 border-t border-slate-100 flex items-center">
-                    <a href="{{ $inst['action_url'] }}"
-                       class="w-full flex items-center justify-center space-x-2 px-4 py-2.5 min-h-[40px] text-xs font-bold {{ $inst['action_button_class'] }} rounded-lg shadow-sm transition">
-                        <span>{{ $inst['action_label'] }}</span>
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
-                        </svg>
-                    </a>
+                    @if($inst['is_locked'] ?? false)
+                        <button type="button" disabled
+                               class="w-full flex items-center justify-center space-x-2 px-4 py-2.5 min-h-[40px] text-xs font-bold {{ $inst['action_button_class'] }} rounded-lg transition"
+                               title="Selesaikan seluruh rangkaian asesmen untuk membuka formulir ini">
+                            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                            </svg>
+                            <span>{{ $inst['action_label'] }}</span>
+                        </button>
+                    @else
+                        <a href="{{ $inst['action_url'] }}"
+                           class="w-full flex items-center justify-center space-x-2 px-4 py-2.5 min-h-[40px] text-xs font-bold {{ $inst['action_button_class'] }} rounded-lg shadow-sm transition">
+                            <span>{{ $inst['action_label'] }}</span>
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                            </svg>
+                        </a>
+                    @endif
                 </div>
             </div>
         @empty
@@ -135,27 +146,21 @@
         @endforelse
     </div>
 
-    {{-- Pasca Asesmen (Hanya jika asesmen telah diselesaikan oleh Asesor) --}}
-    @if($assessment->status === 'COMPLETED')
+    {{-- Pasca Asesmen: Banding (Hanya jika eligible & selesai) --}}
+    @if($assessment->status === 'COMPLETED' && $assessment->canAppeal())
         <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
             <div>
                 <span class="text-xs font-bold uppercase tracking-wider text-emerald-700">Tahap Pasca Asesmen</span>
                 <h4 class="text-base font-bold text-slate-900 mt-0.5">Rangkaian Asesmen Selesai ({{ $assessment->final_result ?? 'KOMPETEN' }})</h4>
-                <p class="text-xs text-slate-500 mt-1 leading-relaxed">Silakan lengkapi formulir umpan balik proses asesmen (FR.AK.03) atau ajukan banding (FR.AK.04) jika terdapat sanggahan hasil atau ketidaksesuaian prosedur uji.</p>
+                <p class="text-xs text-slate-500 mt-1 leading-relaxed">Anda dapat mengajukan permohonan banding asesmen (FR.AK.04) jika terdapat sanggahan atas keputusan asesmen atau ketidaksesuaian prosedur uji.</p>
             </div>
             <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 shrink-0">
-                <a href="{{ route('asesi.assessment.ak03', $assessment) }}" class="px-4 py-2.5 min-h-[40px] inline-flex items-center justify-center bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold rounded-xl shadow-sm transition text-center">
-                    <span>FR.AK.03 Umpan Balik</span>
-                    <span class="ml-1">&rarr;</span>
+                <a href="{{ route('asesi.assessment.appeal', $assessment) }}" class="px-4 py-2.5 min-h-[40px] inline-flex items-center justify-center bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 text-xs font-bold rounded-xl shadow-sm transition gap-1.5">
+                    <span>FR.AK.04 Banding Asesmen</span>
+                    @if($assessment->appeals->isNotEmpty())
+                        <span class="px-1.5 py-0.5 bg-amber-100 text-amber-800 text-[10px] rounded font-mono font-semibold">Tercatat</span>
+                    @endif
                 </a>
-                @if($assessment->canAppeal())
-                    <a href="{{ route('asesi.assessment.appeal', $assessment) }}" class="px-4 py-2.5 min-h-[40px] inline-flex items-center justify-center bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 text-xs font-bold rounded-xl shadow-sm transition gap-1.5">
-                        <span>FR.AK.04 Banding</span>
-                        @if($assessment->appeals->isNotEmpty())
-                            <span class="px-1.5 py-0.5 bg-amber-100 text-amber-800 text-[10px] rounded font-mono font-semibold">Tercatat</span>
-                        @endif
-                    </a>
-                @endif
             </div>
         </div>
     @endif

@@ -228,9 +228,6 @@
                                 <a href="{{ route('asesi.assessment.ruang-uji', $item->id) }}" class="flex-1 sm:flex-initial text-center px-3 py-2 min-h-[38px] inline-flex items-center justify-center text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 border border-slate-300 rounded-lg shadow-xs transition">
                                     Rekap Hasil
                                 </a>
-                                <a href="{{ route('asesi.assessment.ak03', $item->id) }}" class="flex-1 sm:flex-initial text-center px-3 py-2 min-h-[38px] inline-flex items-center justify-center text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 rounded-lg shadow-xs transition" title="FR.AK.03 Umpan Balik Asesmen">
-                                    Umpan Balik
-                                </a>
                                 @if($item->canAppeal())
                                     <a href="{{ route('asesi.assessment.appeal', $item->id) }}" class="flex-1 sm:flex-initial text-center px-3 py-2 min-h-[38px] inline-flex items-center justify-center text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 border border-slate-300 rounded-lg shadow-xs transition" title="FR.AK.04 Banding Asesmen">
                                         Banding
