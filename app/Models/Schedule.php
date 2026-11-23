@@ -218,6 +218,11 @@ class Schedule extends Model
             return true;
         }
 
+        // When schedule has been reopened by admin, it is open for edits by all assigned assessors
+        if (! empty($this->reopened_at)) {
+            return false;
+        }
+
         $assessor ??= (auth()->check() && auth()->user()->role === 'ASESOR' ? auth()->user() : null);
         if (! $assessor || $assessor->role !== 'ASESOR') {
             return (bool) $this->is_closed;

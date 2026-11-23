@@ -1,7 +1,7 @@
 <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
     <div class="px-4 sm:px-6 py-3.5 sm:py-4 bg-slate-50 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center sm:justify-between items-start gap-1">
         <div>
-            <h2 class="text-sm font-bold text-slate-900">Daftar Peserta Asesmen ({{ $assessments->total() ?? $assessments->count() }})</h2>
+            <h2 class="text-sm font-bold text-slate-900">Daftar Asesi Asesmen ({{ $assessments->total() ?? $assessments->count() }})</h2>
             <p class="text-xs text-slate-500">Status verifikasi APL oleh asesor, progres ujian, dan hasil rekomendasi asesmen</p>
         </div>
     </div>

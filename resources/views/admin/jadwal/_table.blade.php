@@ -57,8 +57,8 @@
 
                     <div class="grid grid-cols-3 gap-2 pt-1">
                         <a href="{{ route('admin.jadwal.show', $sch->id) }}" class="px-2.5 py-2 text-xs font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-lg text-center transition flex items-center justify-center gap-1 min-h-[40px]">
-                            <svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-                            <span>Peserta</span>
+                            <svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                            <span>Detail</span>
                         </a>
                         <a href="{{ route('admin.jadwal.edit', $sch->id) }}" class="px-2.5 py-2 text-xs font-bold text-brand-700 bg-brand-50 hover:bg-brand-100 border border-brand-200 rounded-lg text-center transition flex items-center justify-center gap-1 min-h-[40px]">
                             <svg class="w-3.5 h-3.5 text-brand-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
@@ -67,7 +67,7 @@
                         <form action="{{ route('admin.jadwal.destroy', $sch->id) }}" method="POST" class="inline w-full"
                               data-confirm="PERINGATAN KONSEKUENSI PENGHAPUSAN JADWAL:
 
-Jika jadwal memiliki peserta atau riwayat asesmen aktif, status jadwal akan dinonaktifkan (FINISHED) untuk melindungi data audit BNSP. Jika kosong, jadwal akan dihapus.
+Jika jadwal memiliki asesi terdaftar atau riwayat asesmen aktif, status jadwal akan dinonaktifkan (FINISHED) untuk melindungi data audit BNSP. Jika kosong, jadwal akan dihapus.
 
 Apakah Anda yakin ingin melanjutkan?"
                               data-confirm-title="Konfirmasi Penghapusan Jadwal"
@@ -128,7 +128,7 @@ Apakah Anda yakin ingin melanjutkan?"
                             <td class="px-6 py-4 text-right">
                                 <div class="flex items-center justify-end space-x-2">
                                     <a href="{{ route('admin.jadwal.show', $sch->id) }}" class="px-3 py-1 text-xs font-semibold text-emerald-700 hover:text-emerald-900 bg-emerald-50 rounded">
-                                        Peserta
+                                        Detail
                                     </a>
                                     <a href="{{ route('admin.jadwal.edit', $sch->id) }}" class="px-3 py-1 text-xs font-semibold text-brand-600 hover:text-brand-800 bg-brand-50 rounded">
                                         Edit
@@ -136,7 +136,7 @@ Apakah Anda yakin ingin melanjutkan?"
                                     <form action="{{ route('admin.jadwal.destroy', $sch->id) }}" method="POST" class="inline"
                                           data-confirm="PERINGATAN KONSEKUENSI PENGHAPUSAN JADWAL:
 
-Jika jadwal memiliki peserta atau riwayat asesmen aktif, status jadwal akan dinonaktifkan (FINISHED) untuk melindungi data audit BNSP. Jika kosong, jadwal akan dihapus.
+Jika jadwal memiliki asesi terdaftar atau riwayat asesmen aktif, status jadwal akan dinonaktifkan (FINISHED) untuk melindungi data audit BNSP. Jika kosong, jadwal akan dihapus.
 
 Apakah Anda yakin ingin melanjutkan?"
                                           data-confirm-title="Konfirmasi Penghapusan Jadwal"

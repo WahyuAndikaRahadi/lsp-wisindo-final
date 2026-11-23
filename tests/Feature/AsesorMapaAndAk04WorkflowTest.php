@@ -257,6 +257,9 @@ class AsesorMapaAndAk04WorkflowTest extends TestCase
             'confirm_draft_review' => '1',
         ];
 
+        // Verify schedule is open for assessor edits when reopened
+        $this->assertFalse($this->schedule->isClosedForAssessor($this->asesor));
+
         $response = $this->actingAs($this->asesor)->post(route('asesor.schedule.reports.submit', $this->schedule), $payload);
         $response->assertRedirect(route('asesor.jadwal.index'));
         $response->assertSessionHas('success');
@@ -264,6 +267,7 @@ class AsesorMapaAndAk04WorkflowTest extends TestCase
         // Verify schedule did NOT auto-close because it was reopened by admin!
         $this->schedule->refresh();
         $this->assertFalse($this->schedule->is_closed);
+        $this->assertFalse($this->schedule->isClosedForAssessor($this->asesor));
         $this->assertEquals('ACTIVE', $this->schedule->status);
 
         // Now Admin closes it officially
@@ -271,6 +275,7 @@ class AsesorMapaAndAk04WorkflowTest extends TestCase
         $closeResponse->assertRedirect();
         $this->schedule->refresh();
         $this->assertTrue($this->schedule->is_closed);
+        $this->assertTrue($this->schedule->isClosedForAssessor($this->asesor));
         $this->assertEquals('FINISHED', $this->schedule->status);
     }
 }

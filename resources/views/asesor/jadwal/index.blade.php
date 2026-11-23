@@ -23,7 +23,7 @@
                         <span class="text-xs font-bold text-emerald-900">Token Registrasi Asesi:</span>
                     </div>
                     <p class="text-[11px] text-slate-500">
-                        Bagikan token ini kepada calon peserta uji (asesi) yang membuat akun di lokasi asesmen. Token ini akan direset otomatis setiap minggu.
+                        Bagikan token ini kepada calon asesi yang membuat akun di lokasi asesmen. Token ini akan direset otomatis setiap minggu.
                     </p>
                 </div>
             </div>

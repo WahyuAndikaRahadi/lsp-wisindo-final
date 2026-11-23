@@ -1,4 +1,4 @@
-@extends('layouts.app', ['title' => 'Review Jadwal & Peserta - ' . $jadwal->name])
+@extends('layouts.app', ['title' => 'Detail Jadwal & Asesi - ' . $jadwal->name])
 
 @section('content')
 <div class="space-y-6">
@@ -55,7 +55,7 @@
         </div>
     </div>
 
-    {{-- Search & Filter Peserta --}}
+    {{-- Search & Filter Asesi --}}
     <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
         <form method="GET" action="{{ route('admin.jadwal.show', $jadwal->id) }}" data-ajax-filter="peserta" data-no-loading="true" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
             <div class="relative flex-1">
@@ -65,7 +65,7 @@
                     </svg>
                 </div>
                 <input type="text" name="search" value="{{ request('search') }}"
-                       placeholder="Cari nama peserta, email, atau NIK..."
+                       placeholder="Cari nama asesi, email, atau NIK..."
                        class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs sm:text-sm text-slate-800 focus:outline-none focus:ring-1 focus:ring-brand-500 focus:border-brand-500">
             </div>
             <div class="flex items-center gap-2">
