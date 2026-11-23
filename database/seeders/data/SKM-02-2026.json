@@ -6,7 +6,7 @@
         "version": "1.0",
         "muk_code": "02/LSP PrO Indo/I/2026",
         "description": "Skema Sertifikasi Maintenance Gasoline Engine Injection System - LSP Praktisi Otomotif Indonesia",
-        "passing_grade_theory": 75.0,
+        "passing_grade_theory": 75,
         "is_active": true
     },
     "units": [
@@ -605,7 +605,7 @@
             "option_b": "Buka pin pengunci  arahkan selang obyek - tekan handle",
             "option_c": "Tekan handle  arahkan selang ke obyek  buka pin pengunci",
             "option_d": "Arahkan selang ke obyek  Tekan handle  buka pin pengunci",
-            "correct_answer": "C"
+            "correct_answer": "B"
         },
         {
             "number": 4,
@@ -623,7 +623,7 @@
             "option_b": "Penataan di dalam caddy lebih rapi",
             "option_c": "Lebih banyak menampung peralatan kerja",
             "option_d": "Jawaban a,b, dan c benar",
-            "correct_answer": "B"
+            "correct_answer": "D"
         },
         {
             "number": 6,
@@ -695,7 +695,7 @@
             "option_b": "Piston ring dan cylinder aus",
             "option_c": "Carbon terkumpul di ruang pembakaran",
             "option_d": "Coolant kurang",
-            "correct_answer": "C"
+            "correct_answer": "B"
         },
         {
             "number": 14,

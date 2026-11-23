@@ -6,7 +6,7 @@
         "version": "1.0",
         "muk_code": "06/LSP PrO Indo/I/2026",
         "description": "Skema Sertifikasi Servis Sepeda Motor Listrik - LSP Praktisi Otomotif Indonesia",
-        "passing_grade_theory": 75.0,
+        "passing_grade_theory": 75,
         "is_active": true
     },
     "units": [
@@ -1183,7 +1183,7 @@
             "option_b": "Kebersihan pegas throttle",
             "option_c": "Memastikan baut stopscrew tidak berubah\n\n                                                              3\n\f                                      Lembaga Sertifikasi Profesi Praktisi Otomotif Indonesia\n                                                                 LSP-PrO Indo",
             "option_d": "Kebersihan Throttle body",
-            "correct_answer": "A"
+            "correct_answer": "C"
         },
         {
             "number": 24,
@@ -1255,7 +1255,7 @@
             "option_b": "Tekanan udara ban terlalu keras",
             "option_c": "Seal debu rusak\n\n                                                              4\n\f                                      Lembaga Sertifikasi Profesi Praktisi Otomotif Indonesia\n                                                                 LSP-PrO Indo",
             "option_d": "Pegas fork lemah",
-            "correct_answer": "D"
+            "correct_answer": "A"
         },
         {
             "number": 32,

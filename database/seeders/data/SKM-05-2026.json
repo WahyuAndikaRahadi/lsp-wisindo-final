@@ -6,7 +6,7 @@
         "version": "1.0",
         "muk_code": "05/LSP PrO Indo/I/2026",
         "description": "Skema Sertifikasi Mekanik Junior - LSP Praktisi Otomotif Indonesia",
-        "passing_grade_theory": 75.0,
+        "passing_grade_theory": 75,
         "is_active": true
     },
     "units": [
@@ -2812,7 +2812,7 @@
             "option_b": "Aksial 2,0 mm, Radial 2,0 mm",
             "option_c": "Aksial 3,0 mm, Radial 3,0 mm",
             "option_d": "Aksial 4,0 mm, Radial 4,0 mm",
-            "correct_answer": "A"
+            "correct_answer": "B"
         },
         {
             "number": 62,

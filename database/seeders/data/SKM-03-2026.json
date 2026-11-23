@@ -412,7 +412,7 @@
             "option_b": "Menunggu teman kerja lain mengerjakan terlebih dahulu",
             "option_c": "Langsung mengerjakan sesuai perkiraan",
             "option_d": "Mengabaikan instruksi tersebut",
-            "correct_answer": "B"
+            "correct_answer": "A"
         },
         {
             "number": 2,
@@ -421,7 +421,7 @@
             "option_b": "Mempertahankan standar ringkas, rapi, dan resik secara konsisten",
             "option_c": "Membuang barang yang tidak perlu",
             "option_d": "Menyusun alat berdasarkan ukuran",
-            "correct_answer": "C"
+            "correct_answer": "B"
         },
         {
             "number": 3,
@@ -430,7 +430,7 @@
             "option_b": "Garis ukuran",
             "option_c": "Garis sumbu",
             "option_d": "Bagian benda yang tidak tampak/tersembunyi\n\n                                          1\n\f                                      Lembaga Sertifikasi Profesi Praktisi Otomotif LSP-PrO Indo",
-            "correct_answer": "A"
+            "correct_answer": "D"
         },
         {
             "number": 4,
@@ -439,7 +439,7 @@
             "option_b": "Dial gauge",
             "option_c": "Micrometer luar",
             "option_d": "Feeler gauge",
-            "correct_answer": "B"
+            "correct_answer": "C"
         },
         {
             "number": 5,
@@ -448,7 +448,7 @@
             "option_b": "Creeper",
             "option_c": "Jack stand",
             "option_d": "Floor jack",
-            "correct_answer": "A"
+            "correct_answer": "C"
         },
         {
             "number": 6,
@@ -457,7 +457,7 @@
             "option_b": "Kuning",
             "option_c": "Merah",
             "option_d": "Oranye",
-            "correct_answer": "C"
+            "correct_answer": "D"
         },
         {
             "number": 7,
@@ -475,7 +475,7 @@
             "option_b": "Membiarkan sistem pendingin baterai mati",
             "option_c": "Menunggu perintah dari supervisor",
             "option_d": "Mendinginkan suhu motor listrik\n\n                                                                  2\n\f                                     Lembaga Sertifikasi Profesi Praktisi Otomotif LSP-PrO Indo",
-            "correct_answer": "B"
+            "correct_answer": "A"
         },
         {
             "number": 9,
@@ -493,7 +493,7 @@
             "option_b": "Mematikan alat ukur",
             "option_c": "Mengisi baterai hingga 0%",
             "option_d": "Menyetel alat ukur pada posisi nol agar pengukuran akurat",
-            "correct_answer": "B"
+            "correct_answer": "D"
         },
         {
             "number": 11,
@@ -502,7 +502,7 @@
             "option_b": "Kabel charger masih terhubung",
             "option_c": "Pengereman regeneratif sedang bekerja",
             "option_d": "Baterai 12V sedang diisi",
-            "correct_answer": "B"
+            "correct_answer": "A"
         },
         {
             "number": 12,
@@ -511,7 +511,7 @@
             "option_b": "Berbahan dasar oli mesin",
             "option_c": "Konduktif tinggi",
             "option_d": "Sangat kental",
-            "correct_answer": "C"
+            "correct_answer": "A"
         },
         {
             "number": 13,
@@ -520,7 +520,7 @@
             "option_b": "Karena rem fisik digunakan untuk mengisi daya baterai",
             "option_c": "Karena kampas rem EV terbuat dari bahan plastik",
             "option_d": "Karena rem fisik tetap bekerja pada pengereman darurat dan kecepatan rendah",
-            "correct_answer": "A"
+            "correct_answer": "D"
         },
         {
             "number": 14,
@@ -529,7 +529,7 @@
             "option_b": "Rem terasa blong",
             "option_c": "Mobil sulit belok",
             "option_d": "Getaran pada setir di kecepatan tertentu",
-            "correct_answer": "B"
+            "correct_answer": "D"
         },
         {
             "number": 15,
@@ -538,7 +538,7 @@
             "option_b": "Pompa oli",
             "option_c": "Gaya magnet permanen roda",
             "option_d": "Tekanan udara",
-            "correct_answer": "B"
+            "correct_answer": "A"
         },
         {
             "number": 16,
@@ -547,7 +547,7 @@
             "option_b": "Knuckle arm",
             "option_c": "Tie rod",
             "option_d": "Lower arm",
-            "correct_answer": "B"
+            "correct_answer": "A"
         },
         {
             "number": 17,
@@ -565,7 +565,7 @@
             "option_b": "Tidak bisa membeku",
             "option_c": "Harganya lebih murah",
             "option_d": "Memiliki sifat isolasi listrik yang baik",
-            "correct_answer": "B"
+            "correct_answer": "D"
         },
         {
             "number": 19,
@@ -574,7 +574,7 @@
             "option_b": "Tire gauge",
             "option_c": "Multimeter biasa\n\n                                                                 4\n\f                                     Lembaga Sertifikasi Profesi Praktisi Otomotif LSP-PrO Indo",
             "option_d": "Hydrometer",
-            "correct_answer": "B"
+            "correct_answer": "A"
         },
         {
             "number": 20,
@@ -592,7 +592,7 @@
             "option_b": "Sudut camber",
             "option_c": "Kekencangan baut roda",
             "option_d": "Keausan ban",
-            "correct_answer": "B"
+            "correct_answer": "A"
         },
         {
             "number": 22,
@@ -601,7 +601,7 @@
             "option_b": "Berwarna cerah",
             "option_c": "Tidak bocor dengan tes udara",
             "option_d": "Tipis agar nyaman",
-            "correct_answer": "A"
+            "correct_answer": "C"
         },
         {
             "number": 23,
@@ -619,7 +619,7 @@
             "option_b": "Bearing",
             "option_c": "Spacer",
             "option_d": "Balance weight (timah)",
-            "correct_answer": "B"
+            "correct_answer": "D"
         },
         {
             "number": 25,
@@ -628,7 +628,7 @@
             "option_b": "Inverter",
             "option_c": "Motor Controller",
             "option_d": "DC-DC Converter",
-            "correct_answer": "B"
+            "correct_answer": "D"
         },
         {
             "number": 26,
@@ -637,7 +637,7 @@
             "option_b": "Ban",
             "option_c": "Shock absorber",
             "option_d": "Pompa rem",
-            "correct_answer": "B"
+            "correct_answer": "A"
         },
         {
             "number": 27,
@@ -646,7 +646,7 @@
             "option_b": "Cincin dan jam tangan logam",
             "option_c": "Sepatu Safety Non-Konduktif",
             "option_d": "Insulated tools",
-            "correct_answer": "D"
+            "correct_answer": "B"
         },
         {
             "number": 28,
@@ -664,7 +664,7 @@
             "option_b": "Leak detector",
             "option_c": "Compression tester",
             "option_d": "Vernier caliper",
-            "correct_answer": "A"
+            "correct_answer": "B"
         },
         {
             "number": 30,
@@ -673,7 +673,7 @@
             "option_b": "Mematikan lampu utama\n\n                                                                 6\n\f                                Lembaga Sertifikasi Profesi Praktisi Otomotif LSP-PrO Indo",
             "option_c": "Melepas Service Plug secara otomatis",
             "option_d": "Meningkatkan tenaga motor\n\nPENYUSUN DAN VALIDATOR  NAMA     NOMOR MET            TANDA\n       STATUS NO                                  TANGAN DAN\n\n                                                    TANGGAL\n\n          1 RIDWAN               000.008265 2025\n\nPENYUSUN                                          12 Januari 2026\n\n          2 RANDI ARDIANSYAH     000.002498 2013\n\n                                                  12 Januari 2026\n\n          1 SAPTONO              000.003672 2016\n\n                                                  12 Januari 2026\n\nVALIDATOR 2 KARYANTO             000.008260 2025\n\n                                                  12 Januari 2026\n\n          3 GUNADI               000.000459 2007\n                                                            12 Januari 2026\n\n                              7",
-            "correct_answer": "B"
+            "correct_answer": "A"
         }
     ],
     "tpd": {
