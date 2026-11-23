@@ -36,7 +36,14 @@
         </div>
 
         <div class="flex items-center space-x-2">
-            @if($meta['route_code'] !== 'apl')
+            @if($meta['route_code'] === 'apl')
+                @if($schedule->isStepUnlocked('mapa'))
+                    <a href="{{ route('asesor.schedule.mapa', $schedule->id) }}" class="px-4 py-2 text-xs font-bold bg-brand-600 text-white rounded-lg shadow-sm hover:bg-brand-700 transition flex items-center gap-1.5">
+                        <span>Lanjut ke FR.MAPA.01</span>
+                        <span>&rarr;</span>
+                    </a>
+                @endif
+            @else
                 <a href="{{ route('asesor.schedule.ruang-uji', $schedule->id) }}" class="px-4 py-2 text-xs font-semibold bg-white text-slate-800 border border-slate-300 rounded-lg shadow-sm hover:bg-slate-50 transition">
                     Kembali ke Ruang Uji
                 </a>

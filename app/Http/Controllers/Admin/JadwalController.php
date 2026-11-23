@@ -348,4 +348,34 @@ class JadwalController extends Controller
 
         return back()->with('success', "Asesi {$asesiName} berhasil dikeluarkan dari jadwal.");
     }
+
+    /**
+     * Buka kembali jadwal atau tutup dan kunci jadwal resmi (Admin Control).
+     */
+    public function toggleLock(Schedule $jadwal, AkWorkflowService $workflowService): RedirectResponse
+    {
+        if ($jadwal->is_closed) {
+            $jadwal->update([
+                'is_closed' => false,
+                'reopened_at' => now(),
+                'status' => 'ACTIVE',
+            ]);
+
+            return back()->with('success', "Jadwal {$jadwal->name} berhasil dibuka kembali. Seluruh data asesmen tetap aman tersimpan dan formulir kini dapat ditinjau atau diperbaiki.");
+        }
+
+        $readiness = $workflowService->isScheduleReadyForClosure($jadwal);
+        if (! $readiness['is_ready']) {
+            return back()->with('error', "Jadwal belum dapat ditutup: Masih ada {$readiness['uncompleted_count']} asesi yang belum selesai asesmennya.");
+        }
+
+        $jadwal->update([
+            'is_closed' => true,
+            'closed_at' => now(),
+            'reopened_at' => null,
+            'status' => 'FINISHED',
+        ]);
+
+        return back()->with('success', "Jadwal {$jadwal->name} berhasil ditutup dan dikunci resmi.");
+    }
 }

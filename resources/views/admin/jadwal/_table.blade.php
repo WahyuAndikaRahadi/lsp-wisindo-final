@@ -21,9 +21,20 @@
             @foreach($schedules as $sch)
                 <div class="p-4 space-y-3">
                     <div class="flex items-start justify-between gap-2">
-                        <span class="font-mono text-xs font-bold text-brand-700 bg-brand-50 px-2 py-0.5 rounded border border-brand-200">
-                            {{ $sch->code }}
-                        </span>
+                        <div class="flex items-center gap-1.5">
+                            <span class="font-mono text-xs font-bold text-brand-700 bg-brand-50 px-2 py-0.5 rounded border border-brand-200">
+                                {{ $sch->code }}
+                            </span>
+                            @if($sch->is_closed)
+                                <span class="text-[10px] font-bold text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">
+                                    Ditutup
+                                </span>
+                            @else
+                                <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
+                                    Aktif
+                                </span>
+                            @endif
+                        </div>
                         <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200">
                             {{ $sch->assessments_count ?? $sch->assessments->count() }} Asesi
                         </span>
@@ -90,8 +101,17 @@ Apakah Anda yakin ingin melanjutkan?"
                 <tbody class="divide-y divide-slate-100">
                     @foreach($schedules as $sch)
                         <tr class="hover:bg-slate-50/60 transition">
-                            <td class="px-6 py-4 font-mono font-bold text-xs text-brand-700">
-                                {{ $sch->code }}
+                            <td class="px-6 py-4">
+                                <div class="font-mono font-bold text-xs text-brand-700">{{ $sch->code }}</div>
+                                @if($sch->is_closed)
+                                    <span class="inline-flex items-center text-[10px] font-bold text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200 mt-1">
+                                        Ditutup
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200 mt-1">
+                                        Aktif
+                                    </span>
+                                @endif
                             </td>
                             <td class="px-6 py-4">
                                 <div class="font-bold text-slate-900">{{ $sch->name ?? $sch->scheme->name }}</div>

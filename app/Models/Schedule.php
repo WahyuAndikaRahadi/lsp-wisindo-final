@@ -33,10 +33,13 @@ class Schedule extends Model
         'notes',
         'ak01_data',
         'ak07_data',
+        'mapa01_data',
+        'ak04_briefed_at',
         'ak05_report',
         'ak06_review',
         'is_closed',
         'closed_at',
+        'reopened_at',
         'status',
         'created_by',
     ];
@@ -46,9 +49,12 @@ class Schedule extends Model
         return [
             'date' => 'date',
             'closed_at' => 'datetime',
+            'reopened_at' => 'datetime',
             'is_closed' => 'boolean',
             'ak01_data' => 'array',
             'ak07_data' => 'array',
+            'mapa01_data' => 'array',
+            'ak04_briefed_at' => 'datetime',
             'ak05_report' => 'array',
             'ak06_review' => 'array',
             'selected_instruments' => 'array',
@@ -250,6 +256,8 @@ class Schedule extends Model
 
         return match ($step) {
             'apl' => true,
+            'mapa' => $this->isMapaUnlocked($assessor),
+            'ak04' => $this->isAk04Unlocked($assessor),
             'ak01' => $this->isAk01Unlocked($assessor),
             'ak07' => $this->isAk07Unlocked($assessor),
             'ruang-uji' => $this->isRuangUjiUnlocked($assessor),
@@ -257,6 +265,50 @@ class Schedule extends Model
             'reports' => $this->isReportsUnlocked($assessor),
             default => true,
         };
+    }
+
+    public function isMapaUnlocked(?User $assessor = null): bool
+    {
+        $assessor ??= auth()->user();
+        $query = $this->assessorAssessmentsQuery($assessor);
+
+        $hasAssessments = (clone $query)->exists();
+        if (! $hasAssessments) {
+            return false;
+        }
+
+        $hasApproved = (clone $query)->where('apl_status', 'APPROVED')->exists();
+        if (! $hasApproved) {
+            return false;
+        }
+
+        // If MAPA is already filled or AK.01 already initiated, keep it accessible
+        if (! empty($this->mapa01_data) || ! empty($this->ak01_data)) {
+            return true;
+        }
+
+        $hasPendingSubmitted = (clone $query)->where('apl_status', 'SUBMITTED')->exists();
+
+        return ! $hasPendingSubmitted;
+    }
+
+    public function isAk04Unlocked(?User $assessor = null): bool
+    {
+        $assessor ??= auth()->user();
+        if (! $this->isMapaUnlocked($assessor)) {
+            return false;
+        }
+
+        // If briefed or AK.01 already filled/signed, keep it accessible
+        if (! empty($this->ak04_briefed_at) || ! empty($this->ak01_data)) {
+            return true;
+        }
+
+        // Requires MAPA 01 to be filled
+        $query = $this->assessorAssessmentsQuery($assessor);
+        $hasCandidateMapa = (clone $query)->whereNotNull('mapa01_data')->exists();
+
+        return ! empty($this->mapa01_data) || $hasCandidateMapa;
     }
 
     public function isAk01Unlocked(?User $assessor = null): bool

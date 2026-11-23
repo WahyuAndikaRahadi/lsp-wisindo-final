@@ -35,6 +35,8 @@ class Ak01Controller extends Controller
         $savedEvidence = $schedule->ak01_data['evidence'] ?? $defaultEvidence;
         $savedOtherEvidence = $schedule->ak01_data['other_evidence'] ?? '';
         $savedTukType = $schedule->ak01_data['tuk_type'] ?? 'Sewaktu';
+        $savedEvidenceTypes = $schedule->ak01_data['evidence_types'] ?? ['L', 'T'];
+        $savedEvidenceTypesSummary = $schedule->ak01_data['evidence_types_summary'] ?? 'L dan T';
         $selectedInstruments = $schedule->getEffectiveInstruments();
 
         return view('asesor.ak01', compact(
@@ -44,6 +46,8 @@ class Ak01Controller extends Controller
             'savedEvidence',
             'savedOtherEvidence',
             'savedTukType',
+            'savedEvidenceTypes',
+            'savedEvidenceTypesSummary',
             'selectedInstruments'
         ));
     }
@@ -59,6 +63,8 @@ class Ak01Controller extends Controller
         $request->validate([
             'evidence' => ['nullable', 'array'],
             'other_evidence' => ['nullable', 'string', 'max:255'],
+            'evidence_types' => ['nullable', 'array'],
+            'evidence_types_summary' => ['nullable', 'string', 'max:255'],
             'assessor_signature' => ['nullable', 'string', new ValidSignature],
             'tuk_type' => ['nullable', 'string'],
         ]);
@@ -68,6 +74,12 @@ class Ak01Controller extends Controller
             $evidence = ['Hasil Observasi Langsung', 'Hasil Pertanyaan Tertulis'];
         }
 
+        $evidenceTypes = (array) $request->input('evidence_types', ['L', 'T']);
+        if (empty($evidenceTypes)) {
+            $evidenceTypes = ['L', 'T'];
+        }
+        $evidenceTypesSummary = $request->input('evidence_types_summary') ?: implode(' dan ', $evidenceTypes);
+
         $otherEvidence = $request->input('other_evidence');
         $tukType = $request->input('tuk_type', 'Sewaktu');
         $assessorSignature = $request->input('assessor_signature') ?? auth()->user()->profile?->signature_data;
@@ -75,6 +87,8 @@ class Ak01Controller extends Controller
         $ak01Data = [
             'evidence' => $evidence,
             'other_evidence' => $otherEvidence,
+            'evidence_types' => $evidenceTypes,
+            'evidence_types_summary' => $evidenceTypesSummary,
             'tuk_type' => $tukType,
             'agreed_date' => $schedule->date?->format('Y-m-d'),
             'agreed_time' => substr($schedule->start_time, 0, 5).' - '.substr($schedule->end_time, 0, 5).' WIB',

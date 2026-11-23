@@ -437,13 +437,21 @@ class FinalizationController extends Controller
         $myPoolReadiness = $this->workflowService->isAssessorPoolReadyForReports($schedule, auth()->user());
         $scheduleReadiness = $this->workflowService->isScheduleReadyForClosure($schedule);
 
-        DB::transaction(function () use ($schedule, $ak05, $ak06, $scheduleReadiness) {
-            $this->workflowService->saveScheduleReports($schedule, $ak05, $ak06, $scheduleReadiness['is_ready']);
+        $isReopened = ! empty($schedule->reopened_at);
+        $shouldClose = ! $isReopened && $scheduleReadiness['is_ready'];
+
+        DB::transaction(function () use ($schedule, $ak05, $ak06, $shouldClose) {
+            $this->workflowService->saveScheduleReports($schedule, $ak05, $ak06, $shouldClose);
         });
 
         if (! $myPoolReadiness['is_ready']) {
             return redirect()->route('asesor.schedule.ruang-uji', $schedule->id)
                 ->with('warning', "Laporan tersimpan. Jadwal belum dapat ditutup: Masih ada {$myPoolReadiness['uncompleted_count']} asesi binaan Anda yang belum selesai.");
+        }
+
+        if ($isReopened) {
+            return redirect()->route('asesor.jadwal.index')
+                ->with('success', 'FR.AK.05 Laporan Asesmen dan FR.AK.06 Tinjauan Proses berhasil diperbarui. Karena jadwal ini dibuka kembali oleh Admin, penutupan resmi dilakukan melalui panel Admin.');
         }
 
         if (! $scheduleReadiness['is_ready']) {

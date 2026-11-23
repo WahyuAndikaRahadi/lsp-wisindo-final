@@ -8,6 +8,8 @@
     $savedEvidence = $savedEvidence ?? ['Hasil Observasi Langsung', 'Hasil Pertanyaan Tertulis'];
     $savedOtherEvidence = $savedOtherEvidence ?? '';
     $savedTukType = $savedTukType ?? 'Sewaktu';
+    $savedEvidenceTypes = $savedEvidenceTypes ?? $jadwal->ak01_data['evidence_types'] ?? ['L', 'T'];
+    $savedEvidenceTypesSummary = $savedEvidenceTypesSummary ?? $jadwal->ak01_data['evidence_types_summary'] ?? 'L dan T';
 
     $instrumentCatalog = [
         'IA01' => ['code' => 'FR.IA.01', 'title' => 'Ceklis Observasi Aktivitas Praktik', 'desc' => 'Observasi langsung demonstrasi keterampilan kerja asesi.'],
@@ -386,6 +388,71 @@
                     </div>
                 </div>
 
+                {{-- Row 5a: Jenis Bukti (L / TL / T) --}}
+                <div class="grid grid-cols-1 md:grid-cols-12 bg-white border-t border-slate-200">
+                    <div class="md:col-span-4 p-4 md:p-5 text-slate-700 bg-slate-50/50 md:border-r border-slate-200 flex items-start">
+                        <div>
+                            <span class="font-bold block text-slate-900 text-sm">Jenis Bukti (L / TL / T) :</span>
+                            <p class="text-[11px] text-slate-500 font-normal mt-1 leading-relaxed">
+                                Tentukan klasifikasi bukti uji sesuai ketentuan standar BNSP. Pilihan ini akan otomatis dicetak pada formulir MAPA.01.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="md:col-span-8 p-4 md:p-5 bg-white space-y-3.5">
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            {{-- L: Langsung --}}
+                            <label class="flex items-start space-x-2.5 p-3 rounded-xl border border-slate-200 hover:border-brand-300 hover:bg-slate-50 transition cursor-pointer bg-white shadow-2xs">
+                                <input type="checkbox" name="evidence_types[]" value="L"
+                                       class="rounded border-slate-300 text-brand-600 focus:ring-brand-500 w-4 h-4 mt-0.5 shrink-0"
+                                       @disabled($isClosedForMe)
+                                       {{ in_array('L', $savedEvidenceTypes) ? 'checked' : '' }}>
+                                <div class="text-xs">
+                                    <div class="font-bold text-slate-900 flex items-center gap-1.5">
+                                        <span>L (Langsung)</span>
+                                        <span class="text-[9px] font-bold text-emerald-700 bg-emerald-100 px-1.5 py-0.2 rounded">Baku</span>
+                                    </div>
+                                    <p class="text-[11px] text-slate-500 mt-0.5 leading-snug">Observasi praktik / demonstrasi langsung di TUK (CL, TPD).</p>
+                                </div>
+                            </label>
+
+                            {{-- TL: Tidak Langsung --}}
+                            <label class="flex items-start space-x-2.5 p-3 rounded-xl border border-slate-200 hover:border-brand-300 hover:bg-slate-50 transition cursor-pointer bg-white shadow-2xs">
+                                <input type="checkbox" name="evidence_types[]" value="TL"
+                                       class="rounded border-slate-300 text-brand-600 focus:ring-brand-500 w-4 h-4 mt-0.5 shrink-0"
+                                       @disabled($isClosedForMe)
+                                       {{ in_array('TL', $savedEvidenceTypes) ? 'checked' : '' }}>
+                                <div class="text-xs">
+                                    <div class="font-bold text-slate-900">TL (Tidak Langsung)</div>
+                                    <p class="text-[11px] text-slate-500 mt-0.5 leading-snug">Bukti historis, portofolio, sertifikat pelatihan, lembar kerja.</p>
+                                </div>
+                            </label>
+
+                            {{-- T: Tambahan --}}
+                            <label class="flex items-start space-x-2.5 p-3 rounded-xl border border-slate-200 hover:border-brand-300 hover:bg-slate-50 transition cursor-pointer bg-white shadow-2xs">
+                                <input type="checkbox" name="evidence_types[]" value="T"
+                                       class="rounded border-slate-300 text-brand-600 focus:ring-brand-500 w-4 h-4 mt-0.5 shrink-0"
+                                       @disabled($isClosedForMe)
+                                       {{ in_array('T', $savedEvidenceTypes) ? 'checked' : '' }}>
+                                <div class="text-xs">
+                                    <div class="font-bold text-slate-900 flex items-center gap-1.5">
+                                        <span>T (Tambahan)</span>
+                                        <span class="text-[9px] font-bold text-emerald-700 bg-emerald-100 px-1.5 py-0.2 rounded">Baku</span>
+                                    </div>
+                                    <p class="text-[11px] text-slate-500 mt-0.5 leading-snug">Pertanyaan tertulis CBT (DPT) atau pertanyaan lisan (PMO).</p>
+                                </div>
+                            </label>
+                        </div>
+
+                        <div class="pt-2 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center gap-2">
+                            <label class="text-xs font-semibold text-slate-700 shrink-0">Keterangan Jenis Bukti (Cetak MAPA):</label>
+                            <input type="text" name="evidence_types_summary" value="{{ old('evidence_types_summary', $savedEvidenceTypesSummary) }}"
+                                   placeholder="Contoh: L dan T, atau TL dan L"
+                                   @disabled($isClosedForMe)
+                                   class="flex-1 text-xs rounded-lg border border-slate-300 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 focus:outline-none px-3 py-1.5 bg-white text-slate-900 transition">
+                        </div>
+                    </div>
+                </div>
+
                 {{-- Row 5b: Pemilihan Instrumen FR.IA yang Digunakan --}}
                 <div class="grid grid-cols-1 md:grid-cols-12 bg-white">
                     <div class="md:col-span-4 p-4 md:p-5 text-slate-700 bg-slate-50/50 md:border-r border-slate-200 flex items-start">
@@ -536,8 +603,8 @@
 
         {{-- Bottom Action Buttons --}}
         <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
-            <a href="{{ route('asesor.schedule.instrument', ['schedule' => $jadwal->id, 'code' => 'apl']) }}" class="text-xs font-semibold text-slate-600 hover:text-slate-900 inline-flex items-center gap-1">
-                <span>&larr;</span> Kembali ke Verifikasi APL
+            <a href="{{ route('asesor.schedule.ak04', $jadwal->id) }}" class="text-xs font-semibold text-slate-600 hover:text-slate-900 inline-flex items-center gap-1">
+                <span>&larr;</span> Kembali ke FR.AK.04
             </a>
 
             <div class="flex items-center space-x-3 w-full sm:w-auto">
@@ -547,9 +614,9 @@
                     </button>
                 @else
                     <button type="submit" class="w-full sm:w-auto px-6 py-2.5 min-h-[40px] text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 rounded-lg shadow-sm transition flex items-center justify-center space-x-2">
-                        <span>Simpan Persetujuan FR.AK.01</span>
+                        <span>Simpan FR.AK.01 &amp; Lanjut ke FR.AK.07</span>
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
                         </svg>
                     </button>
                 @endif

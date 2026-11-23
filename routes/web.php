@@ -281,6 +281,14 @@ Route::middleware(['auth', 'role:ASESOR'])->prefix('asesor')->name('asesor.')->g
     Route::post('/review-apl/{assessment}', [Asesor\AplReviewController::class, 'decide'])->name('review-apl.update');
     Route::post('/schedule/{schedule}/bulk-review-apl', [Asesor\AplReviewController::class, 'bulkApprove'])->name('schedule.apl.bulk-review');
 
+    // FR.MAPA.01
+    Route::get('/schedule/{schedule}/mapa', [Asesor\MapaController::class, 'index'])->name('schedule.mapa');
+    Route::post('/schedule/{schedule}/mapa', [Asesor\MapaController::class, 'store'])->name('schedule.mapa.store');
+
+    // FR.AK.04 (Briefing / Pengenalan Banding Asesmen)
+    Route::get('/schedule/{schedule}/ak04', [Asesor\Ak04BriefingController::class, 'index'])->name('schedule.ak04');
+    Route::post('/schedule/{schedule}/ak04', [Asesor\Ak04BriefingController::class, 'store'])->name('schedule.ak04.brief');
+
     // AK01
     Route::get('/schedule/{schedule}/ak01', [Asesor\Ak01Controller::class, 'index'])->name('schedule.ak01');
     Route::post('/schedule/{schedule}/ak01', [Asesor\Ak01Controller::class, 'store'])->name('schedule.ak01.store');
@@ -371,6 +379,7 @@ Route::middleware(['auth', 'role:SUPER_ADMIN,ADMIN_LSP,KOMITE_TEKNIS,TUK_ADMIN']
 
     // Write actions restricted strictly to SUPER_ADMIN and ADMIN_LSP
     Route::middleware(['role:SUPER_ADMIN,ADMIN_LSP'])->group(function () {
+        Route::post('/jadwal/{jadwal}/toggle-lock', [Admin\JadwalController::class, 'toggleLock'])->name('jadwal.toggle-lock');
         // Candidate Registration Review
         Route::post('/assessment/{assessment}/review-registration', [Admin\JadwalController::class, 'reviewRegistration'])->name('assessment.review-registration');
         Route::post('/assessment/{assessment}/assign-assessor', [Admin\JadwalController::class, 'assignAssessor'])->name('assessment.assign-assessor');
