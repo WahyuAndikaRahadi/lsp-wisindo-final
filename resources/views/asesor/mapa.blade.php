@@ -65,6 +65,16 @@
         hasPenyesuaian: '{{ $hasPenyesuaian }}',
         hasTerintegrasi: '{{ $hasTerintegrasi }}',
         tasks: {{ json_encode($savedIntegratedTasks) }},
+        modalOpen: false,
+        selectedAsesi: null,
+        openModal(data) {
+            this.selectedAsesi = data;
+            this.modalOpen = true;
+        },
+        closeModal() {
+            this.modalOpen = false;
+            this.selectedAsesi = null;
+        },
         addTask() {
             this.tasks.push('');
         },
@@ -83,18 +93,6 @@
                 <span><strong>{{ $jadwal->is_closed ? 'Jadwal Ditutup:' : 'Asesmen Selesai:' }}</strong> Dokumen FR.MAPA.01 dalam mode lihat (read-only).</span>
             </div>
             <span class="font-bold font-mono text-[11px] bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded border border-emerald-300 shrink-0">STATUS: READ-ONLY</span>
-        </div>
-    @endif
-
-    @if(isset($selectedAssessment) && $selectedAssessment)
-        <div class="p-3.5 bg-amber-50 border border-amber-300 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-amber-900">
-            <div class="flex items-center space-x-2">
-                <svg class="w-4 h-4 text-amber-600 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg>
-                <span><strong>Mode Data Khusus Asesi:</strong> Meninjau dan menyetel formulir MAPA.01 khusus untuk <strong>{{ $selectedAssessment->asesi?->full_name }}</strong>.</span>
-            </div>
-            <a href="{{ route('asesor.schedule.mapa', $jadwal->id) }}" class="font-bold text-amber-900 underline hover:text-amber-700 shrink-0">
-                &larr; Terapkan untuk Seluruh Jadwal
-            </a>
         </div>
     @endif
 
@@ -206,22 +204,21 @@
                 </div>
 
                 {{-- Siapa Pelaksana Asesmen --}}
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="space-y-1.5">
-                        <label class="block text-xs font-bold text-slate-800">
-                            Siapa yang Melakukan Asesmen / RPL <span class="text-rose-500">*</span>
-                        </label>
-                        <select name="pelaksana_asesmen" @disabled($isClosedForMe) required class="w-full text-xs rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 focus:outline-none transition">
-                            @foreach($pelaksanaOptions as $opt)
-                                <option value="{{ $opt }}" {{ $savedPelaksana === $opt ? 'selected' : '' }}>
-                                    {{ $opt }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
+                <div class="space-y-1.5">
+                    <label class="block text-xs font-bold text-slate-800">
+                        Siapa yang Melakukan Asesmen / RPL <span class="text-rose-500">*</span>
+                    </label>
+                    <select name="pelaksana_asesmen" @disabled($isClosedForMe) required class="w-full text-xs rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 focus:outline-none transition">
+                        @foreach($pelaksanaOptions as $opt)
+                            <option value="{{ $opt }}" {{ $savedPelaksana === $opt ? 'selected' : '' }}>
+                                {{ $opt }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
 
                 {{-- Standar Industri atau Tempat Kerja (Checkboxes) --}}
-                <div class="space-y-2.5 pt-2 border-t border-slate-100">
+                <div class="space-y-2.5 pt-4 border-t border-slate-200">
                     <div>
                         <label class="block text-xs font-bold text-slate-900">
                             Standar Industri atau Tempat Kerja
@@ -229,9 +226,9 @@
                         <p class="text-[11px] text-slate-500">Pilih tolok ukur standar yang digunakan sebagai acuan asesmen.</p>
                     </div>
 
-                    <div class="space-y-2 bg-slate-50/60 p-3 rounded-xl border border-slate-200">
+                    <div class="space-y-2.5 bg-slate-50/60 p-3 sm:p-4 rounded-xl border border-slate-200">
                         {{-- 1. Standar Kompetensi --}}
-                        <div class="flex flex-col sm:flex-row sm:items-center gap-2 p-2 rounded-lg border border-slate-200 bg-white">
+                        <div class="flex flex-col sm:flex-row sm:items-center gap-2 p-2.5 rounded-lg border border-slate-200 bg-white shadow-2xs">
                             <label class="inline-flex items-center gap-2 text-xs font-semibold text-slate-800 cursor-pointer shrink-0">
                                 <input type="checkbox" name="standar_industri_opt[]" value="standar_kompetensi"
                                        @disabled($isClosedForMe)
@@ -242,11 +239,11 @@
                             <input type="text" name="standar_kompetensi_val" value="{{ $savedStandarKompetensiVal }}"
                                    placeholder="Contoh: SKKNI Nomor 97 Tahun 2018"
                                    @disabled($isClosedForMe)
-                                   class="flex-1 text-xs rounded-md border border-slate-300 bg-white px-2.5 py-1.5 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 focus:outline-none transition">
+                                   class="w-full sm:flex-1 min-w-0 text-xs rounded-md border border-slate-300 bg-white px-3 py-1.5 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 focus:outline-none transition">
                         </div>
 
                         {{-- 2. Kriteria asesmen dari kurikulum pelatihan --}}
-                        <label class="flex items-center gap-2 p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:bg-slate-50 transition text-xs">
+                        <label class="flex items-center gap-2 p-2.5 rounded-lg border border-slate-200 bg-white cursor-pointer hover:bg-slate-50 transition text-xs shadow-2xs">
                             <input type="checkbox" name="standar_industri_opt[]" value="kurikulum_pelatihan"
                                    @disabled($isClosedForMe)
                                    {{ in_array('kurikulum_pelatihan', $savedStandarIndustri) ? 'checked' : '' }}
@@ -255,7 +252,7 @@
                         </label>
 
                         {{-- 3. Spesifikasi kinerja suatu perusahaan atau industri --}}
-                        <div class="flex flex-col sm:flex-row sm:items-center gap-2 p-2 rounded-lg border border-slate-200 bg-white">
+                        <div class="flex flex-col sm:flex-row sm:items-center gap-2 p-2.5 rounded-lg border border-slate-200 bg-white shadow-2xs">
                             <label class="inline-flex items-center gap-2 text-xs font-semibold text-slate-800 cursor-pointer shrink-0">
                                 <input type="checkbox" name="standar_industri_opt[]" value="spesifikasi_kinerja"
                                        @disabled($isClosedForMe)
@@ -266,11 +263,11 @@
                             <input type="text" name="spesifikasi_kinerja_val" value="{{ $savedSpesifikasiKinerjaVal }}"
                                    placeholder="Contoh: Repair Manual"
                                    @disabled($isClosedForMe)
-                                   class="flex-1 text-xs rounded-md border border-slate-300 bg-white px-2.5 py-1.5 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 focus:outline-none transition">
+                                   class="w-full sm:flex-1 min-w-0 text-xs rounded-md border border-slate-300 bg-white px-3 py-1.5 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 focus:outline-none transition">
                         </div>
 
                         {{-- 4. Spesifikasi Produk --}}
-                        <div class="flex flex-col sm:flex-row sm:items-center gap-2 p-2 rounded-lg border border-slate-200 bg-white">
+                        <div class="flex flex-col sm:flex-row sm:items-center gap-2 p-2.5 rounded-lg border border-slate-200 bg-white shadow-2xs">
                             <label class="inline-flex items-center gap-2 text-xs font-semibold text-slate-800 cursor-pointer shrink-0">
                                 <input type="checkbox" name="standar_industri_opt[]" value="spesifikasi_produk"
                                        @disabled($isClosedForMe)
@@ -281,11 +278,11 @@
                             <input type="text" name="spesifikasi_produk_val" value="{{ $savedSpesifikasiProdukVal }}"
                                    placeholder="Tuliskan spesifikasi produk bila ada..."
                                    @disabled($isClosedForMe)
-                                   class="flex-1 text-xs rounded-md border border-slate-300 bg-white px-2.5 py-1.5 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 focus:outline-none transition">
+                                   class="w-full sm:flex-1 min-w-0 text-xs rounded-md border border-slate-300 bg-white px-3 py-1.5 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 focus:outline-none transition">
                         </div>
 
                         {{-- 5. Pedoman khusus --}}
-                        <div class="flex flex-col sm:flex-row sm:items-center gap-2 p-2 rounded-lg border border-slate-200 bg-white">
+                        <div class="flex flex-col sm:flex-row sm:items-center gap-2 p-2.5 rounded-lg border border-slate-200 bg-white shadow-2xs">
                             <label class="inline-flex items-center gap-2 text-xs font-semibold text-slate-800 cursor-pointer shrink-0">
                                 <input type="checkbox" name="standar_industri_opt[]" value="pedoman_khusus"
                                        @disabled($isClosedForMe)
@@ -296,19 +293,19 @@
                             <input type="text" name="pedoman_khusus_val" value="{{ $savedPedomanKhususVal }}"
                                    placeholder="Tuliskan pedoman khusus bila ada..."
                                    @disabled($isClosedForMe)
-                                   class="flex-1 text-xs rounded-md border border-slate-300 bg-white px-2.5 py-1.5 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 focus:outline-none transition">
+                                   class="w-full sm:flex-1 min-w-0 text-xs rounded-md border border-slate-300 bg-white px-3 py-1.5 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 focus:outline-none transition">
                         </div>
                     </div>
                 </div>
 
                 {{-- Konfirmasi Orang yang Relevan (Checkbox) --}}
-                <div class="space-y-2 pt-2 border-t border-slate-100">
+                <div class="space-y-2 pt-4 border-t border-slate-200">
                     <label class="block text-xs font-bold text-slate-800">
                         Konfirmasi dengan Orang yang Relevan:
                     </label>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                         @foreach($orangRelevanOptions as $idx => $opt)
-                            <label class="flex items-center space-x-2.5 p-2 rounded-lg border border-slate-200 hover:bg-slate-50 transition cursor-pointer text-xs">
+                            <label class="flex items-center space-x-2.5 p-2.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 transition cursor-pointer text-xs shadow-2xs">
                                 <input type="checkbox" name="orang_relevan[]" value="{{ $opt }}"
                                        @disabled($isClosedForMe)
                                        {{ in_array($opt, $savedOrangRelevan) ? 'checked' : '' }}
@@ -500,6 +497,11 @@
                         </div>
                     </div>
                 </div>
+
+                {{-- Footer Note Section 3 --}}
+                <div class="pt-2 text-[11px] text-slate-500 italic">
+                    * Coret yang tidak perlu
+                </div>
             </div>
 
             {{-- 4. Pemilihan Asesi (Kolektif / Individual) --}}
@@ -508,11 +510,11 @@
                     <div>
                         <span class="text-xs font-bold text-slate-900 block">Terapkan Perencanaan MAPA.01 untuk Asesi:</span>
                         <p class="text-[11px] text-slate-500 mt-0.5 leading-relaxed">
-                            Pilih asesi yang akan diterapkan perencanaan MAPA.01 ini. Jika terdapat asesi dengan penyesuaian khusus, Anda dapat mengaturnya secara spesifik.
+                            Pilih asesi yang akan diterapkan perencanaan MAPA.01 ini. Klik tombol <strong>Rincian Asesi</strong> untuk meninjau data masing-masing asesi dalam jendela popup modal tanpa reload halaman.
                         </p>
                     </div>
                     <label class="inline-flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer shrink-0">
-                        <input type="checkbox" id="check-all-mapa-asesi" {{ empty($selectedAssessmentId) ? 'checked' : '' }} @disabled($isClosedForMe)
+                        <input type="checkbox" id="check-all-mapa-asesi" checked @disabled($isClosedForMe)
                                class="rounded border-slate-300 text-brand-600 focus:ring-brand-500 w-4 h-4"
                                onclick="document.querySelectorAll('.mapa-asesi-item').forEach(el => el.checked = this.checked)">
                         <span>Pilih Semua ({{ $assessments->count() }})</span>
@@ -522,13 +524,31 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 max-h-80 overflow-y-auto pr-1">
                     @foreach($assessments as $asm)
                         @php
-                            $hasCustomMapa = !empty($asm->mapa01_data);
-                            $isSelected = (string)$selectedAssessmentId === (string)$asm->id;
+                            $isMapaApproved = !empty($asm->mapa01_data) || !empty($schedule->mapa01_data);
+                            $candMapa = $asm->mapa01_data ?? $schedule->mapa01_data ?? [];
                             $isChecked = empty(old('assessment_ids')) 
-                                ? (empty($selectedAssessmentId) || $isSelected)
+                                ? true
                                 : in_array($asm->id, old('assessment_ids', []));
+
+                            $candTolokParts = [];
+                            if (!empty($candMapa['standar_industri']['standar_kompetensi']['checked'])) {
+                                $candTolokParts[] = 'Standar Kompetensi: ' . ($candMapa['standar_industri']['standar_kompetensi']['text'] ?? 'SKKNI');
+                            }
+                            if (!empty($candMapa['standar_industri']['kurikulum_pelatihan']['checked'])) {
+                                $candTolokParts[] = 'Kurikulum Pelatihan';
+                            }
+                            if (!empty($candMapa['standar_industri']['spesifikasi_kinerja']['checked'])) {
+                                $candTolokParts[] = 'Kinerja: ' . ($candMapa['standar_industri']['spesifikasi_kinerja']['text'] ?? 'Repair Manual');
+                            }
+                            if (!empty($candMapa['standar_industri']['spesifikasi_produk']['checked']) && !empty($candMapa['standar_industri']['spesifikasi_produk']['text'])) {
+                                $candTolokParts[] = 'Produk: ' . $candMapa['standar_industri']['spesifikasi_produk']['text'];
+                            }
+                            if (!empty($candMapa['standar_industri']['pedoman_khusus']['checked']) && !empty($candMapa['standar_industri']['pedoman_khusus']['text'])) {
+                                $candTolokParts[] = 'Pedoman: ' . $candMapa['standar_industri']['pedoman_khusus']['text'];
+                            }
+                            $candTolokStr = !empty($candTolokParts) ? implode('; ', $candTolokParts) : ($candMapa['standar_tolok_ukur'] ?? 'Standar Kompetensi: SKKNI');
                         @endphp
-                        <div class="p-3 rounded-xl border-2 transition shadow-2xs flex flex-col justify-between {{ $hasCustomMapa ? 'bg-amber-50/80 border-amber-300 hover:border-amber-400' : 'bg-white border-slate-200 hover:border-slate-300' }}">
+                        <div class="p-3 rounded-xl border-2 transition shadow-2xs flex flex-col justify-between {{ $isMapaApproved ? 'bg-emerald-50/80 border-emerald-300 hover:border-emerald-400' : 'bg-amber-50/90 border-amber-300 hover:border-amber-400' }}">
                             <div class="flex items-start justify-between gap-2">
                                 <label class="flex items-start space-x-2.5 {{ $isClosedForMe ? 'cursor-default' : 'cursor-pointer' }} flex-1 min-w-0">
                                     <input type="checkbox" name="assessment_ids[]" value="{{ $asm->id }}"
@@ -540,29 +560,51 @@
                                         <span class="text-[10px] text-slate-500 block font-mono mt-0.5">NIK: {{ $asm->asesi?->profile?->nik ?? '-' }}</span>
                                     </div>
                                 </label>
-                                @if($hasCustomMapa)
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300 shrink-0">
-                                        Data Khusus
-                                    </span>
-                                @elseif(!empty($schedule->mapa01_data))
+                                @if($isMapaApproved)
                                     <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 shrink-0">
-                                        Sesuai Jadwal
+                                        ✓ Disetujui
                                     </span>
                                 @else
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-300 shrink-0">
-                                        Belum Disimpan
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300 shrink-0">
+                                        Belum Disetujui
                                     </span>
                                 @endif
                             </div>
 
-                            <div class="mt-2.5 pt-2 border-t {{ $hasCustomMapa ? 'border-amber-200' : 'border-slate-100' }} flex items-center justify-between text-[11px]">
-                                <span class="text-[10px] text-slate-500">
-                                    {{ $hasCustomMapa ? 'Memiliki data MAPA tersendiri' : 'Mengikuti master jadwal' }}
+                            <div class="mt-2.5 pt-2 border-t {{ $isMapaApproved ? 'border-emerald-200/80' : 'border-amber-200/80' }} flex items-center justify-between text-[11px]">
+                                <span class="text-[10px] font-medium {{ $isMapaApproved ? 'text-emerald-700' : 'text-amber-800' }}">
+                                    {{ $isMapaApproved ? 'Data FR.MAPA.01 tersimpan' : 'Data masih kosong' }}
                                 </span>
-                                <a href="{{ route('asesor.schedule.mapa', ['schedule' => $jadwal->id, 'assessment' => $asm->id]) }}"
-                                   class="font-bold text-brand-700 hover:text-brand-900 transition">
-                                    {{ $isSelected ? 'Sedang Dipilih' : 'Tinjau Asesi' }} &rarr;
-                                </a>
+                                <button type="button" 
+                                        @click="openModal({
+                                            name: '{{ addslashes($asm->asesi?->full_name ?? '-') }}',
+                                            email: '{{ addslashes($asm->asesi?->email ?? '-') }}',
+                                            nik: '{{ addslashes($asm->asesi?->profile?->nik ?? '-') }}',
+                                            isApproved: {{ $isMapaApproved ? 'true' : 'false' }},
+                                            pendekatan: '{{ addslashes($candMapa['pendekatan_asesi'] ?? $savedPendekatan) }}',
+                                            tujuan: '{{ addslashes($candMapa['tujuan_asesmen'] ?? $savedTujuan) }}',
+                                            lingkungan: '{{ addslashes($candMapa['konteks_lingkungan'] ?? $savedLingkungan) }}',
+                                            peluang: '{{ addslashes($candMapa['peluang_bukti'] ?? $savedPeluang) }}',
+                                            hubungan: '{{ addslashes($candMapa['hubungan_standar'] ?? $savedHubungan) }}',
+                                            pelaksana: '{{ addslashes($candMapa['pelaksana_asesmen'] ?? $savedPelaksana) }}',
+                                            orangRelevan: {{ json_encode($candMapa['orang_relevan'] ?? $savedOrangRelevan) }},
+                                            tolokUkur: '{{ addslashes($candTolokStr) }}',
+                                            hasKarakteristik: {{ (!empty($candMapa['has_karakteristik']) || (!isset($candMapa['has_karakteristik']) && $hasKarakteristik === '1')) ? 'true' : 'false' }},
+                                            karakteristikDetail: '{{ addslashes($candMapa['karakteristik_detail'] ?? $karakteristikDetail) }}',
+                                            hasKontekstualisasi: {{ (!empty($candMapa['has_kontekstualisasi']) || (!isset($candMapa['has_kontekstualisasi']) && $hasKontekstualisasi === '1')) ? 'true' : 'false' }},
+                                            kontekstualisasiDetail: '{{ addslashes($candMapa['kontekstualisasi_detail'] ?? $kontekstualisasiDetail) }}',
+                                            hasSaran: {{ (!empty($candMapa['has_saran']) || (!isset($candMapa['has_saran']) && $hasSaran === '1')) ? 'true' : 'false' }},
+                                            saranDetail: '{{ addslashes($candMapa['saran_detail'] ?? $saranDetail) }}',
+                                            hasPenyesuaian: {{ (!empty($candMapa['has_penyesuaian']) || (!isset($candMapa['has_penyesuaian']) && $hasPenyesuaian === '1')) ? 'true' : 'false' }},
+                                            penyesuaianDetail: '{{ addslashes($candMapa['penyesuaian_detail'] ?? $penyesuaianDetail) }}',
+                                            hasTerintegrasi: {{ (!empty($candMapa['has_terintegrasi']) || (!isset($candMapa['has_terintegrasi']) && $hasTerintegrasi === '1')) ? 'true' : 'false' }},
+                                            integratedTasks: {{ json_encode(!empty($candMapa['integrated_tasks']) ? $candMapa['integrated_tasks'] : $savedIntegratedTasks) }}
+                                        })"
+                                        class="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-bold rounded-lg transition shadow-2xs {{ $isMapaApproved ? 'text-emerald-900 bg-white hover:bg-emerald-100 border border-emerald-300' : 'text-amber-900 bg-white hover:bg-amber-100 border border-amber-300' }}"
+                                        title="Buka rincian perencanaan FR.MAPA.01 asesi ini">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                    <span>Rincian Asesi</span>
+                                </button>
                             </div>
                         </div>
                     @endforeach
@@ -592,5 +634,175 @@
             </div>
         </div>
     </form>
+
+    {{-- Modal Rincian FR.MAPA.01 Asesi --}}
+    <div x-show="modalOpen" 
+         x-cloak 
+         class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4"
+         @keydown.escape.window="closeModal()">
+        <div @click.away="closeModal()" 
+             class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full overflow-hidden border border-slate-200 flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-150">
+            {{-- Header Modal --}}
+            <div class="px-6 py-4 bg-slate-900 text-white flex items-center justify-between border-b border-slate-800">
+                <div class="flex items-center space-x-2.5">
+                    <span class="px-2.5 py-0.5 rounded text-[11px] font-mono font-bold bg-amber-400 text-slate-950">
+                        FR.MAPA.01
+                    </span>
+                    <h3 class="text-sm font-bold tracking-wide uppercase text-white">
+                        Rincian Perencanaan MAPA Asesi
+                    </h3>
+                </div>
+                <button type="button" @click="closeModal()" class="text-slate-400 hover:text-white p-1 rounded-lg transition" title="Tutup Modal">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            {{-- Body Modal --}}
+            <div class="p-5 sm:p-6 overflow-y-auto space-y-4 text-xs text-slate-700 divide-y divide-slate-100">
+                {{-- 1. Identitas & Status --}}
+                <div class="pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                        <h4 class="text-base font-black text-slate-900" x-text="selectedAsesi?.name"></h4>
+                        <p class="text-xs text-slate-500 font-mono mt-0.5" x-text="selectedAsesi?.email"></p>
+                        <template x-if="selectedAsesi?.nik && selectedAsesi?.nik !== '-'">
+                            <span class="text-[11px] text-slate-600 font-mono block mt-0.5" x-text="'NIK: ' + selectedAsesi?.nik"></span>
+                        </template>
+                    </div>
+                    <div>
+                        <template x-if="selectedAsesi?.isApproved">
+                            <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 shadow-2xs">
+                                <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
+                                ✓ Sudah Disetujui
+                            </span>
+                        </template>
+                        <template x-if="!selectedAsesi?.isApproved">
+                            <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-900 border border-amber-300 shadow-2xs">
+                                <span class="w-2 h-2 rounded-full bg-amber-600"></span>
+                                Belum Disetujui
+                            </span>
+                        </template>
+                    </div>
+                </div>
+
+                {{-- 2. Pendekatan Asesmen --}}
+                <div class="pt-3 space-y-1.5">
+                    <div class="font-bold text-slate-900 uppercase tracking-wider text-[11px] flex items-center gap-1.5 text-brand-700">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        1. Pendekatan Calon Asesi
+                    </div>
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                        <span class="font-semibold text-slate-800 text-xs leading-relaxed" x-text="selectedAsesi?.pendekatan"></span>
+                    </div>
+                </div>
+
+                {{-- 3. Tujuan & Konteks Lingkungan --}}
+                <div class="pt-3 space-y-2">
+                    <div class="font-bold text-slate-900 uppercase tracking-wider text-[11px] flex items-center gap-1.5 text-brand-700">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                        Tujuan &amp; Konteks Asesmen
+                    </div>
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        <div>
+                            <span class="text-slate-500 font-medium block text-[11px]">Tujuan Asesmen:</span>
+                            <span class="font-bold text-slate-900 text-xs" x-text="selectedAsesi?.tujuan"></span>
+                        </div>
+                        <div>
+                            <span class="text-slate-500 font-medium block text-[11px]">Konteks Asesmen:</span>
+                            <span class="font-bold text-brand-700 text-xs px-2 py-0.5 bg-brand-50 border border-brand-200 rounded-md inline-block mt-0.5" x-text="selectedAsesi?.lingkungan"></span>
+                        </div>
+                        <div>
+                            <span class="text-slate-500 font-medium block text-[11px]">Peluang Mengumpulkan Bukti:</span>
+                            <span class="font-medium text-slate-800 text-xs" x-text="selectedAsesi?.peluang"></span>
+                        </div>
+                        <div>
+                            <span class="text-slate-500 font-medium block text-[11px]">Hubungan Standar:</span>
+                            <span class="font-medium text-slate-800 text-xs" x-text="selectedAsesi?.hubungan"></span>
+                        </div>
+                        <div class="sm:col-span-2">
+                            <span class="text-slate-500 font-medium block text-[11px]">Pelaksana Asesmen / RPL:</span>
+                            <span class="font-semibold text-slate-900 text-xs" x-text="selectedAsesi?.pelaksana"></span>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- 4. Tolok Ukur & Konfirmasi Orang Relevan --}}
+                <div class="pt-3 space-y-2">
+                    <div class="font-bold text-slate-900 uppercase tracking-wider text-[11px] flex items-center gap-1.5 text-brand-700">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                        Tolok Ukur Standar &amp; Konfirmasi
+                    </div>
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2">
+                        <div>
+                            <span class="text-slate-500 font-medium block text-[11px]">Standar Industri / Tempat Kerja:</span>
+                            <span class="font-semibold text-slate-800 text-xs leading-relaxed" x-text="selectedAsesi?.tolokUkur"></span>
+                        </div>
+                        <template x-if="selectedAsesi?.orangRelevan && selectedAsesi?.orangRelevan.length > 0">
+                            <div class="pt-2 border-t border-slate-200">
+                                <span class="text-slate-500 font-medium block text-[11px] mb-1">Konfirmasi dengan Orang yang Relevan:</span>
+                                <div class="flex flex-wrap gap-1">
+                                    <template x-for="(or, idx) in selectedAsesi?.orangRelevan" :key="idx">
+                                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-medium bg-white border border-slate-200 text-slate-800 shadow-2xs" x-text="or"></span>
+                                    </template>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+                {{-- 5. Modifikasi dan Kontekstualisasi (Section 3) --}}
+                <div class="pt-3 space-y-2">
+                    <div class="font-bold text-slate-900 uppercase tracking-wider text-[11px] flex items-center gap-1.5 text-brand-700">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+                        Persyaratan Modifikasi &amp; Kontekstualisasi
+                    </div>
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2.5">
+                        <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-1">
+                            <span class="font-bold text-slate-900 text-[11px]">3.1.a. Karakteristik Asesi:</span>
+                            <span class="text-xs break-words max-w-sm" :class="selectedAsesi?.hasKarakteristik ? 'text-amber-700 font-bold' : 'text-slate-600'" x-text="selectedAsesi?.hasKarakteristik ? ('Ada: ' + selectedAsesi?.karakteristikDetail) : 'Tidak Ada'"></span>
+                        </div>
+                        <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-1 pt-1 border-t border-slate-200">
+                            <span class="font-bold text-slate-900 text-[11px]">3.1.b. Kebutuhan Kontekstualisasi:</span>
+                            <span class="text-xs break-words max-w-sm" :class="selectedAsesi?.hasKontekstualisasi ? 'text-amber-700 font-bold' : 'text-slate-600'" x-text="selectedAsesi?.hasKontekstualisasi ? ('Ada: ' + selectedAsesi?.kontekstualisasiDetail) : 'Tidak Ada'"></span>
+                        </div>
+                        <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-1 pt-1 border-t border-slate-200">
+                            <span class="font-bold text-slate-900 text-[11px]">3.2. Saran Paket Pelatihan:</span>
+                            <span class="text-xs break-words max-w-sm" :class="selectedAsesi?.hasSaran ? 'text-amber-700 font-bold' : 'text-slate-600'" x-text="selectedAsesi?.hasSaran ? ('Ada: ' + selectedAsesi?.saranDetail) : 'Tidak Ada'"></span>
+                        </div>
+                        <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-1 pt-1 border-t border-slate-200">
+                            <span class="font-bold text-slate-900 text-[11px]">3.3. Penyesuaian Perangkat:</span>
+                            <span class="text-xs break-words max-w-sm" :class="selectedAsesi?.hasPenyesuaian ? 'text-amber-700 font-bold' : 'text-slate-600'" x-text="selectedAsesi?.hasPenyesuaian ? ('Ada: ' + selectedAsesi?.penyesuaianDetail) : 'Tidak Ada'"></span>
+                        </div>
+                        <template x-if="selectedAsesi?.hasTerintegrasi && selectedAsesi?.integratedTasks && selectedAsesi?.integratedTasks.length > 0">
+                            <div class="pt-2 border-t border-slate-200">
+                                <span class="font-bold text-emerald-800 text-[11px] block mb-1">3.4. Kegiatan Asesmen Terintegrasi (Ada):</span>
+                                <ul class="list-disc list-inside space-y-0.5 text-slate-700 text-[11px]">
+                                    <template x-for="(task, tIdx) in selectedAsesi?.integratedTasks" :key="tIdx">
+                                        <li x-text="task"></li>
+                                    </template>
+                                </ul>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+                {{-- Catatan Panduan --}}
+                <div class="pt-3">
+                    <div class="bg-blue-50/80 border border-blue-200 rounded-xl p-3 text-[11px] text-blue-900 leading-relaxed flex items-start gap-2">
+                        <svg class="w-4 h-4 text-blue-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <div>
+                            <span class="font-bold">Panduan Penerapan:</span> Centang kotak nama asesi pada kartu di bawah jika ingin menerapkan atau memperbarui pengaturan formulir ini untuk asesi tersebut, lalu klik <strong>"Simpan FR.MAPA.01 &amp; Lanjut ke FR.AK.04"</strong>.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Footer Modal --}}
+            <div class="px-6 py-3 bg-slate-50 border-t border-slate-200 flex items-center justify-end">
+                <button type="button" @click="closeModal()" class="px-4 py-2 text-xs font-bold text-slate-700 bg-white hover:bg-slate-100 border border-slate-300 rounded-lg shadow-2xs transition cursor-pointer">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
 @endsection
