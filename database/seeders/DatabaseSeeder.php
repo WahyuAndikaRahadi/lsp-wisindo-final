@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             TukSeeder::class,
             SchemeSeeder::class,
             CorrectedQuestionBankAnswerKeySeeder::class,
+            CompleteMissingAk03FeedbackSeeder::class,
         ]);
 
         Setting::firstOrCreate(
