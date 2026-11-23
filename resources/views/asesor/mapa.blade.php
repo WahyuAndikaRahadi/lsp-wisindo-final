@@ -524,7 +524,7 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 max-h-80 overflow-y-auto pr-1">
                     @foreach($assessments as $asm)
                         @php
-                            $hasCustomMapa = !empty($asm->mapa01_data);
+                            $isMapaApproved = !empty($asm->mapa01_data) || !empty($schedule->mapa01_data);
                             $candMapa = $asm->mapa01_data ?? $schedule->mapa01_data ?? [];
                             $isChecked = empty(old('assessment_ids')) 
                                 ? true
@@ -548,7 +548,7 @@
                             }
                             $candTolokStr = !empty($candTolokParts) ? implode('; ', $candTolokParts) : ($candMapa['standar_tolok_ukur'] ?? 'Standar Kompetensi: SKKNI');
                         @endphp
-                        <div class="p-3 rounded-xl border-2 transition shadow-2xs flex flex-col justify-between {{ $hasCustomMapa ? 'bg-amber-50/80 border-amber-300 hover:border-amber-400' : 'bg-white border-slate-200 hover:border-slate-300' }}">
+                        <div class="p-3 rounded-xl border-2 transition shadow-2xs flex flex-col justify-between {{ $isMapaApproved ? 'bg-emerald-50/80 border-emerald-300 hover:border-emerald-400' : 'bg-amber-50/90 border-amber-300 hover:border-amber-400' }}">
                             <div class="flex items-start justify-between gap-2">
                                 <label class="flex items-start space-x-2.5 {{ $isClosedForMe ? 'cursor-default' : 'cursor-pointer' }} flex-1 min-w-0">
                                     <input type="checkbox" name="assessment_ids[]" value="{{ $asm->id }}"
@@ -560,32 +560,27 @@
                                         <span class="text-[10px] text-slate-500 block font-mono mt-0.5">NIK: {{ $asm->asesi?->profile?->nik ?? '-' }}</span>
                                     </div>
                                 </label>
-                                @if($hasCustomMapa)
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300 shrink-0">
-                                        Data Khusus
-                                    </span>
-                                @elseif(!empty($schedule->mapa01_data))
+                                @if($isMapaApproved)
                                     <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 shrink-0">
-                                        Sesuai Jadwal
+                                        ✓ Disetujui
                                     </span>
                                 @else
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-300 shrink-0">
-                                        Belum Disimpan
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300 shrink-0">
+                                        Belum Disetujui
                                     </span>
                                 @endif
                             </div>
 
-                            <div class="mt-2.5 pt-2 border-t {{ $hasCustomMapa ? 'border-amber-200' : 'border-slate-100' }} flex items-center justify-between text-[11px]">
-                                <span class="text-[10px] text-slate-500">
-                                    {{ $hasCustomMapa ? 'Data MAPA tersendiri' : 'Mengikuti master jadwal' }}
+                            <div class="mt-2.5 pt-2 border-t {{ $isMapaApproved ? 'border-emerald-200/80' : 'border-amber-200/80' }} flex items-center justify-between text-[11px]">
+                                <span class="text-[10px] font-medium {{ $isMapaApproved ? 'text-emerald-700' : 'text-amber-800' }}">
+                                    {{ $isMapaApproved ? 'Data FR.MAPA.01 tersimpan' : 'Data masih kosong' }}
                                 </span>
                                 <button type="button" 
                                         @click="openModal({
                                             name: '{{ addslashes($asm->asesi?->full_name ?? '-') }}',
                                             email: '{{ addslashes($asm->asesi?->email ?? '-') }}',
                                             nik: '{{ addslashes($asm->asesi?->profile?->nik ?? '-') }}',
-                                            hasCustomData: {{ $hasCustomMapa ? 'true' : 'false' }},
-                                            isSaved: {{ (!empty($asm->mapa01_data) || !empty($schedule->mapa01_data)) ? 'true' : 'false' }},
+                                            isApproved: {{ $isMapaApproved ? 'true' : 'false' }},
                                             pendekatan: '{{ addslashes($candMapa['pendekatan_asesi'] ?? $savedPendekatan) }}',
                                             tujuan: '{{ addslashes($candMapa['tujuan_asesmen'] ?? $savedTujuan) }}',
                                             lingkungan: '{{ addslashes($candMapa['konteks_lingkungan'] ?? $savedLingkungan) }}',
@@ -605,7 +600,7 @@
                                             hasTerintegrasi: {{ (!empty($candMapa['has_terintegrasi']) || (!isset($candMapa['has_terintegrasi']) && $hasTerintegrasi === '1')) ? 'true' : 'false' }},
                                             integratedTasks: {{ json_encode(!empty($candMapa['integrated_tasks']) ? $candMapa['integrated_tasks'] : $savedIntegratedTasks) }}
                                         })"
-                                        class="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-bold rounded-lg transition shadow-2xs {{ $hasCustomMapa ? 'text-amber-900 bg-white hover:bg-amber-100 border border-amber-300' : 'text-slate-800 bg-white hover:bg-slate-100 border border-slate-300' }}"
+                                        class="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-bold rounded-lg transition shadow-2xs {{ $isMapaApproved ? 'text-emerald-900 bg-white hover:bg-emerald-100 border border-emerald-300' : 'text-amber-900 bg-white hover:bg-amber-100 border border-amber-300' }}"
                                         title="Buka rincian perencanaan FR.MAPA.01 asesi ini">
                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                     <span>Rincian Asesi</span>
@@ -674,21 +669,16 @@
                         </template>
                     </div>
                     <div>
-                        <template x-if="selectedAsesi?.hasCustomData">
-                            <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-900 border border-amber-300 shadow-2xs">
-                                <span class="w-2 h-2 rounded-full bg-amber-600"></span>
-                                Data Khusus
-                            </span>
-                        </template>
-                        <template x-if="!selectedAsesi?.hasCustomData && selectedAsesi?.isSaved">
+                        <template x-if="selectedAsesi?.isApproved">
                             <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 shadow-2xs">
                                 <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
-                                Sesuai Jadwal
+                                ✓ Sudah Disetujui
                             </span>
                         </template>
-                        <template x-if="!selectedAsesi?.hasCustomData && !selectedAsesi?.isSaved">
-                            <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-600 border border-slate-300 shadow-2xs">
-                                Belum Disimpan
+                        <template x-if="!selectedAsesi?.isApproved">
+                            <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-900 border border-amber-300 shadow-2xs">
+                                <span class="w-2 h-2 rounded-full bg-amber-600"></span>
+                                Belum Disetujui
                             </span>
                         </template>
                     </div>
