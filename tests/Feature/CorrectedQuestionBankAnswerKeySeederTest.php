@@ -5,10 +5,19 @@ namespace Tests\Feature;
 use App\Models\QuestionBank;
 use App\Models\Scheme;
 use Database\Seeders\CorrectedQuestionBankAnswerKeySeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class CorrectedQuestionBankAnswerKeySeederTest extends TestCase
 {
+    use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->seed();
+    }
+
     public function test_seeder_corrects_fr_ia_05_question_bank_answer_keys(): void
     {
         (new CorrectedQuestionBankAnswerKeySeeder)->run();
