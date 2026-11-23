@@ -436,6 +436,13 @@ Route::middleware(['auth', 'role:SUPER_ADMIN,ADMIN_LSP,KOMITE_TEKNIS,TUK_ADMIN']
         Route::post('/elements/{element}/kuks', [Admin\SchemeController::class, 'storeKuk'])->name('schemes.kuks.store');
         Route::put('/kuks/{kuk}', [Admin\SchemeController::class, 'updateKuk'])->name('schemes.kuks.update');
         Route::delete('/kuks/{kuk}', [Admin\SchemeController::class, 'destroyKuk'])->name('schemes.kuks.destroy');
+
+        // Database Backup Management (Super Admin only)
+        Route::get('/backups', [Admin\BackupController::class, 'index'])->name('backups.index');
+        Route::post('/backups', [Admin\BackupController::class, 'store'])->name('backups.store');
+        Route::get('/backups/export-live', [Admin\BackupController::class, 'exportLive'])->name('backups.export-live');
+        Route::get('/backups/{filename}/download', [Admin\BackupController::class, 'download'])->name('backups.download');
+        Route::delete('/backups/{filename}', [Admin\BackupController::class, 'destroy'])->name('backups.destroy');
     });
 });
 
