@@ -53,10 +53,14 @@ class FinalizationController extends Controller
                 'assessment' => $assessment,
                 'asesi' => $assessment->asesi,
                 'is_completed' => ! empty($assessment->final_result),
-                'status_label' => $assessment->final_result ?? 'Belum Direkam',
+                'status_label' => match ($assessment->final_result) {
+                    'KOMPETEN', 'K' => 'Kompeten (K)',
+                    'BELUM_KOMPETEN', 'BK' => 'Belum Kompeten (BK)',
+                    default => 'Belum Direkam',
+                },
                 'status_class' => match ($assessment->final_result) {
-                    'KOMPETEN' => 'bg-emerald-50 text-emerald-700 border-emerald-300',
-                    'BELUM_KOMPETEN' => 'bg-rose-50 text-rose-700 border-rose-300',
+                    'KOMPETEN', 'K' => 'bg-emerald-50 text-emerald-700 border-emerald-300',
+                    'BELUM_KOMPETEN', 'BK' => 'bg-rose-50 text-rose-700 border-rose-300',
                     default => 'bg-slate-100 text-slate-700 border-slate-300',
                 },
                 'inspect_url' => route('asesor.assessment.ak02', $assessment->id),
@@ -297,7 +301,9 @@ class FinalizationController extends Controller
                     ],
                     [
                         'methods_json' => $methods,
-                        'is_competent' => ! empty($data['is_competent']),
+                        'is_competent' => array_key_exists('is_competent', $data)
+                            ? ! empty($data['is_competent'])
+                            : ($finalResult === 'KOMPETEN'),
                     ]
                 );
             }

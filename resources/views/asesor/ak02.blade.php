@@ -11,7 +11,7 @@
             <p class="text-xs text-slate-500">Rekapitulasi bukti dan penetapan rekomendasi hasil asesmen kompetensi per unit</p>
         </div>
         <div class="flex items-center space-x-2 shrink-0 self-start sm:self-auto">
-            <span class="px-3 py-1 text-xs font-bold rounded-lg border {{ $assessment->final_result === 'KOMPETEN' ? 'bg-emerald-50 text-emerald-700 border-emerald-300' : 'bg-amber-50 text-amber-700 border-amber-300' }}">
+            <span class="px-3 py-1 text-xs font-bold rounded-lg border {{ in_array($assessment->final_result, ['KOMPETEN', 'K']) ? 'bg-emerald-50 text-emerald-700 border-emerald-300' : (in_array($assessment->final_result, ['BELUM_KOMPETEN', 'BK']) ? 'bg-rose-50 text-rose-700 border-rose-300' : 'bg-amber-50 text-amber-700 border-amber-300') }}">
                 Status: {{ $assessment->final_result ?? 'BELUM SELESAI' }}
             </span>
         </div>
@@ -45,13 +45,6 @@
 
         {{-- Units Table with Methods Checkboxes --}}
         <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden" x-data="{
-            setAllUnits(val) {
-                document.querySelectorAll('.unit-result-select').forEach(el => el.value = val);
-                const finalSel = document.getElementById('finalResultSelect');
-                if (finalSel) {
-                    finalSel.value = (val == 1) ? 'KOMPETEN' : 'BELUM_KOMPETEN';
-                }
-            },
             toggleMethod(name) {
                 const boxes = document.querySelectorAll(`input[name*='[${name}]']`);
                 const allChecked = Array.from(boxes).every(b => b.checked);
@@ -64,24 +57,16 @@
                     <p class="text-xs text-slate-500">Beri tanda centang pada metode pengumpulan bukti yang diperoleh untuk menentukan kompetensi asesi</p>
                 </div>
                 <div class="flex items-center gap-2 flex-wrap">
-                    <button type="button" @click="setAllUnits(1)" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white rounded text-xs font-bold shadow-xs transition flex items-center gap-1">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
-                        Semua K
-                    </button>
-                    <button type="button" @click="setAllUnits(0)" class="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 active:bg-rose-800 text-white rounded text-xs font-bold shadow-xs transition flex items-center gap-1">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
-                        Semua BK
-                    </button>
-                    <button type="button" @click="toggleMethod('observasi_demonstrasi')" class="px-2.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded text-xs font-medium transition">
+                    <button type="button" @click="toggleMethod('observasi_demonstrasi')" class="px-2.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded text-xs font-medium transition cursor-pointer">
                         + Observasi
                     </button>
-                    <button type="button" @click="toggleMethod('tulis')" class="px-2.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded text-xs font-medium transition">
+                    <button type="button" @click="toggleMethod('tulis')" class="px-2.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded text-xs font-medium transition cursor-pointer">
                         + Tulis (DPT)
                     </button>
-                    <button type="button" @click="toggleMethod('lisan')" class="px-2.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded text-xs font-medium transition">
+                    <button type="button" @click="toggleMethod('lisan')" class="px-2.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded text-xs font-medium transition cursor-pointer">
                         + Lisan (PW)
                     </button>
-                    <button type="button" @click="toggleMethod('portofolio')" class="px-2.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded text-xs font-medium transition">
+                    <button type="button" @click="toggleMethod('portofolio')" class="px-2.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded text-xs font-medium transition cursor-pointer">
                         + Portofolio
                     </button>
                 </div>
@@ -98,7 +83,6 @@
                             <th class="px-2 py-3 text-center">Lisan (PW)</th>
                             <th class="px-2 py-3 text-center">Tulis (DPT)</th>
                             <th class="px-2 py-3 text-center">Pihak Ketiga</th>
-                            <th class="px-3 py-3 text-center w-32">Hasil Unit</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100">
@@ -106,11 +90,11 @@
                             @php
                                 $item = $ak02Items->get($unit->id);
                                 $methods = $item?->methods_json ?? [];
-                                $isCompetent = $item ? $item->is_competent : true;
                             @endphp
                             <tr class="flex flex-col md:table-row p-4 md:p-0 hover:bg-slate-50/60 transition space-y-3 md:space-y-0">
                                 <td class="hidden md:table-cell px-4 py-3 text-center text-slate-500 font-mono">{{ $idx + 1 }}</td>
                                 <td class="px-0 md:px-4 py-0 md:py-3">
+                                    <input type="hidden" name="units[{{ $unit->id }}][exists]" value="1">
                                     <div class="flex items-start gap-2">
                                         <span class="md:hidden font-mono font-bold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded text-[11px] shrink-0">#{{ $idx + 1 }}</span>
                                         <div>
@@ -171,13 +155,6 @@
                                         <input type="checkbox" name="units[{{ $unit->id }}][pihak_ketiga]" value="1" {{ !empty($methods['pihak_ketiga']) ? 'checked' : '' }} class="w-5 h-5 rounded border-slate-300 text-brand-600 focus:ring-brand-500 cursor-pointer">
                                     </label>
                                 </td>
-                                <td class="px-0 md:px-3 py-0 md:py-3 md:text-center">
-                                    <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider md:hidden mb-1">Hasil Unit:</label>
-                                    <select name="units[{{ $unit->id }}][is_competent]" class="unit-result-select text-xs font-bold rounded-lg border border-slate-300 bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:outline-none py-2 md:py-1.5 px-3 md:px-2.5 w-full transition shadow-2xs min-h-[40px] md:min-h-0 {{ $isCompetent ? 'text-emerald-700' : 'text-rose-700' }}">
-                                        <option value="1" {{ $isCompetent ? 'selected' : '' }}>Kompeten (K)</option>
-                                        <option value="0" {{ !$isCompetent ? 'selected' : '' }}>Belum Kompeten (BK)</option>
-                                    </select>
-                                </td>
                             </tr>
                         @endforeach
                     </tbody>
@@ -191,12 +168,52 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label class="block font-bold text-slate-700 mb-1">Rekomendasi Hasil Asesmen (*):</label>
-                    <select name="final_result" id="finalResultSelect" required @disabled($assessment->schedule?->is_closed) class="w-full text-xs font-bold rounded-xl border border-slate-300 bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:outline-none px-3.5 py-2.5 transition shadow-2xs {{ $assessment->schedule?->is_closed ? 'bg-slate-50 text-slate-700' : '' }}">
-                        <option value="" disabled {{ empty($assessment->final_result) ? 'selected' : '' }}>-- Pilih Rekomendasi Akhir (Wajib) --</option>
-                        <option value="KOMPETEN" {{ in_array($assessment->final_result, ['KOMPETEN', 'K']) ? 'selected' : '' }}>KOMPETEN (K)</option>
-                        <option value="BELUM_KOMPETEN" {{ in_array($assessment->final_result, ['BELUM_KOMPETEN', 'BK']) ? 'selected' : '' }}>BELUM KOMPETEN (BK)</option>
-                    </select>
+                    <label class="block font-bold text-slate-700 mb-2">Rekomendasi Hasil Asesmen (*):</label>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" x-data="{
+                        selected: '{{ old('final_result', in_array($assessment->final_result, ['KOMPETEN', 'K']) ? 'KOMPETEN' : (in_array($assessment->final_result, ['BELUM_KOMPETEN', 'BK']) ? 'BELUM_KOMPETEN' : '')) }}'
+                    }">
+                        <label class="relative flex items-center p-3 rounded-xl border-2 cursor-pointer transition select-none has-[:checked]:bg-emerald-50 has-[:checked]:border-emerald-500 has-[:checked]:ring-2 has-[:checked]:ring-emerald-500/20"
+                               :class="selected === 'KOMPETEN' ? 'bg-emerald-50 border-emerald-500 ring-2 ring-emerald-500/20' : 'bg-white border-slate-200 hover:bg-slate-50 hover:border-slate-300'">
+                            <input type="radio" 
+                                   name="final_result" 
+                                   value="KOMPETEN" 
+                                   x-model="selected"
+                                   {{ in_array(old('final_result', $assessment->final_result), ['KOMPETEN', 'K']) ? 'checked' : '' }} 
+                                   required 
+                                   @disabled($assessment->schedule?->is_closed) 
+                                   class="w-4 h-4 text-emerald-600 border-slate-300 focus:ring-emerald-500 cursor-pointer">
+                            <div class="ml-2.5 flex items-center gap-1.5 flex-wrap">
+                                <span class="text-xs font-bold text-emerald-700 flex items-center gap-1">
+                                    <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                    </svg>
+                                    <span>Kompeten (K)</span>
+                                </span>
+                                <span class="text-[11px] font-semibold text-emerald-600">/ Competent</span>
+                            </div>
+                        </label>
+
+                        <label class="relative flex items-center p-3 rounded-xl border-2 cursor-pointer transition select-none has-[:checked]:bg-rose-50 has-[:checked]:border-rose-500 has-[:checked]:ring-2 has-[:checked]:ring-rose-500/20"
+                               :class="selected === 'BELUM_KOMPETEN' ? 'bg-rose-50 border-rose-500 ring-2 ring-rose-500/20' : 'bg-white border-slate-200 hover:bg-slate-50 hover:border-slate-300'">
+                            <input type="radio" 
+                                   name="final_result" 
+                                   value="BELUM_KOMPETEN" 
+                                   x-model="selected"
+                                   {{ in_array(old('final_result', $assessment->final_result), ['BELUM_KOMPETEN', 'BK']) ? 'checked' : '' }} 
+                                   required 
+                                   @disabled($assessment->schedule?->is_closed) 
+                                   class="w-4 h-4 text-rose-600 border-slate-300 focus:ring-rose-500 cursor-pointer">
+                            <div class="ml-2.5 flex items-center gap-1.5 flex-wrap">
+                                <span class="text-xs font-bold text-rose-700 flex items-center gap-1">
+                                    <svg class="w-4 h-4 text-rose-600 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                                    </svg>
+                                    <span>Belum Kompeten (BK)</span>
+                                </span>
+                                <span class="text-[11px] font-semibold text-rose-600">/ Not Competent</span>
+                            </div>
+                        </label>
+                    </div>
                 </div>
 
                 <div>

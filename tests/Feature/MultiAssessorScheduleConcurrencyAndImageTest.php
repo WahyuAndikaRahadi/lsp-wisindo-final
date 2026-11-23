@@ -375,7 +375,7 @@ class MultiAssessorScheduleConcurrencyAndImageTest extends TestCase
         );
         $ak02Response2->assertOk();
         $ak02Response2->assertDontSee('Asesmen Binaan Selesai (Read-Only)');
-        $ak02Response2->assertSee('Simpan Seluruh Rekaman FR.AK.02 (Bulk Save)');
+        $ak02Response2->assertSee('Tentukan rekomendasi');
 
         // Assessor 2 can bulk update their candidate
         $postAk02Assessor2 = $this->actingAs($this->assessor2)->post(
