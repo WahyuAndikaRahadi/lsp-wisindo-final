@@ -456,6 +456,7 @@ class InstrumentController extends Controller
 
         $scheme = $assessment->schedule->scheme;
         $units = $scheme->competencyUnits;
+        $units?->loadMissing('elements.kuks');
         $tpdData = $instrumentService->getTpdData($scheme);
         $tasks = collect($tpdData['tasks'])->map(fn ($t) => (object) [
             'id' => $t['id'],

@@ -62,6 +62,7 @@ class DynamicDokumenMukTest extends TestCase
             'scheme_id' => $this->scheme->id,
             'asesi_id' => $this->asesi->id,
             'assessor_id' => $this->asesor->id,
+            'apl_status' => 'APPROVED',
             'final_result' => 'KOMPETEN',
             'status' => 'COMPLETED',
             'ak01_data' => [
@@ -159,5 +160,88 @@ class DynamicDokumenMukTest extends TestCase
         $response->assertSee('Buka Berkas');
         $response->assertSee('max-w-6xl');
         $response->assertSee('viewDocument');
+    }
+
+    public function test_ia08_section_2_displays_full_kuks_and_klarifikasi_semua_button(): void
+    {
+        // Create unit, element, and KUK for scheme
+        $unit = $this->scheme->competencyUnits()->create([
+            'code' => 'G.45OTO01.001.2',
+            'title' => 'Melaksanakan Keselamatan dan Kesehatan Kerja',
+            'sequence' => 1,
+        ]);
+
+        $elem = $unit->elements()->create([
+            'title' => 'Menyiapkan prosedur Keselamatan',
+            'sequence' => 1,
+        ]);
+
+        $elem->kuks()->create([
+            'code_number' => '1.1',
+            'statement' => 'Prosedur K3 di tempat kerja diidentifikasi sesuai standar bengkel.',
+            'sequence' => 1,
+        ]);
+
+        $elem->kuks()->create([
+            'code_number' => '1.2',
+            'statement' => 'Alat Pelindung Diri (APD) disiapkan secara lengkap sebelum bekerja.',
+            'sequence' => 2,
+        ]);
+
+        $response = $this->actingAs($this->asesor)
+            ->get(route('asesor.assessment.instrument', [
+                'assessment' => $this->assessment->id,
+                'code' => 'ia08',
+            ]));
+
+        $response->assertOk();
+        $response->assertSee('2. Tindak Lanjut Hasil Verifikasi Bukti');
+        $response->assertSee('Klarifikasi Semua');
+        $response->assertSee('Batal Semua');
+        $response->assertSee('setAllClarification');
+        $response->assertSee('G.45OTO01.001.2');
+        $response->assertSee('Menyiapkan prosedur Keselamatan');
+        // Assert full KUK code numbers and statements are displayed
+        $response->assertSee('1.1');
+        $response->assertSee('Prosedur K3 di tempat kerja diidentifikasi sesuai standar bengkel.');
+        $response->assertSee('1.2');
+        $response->assertSee('Alat Pelindung Diri (APD) disiapkan secara lengkap sebelum bekerja.');
+    }
+
+    public function test_ia08_saves_clarification_elements_correctly(): void
+    {
+        $unit = $this->scheme->competencyUnits()->create([
+            'code' => 'G.45OTO01.001.2',
+            'title' => 'Melaksanakan K3',
+            'sequence' => 1,
+        ]);
+
+        $elem = $unit->elements()->create([
+            'title' => 'Menyiapkan APD',
+            'sequence' => 1,
+        ]);
+
+        $response = $this->actingAs($this->asesor)
+            ->post(route('asesor.assessment.instrument.store', [
+                'assessment' => $this->assessment->id,
+                'code' => 'ia08',
+            ]), [
+                'vatm' => [
+                    0 => ['v' => 'YA', 'a' => 'YA', 't' => 'YA', 'm' => 'YA'],
+                ],
+                'clarification_elements' => [$elem->id],
+                'additional_evidence' => 'Perlu bukti tambahan',
+                'recommendation' => 'K',
+            ]);
+
+        $response->assertRedirect();
+
+        $savedIa08 = AssessmentIaResponse::where('assessment_id', $this->assessment->id)
+            ->where('instrument_code', 'IA08')
+            ->first();
+
+        $this->assertNotNull($savedIa08);
+        $this->assertEquals([$elem->id], $savedIa08->data_json['clarification_elements']);
+        $this->assertEquals('K', $savedIa08->data_json['recommendation']);
     }
 }

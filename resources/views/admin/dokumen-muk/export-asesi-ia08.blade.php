@@ -191,8 +191,18 @@
                         <td style="border: 1px solid #000; padding: 3px 6px;">
                             Elemen {{ $eIdx + 1 }}
                         </td>
-                        <td style="border: 1px solid #000; padding: 3px 6px; font-size: 8pt;">
-                            {{ $elem->name }}
+                        <td style="border: 1px solid #000; padding: 4px 6px; font-size: 8pt; vertical-align: top;">
+                            <div style="font-weight: bold; margin-bottom: 2px;">{{ $elem->title ?? $elem->name }}</div>
+                            @if($elem->kuks && $elem->kuks->isNotEmpty())
+                                <div style="margin-top: 3px; padding-left: 6px; border-left: 1px solid #999; font-size: 7.5pt; color: #333;">
+                                    @foreach($elem->kuks as $kIdx => $kuk)
+                                        <div style="margin-bottom: 2px;">
+                                            <span style="font-family: monospace; font-weight: bold;">{{ $kuk->code_number ?: (($eIdx + 1) . '.' . ($kIdx + 1)) }}</span>
+                                            {{ $kuk->statement ?: $kuk->description }}
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @endif
                         </td>
                     </tr>
                 @endforeach

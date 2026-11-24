@@ -36,6 +36,13 @@
             el.checked = true;
             el.dispatchEvent(new Event('change', { bubbles: true }));
         });
+    },
+    setAllClarification(val) {
+        if (!this.isEditing) return;
+        document.querySelectorAll('.clarification-checkbox').forEach(el => {
+            el.checked = Boolean(val);
+            el.dispatchEvent(new Event('change', { bubbles: true }));
+        });
     }
 }">
     @if($isScheduleClosed)
@@ -244,20 +251,41 @@
 
         {{-- Section 2: Klarifikasi Wawancara (Sesuai MUK) --}}
         <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-            <div class="px-6 py-4 border-b border-slate-200 bg-slate-50">
-                <h2 class="text-base font-bold text-slate-900">2. Tindak Lanjut Hasil Verifikasi Bukti</h2>
-                <p class="text-xs text-slate-500">
-                    Sebagai tindak lanjut dari hasil verifikasi bukti, substansi materi di bawah ini (nomor elemen yang dicentang) <strong>harus diklarifikasi selama wawancara (FR.IA.09)</strong>:
-                </p>
+            <div class="px-6 py-4 border-b border-slate-200 bg-slate-50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div>
+                    <h2 class="text-base font-bold text-slate-900">2. Tindak Lanjut Hasil Verifikasi Bukti</h2>
+                    <p class="text-xs text-slate-500 mt-0.5">
+                        Sebagai tindak lanjut dari hasil verifikasi bukti, substansi materi di bawah ini (nomor elemen yang dicentang) <strong>harus diklarifikasi selama wawancara (FR.IA.09)</strong>:
+                    </p>
+                </div>
+                <div class="flex items-center gap-2 shrink-0" x-show="isEditing">
+                    <button type="button" @click="setAllClarification(true)" 
+                            class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg bg-brand-600 hover:bg-brand-700 text-white shadow-2xs transition cursor-pointer">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        <span>Klarifikasi Semua</span>
+                    </button>
+                    <button type="button" @click="setAllClarification(false)" 
+                            class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 shadow-2xs transition cursor-pointer">
+                        <span>Batal Semua</span>
+                    </button>
+                </div>
             </div>
 
             <div class="overflow-x-auto">
                 <table class="w-full text-xs">
                     <thead class="bg-slate-50 text-slate-700 uppercase tracking-wider font-bold border-b border-slate-200">
                         <tr>
-                            <th class="px-4 py-3 text-center border-r border-slate-200 w-16">Klarifikasi Wawancara</th>
+                            <th class="px-4 py-3 text-center border-r border-slate-200 w-24">
+                                <div class="flex flex-col items-center justify-center gap-1">
+                                    <span>Klarifikasi Wawancara</span>
+                                    <label class="inline-flex items-center gap-1 cursor-pointer font-normal" x-show="isEditing" title="Centang / Batal Semua">
+                                        <input type="checkbox" @click="setAllClarification($event.target.checked)" class="rounded border-slate-300 text-brand-600 focus:ring-brand-500 w-3.5 h-3.5 cursor-pointer">
+                                        <span class="text-[9px] lowercase text-slate-400">semua</span>
+                                    </label>
+                                </div>
+                            </th>
                             <th class="px-4 py-3 text-left border-r border-slate-200 w-48">No. Unit Kompetensi</th>
-                            <th class="px-4 py-3 text-left border-r border-slate-200 w-36">No. Elemen</th>
+                            <th class="px-4 py-3 text-left border-r border-slate-200 w-32">No. Elemen</th>
                             <th class="px-4 py-3 text-left">Materi / Substansi Wawancara / KUK</th>
                         </tr>
                     </thead>
@@ -271,22 +299,30 @@
                                 <tr class="hover:bg-slate-50/50 transition">
                                     <td class="px-4 py-3 text-center border-r border-slate-200 align-top">
                                         <input type="checkbox" name="clarification_elements[]" value="{{ $elem->id }}" :disabled="!isEditing"
-                                            class="rounded border-slate-300 text-brand-600 focus:ring-brand-500 w-4 h-4 cursor-pointer"
+                                            class="clarification-checkbox rounded border-slate-300 text-brand-600 focus:ring-brand-500 w-4 h-4 cursor-pointer"
                                             {{ $isClarified ? 'checked' : '' }}>
                                     </td>
                                     <td class="px-4 py-3 border-r border-slate-200 align-top">
                                         <div class="font-mono font-bold text-slate-900">{{ $unit->code }}</div>
-                                        <div class="text-[11px] text-slate-500 mt-0.5">{{ $unit->title }}</div>
+                                        <div class="text-[11px] text-slate-500 mt-0.5 leading-snug">{{ $unit->title }}</div>
                                     </td>
-                                    <td class="px-4 py-3 border-r border-slate-200 align-top font-semibold text-slate-800">
+                                    <td class="px-4 py-3 border-r border-slate-200 align-top font-semibold text-slate-800 whitespace-nowrap">
                                         Elemen {{ $eIdx + 1 }}
                                     </td>
                                     <td class="px-4 py-3 align-top">
-                                        <div class="font-bold text-slate-900 mb-1">{{ $elem->name }}</div>
-                                        @if($elem->kuks->isNotEmpty())
-                                            <div class="text-[11px] text-slate-600 space-y-0.5 border-l-2 border-slate-200 pl-2 mt-1">
-                                                @foreach($elem->kuks as $kuk)
-                                                    <div><span class="font-mono font-semibold">{{ $kuk->order }}</span> {{ $kuk->criteria }}</div>
+                                        <div class="font-bold text-slate-900 mb-1.5 flex items-center gap-1.5">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-brand-500 shrink-0"></span>
+                                            <span>{{ $elem->title ?? $elem->name }}</span>
+                                        </div>
+                                        @if($elem->kuks && $elem->kuks->isNotEmpty())
+                                            <div class="text-[11px] text-slate-600 space-y-1.5 border-l-2 border-slate-200 pl-3 mt-1.5">
+                                                @foreach($elem->kuks as $kIdx => $kuk)
+                                                    <div class="leading-relaxed flex items-start gap-1.5">
+                                                        <span class="font-mono font-bold text-slate-800 text-[10px] px-1.5 py-0.5 rounded bg-slate-100 border border-slate-200 shrink-0">
+                                                            {{ $kuk->code_number ?: (($eIdx + 1) . '.' . ($kIdx + 1)) }}
+                                                        </span>
+                                                        <span class="text-slate-700">{{ $kuk->statement ?: $kuk->description }}</span>
+                                                    </div>
                                                 @endforeach
                                             </div>
                                         @endif
