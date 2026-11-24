@@ -663,6 +663,144 @@ def draw_clean_section_1_2(page, data, reg_font=None, bold_font=None, italic_fon
             val_x = tx + prefix_len
             put_text(page, fitz.Point(val_x, ty), val, is_italic=val_italic, size=8.8, reg_font=reg_font, bold_font=bold_font, italic_font=italic_font)
 
+def draw_clean_section_2(doc, data, reg_font=None, bold_font=None):
+    """
+    Synchronize Table 2 (Rencana Asesmen Berdasarkan Unit Kompetensi) with FR.AK.01:
+    - Jenis Bukti (L, TL, T)
+    - Metode dan Perangkat Asesmen (CL, DIT, DPT/DPL/PW, VP, CRP, VPK)
+    - Bukti-Bukti description prefix
+    Preserves exact master table borders and typography.
+    """
+    raw_types = data.get("evidence_types", ["L", "T"])
+    if isinstance(raw_types, str):
+        evidence_types = [x.strip().upper() for x in raw_types.replace("dan", ",").split(",") if x.strip()]
+    elif isinstance(raw_types, list):
+        evidence_types = [str(x).strip().upper() for x in raw_types]
+    else:
+        evidence_types = ["L", "T"]
+
+    raw_metode = data.get("metode_codes", ["CL", "DPT"])
+    if isinstance(raw_metode, list):
+        metode_codes = [("CVP" if str(x).strip().upper() == "VP" else str(x).strip().upper()) for x in raw_metode]
+    else:
+        metode_codes = ["CL", "DPT"]
+
+    evidence_lines = data.get("evidence_lines", [])
+    if not isinstance(evidence_lines, list) or len(evidence_lines) != 3:
+        evidence_lines = None
+
+    # Cells bounds inside column dividers (preserving 100% of divider lines without touching them)
+    cells = [
+        (249.5, 264.0),  # L
+        (266.0, 281.0),  # TL
+        (283.0, 298.0),  # T
+        (300.5, 348.5),  # Observasi (CL)
+        (351.0, 384.0),  # Kegiatan Terstruktur (DIT)
+        (386.5, 432.5),  # Tanya Jawab (DPT, DPL, PW)
+        (435.5, 482.0),  # Verifikasi Portofolio (CVP)
+        (485.0, 518.5),  # Reviu Produk (CRP)
+        (521.0, 560.5),  # Verifikasi Pihak Ketiga (VPK)
+    ]
+
+    for page in doc:
+        words = page.get_text("words")
+        # Find data row coordinates on this page
+        # A data row has 'L' in 245..265 (and no 'TL' on same line)
+        l_words = [w for w in words if w[4] == "L" and 245.0 <= w[0] <= 265.0 and w[1] > 110.0]
+        data_rows = []
+        for lw in l_words:
+            # Check if header (header has 'TL' on same row)
+            same_line = [w2[4] for w2 in words if abs(w2[1] - lw[1]) < 4.0 and 264.0 <= w2[0] <= 283.0]
+            if "TL" in same_line:
+                continue
+            data_rows.append((lw[1] + lw[3]) / 2.0)
+
+        # Fallback only if some row had no 'L' but had 'CL' (use 15pt threshold to avoid duplicates)
+        cl_words = [w for w in words if w[4] == "CL" and 305.0 <= w[0] <= 335.0 and w[1] > 110.0]
+        for cw in cl_words:
+            cy = (cw[1] + cw[3]) / 2.0
+            if not any(abs(ry - cy) < 15.0 for ry in data_rows):
+                # Ensure not header
+                near_dit = any("DIT" in w2[4] and abs(w2[1] - cw[1]) < 4.0 for w2 in words)
+                if not near_dit:
+                    data_rows.append(cy)
+
+        data_rows.sort()
+        if not data_rows:
+            continue
+
+        # Process each data row
+        for ry in data_rows:
+            # Find all words in this row across the evidence/method columns (248 <= x <= 561)
+            row_words = [w for w in words if 248.0 <= w[0] <= 561.0 and abs(w[1] - ry) < 14.0]
+            if row_words:
+                min_y = min(w[1] for w in row_words) - 1.5
+                max_y = max(w[3] for w in row_words) + 1.5
+                mid_y = (min_y + max_y) / 2.0
+            else:
+                min_y = ry - 7.5
+                max_y = ry + 7.5
+                mid_y = ry
+
+            # 1. Whiteout inside each of the 9 cells
+            for x0, x1 in cells:
+                page.draw_rect(fitz.Rect(x0, min_y, x1, max_y), fill=(1, 1, 1), color=(1, 1, 1))
+
+            # Helper to center text horizontally inside a column cell
+            def draw_centered(cx, text, sz=8.8):
+                w = fitz.get_text_length(text, fontname="helv", fontsize=sz)
+                put_text(page, fitz.Point(cx - w / 2.0, mid_y + 3.0), text, size=sz, reg_font=reg_font, bold_font=bold_font)
+
+            # 2. Draw active Jenis Bukti
+            if "L" in evidence_types:
+                draw_centered(256.75, "L", 8.8)
+            if "TL" in evidence_types:
+                draw_centered(273.5, "TL", 8.8)
+            if "T" in evidence_types:
+                draw_centered(290.5, "T", 8.8)
+
+            # 3. Draw active Metode & Perangkat
+            if "CL" in metode_codes:
+                draw_centered(324.5, "CL", 8.8)
+            if "DIT" in metode_codes:
+                draw_centered(367.5, "DIT", 8.8)
+
+            # Tanya Jawab (DPT / DPL / PW)
+            tj_items = [x for x in ["DPT", "DPL", "PW"] if x in metode_codes]
+            if tj_items:
+                tj_str = ", ".join(tj_items)
+                if len(tj_items) >= 3:
+                    sz = 6.6
+                elif len(tj_items) == 2:
+                    sz = 7.6
+                else:
+                    sz = 8.8
+                draw_centered(409.5, tj_str, sz)
+
+            if "CVP" in metode_codes:
+                draw_centered(458.75, "CVP", 8.8)
+            if "CRP" in metode_codes:
+                draw_centered(501.75, "CRP", 8.8)
+            if "VPK" in metode_codes:
+                draw_centered(540.75, "VPK", 8.8)
+
+        # 4. Optional: Update Column 2 (Bukti-Bukti) description prefix if evidence_lines provided
+        if evidence_lines:
+            hasils = [w for w in words if w[4] == "Hasil" and 156.0 <= w[0] <= 248.0]
+            for h in hasils:
+                phrase_words = [w for w in words if 156.0 <= w[0] <= 248.0 and h[1] - 2.0 <= w[1] <= h[1] + 35.0]
+                tentangs = [w for w in phrase_words if w[4] == "tentang"]
+                if tentangs:
+                    t = tentangs[0]
+                    page.draw_rect(fitz.Rect(158.0, h[1] - 1.5, 247.0, t[3] + 1.0), fill=(1, 1, 1), color=(1, 1, 1))
+                    x_text = 160.0
+                    line1_y = h[1] + 9.5
+                    line2_y = line1_y + 13.0
+                    line3_y = line2_y + 13.0
+                    put_text(page, fitz.Point(x_text, line1_y), evidence_lines[0], size=8.6, reg_font=reg_font, bold_font=bold_font)
+                    put_text(page, fitz.Point(x_text, line2_y), evidence_lines[1], size=8.6, reg_font=reg_font, bold_font=bold_font)
+                    put_text(page, fitz.Point(x_text, line3_y), evidence_lines[2], size=8.4, reg_font=reg_font, bold_font=bold_font)
+
 def render_mapa_overlay(master_pdf_path, data, dest_path):
     """Overlay assessor's MAPA data onto official clean master template without watermarks."""
     if not os.path.isfile(master_pdf_path):
@@ -693,6 +831,11 @@ def render_mapa_overlay(master_pdf_path, data, dest_path):
             break
     if p_si is not None:
         draw_clean_section_1_2(p_si, data, reg_font=reg_font, bold_font=bold_font, italic_font=italic_font)
+
+    # -------------------------------------------------------------
+    # SECTION 2: Mempersiapkan Rencana Asesmen (Dynamic with FR.AK.01)
+    # -------------------------------------------------------------
+    draw_clean_section_2(doc, data, reg_font=reg_font, bold_font=bold_font)
 
     # -------------------------------------------------------------
     # SECTION 3: Mengidentifikasi Persyaratan Modifikasi (Penultimate Page)
