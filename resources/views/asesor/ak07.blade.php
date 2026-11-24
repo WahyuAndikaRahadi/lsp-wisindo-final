@@ -367,7 +367,7 @@
                 </label>
                 <label class="inline-flex items-center space-x-1.5 {{ $isClosedForMe ? 'cursor-default' : 'cursor-pointer' }}">
                     <input type="radio" name="agreement_status" value="TIDAK" checked @disabled($isClosedForMe) class="text-slate-600 focus:ring-slate-500 w-4 h-4">
-                    <span class="font-medium text-slate-700">Tidak Diperlukan Penyesuaian (Standar Baku)</span>
+                    <span class="font-medium text-slate-700">Tidak Diperlukan Penyesuaian</span>
                 </label>
             </div>
 
