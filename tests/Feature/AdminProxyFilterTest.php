@@ -137,4 +137,56 @@ class AdminProxyFilterTest extends TestCase
         $response->assertSessionHas('warning');
         $this->assertTrue(auth()->check());
     }
+
+    public function test_sidebar_logout_button_is_rendered_at_the_bottom_for_all_roles_with_red_styling(): void
+    {
+        // 1. Super Admin
+        $superAdminRes = $this->actingAs($this->admin)->get(route('admin.dashboard'));
+        $superAdminRes->assertOk();
+        $superAdminContent = $superAdminRes->getContent();
+        $this->assertStringContainsString('Backup Database (SQL)', $superAdminContent);
+        $this->assertStringContainsString('bg-red-600', $superAdminContent);
+        $this->assertStringContainsString('Log Out', $superAdminContent);
+        $this->assertTrue(
+            strpos($superAdminContent, 'Backup Database (SQL)') < strpos($superAdminContent, 'Log Out'),
+            'Log Out button should appear after Backup Database (SQL) in Super Admin sidebar.'
+        );
+
+        // 2. Asesi
+        $asesiRes = $this->actingAs($this->asesi)->get(route('asesi.dashboard'));
+        $asesiRes->assertOk();
+        $asesiContent = $asesiRes->getContent();
+        $this->assertStringContainsString('Sertifikat Saya', $asesiContent);
+        $this->assertStringContainsString('bg-red-600', $asesiContent);
+        $this->assertStringContainsString('Log Out', $asesiContent);
+        $this->assertTrue(
+            strpos($asesiContent, 'Sertifikat Saya') < strpos($asesiContent, 'Log Out'),
+            'Log Out button should appear after Sertifikat Saya in Asesi sidebar.'
+        );
+
+        // 3. Asesor
+        $asesorRes = $this->actingAs($this->asesor)->get(route('asesor.jadwal.index'));
+        $asesorRes->assertOk();
+        $asesorContent = $asesorRes->getContent();
+        $this->assertStringContainsString('Jadwal Penugasan Uji', $asesorContent);
+        $this->assertStringContainsString('bg-red-600', $asesorContent);
+        $this->assertStringContainsString('Log Out', $asesorContent);
+        $this->assertTrue(
+            strpos($asesorContent, 'Jadwal Penugasan Uji') < strpos($asesorContent, 'Log Out'),
+            'Log Out button should appear after role links in Asesor sidebar.'
+        );
+
+        // 4. Admin LSP (non Super Admin)
+        $adminLspRes = $this->actingAs($this->adminLsp)->get(route('admin.dashboard'));
+        $adminLspRes->assertOk();
+        $adminLspContent = $adminLspRes->getContent();
+        $this->assertStringContainsString('Switch Role (Proxy)', $adminLspContent);
+        $this->assertStringNotContainsString('Backup Database (SQL)', $adminLspContent);
+        $this->assertStringContainsString('bg-red-600', $adminLspContent);
+        $this->assertStringContainsString('Log Out', $adminLspContent);
+        $this->assertTrue(
+            strpos($adminLspContent, 'Switch Role (Proxy)') < strpos($adminLspContent, 'Log Out'),
+            'Log Out button should appear after Switch Role (Proxy) in Admin LSP sidebar.'
+        );
+    }
 }

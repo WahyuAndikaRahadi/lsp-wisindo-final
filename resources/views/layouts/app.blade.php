@@ -176,15 +176,15 @@
                    class="fixed inset-y-0 left-0 md:left-1.5 z-50 md:z-30 w-72 md:w-64 bg-white border-r border-slate-200 shadow-xl md:shadow-none flex flex-col justify-between transition-transform duration-200 ease-in-out md:translate-x-0">
                 
                 <!-- Sidebar Top Section -->
-                <div>
+                <div class="flex-1 flex flex-col min-h-0 overflow-y-auto">
                     <!-- Top Horizontal Dual Stripe -->
-                    <div class="w-full flex h-1">
+                    <div class="w-full flex h-1 shrink-0">
                         <div class="w-2/3 bg-lsp-navy"></div>
                         <div class="w-1/3 bg-lsp-red"></div>
                     </div>
 
                     <!-- Brand / Logo with Mobile Close Button -->
-                    <div class="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between">
+                    <div class="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between shrink-0">
                         <div class="flex items-center space-x-3">
                             <img src="{{ asset('images/logo-lsp-wisindo.png') }}" 
                                  alt="Logo LSP" 
@@ -357,12 +357,43 @@
                             @endif
                         @endif
 
+                        <!-- Logout / Switch Back Button (dipaling bawah setelah sidebar) -->
+                        @if(session('admin_impersonator_id'))
+                            <div class="pt-3 mt-3 border-t border-slate-100">
+                                <form action="{{ route('proxy.switch-back') }}" method="POST" class="w-full">
+                                    @csrf
+                                    <button type="submit" 
+                                            title="Kembali ke Sesi Admin" 
+                                            class="w-full flex items-center space-x-3 px-3 py-2.5 rounded text-xs font-bold transition text-white bg-amber-600 hover:bg-amber-700 active:bg-amber-800 shadow-xs focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-1 cursor-pointer">
+                                        <svg class="w-4 h-4 text-white shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
+                                        </svg>
+                                        <span>Kembali ke Admin</span>
+                                    </button>
+                                </form>
+                            </div>
+                        @else
+                            <div class="pt-3 mt-3 border-t border-slate-100">
+                                <form action="{{ route('logout') }}" method="POST" class="w-full">
+                                    @csrf
+                                    <button type="submit" 
+                                            title="Keluar dari Sistem" 
+                                            class="w-full flex items-center space-x-3 px-3 py-2.5 rounded text-xs font-bold transition text-white bg-red-600 hover:bg-red-700 active:bg-red-800 shadow-xs hover:shadow focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 cursor-pointer">
+                                        <svg class="w-4 h-4 text-white shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                                        </svg>
+                                        <span>Log Out</span>
+                                    </button>
+                                </form>
+                            </div>
+                        @endif
+
                     </nav>
                 </div>
 
-                <!-- Sidebar Bottom: User Profile & Logout -->
-                <div class="p-3 border-t border-slate-200 bg-slate-50/50">
-                    <div class="flex items-center justify-between p-2">
+                <!-- Sidebar Bottom: User Profile -->
+                <div class="p-3 border-t border-slate-200 bg-slate-50/50 shrink-0">
+                    <div class="flex items-center justify-between p-1">
                         @php
                             $userProfileLink = match(true) {
                                 auth()->user()->isRole('ASESI') => route('asesi.profile.edit'),
@@ -372,11 +403,11 @@
                             };
                         @endphp
                         @if($userProfileLink)
-                            <a href="{{ $userProfileLink }}" title="Buka Profil &amp; Pengaturan" class="flex items-center space-x-2.5 overflow-hidden group hover:opacity-85 transition">
+                            <a href="{{ $userProfileLink }}" title="Buka Profil &amp; Pengaturan" class="flex items-center space-x-2.5 overflow-hidden group hover:opacity-85 transition w-full">
                                 <div class="w-8 h-8 rounded bg-lsp-navy group-hover:bg-lsp-navy-dark text-white font-bold text-xs flex items-center justify-center flex-shrink-0 shadow-sm">
                                     {{ strtoupper(substr(auth()->user()->full_name, 0, 2)) }}
                                 </div>
-                                <div class="truncate">
+                                <div class="truncate flex-1 min-w-0">
                                     <p class="text-xs font-bold text-slate-800 group-hover:text-lsp-navy truncate leading-tight">
                                         {{ auth()->user()->full_name }}
                                     </p>
@@ -386,11 +417,11 @@
                                 </div>
                             </a>
                         @else
-                            <div class="flex items-center space-x-2.5 overflow-hidden">
+                            <div class="flex items-center space-x-2.5 overflow-hidden w-full">
                                 <div class="w-8 h-8 rounded bg-lsp-navy text-white font-bold text-xs flex items-center justify-center flex-shrink-0 shadow-sm">
                                     {{ strtoupper(substr(auth()->user()->full_name, 0, 2)) }}
                                 </div>
-                                <div class="truncate">
+                                <div class="truncate flex-1 min-w-0">
                                     <p class="text-xs font-bold text-slate-800 truncate leading-tight">
                                         {{ auth()->user()->full_name }}
                                     </p>
@@ -399,31 +430,6 @@
                                     </span>
                                 </div>
                             </div>
-                        @endif
-
-                        @if(session('admin_impersonator_id'))
-                            <!-- Switch Back Button (Logout is hidden in proxy mode) -->
-                            <form action="{{ route('proxy.switch-back') }}" method="POST">
-                                @csrf
-                                <button type="submit" 
-                                        title="Kembali ke Sesi Admin" 
-                                        class="px-2 py-1 text-[11px] font-bold bg-amber-600 hover:bg-amber-700 text-white rounded-md shadow-xs transition flex items-center gap-1">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/></svg>
-                                    <span>Kembali</span>
-                                </button>
-                            </form>
-                        @else
-                            <!-- Logout Form -->
-                            <form action="{{ route('logout') }}" method="POST">
-                                @csrf
-                                <button type="submit" 
-                                        title="Keluar" 
-                                        class="p-1.5 text-slate-400 hover:text-lsp-red hover:bg-red-50 rounded transition">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
-                                    </svg>
-                                </button>
-                            </form>
                         @endif
                     </div>
                 </div>
