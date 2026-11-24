@@ -86,12 +86,15 @@
                 </div>
 
                 <div class="mt-5 pt-4 border-t border-slate-100 flex items-center gap-2">
-                    <a href="{{ route('asesor.schedule.surat-tugas', $jadwal->id) }}" class="inline-flex items-center justify-center px-3.5 py-2.5 min-h-[42px] text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 border border-slate-300 rounded-lg shadow-2xs transition shrink-0" title="Lihat Surat Tugas Asesor">
+                    <button type="button" 
+                            @click="$dispatch('open-surat-tugas', { scheduleId: {{ $jadwal->id }} })" 
+                            class="inline-flex items-center justify-center px-3.5 py-2.5 min-h-[42px] text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 border border-slate-300 rounded-lg shadow-2xs transition shrink-0 cursor-pointer" 
+                            title="Buka Pratinjau Surat Tugas Asesor">
                         <svg class="w-4 h-4 mr-1 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                         </svg>
                         <span>Surat Tugas</span>
-                    </a>
+                    </button>
                     @cannot('enter-schedule', $jadwal)
                         <button type="button" disabled
                                 class="flex-1 inline-flex items-center justify-center px-4 py-2.5 min-h-[42px] text-xs font-bold uppercase tracking-wider bg-slate-100 text-slate-400 border border-slate-200 rounded-lg cursor-not-allowed transition select-none"

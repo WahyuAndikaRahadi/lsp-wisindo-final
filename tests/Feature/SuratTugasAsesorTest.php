@@ -172,6 +172,56 @@ class SuratTugasAsesorTest extends TestCase
         $response->assertSee('Gedung SMKS Inovasi Mandiri');
     }
 
+    public function test_asesor_can_fetch_surat_tugas_partial_modal(): void
+    {
+        $response = $this->actingAs($this->assignedAssessor)
+            ->get(route('asesor.schedule.surat-tugas', ['schedule' => $this->schedule->id, 'modal' => 1]));
+
+        $response->assertOk();
+        $response->assertSee('surat-tugas-wrapper');
+        $response->assertSee('SURAT TUGAS ASESOR');
+        $response->assertSee($this->schedule->surat_tugas_number);
+    }
+
+    public function test_director_name_and_signature_sourced_from_super_admin(): void
+    {
+        $superAdmin = User::create([
+            'full_name' => 'Dr. H. Ridwan, M.Pd.',
+            'email' => 'superadmin_st@test.com',
+            'password' => Hash::make('Password123!'),
+            'role' => 'SUPER_ADMIN',
+            'status' => 'ACTIVE',
+        ]);
+
+        $superAdmin->profile()->create([
+            'signature_data' => 'data:image/png;base64,sample-signature-base64',
+        ]);
+
+        $this->assertEquals('Dr. H. Ridwan, M.Pd.', $this->schedule->effective_director_name);
+        $this->assertEquals('data:image/png;base64,sample-signature-base64', $this->schedule->effective_director_signature);
+
+        $response = $this->actingAs($this->assignedAssessor)
+            ->get(route('asesor.schedule.surat-tugas', $this->schedule->id));
+
+        $response->assertOk();
+        $response->assertSee('Dr. H. Ridwan, M.Pd.');
+        $response->assertSee('data:image/png;base64,sample-signature-base64');
+    }
+
+    public function test_admin_detail_header_contains_only_surat_tugas_and_lock_buttons(): void
+    {
+        $response = $this->actingAs($this->admin)
+            ->get(route('admin.jadwal.show', $this->schedule->id));
+
+        $response->assertOk();
+        $response->assertSee('Surat Tugas Asesor');
+        $response->assertSee('Kunci &amp; Tutup Jadwal', false);
+        $response->assertSee('printSuratTugas');
+        // Ensure header does not contain links to edit or external actions
+        $response->assertDontSee(route('admin.jadwal.edit', $this->schedule->id));
+        $response->assertDontSee('Pusat Dokumen MUK &rarr;', false);
+    }
+
     public function test_schedule_formatted_accessors(): void
     {
         // Single day

@@ -23,15 +23,13 @@
         </div>
 
         <div class="flex items-center flex-wrap gap-2">
-            <a href="{{ route('admin.jadwal.edit', $jadwal->id) }}" class="px-3.5 py-2 text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 border border-slate-300 rounded-lg shadow-2xs transition flex items-center gap-1.5" title="Edit Data Jadwal">
-                <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                <span>Edit Jadwal</span>
-            </a>
-
-            <a href="{{ route('admin.jadwal.surat-tugas', $jadwal->id) }}" target="_blank" class="px-3.5 py-2 text-xs font-bold text-brand-800 bg-brand-50 hover:bg-brand-100 border border-brand-300 rounded-lg shadow-2xs transition flex items-center gap-1.5" title="Lihat Dokumen Surat Tugas Asesor">
-                <svg class="w-3.5 h-3.5 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            <button type="button" 
+                    onclick="printSuratTugas('{{ route('admin.jadwal.surat-tugas', $jadwal->id) }}')" 
+                    class="px-3.5 py-2 text-xs font-bold text-brand-800 bg-brand-50 hover:bg-brand-100 border border-brand-300 rounded-lg shadow-2xs transition flex items-center gap-1.5 cursor-pointer" 
+                    title="Cetak Surat Tugas Asesor Langsung">
+                <svg class="w-3.5 h-3.5 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
                 <span>Surat Tugas Asesor</span>
-            </a>
+            </button>
 
             @if(in_array(auth()->user()?->role, ['SUPER_ADMIN', 'ADMIN_LSP']))
                 <form action="{{ route('admin.jadwal.toggle-lock', $jadwal->id) }}" method="POST" class="inline">
@@ -55,15 +53,6 @@
                     @endif
                 </form>
             @endif
-
-            <a href="{{ route('admin.certificates.schedule', $jadwal->id) }}" class="px-3.5 py-2 text-xs font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 rounded-lg shadow-2xs transition flex items-center gap-1.5">
-                <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-                <span>Kelola Sertifikat</span>
-            </a>
-
-            <a href="{{ route('admin.dokumen-muk.index') }}" class="px-3.5 py-2 text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 border border-slate-300 rounded-lg shadow-2xs transition">
-                Pusat Dokumen MUK &rarr;
-            </a>
         </div>
     </div>
 
@@ -147,4 +136,24 @@
         @include('admin.jadwal._peserta_table')
     </div>
 </div>
+
+@push('scripts')
+<script>
+    function printSuratTugas(url) {
+        let iframe = document.getElementById('print-surat-tugas-frame');
+        if (!iframe) {
+            iframe = document.createElement('iframe');
+            iframe.id = 'print-surat-tugas-frame';
+            iframe.style.position = 'fixed';
+            iframe.style.right = '0';
+            iframe.style.bottom = '0';
+            iframe.style.width = '0';
+            iframe.style.height = '0';
+            iframe.style.border = '0';
+            document.body.appendChild(iframe);
+        }
+        iframe.src = url + (url.includes('?') ? '&' : '?') + 'autoprint=1';
+    }
+</script>
+@endpush
 @endsection

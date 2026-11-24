@@ -166,6 +166,23 @@ class Schedule extends Model
         return Carbon::parse($d)->isoFormat('D MMMM Y');
     }
 
+    public function getEffectiveDirectorNameAttribute(): string
+    {
+        $superAdmin = User::where('role', 'SUPER_ADMIN')->first();
+        if (! empty($superAdmin?->full_name)) {
+            return $superAdmin->full_name;
+        }
+
+        return $this->director_name ?: 'RIDWAN';
+    }
+
+    public function getEffectiveDirectorSignatureAttribute(): ?string
+    {
+        $superAdmin = User::where('role', 'SUPER_ADMIN')->with('profile')->first();
+
+        return $superAdmin?->profile?->signature_data;
+    }
+
     public function generateDefaultSuratTugasNumber(): string
     {
         $date = $this->date ? Carbon::parse($this->date) : now();

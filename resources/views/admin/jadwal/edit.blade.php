@@ -84,62 +84,57 @@
 
         {{-- Date and Time --}}
         <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 space-y-4">
-            <div class="flex items-center justify-between">
-                <h2 class="text-base font-bold text-slate-900">Jadwal Pelaksanaan & Kuota Peserta</h2>
-                <a href="{{ route('admin.jadwal.surat-tugas', $jadwal->id) }}" target="_blank" class="px-3 py-1.5 text-xs font-bold rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 transition inline-flex items-center gap-1.5" title="Lihat Surat Tugas Asesor">
-                    <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                    <span>Lihat Surat Tugas &rarr;</span>
-                </a>
+            <h2 class="text-base font-bold text-slate-900">Jadwal Pelaksanaan & Kuota Peserta</h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1">Tanggal Mulai <span class="text-rose-500">*</span></label>
+                        <input type="date" name="date" required value="{{ old('date', \Carbon\Carbon::parse($jadwal->date)->format('Y-m-d')) }}" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                        @error('date')
+                            <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1">Tanggal Selesai</label>
+                        <input type="date" name="end_date" value="{{ old('end_date', $jadwal->end_date ? \Carbon\Carbon::parse($jadwal->end_date)->format('Y-m-d') : '') }}" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                        <p class="text-[11px] text-slate-400 mt-1">Kosongkan jika 1 hari.</p>
+                        @error('end_date')
+                            <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1">Jam Mulai <span class="text-rose-500">*</span></label>
+                        <input type="time" name="start_time" required value="{{ old('start_time', substr($jadwal->start_time ?? '08:00', 0, 5)) }}" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                        @error('start_time')
+                            <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1">Jam Selesai <span class="text-rose-500">*</span></label>
+                        <input type="time" name="end_time" required value="{{ old('end_time', substr($jadwal->end_time ?? '16:00', 0, 5)) }}" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                        @error('end_time')
+                            <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-3 border-t border-slate-100">
                 <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-1">Tanggal Mulai <span class="text-rose-500">*</span></label>
-                    <input type="date" name="date" required value="{{ old('date', \Carbon\Carbon::parse($jadwal->date)->format('Y-m-d')) }}" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
-                    @error('date')
-                        <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-1">Tanggal Selesai</label>
-                    <input type="date" name="end_date" value="{{ old('end_date', $jadwal->end_date ? \Carbon\Carbon::parse($jadwal->end_date)->format('Y-m-d') : '') }}" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
-                    <p class="text-xs text-slate-400 mt-1">Kosongkan jika jadwal hanya 1 hari.</p>
-                    @error('end_date')
-                        <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-1">Perkiraan Kuota Peserta (Siswa)</label>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Perkiraan Jumlah Peserta (Siswa)</label>
                     <input type="number" name="estimated_candidates" min="0" value="{{ old('estimated_candidates', $jadwal->estimated_candidates ?? 0) }}" placeholder="Contoh: 88" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
-                    <p class="text-xs text-slate-400 mt-1">Dicantumkan pada Surat Tugas (0 = otomatis).</p>
                     @error('estimated_candidates')
                         <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
                     @enderror
                 </div>
-
-                <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-1">Jam Mulai <span class="text-rose-500">*</span></label>
-                    <input type="time" name="start_time" required value="{{ old('start_time', substr($jadwal->start_time ?? '08:00', 0, 5)) }}" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
-                    @error('start_time')
-                        <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-1">Jam Selesai <span class="text-rose-500">*</span></label>
-                    <input type="time" name="end_time" required value="{{ old('end_time', substr($jadwal->end_time ?? '16:00', 0, 5)) }}" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
-                    @error('end_time')
-                        <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <div class="rounded-lg bg-slate-50 border border-slate-200 p-3 flex items-start gap-2.5 text-xs text-slate-600">
-                    <svg class="w-4 h-4 text-brand-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                    <div class="leading-relaxed">
-                        <span class="font-semibold text-slate-800">Surat Tugas Otomatis:</span> Nomor surat, kota Bekasi, dan direktur RIDWAN telah terkonfigurasi otomatis sesuai standar LSP.
-                    </div>
+                <div class="flex items-center text-xs text-slate-500 leading-relaxed">
+                    Dicantumkan pada Surat Tugas Asesor (contoh: <em>88 siswa</em>). Jika diisi 0 atau dikosongkan, sistem akan otomatis mencantumkan jumlah riil asesi yang terdaftar.
                 </div>
             </div>
         </div>

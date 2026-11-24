@@ -177,5 +177,8 @@
     <div id="asesor-jadwal-table-container" data-ajax-container="asesor-jadwal" data-skeleton-cols="2" data-skeleton-rows="4">
         @include('asesor.jadwal._table')
     </div>
+
+    {{-- Modal Surat Tugas Asesor --}}
+    @include('asesor.partials.surat-tugas-modal')
 </div>
 @endsection

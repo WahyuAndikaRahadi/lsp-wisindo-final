@@ -228,9 +228,16 @@ class JadwalController extends Controller
             ->with('success', 'Jadwal berhasil diperbarui.');
     }
 
-    public function suratTugas(Schedule $jadwal): View
+    public function suratTugas(Request $request, Schedule $jadwal): View
     {
         $jadwal->load(['scheme', 'assessors', 'assessments']);
+
+        if ($request->has('modal') || $request->ajax()) {
+            return view('asesor.jadwal._surat_tugas_content', [
+                'schedule' => $jadwal,
+                'assessors' => $jadwal->assessors,
+            ]);
+        }
 
         return view('asesor.jadwal.surat-tugas', [
             'schedule' => $jadwal,

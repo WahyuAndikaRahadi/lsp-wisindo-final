@@ -97,7 +97,7 @@ class JadwalController extends Controller
         return view('asesor.jadwal.index', compact('schedules', 'jadwals', 'registrationToken', 'counts'));
     }
 
-    public function suratTugas(Schedule $schedule): View
+    public function suratTugas(Request $request, Schedule $schedule): View
     {
         $user = auth()->user();
 
@@ -106,6 +106,13 @@ class JadwalController extends Controller
         abort_unless($isAssigned, 403, 'Anda tidak ditugaskan pada jadwal asesmen ini.');
 
         $schedule->load(['scheme', 'assessors', 'assessments']);
+
+        if ($request->has('modal') || $request->ajax()) {
+            return view('asesor.jadwal._surat_tugas_content', [
+                'schedule' => $schedule,
+                'assessors' => $schedule->assessors,
+            ]);
+        }
 
         return view('asesor.jadwal.surat-tugas', [
             'schedule' => $schedule,
