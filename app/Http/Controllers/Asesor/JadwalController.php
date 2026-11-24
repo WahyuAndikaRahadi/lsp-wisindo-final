@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Asesor;
 
 use App\Http\Controllers\Concerns\AuthorizesAssessor;
 use App\Http\Controllers\Controller;
+use App\Models\Schedule;
 use App\Services\RegistrationTokenService;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -94,5 +95,22 @@ class JadwalController extends Controller
         $registrationToken = RegistrationTokenService::getCurrentToken();
 
         return view('asesor.jadwal.index', compact('schedules', 'jadwals', 'registrationToken', 'counts'));
+    }
+
+    public function suratTugas(Schedule $schedule): View
+    {
+        $user = auth()->user();
+
+        // Check if the assessor is assigned to this schedule
+        $isAssigned = $schedule->assessors()->where('users.id', $user->id)->exists();
+        abort_unless($isAssigned, 403, 'Anda tidak ditugaskan pada jadwal asesmen ini.');
+
+        $schedule->load(['scheme', 'assessors', 'assessments']);
+
+        return view('asesor.jadwal.surat-tugas', [
+            'schedule' => $schedule,
+            'assessors' => $schedule->assessors,
+            'backUrl' => route('asesor.jadwal.index'),
+        ]);
     }
 }

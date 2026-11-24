@@ -17,12 +17,21 @@
                         Jadwal Aktif
                     </span>
                 @endif
+                <span class="font-mono font-bold text-brand-600">{{ $jadwal->code }}</span>
                 <span>{{ $jadwal->scheme->name }}</span>
                 <span>TUK: {{ $jadwal->tuk_name }}</span>
-                <span>{{ \Carbon\Carbon::parse($jadwal->date)->isoFormat('D MMMM Y') }}</span>
+                <span>{{ $jadwal->formatted_date_range }}</span>
+                <span>Peserta: {{ $jadwal->effective_candidate_count }} Siswa</span>
+                @if($jadwal->surat_tugas_number)
+                    <span class="font-mono text-slate-600">No. ST: {{ $jadwal->surat_tugas_number }}</span>
+                @endif
             </div>
         </div>
-        <div class="flex items-center space-x-2">
+        <div class="flex items-center space-x-2 flex-wrap gap-y-2">
+            <a href="{{ route('admin.jadwal.surat-tugas', $jadwal->id) }}" target="_blank" class="px-3.5 py-2 text-xs font-bold text-brand-800 bg-brand-50 hover:bg-brand-100 border border-brand-300 rounded-lg shadow-xs transition flex items-center gap-1.5" title="Lihat Dokumen Surat Tugas Asesor">
+                <svg class="w-3.5 h-3.5 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                <span>Surat Tugas Asesor</span>
+            </a>
             @if(in_array(auth()->user()?->role, ['SUPER_ADMIN', 'ADMIN_LSP']))
                 <form action="{{ route('admin.jadwal.toggle-lock', $jadwal->id) }}" method="POST" class="inline">
                     @csrf

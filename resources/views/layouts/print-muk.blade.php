@@ -247,7 +247,7 @@
 <body>
     <div class="screen-toolbar no-print">
         <div>
-            <a href="{{ route('admin.dokumen-muk.index') }}">&larr; Kembali ke Indeks Dokumen</a>
+            <a href="{{ $backUrl ?? route('admin.dokumen-muk.index') }}">&larr; Kembali</a>
             <span style="margin: 0 10px; color: #475569;">|</span>
             <span style="font-size: 13px; font-weight: bold;">@yield('doc-title', 'Dokumen Cetak MUK')</span>
         </div>

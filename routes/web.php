@@ -273,6 +273,7 @@ Route::middleware(['auth', 'role:ASESOR'])->prefix('asesor')->name('asesor.')->g
     Route::post('/profile', [Asesor\ProfileController::class, 'update'])->name('profile.update');
 
     Route::get('/jadwal', [Asesor\JadwalController::class, 'index'])->name('jadwal.index');
+    Route::get('/schedule/{schedule}/surat-tugas', [Asesor\JadwalController::class, 'suratTugas'])->name('schedule.surat-tugas');
 
     // Review APL (both aliases supported)
     Route::get('/assessment/{assessment}/review-apl', [Asesor\AplReviewController::class, 'show'])->name('apl.review');
@@ -399,6 +400,7 @@ Route::middleware(['auth', 'role:SUPER_ADMIN,ADMIN_LSP,KOMITE_TEKNIS,TUK_ADMIN']
     });
 
     Route::get('/jadwal/{jadwal}', [Admin\JadwalController::class, 'show'])->name('jadwal.show');
+    Route::get('/jadwal/{jadwal}/surat-tugas', [Admin\JadwalController::class, 'suratTugas'])->name('jadwal.surat-tugas');
 
     // Dokumen MUK (Schedule level - Admin LSP & TUK Admin)
     Route::get('/dokumen-muk', [Admin\DokumenMukController::class, 'index'])->name('dokumen-muk.index');

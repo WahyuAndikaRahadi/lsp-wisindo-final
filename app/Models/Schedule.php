@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Support\Carbon;
 
 class Schedule extends Model
 {
@@ -18,13 +19,20 @@ class Schedule extends Model
     protected $fillable = [
         'code',
         'name',
+        'surat_tugas_number',
         'scheme_id',
         'tuk_id',
         'tuk_name',
+        'tuk_address',
         'date',
+        'end_date',
         'start_time',
         'end_time',
         'duration_minutes',
+        'estimated_candidates',
+        'surat_tugas_date',
+        'letter_city',
+        'director_name',
         'pic_name',
         'pic_position',
         'pic_signature',
@@ -48,6 +56,8 @@ class Schedule extends Model
     {
         return [
             'date' => 'date',
+            'end_date' => 'date',
+            'surat_tugas_date' => 'date',
             'closed_at' => 'datetime',
             'reopened_at' => 'datetime',
             'is_closed' => 'boolean',
@@ -60,6 +70,7 @@ class Schedule extends Model
             'selected_instruments' => 'array',
             'cbt_question_ids' => 'array',
             'duration_minutes' => 'integer',
+            'estimated_candidates' => 'integer',
         ];
     }
 
@@ -76,6 +87,97 @@ class Schedule extends Model
     public function getPicTukSignatureAttribute(): ?string
     {
         return $this->pic_signature;
+    }
+
+    public function getFormattedDateRangeAttribute(): string
+    {
+        if (! $this->date) {
+            return '-';
+        }
+
+        $startDate = Carbon::parse($this->date);
+        $endDate = $this->end_date ? Carbon::parse($this->end_date) : $startDate;
+
+        if ($startDate->isSameDay($endDate)) {
+            $dayName = $startDate->isoFormat('dddd');
+            $dateFormatted = $startDate->isoFormat('D MMMM Y');
+
+            return "{$dayName} / {$dateFormatted}";
+        }
+
+        $startDayName = $startDate->isoFormat('dddd');
+        $endDayName = $endDate->isoFormat('dddd');
+        $daysPart = "{$startDayName} s.d {$endDayName}";
+
+        if ($startDate->format('Y-m') === $endDate->format('Y-m')) {
+            $datesPart = $startDate->format('j').' s.d '.$endDate->isoFormat('D MMMM Y');
+        } elseif ($startDate->format('Y') === $endDate->format('Y')) {
+            $datesPart = $startDate->isoFormat('D MMMM').' s.d '.$endDate->isoFormat('D MMMM Y');
+        } else {
+            $datesPart = $startDate->isoFormat('D MMMM Y').' s.d '.$endDate->isoFormat('D MMMM Y');
+        }
+
+        return "{$daysPart} / {$datesPart}";
+    }
+
+    public function getFormattedTimeRangeAttribute(): string
+    {
+        $start = $this->start_time ? substr($this->start_time, 0, 5) : '08.00';
+        $end = $this->end_time ? substr($this->end_time, 0, 5) : '17.00';
+        $start = str_replace(':', '.', $start);
+        $end = str_replace(':', '.', $end);
+
+        return "{$start} s/d {$end} WIB";
+    }
+
+    public function getEffectiveCandidateCountAttribute(): int
+    {
+        if ($this->estimated_candidates && $this->estimated_candidates > 0) {
+            return (int) $this->estimated_candidates;
+        }
+
+        if ($this->relationLoaded('assessments')) {
+            return $this->assessments->count();
+        }
+
+        return $this->assessments()->count();
+    }
+
+    public function getEffectiveTukAddressAttribute(): string
+    {
+        if (! empty($this->tuk_address) && $this->tuk_address !== '-') {
+            return $this->tuk_address;
+        }
+
+        if ($this->relationLoaded('tuk') ? $this->tuk : $this->tuk()->first()) {
+            $tuk = $this->relationLoaded('tuk') ? $this->tuk : $this->tuk()->first();
+            if (! empty($tuk?->address)) {
+                return $tuk->address;
+            }
+        }
+
+        return $this->tuk_address ?: '-';
+    }
+
+    public function getFormattedSuratTugasDateAttribute(): string
+    {
+        $d = $this->surat_tugas_date ?: ($this->date ?: now());
+
+        return Carbon::parse($d)->isoFormat('D MMMM Y');
+    }
+
+    public function generateDefaultSuratTugasNumber(): string
+    {
+        $date = $this->date ? Carbon::parse($this->date) : now();
+        $romanMonths = [
+            1 => 'I', 2 => 'II', 3 => 'III', 4 => 'IV', 5 => 'V', 6 => 'VI',
+            7 => 'VII', 8 => 'VIII', 9 => 'IX', 10 => 'X', 11 => 'XI', 12 => 'XII',
+        ];
+        $monthNum = (int) $date->format('n');
+        $romanMonth = $romanMonths[$monthNum] ?? 'I';
+        $year = $date->format('Y');
+
+        return sprintf('%03d/ST/PRO-INDO/INT/%s/%s', $this->id ?: 1, $romanMonth, $year);
     }
 
     /**

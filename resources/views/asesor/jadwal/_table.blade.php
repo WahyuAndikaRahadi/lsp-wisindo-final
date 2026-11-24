@@ -64,7 +64,7 @@
                             <svg class="w-4 h-4 mr-2 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                             </svg>
-                            <span>{{ \Carbon\Carbon::parse($jadwal->date)->isoFormat('dddd, D MMMM Y') }}</span>
+                            <span>{{ $jadwal->formatted_date_range }}</span>
                         </div>
                         <div class="flex items-center">
                             <svg class="w-4 h-4 mr-2 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -85,10 +85,16 @@
                     </div>
                 </div>
 
-                <div class="mt-5 pt-4 border-t border-slate-100">
+                <div class="mt-5 pt-4 border-t border-slate-100 flex items-center gap-2">
+                    <a href="{{ route('asesor.schedule.surat-tugas', $jadwal->id) }}" class="inline-flex items-center justify-center px-3.5 py-2.5 min-h-[42px] text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 border border-slate-300 rounded-lg shadow-2xs transition shrink-0" title="Lihat Surat Tugas Asesor">
+                        <svg class="w-4 h-4 mr-1 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                        <span>Surat Tugas</span>
+                    </a>
                     @cannot('enter-schedule', $jadwal)
                         <button type="button" disabled
-                                class="w-full inline-flex items-center justify-center px-4 py-2.5 min-h-[42px] text-xs font-bold uppercase tracking-wider bg-slate-100 text-slate-400 border border-slate-200 rounded-lg cursor-not-allowed transition select-none"
+                                class="flex-1 inline-flex items-center justify-center px-4 py-2.5 min-h-[42px] text-xs font-bold uppercase tracking-wider bg-slate-100 text-slate-400 border border-slate-200 rounded-lg cursor-not-allowed transition select-none"
                                 title="Silakan simpan tanda tangan digital pada profil Anda terlebih dahulu untuk masuk ke jadwal">
                             <svg class="w-4 h-4 mr-1.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m0 0v2m0-2h2m-2 0H10m7-7V7a5 5 0 00-10 0v4h10zM5 11h14a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2z"/>
@@ -97,12 +103,12 @@
                         </button>
                     @else
                         @if($isClosedForMe)
-                            <a href="{{ route('asesor.schedule.ruang-uji', $jadwal->id) }}" class="w-full inline-flex items-center justify-center px-4 py-2.5 min-h-[42px] text-xs font-bold uppercase tracking-wider bg-slate-800 hover:bg-slate-900 text-white rounded-lg shadow-sm transition">
+                            <a href="{{ route('asesor.schedule.ruang-uji', $jadwal->id) }}" class="flex-1 inline-flex items-center justify-center px-4 py-2.5 min-h-[42px] text-xs font-bold uppercase tracking-wider bg-slate-800 hover:bg-slate-900 text-white rounded-lg shadow-sm transition">
                                 <span>Lihat Ruang Uji</span>
                                 <svg class="w-4 h-4 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                             </a>
                         @else
-                            <a href="{{ route('asesor.schedule.ruang-uji', $jadwal->id) }}" class="w-full inline-flex items-center justify-center px-4 py-2.5 min-h-[42px] text-xs font-bold uppercase tracking-wider bg-brand-600 hover:bg-brand-700 text-white rounded-lg shadow-sm transition">
+                            <a href="{{ route('asesor.schedule.ruang-uji', $jadwal->id) }}" class="flex-1 inline-flex items-center justify-center px-4 py-2.5 min-h-[42px] text-xs font-bold uppercase tracking-wider bg-brand-600 hover:bg-brand-700 text-white rounded-lg shadow-sm transition">
                                 <span>Masuk Ruang Uji</span>
                                 <svg class="w-4 h-4 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                             </a>

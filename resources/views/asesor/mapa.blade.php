@@ -228,18 +228,20 @@
 
                     <div class="space-y-2.5 bg-slate-50/60 p-3 sm:p-4 rounded-xl border border-slate-200">
                         {{-- 1. Standar Kompetensi --}}
-                        <div class="flex flex-col sm:flex-row sm:items-center gap-2 p-2.5 rounded-lg border border-slate-200 bg-white shadow-2xs">
-                            <label class="inline-flex items-center gap-2 text-xs font-semibold text-slate-800 cursor-pointer shrink-0">
+                        <div class="flex flex-col gap-2 p-2.5 rounded-lg border border-slate-200 bg-white shadow-2xs">
+                            <label class="inline-flex items-center gap-2 text-xs font-semibold text-slate-800 cursor-pointer">
                                 <input type="checkbox" name="standar_industri_opt[]" value="standar_kompetensi"
                                        @disabled($isClosedForMe)
                                        {{ in_array('standar_kompetensi', $savedStandarIndustri) ? 'checked' : '' }}
-                                       class="rounded border-slate-300 text-brand-600 focus:ring-brand-500 w-4 h-4">
+                                       class="rounded border-slate-300 text-brand-600 focus:ring-brand-500 w-4 h-4 shrink-0">
                                 <span>Standar Kompetensi:</span>
                             </label>
-                            <input type="text" name="standar_kompetensi_val" value="{{ $savedStandarKompetensiVal }}"
-                                   placeholder="Contoh: SKKNI Nomor 97 Tahun 2018"
-                                   @disabled($isClosedForMe)
-                                   class="w-full sm:flex-1 min-w-0 text-xs rounded-md border border-slate-300 bg-white px-3 py-1.5 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 focus:outline-none transition">
+                            <div class="pl-6">
+                                <input type="text" name="standar_kompetensi_val" value="{{ $savedStandarKompetensiVal }}"
+                                       placeholder="Contoh: SKKNI Nomor 97 Tahun 2018"
+                                       @disabled($isClosedForMe)
+                                       class="w-full text-xs rounded-md border border-slate-300 bg-white px-3 py-1.5 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 focus:outline-none transition">
+                            </div>
                         </div>
 
                         {{-- 2. Kriteria asesmen dari kurikulum pelatihan --}}
@@ -247,53 +249,59 @@
                             <input type="checkbox" name="standar_industri_opt[]" value="kurikulum_pelatihan"
                                    @disabled($isClosedForMe)
                                    {{ in_array('kurikulum_pelatihan', $savedStandarIndustri) ? 'checked' : '' }}
-                                   class="rounded border-slate-300 text-brand-600 focus:ring-brand-500 w-4 h-4">
+                                   class="rounded border-slate-300 text-brand-600 focus:ring-brand-500 w-4 h-4 shrink-0">
                             <span class="text-slate-800 font-semibold">Kriteria asesmen dari kurikulum pelatihan</span>
                         </label>
 
                         {{-- 3. Spesifikasi kinerja suatu perusahaan atau industri --}}
-                        <div class="flex flex-col sm:flex-row sm:items-center gap-2 p-2.5 rounded-lg border border-slate-200 bg-white shadow-2xs">
-                            <label class="inline-flex items-center gap-2 text-xs font-semibold text-slate-800 cursor-pointer shrink-0">
+                        <div class="flex flex-col gap-2 p-2.5 rounded-lg border border-slate-200 bg-white shadow-2xs">
+                            <label class="inline-flex items-center gap-2 text-xs font-semibold text-slate-800 cursor-pointer">
                                 <input type="checkbox" name="standar_industri_opt[]" value="spesifikasi_kinerja"
                                        @disabled($isClosedForMe)
                                        {{ in_array('spesifikasi_kinerja', $savedStandarIndustri) ? 'checked' : '' }}
-                                       class="rounded border-slate-300 text-brand-600 focus:ring-brand-500 w-4 h-4">
+                                       class="rounded border-slate-300 text-brand-600 focus:ring-brand-500 w-4 h-4 shrink-0">
                                 <span>Spesifikasi kinerja suatu perusahaan atau industri:</span>
                             </label>
-                            <input type="text" name="spesifikasi_kinerja_val" value="{{ $savedSpesifikasiKinerjaVal }}"
-                                   placeholder="Contoh: Repair Manual"
-                                   @disabled($isClosedForMe)
-                                   class="w-full sm:flex-1 min-w-0 text-xs rounded-md border border-slate-300 bg-white px-3 py-1.5 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 focus:outline-none transition">
+                            <div class="pl-6">
+                                <input type="text" name="spesifikasi_kinerja_val" value="{{ $savedSpesifikasiKinerjaVal }}"
+                                       placeholder="Contoh: Repair Manual"
+                                       @disabled($isClosedForMe)
+                                       class="w-full text-xs rounded-md border border-slate-300 bg-white px-3 py-1.5 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 focus:outline-none transition">
+                            </div>
                         </div>
 
                         {{-- 4. Spesifikasi Produk --}}
-                        <div class="flex flex-col sm:flex-row sm:items-center gap-2 p-2.5 rounded-lg border border-slate-200 bg-white shadow-2xs">
-                            <label class="inline-flex items-center gap-2 text-xs font-semibold text-slate-800 cursor-pointer shrink-0">
+                        <div class="flex flex-col gap-2 p-2.5 rounded-lg border border-slate-200 bg-white shadow-2xs">
+                            <label class="inline-flex items-center gap-2 text-xs font-semibold text-slate-800 cursor-pointer">
                                 <input type="checkbox" name="standar_industri_opt[]" value="spesifikasi_produk"
                                        @disabled($isClosedForMe)
                                        {{ in_array('spesifikasi_produk', $savedStandarIndustri) ? 'checked' : '' }}
-                                       class="rounded border-slate-300 text-brand-600 focus:ring-brand-500 w-4 h-4">
+                                       class="rounded border-slate-300 text-brand-600 focus:ring-brand-500 w-4 h-4 shrink-0">
                                 <span>Spesifikasi Produk:</span>
                             </label>
-                            <input type="text" name="spesifikasi_produk_val" value="{{ $savedSpesifikasiProdukVal }}"
-                                   placeholder="Tuliskan spesifikasi produk bila ada..."
-                                   @disabled($isClosedForMe)
-                                   class="w-full sm:flex-1 min-w-0 text-xs rounded-md border border-slate-300 bg-white px-3 py-1.5 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 focus:outline-none transition">
+                            <div class="pl-6">
+                                <input type="text" name="spesifikasi_produk_val" value="{{ $savedSpesifikasiProdukVal }}"
+                                       placeholder="Tuliskan spesifikasi produk bila ada..."
+                                       @disabled($isClosedForMe)
+                                       class="w-full text-xs rounded-md border border-slate-300 bg-white px-3 py-1.5 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 focus:outline-none transition">
+                            </div>
                         </div>
 
                         {{-- 5. Pedoman khusus --}}
-                        <div class="flex flex-col sm:flex-row sm:items-center gap-2 p-2.5 rounded-lg border border-slate-200 bg-white shadow-2xs">
-                            <label class="inline-flex items-center gap-2 text-xs font-semibold text-slate-800 cursor-pointer shrink-0">
+                        <div class="flex flex-col gap-2 p-2.5 rounded-lg border border-slate-200 bg-white shadow-2xs">
+                            <label class="inline-flex items-center gap-2 text-xs font-semibold text-slate-800 cursor-pointer">
                                 <input type="checkbox" name="standar_industri_opt[]" value="pedoman_khusus"
                                        @disabled($isClosedForMe)
                                        {{ in_array('pedoman_khusus', $savedStandarIndustri) ? 'checked' : '' }}
-                                       class="rounded border-slate-300 text-brand-600 focus:ring-brand-500 w-4 h-4">
+                                       class="rounded border-slate-300 text-brand-600 focus:ring-brand-500 w-4 h-4 shrink-0">
                                 <span>Pedoman khusus:</span>
                             </label>
-                            <input type="text" name="pedoman_khusus_val" value="{{ $savedPedomanKhususVal }}"
-                                   placeholder="Tuliskan pedoman khusus bila ada..."
-                                   @disabled($isClosedForMe)
-                                   class="w-full sm:flex-1 min-w-0 text-xs rounded-md border border-slate-300 bg-white px-3 py-1.5 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 focus:outline-none transition">
+                            <div class="pl-6">
+                                <input type="text" name="pedoman_khusus_val" value="{{ $savedPedomanKhususVal }}"
+                                       placeholder="Tuliskan pedoman khusus bila ada..."
+                                       @disabled($isClosedForMe)
+                                       class="w-full text-xs rounded-md border border-slate-300 bg-white px-3 py-1.5 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 focus:outline-none transition">
+                            </div>
                         </div>
                     </div>
                 </div>
