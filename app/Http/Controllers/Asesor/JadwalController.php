@@ -92,9 +92,10 @@ class JadwalController extends Controller
             return view('asesor.jadwal._table', compact('schedules', 'jadwals'));
         }
 
-        $registrationToken = RegistrationTokenService::getCurrentToken();
+        $tokenInfo = RegistrationTokenService::getTokenInfo();
+        $registrationToken = $tokenInfo['token'];
 
-        return view('asesor.jadwal.index', compact('schedules', 'jadwals', 'registrationToken', 'counts'));
+        return view('asesor.jadwal.index', compact('schedules', 'jadwals', 'registrationToken', 'tokenInfo', 'counts'));
     }
 
     public function suratTugas(Request $request, Schedule $schedule): View

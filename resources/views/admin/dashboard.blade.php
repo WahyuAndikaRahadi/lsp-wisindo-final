@@ -39,24 +39,46 @@
             <div>
                 <div class="flex items-center gap-2">
                     <span class="text-xs font-bold uppercase tracking-wider text-emerald-900">Token Registrasi Asesi Aktif</span>
+                    @if(isset($tokenInfo['days_remaining']))
+                        <span class="text-[10px] font-semibold text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded-full border border-emerald-200">
+                            Berlaku {{ $tokenInfo['days_remaining'] }} hari lagi
+                        </span>
+                    @endif
                 </div>
                 <p class="text-xs text-slate-500 mt-0.5">
-                    Gunakan token ini untuk pendaftaran calon peserta (asesi). Token diacak ulang secara otomatis setiap minggu.
+                    Gunakan token ini untuk pendaftaran calon peserta (asesi). Token diacak ulang secara otomatis setiap 7 hari (mingguan).
                 </p>
             </div>
         </div>
-        <div class="flex items-center gap-2 self-start sm:self-auto shrink-0 bg-white px-3.5 py-2 rounded-xl border border-emerald-200 shadow-2xs"
-             x-data="{ copied: false, token: '{{ $registrationToken }}' }">
-            <span class="font-mono font-black text-lg text-emerald-700 tracking-wider select-all" x-text="token">
-                {{ $registrationToken }}
-            </span>
-            <button type="button" 
-                    @click="navigator.clipboard.writeText(token); copied = true; setTimeout(() => copied = false, 2000)"
-                    class="px-2.5 py-1 text-xs font-bold rounded-lg transition"
-                    :class="copied ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'">
-                <span x-show="!copied">Salin</span>
-                <span x-show="copied" x-cloak>Tersalin!</span>
-            </button>
+        <div class="flex items-center gap-2 self-start sm:self-auto shrink-0">
+            <div class="flex items-center gap-2 bg-white px-3.5 py-2 rounded-xl border border-emerald-200 shadow-2xs"
+                 x-data="{ copied: false, token: '{{ $registrationToken }}' }">
+                <span class="font-mono font-black text-lg text-emerald-700 tracking-wider select-all" x-text="token">
+                    {{ $registrationToken }}
+                </span>
+                <button type="button" 
+                        @click="navigator.clipboard.writeText(token); copied = true; setTimeout(() => copied = false, 2000)"
+                        class="px-2.5 py-1 text-xs font-bold rounded-lg transition cursor-pointer"
+                        :class="copied ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'">
+                    <span x-show="!copied">Salin</span>
+                    <span x-show="copied" x-cloak>Tersalin!</span>
+                </button>
+            </div>
+
+            @if(in_array(auth()->user()?->role, ['SUPER_ADMIN', 'ADMIN_LSP']))
+                <form action="{{ route('admin.registration-token.rotate') }}" method="POST" class="inline">
+                    @csrf
+                    <button type="submit"
+                            onclick="return confirm('Acak ulang token pendaftaran sekarang? Token baru akan langsung aktif dan dibagikan ke asesor.')"
+                            class="px-3 py-2 text-xs font-bold text-emerald-800 bg-emerald-100 hover:bg-emerald-200 border border-emerald-300 rounded-xl transition shadow-2xs flex items-center gap-1.5 cursor-pointer"
+                            title="Acak ulang token sekarang">
+                        <svg class="w-3.5 h-3.5 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                        </svg>
+                        <span>Acak Ulang</span>
+                    </button>
+                </form>
+            @endif
         </div>
     </div>
 
