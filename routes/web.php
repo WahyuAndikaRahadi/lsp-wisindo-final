@@ -241,6 +241,7 @@ Route::middleware(['auth', 'role:ASESI'])->prefix('asesi')->name('asesi.')->grou
     // Asesmen & APL
     Route::get('/assessment/{assessment}/apl', [Asesi\AplController::class, 'show'])->name('assessment.apl');
     Route::post('/assessment/{assessment}/apl', [Asesi\AplController::class, 'store'])->name('assessment.apl.store');
+    Route::delete('/assessment/{assessment}/proof/{proof}', [Asesi\AplController::class, 'destroyProof'])->name('assessment.proof.destroy');
 
     // Ruang Uji (Protected by APL Approval Gate)
     Route::middleware(['apl.approved'])->prefix('assessment/{assessment}')->name('assessment.')->group(function () {

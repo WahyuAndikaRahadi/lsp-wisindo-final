@@ -7,9 +7,11 @@ use App\Models\Assessment;
 use App\Models\AssessmentApl02Item;
 use App\Models\AssessmentProof;
 use App\Rules\ValidSignature;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class AplController extends Controller
@@ -284,5 +286,64 @@ class AplController extends Controller
         }
 
         return redirect()->route('asesi.assessment.apl', $assessment)->with('success', 'Menunggu verifikasi asesor');
+    }
+
+    /**
+     * Hapus berkas bukti persyaratan dasar atau administratif yang telah diunggah.
+     */
+    public function destroyProof(Assessment $assessment, AssessmentProof $proof, Request $request): JsonResponse|RedirectResponse
+    {
+        abort_if($assessment->asesi_id !== auth()->id(), 403);
+        abort_if($proof->assessment_id !== $assessment->id, 404);
+
+        if ($assessment->schedule && $assessment->schedule->is_closed) {
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json(['message' => 'Jadwal asesmen sudah resmi ditutup.'], 403);
+            }
+
+            return back()->with('error', 'Jadwal asesmen sudah resmi ditutup.');
+        }
+
+        if ($assessment->apl_status === 'SUBMITTED') {
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json(['message' => 'Permohonan APL Anda sedang menunggu verifikasi asesor sehingga berkas tidak dapat dihapus.'], 403);
+            }
+
+            return back()->with('error', 'Permohonan APL Anda sedang menunggu verifikasi asesor sehingga berkas tidak dapat dihapus.');
+        }
+
+        if ($assessment->apl_status === 'REJECTED' || $assessment->admin_status === 'REJECTED') {
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json(['message' => 'Permohonan APL pada jadwal ini telah ditolak.'], 403);
+            }
+
+            return back()->with('error', 'Permohonan APL pada jadwal ini telah ditolak.');
+        }
+
+        if (! empty($proof->file_path)) {
+            if (Storage::disk('local')->exists($proof->file_path)) {
+                Storage::disk('local')->delete($proof->file_path);
+            } elseif (Storage::disk('public')->exists($proof->file_path)) {
+                Storage::disk('public')->delete($proof->file_path);
+            }
+        }
+
+        $proofType = $proof->proof_type;
+        $filename = $proof->original_filename;
+        $proof->delete();
+
+        $assessment->apl02Items()
+            ->where('selected_proof_type', $proofType)
+            ->update(['selected_proof_type' => null]);
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Berkas '.($filename ? '"'.$filename.'" ' : '').'berhasil dihapus.',
+                'proof_type' => $proofType,
+            ]);
+        }
+
+        return back()->with('success', 'Berkas '.($filename ? '"'.$filename.'" ' : '').'berhasil dihapus.');
     }
 }

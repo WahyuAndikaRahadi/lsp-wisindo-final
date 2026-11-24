@@ -477,7 +477,27 @@
                                 <label class="block text-xs font-bold text-slate-700 mb-1">A. Ijazah SMK Otomotif</label>
                                 <input type="file" name="proofs[IJAZAH_SMK]" accept="image/jpeg,image/png,image/jpg,image/webp,application/pdf,.jpg,.jpeg,.png,.webp,.pdf" class="block w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" @disabled($isAplLocked)>
                                 @if(isset($existingProofs['IJAZAH_SMK']))
-                                    <span class="text-xs text-emerald-600 font-medium mt-1 inline-block">✓ Terunggah: {{ $existingProofs['IJAZAH_SMK']->original_filename }}</span>
+                                    @php $proof = $existingProofs['IJAZAH_SMK']; @endphp
+                                    <div id="proof-item-IJAZAH_SMK" class="mt-2 p-2 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-between gap-2">
+                                        <div class="flex items-center gap-1.5 min-w-0">
+                                            <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                            <div class="min-w-0">
+                                                <a href="{{ route('secure-file.proof', $proof) }}" target="_blank" rel="noopener noreferrer" class="text-xs font-semibold text-emerald-800 hover:text-emerald-950 hover:underline truncate block" title="Lihat berkas: {{ $proof->original_filename }}">
+                                                    {{ $proof->original_filename }}
+                                                </a>
+                                                <span class="text-[10px] text-emerald-600">File sudah terunggah</span>
+                                            </div>
+                                        </div>
+                                        @if(!$isAplLocked)
+                                            <button type="button"
+                                                onclick="deleteUploadedProof({{ $proof->id }}, 'IJAZAH_SMK', @js($proof->original_filename), '{{ route('asesi.assessment.proof.destroy', [$assessment, $proof]) }}')"
+                                                class="shrink-0 inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-rose-700 bg-white hover:bg-rose-50 hover:text-rose-800 border border-rose-300 hover:border-rose-400 rounded-md shadow-2xs transition cursor-pointer"
+                                                title="Hapus berkas yang sudah terunggah">
+                                                <svg class="w-3.5 h-3.5 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                                <span>Hapus</span>
+                                            </button>
+                                        @endif
+                                    </div>
                                 @endif
                             </div>
 
@@ -486,7 +506,27 @@
                                 <label class="block text-xs font-bold text-slate-700 mb-1">B. Surat Keterangan Siswa Aktif SMK</label>
                                 <input type="file" name="proofs[SURAT_SISWA_AKTIF]" accept="image/jpeg,image/png,image/jpg,image/webp,application/pdf,.jpg,.jpeg,.png,.webp,.pdf" class="block w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" @disabled($isAplLocked)>
                                 @if(isset($existingProofs['SURAT_SISWA_AKTIF']))
-                                    <span class="text-xs text-emerald-600 font-medium mt-1 inline-block">✓ Terunggah: {{ $existingProofs['SURAT_SISWA_AKTIF']->original_filename }}</span>
+                                    @php $proof = $existingProofs['SURAT_SISWA_AKTIF']; @endphp
+                                    <div id="proof-item-SURAT_SISWA_AKTIF" class="mt-2 p-2 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-between gap-2">
+                                        <div class="flex items-center gap-1.5 min-w-0">
+                                            <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                            <div class="min-w-0">
+                                                <a href="{{ route('secure-file.proof', $proof) }}" target="_blank" rel="noopener noreferrer" class="text-xs font-semibold text-emerald-800 hover:text-emerald-950 hover:underline truncate block" title="Lihat berkas: {{ $proof->original_filename }}">
+                                                    {{ $proof->original_filename }}
+                                                </a>
+                                                <span class="text-[10px] text-emerald-600">File sudah terunggah</span>
+                                            </div>
+                                        </div>
+                                        @if(!$isAplLocked)
+                                            <button type="button"
+                                                onclick="deleteUploadedProof({{ $proof->id }}, 'SURAT_SISWA_AKTIF', @js($proof->original_filename), '{{ route('asesi.assessment.proof.destroy', [$assessment, $proof]) }}')"
+                                                class="shrink-0 inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-rose-700 bg-white hover:bg-rose-50 hover:text-rose-800 border border-rose-300 hover:border-rose-400 rounded-md shadow-2xs transition cursor-pointer"
+                                                title="Hapus berkas yang sudah terunggah">
+                                                <svg class="w-3.5 h-3.5 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                                <span>Hapus</span>
+                                            </button>
+                                        @endif
+                                    </div>
                                 @endif
                             </div>
 
@@ -495,7 +535,27 @@
                                 <label class="block text-xs font-bold text-slate-700 mb-1">C. Ijazah SMA + Sertifikat Pelatihan Otomotif</label>
                                 <input type="file" name="proofs[IJAZAH_SMA_SERTIFIKAT]" accept="image/jpeg,image/png,image/jpg,image/webp,application/pdf,.jpg,.jpeg,.png,.webp,.pdf" class="block w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" @disabled($isAplLocked)>
                                 @if(isset($existingProofs['IJAZAH_SMA_SERTIFIKAT']))
-                                    <span class="text-xs text-emerald-600 font-medium mt-1 inline-block">✓ Terunggah: {{ $existingProofs['IJAZAH_SMA_SERTIFIKAT']->original_filename }}</span>
+                                    @php $proof = $existingProofs['IJAZAH_SMA_SERTIFIKAT']; @endphp
+                                    <div id="proof-item-IJAZAH_SMA_SERTIFIKAT" class="mt-2 p-2 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-between gap-2">
+                                        <div class="flex items-center gap-1.5 min-w-0">
+                                            <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                            <div class="min-w-0">
+                                                <a href="{{ route('secure-file.proof', $proof) }}" target="_blank" rel="noopener noreferrer" class="text-xs font-semibold text-emerald-800 hover:text-emerald-950 hover:underline truncate block" title="Lihat berkas: {{ $proof->original_filename }}">
+                                                    {{ $proof->original_filename }}
+                                                </a>
+                                                <span class="text-[10px] text-emerald-600">File sudah terunggah</span>
+                                            </div>
+                                        </div>
+                                        @if(!$isAplLocked)
+                                            <button type="button"
+                                                onclick="deleteUploadedProof({{ $proof->id }}, 'IJAZAH_SMA_SERTIFIKAT', @js($proof->original_filename), '{{ route('asesi.assessment.proof.destroy', [$assessment, $proof]) }}')"
+                                                class="shrink-0 inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-rose-700 bg-white hover:bg-rose-50 hover:text-rose-800 border border-rose-300 hover:border-rose-400 rounded-md shadow-2xs transition cursor-pointer"
+                                                title="Hapus berkas yang sudah terunggah">
+                                                <svg class="w-3.5 h-3.5 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                                <span>Hapus</span>
+                                            </button>
+                                        @endif
+                                    </div>
                                 @endif
                             </div>
 
@@ -504,7 +564,27 @@
                                 <label class="block text-xs font-bold text-slate-700 mb-1">D. Surat Pengalaman Kerja Bengkel Otomotif</label>
                                 <input type="file" name="proofs[PENGALAMAN_KERJA]" accept="image/jpeg,image/png,image/jpg,image/webp,application/pdf,.jpg,.jpeg,.png,.webp,.pdf" class="block w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" @disabled($isAplLocked)>
                                 @if(isset($existingProofs['PENGALAMAN_KERJA']))
-                                    <span class="text-xs text-emerald-600 font-medium mt-1 inline-block">✓ Terunggah: {{ $existingProofs['PENGALAMAN_KERJA']->original_filename }}</span>
+                                    @php $proof = $existingProofs['PENGALAMAN_KERJA']; @endphp
+                                    <div id="proof-item-PENGALAMAN_KERJA" class="mt-2 p-2 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-between gap-2">
+                                        <div class="flex items-center gap-1.5 min-w-0">
+                                            <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                            <div class="min-w-0">
+                                                <a href="{{ route('secure-file.proof', $proof) }}" target="_blank" rel="noopener noreferrer" class="text-xs font-semibold text-emerald-800 hover:text-emerald-950 hover:underline truncate block" title="Lihat berkas: {{ $proof->original_filename }}">
+                                                    {{ $proof->original_filename }}
+                                                </a>
+                                                <span class="text-[10px] text-emerald-600">File sudah terunggah</span>
+                                            </div>
+                                        </div>
+                                        @if(!$isAplLocked)
+                                            <button type="button"
+                                                onclick="deleteUploadedProof({{ $proof->id }}, 'PENGALAMAN_KERJA', @js($proof->original_filename), '{{ route('asesi.assessment.proof.destroy', [$assessment, $proof]) }}')"
+                                                class="shrink-0 inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-rose-700 bg-white hover:bg-rose-50 hover:text-rose-800 border border-rose-300 hover:border-rose-400 rounded-md shadow-2xs transition cursor-pointer"
+                                                title="Hapus berkas yang sudah terunggah">
+                                                <svg class="w-3.5 h-3.5 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                                <span>Hapus</span>
+                                            </button>
+                                        @endif
+                                    </div>
                                 @endif
                             </div>
                         </div>
@@ -527,7 +607,27 @@
                                 <label class="block text-xs font-bold text-slate-700 mb-1">Fotokopi KTP / Identitas Diri <span class="text-rose-500">*</span></label>
                                 <input type="file" name="proofs[KTP]" accept="image/jpeg,image/png,image/jpg,image/webp,application/pdf,.jpg,.jpeg,.png,.webp,.pdf" class="block w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100" @disabled($isAplLocked)>
                                 @if(isset($existingProofs['KTP']))
-                                    <span class="text-xs text-emerald-600 font-medium mt-1 inline-block">✓ Terunggah: {{ $existingProofs['KTP']->original_filename }}</span>
+                                    @php $proof = $existingProofs['KTP']; @endphp
+                                    <div id="proof-item-KTP" class="mt-2 p-2 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-between gap-2">
+                                        <div class="flex items-center gap-1.5 min-w-0">
+                                            <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                            <div class="min-w-0">
+                                                <a href="{{ route('secure-file.proof', $proof) }}" target="_blank" rel="noopener noreferrer" class="text-xs font-semibold text-emerald-800 hover:text-emerald-950 hover:underline truncate block" title="Lihat berkas: {{ $proof->original_filename }}">
+                                                    {{ $proof->original_filename }}
+                                                </a>
+                                                <span class="text-[10px] text-emerald-600">File sudah terunggah</span>
+                                            </div>
+                                        </div>
+                                        @if(!$isAplLocked)
+                                            <button type="button"
+                                                onclick="deleteUploadedProof({{ $proof->id }}, 'KTP', @js($proof->original_filename), '{{ route('asesi.assessment.proof.destroy', [$assessment, $proof]) }}')"
+                                                class="shrink-0 inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-rose-700 bg-white hover:bg-rose-50 hover:text-rose-800 border border-rose-300 hover:border-rose-400 rounded-md shadow-2xs transition cursor-pointer"
+                                                title="Hapus berkas yang sudah terunggah">
+                                                <svg class="w-3.5 h-3.5 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                                <span>Hapus</span>
+                                            </button>
+                                        @endif
+                                    </div>
                                 @endif
                             </div>
 
@@ -535,7 +635,27 @@
                                 <label class="block text-xs font-bold text-slate-700 mb-1">Pas Foto 3x4 (Latar Belakang Merah) <span class="text-rose-500">*</span></label>
                                 <input type="file" name="proofs[PAS_FOTO]" accept="image/jpeg,image/png,image/jpg,image/webp,application/pdf,.jpg,.jpeg,.png,.webp,.pdf" class="block w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100" @disabled($isAplLocked)>
                                 @if(isset($existingProofs['PAS_FOTO']))
-                                    <span class="text-xs text-emerald-600 font-medium mt-1 inline-block">✓ Terunggah: {{ $existingProofs['PAS_FOTO']->original_filename }}</span>
+                                    @php $proof = $existingProofs['PAS_FOTO']; @endphp
+                                    <div id="proof-item-PAS_FOTO" class="mt-2 p-2 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-between gap-2">
+                                        <div class="flex items-center gap-1.5 min-w-0">
+                                            <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                            <div class="min-w-0">
+                                                <a href="{{ route('secure-file.proof', $proof) }}" target="_blank" rel="noopener noreferrer" class="text-xs font-semibold text-emerald-800 hover:text-emerald-950 hover:underline truncate block" title="Lihat berkas: {{ $proof->original_filename }}">
+                                                    {{ $proof->original_filename }}
+                                                </a>
+                                                <span class="text-[10px] text-emerald-600">File sudah terunggah</span>
+                                            </div>
+                                        </div>
+                                        @if(!$isAplLocked)
+                                            <button type="button"
+                                                onclick="deleteUploadedProof({{ $proof->id }}, 'PAS_FOTO', @js($proof->original_filename), '{{ route('asesi.assessment.proof.destroy', [$assessment, $proof]) }}')"
+                                                class="shrink-0 inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-rose-700 bg-white hover:bg-rose-50 hover:text-rose-800 border border-rose-300 hover:border-rose-400 rounded-md shadow-2xs transition cursor-pointer"
+                                                title="Hapus berkas yang sudah terunggah">
+                                                <svg class="w-3.5 h-3.5 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                                <span>Hapus</span>
+                                            </button>
+                                        @endif
+                                    </div>
                                 @endif
                             </div>
                         </div>
@@ -736,5 +856,129 @@
             </div>
         </div>
     </form>
+
+    {{-- Fallback form for proof deletion --}}
+    @if(!$isAplLocked)
+        @foreach($assessment->proofs as $p)
+            <form id="delete-proof-form-{{ $p->id }}" action="{{ route('asesi.assessment.proof.destroy', [$assessment, $p]) }}" method="POST" class="hidden">
+                @csrf
+                @method('DELETE')
+            </form>
+        @endforeach
+    @endif
 </div>
 @endsection
+
+@push('scripts')
+<script>
+function deleteUploadedProof(proofId, proofType, filename, deleteUrl) {
+    const confirmation = confirm(`Apakah Anda yakin ingin menghapus berkas "${filename}"?`);
+    if (!confirmation) {
+        return;
+    }
+
+    const itemEl = document.getElementById(`proof-item-${proofType}`);
+    const btn = itemEl ? itemEl.querySelector('button') : null;
+    let originalHtml = '';
+    if (btn) {
+        originalHtml = btn.innerHTML;
+        btn.disabled = true;
+        btn.classList.add('opacity-70', 'cursor-not-allowed');
+        btn.innerHTML = `
+            <svg class="animate-spin w-3.5 h-3.5 text-rose-600 inline mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <span>Menghapus...</span>
+        `;
+    }
+
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+        || document.querySelector('input[name="_token"]')?.value;
+
+    fetch(deleteUrl, {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': csrfToken,
+            'X-HTTP-Method-Override': 'DELETE',
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ _method: 'DELETE' })
+    })
+    .then(async response => {
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+            throw new Error(data.message || 'Gagal menghapus berkas.');
+        }
+        return data;
+    })
+    .then(data => {
+        if (itemEl) {
+            itemEl.style.transition = 'all 0.25s ease';
+            itemEl.style.opacity = '0';
+            itemEl.style.transform = 'scale(0.95)';
+            setTimeout(() => itemEl.remove(), 250);
+        }
+
+        const fileInput = document.querySelector(`input[name="proofs[${proofType}]"]`);
+        if (fileInput) {
+            fileInput.value = '';
+            const clearBtn = fileInput.parentElement.querySelector('.btn-clear-selection');
+            if (clearBtn) {
+                clearBtn.remove();
+            }
+        }
+
+        if (window.Notiflix && Notiflix.Notify) {
+            Notiflix.Notify.success(data.message || 'Berkas berhasil dihapus.');
+        } else {
+            alert(data.message || 'Berkas berhasil dihapus.');
+        }
+    })
+    .catch(error => {
+        if (window.Notiflix && Notiflix.Notify) {
+            Notiflix.Notify.failure(error.message || 'Terjadi kesalahan saat menghapus berkas.');
+        } else {
+            alert(error.message || 'Terjadi kesalahan saat menghapus berkas.');
+        }
+        if (btn) {
+            btn.disabled = false;
+            btn.classList.remove('opacity-70', 'cursor-not-allowed');
+            btn.innerHTML = originalHtml;
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('input[type="file"][name^="proofs["]').forEach(function (input) {
+        input.addEventListener('change', function () {
+            let clearBtn = input.parentElement.querySelector('.btn-clear-selection');
+            if (input.files && input.files.length > 0) {
+                if (!clearBtn) {
+                    clearBtn = document.createElement('button');
+                    clearBtn.type = 'button';
+                    clearBtn.className = 'btn-clear-selection text-[11px] text-slate-500 hover:text-rose-600 mt-1 flex items-center gap-1 cursor-pointer transition';
+                    clearBtn.innerHTML = `
+                        <svg class="w-3 h-3 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                        <span>Batal pilih file baru (${input.files[0].name})</span>
+                    `;
+                    clearBtn.onclick = function () {
+                        input.value = '';
+                        clearBtn.remove();
+                    };
+                    input.parentElement.appendChild(clearBtn);
+                } else {
+                    const span = clearBtn.querySelector('span');
+                    if (span) {
+                        span.textContent = `Batal pilih file baru (${input.files[0].name})`;
+                    }
+                }
+            } else if (clearBtn) {
+                clearBtn.remove();
+            }
+        });
+    });
+});
+</script>
+@endpush
