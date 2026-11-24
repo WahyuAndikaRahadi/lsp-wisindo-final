@@ -48,6 +48,8 @@ class Schedule extends Model
         'is_closed',
         'closed_at',
         'reopened_at',
+        'kode_sumber_anggaran',
+        'kode_kementerian',
         'status',
         'created_by',
     ];

@@ -141,7 +141,7 @@ class DokumenMukController extends Controller
         $targetType = $aliasMap[$normalizedType] ?? $normalizedType;
 
         if (in_array($targetType, ['excel-biodata', 'excel', 'xls', 'biodata-excel', 'asesi-excel'], true)) {
-            return $this->exporter->exportScheduleAsesiXls($schedule);
+            return $this->exporter->exportScheduleAsesiXls($schedule, $request->all());
         }
 
         if (in_array($targetType, ['excel-asesor', 'asesor-excel', 'hadir-asesor-excel'], true)) {
@@ -316,9 +316,24 @@ class DokumenMukController extends Controller
         return $this->dynamicService->exportSchedule($schedule, 'hadir-asesi', request()->boolean('download'));
     }
 
-    public function exportExcelBiodata(Schedule $schedule)
+    public function exportExcelBiodata(Schedule $schedule, Request $request)
     {
-        return $this->exporter->exportScheduleAsesiXls($schedule);
+        $options = [];
+        if ($request->filled('kode_sumber_anggaran')) {
+            $options['kode_sumber_anggaran'] = $request->query('kode_sumber_anggaran');
+        }
+        if ($request->filled('kode_kementerian')) {
+            $options['kode_kementerian'] = $request->query('kode_kementerian');
+        }
+
+        if (! empty($options)) {
+            $schedule->update(array_filter([
+                'kode_sumber_anggaran' => $options['kode_sumber_anggaran'] ?? null,
+                'kode_kementerian' => $options['kode_kementerian'] ?? null,
+            ]));
+        }
+
+        return $this->exporter->exportScheduleAsesiXls($schedule, $options);
     }
 
     public function exportIndividual(Assessment $assessment, Request $request)

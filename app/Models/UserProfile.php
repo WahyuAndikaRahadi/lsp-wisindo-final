@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\BnspReferenceService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -24,9 +25,15 @@ class UserProfile extends Model
         'no_telepon_rumah',
         'no_telepon_kantor',
         'pendidikan_terakhir',
+        'kode_pendidikan',
         'nama_institusi_perusahaan',
         'jabatan',
+        'kode_pekerjaan',
         'alamat_kantor',
+        'kode_provinsi',
+        'nama_provinsi',
+        'kode_kota',
+        'nama_kota',
         'signature_data',
     ];
 
@@ -85,6 +92,25 @@ class UserProfile extends Model
     public function getMetNumberAttribute(): ?string
     {
         return $this->user?->assessor_registration_number;
+    }
+
+    public function getEffectiveKodePendidikanAttribute(): string
+    {
+        return $this->kode_pendidikan ?: BnspReferenceService::resolveEducationCode($this->pendidikan_terakhir);
+    }
+
+    public function getEffectiveKodePekerjaanAttribute(): string
+    {
+        return BnspReferenceService::resolveJobCode($this->jabatan, $this->kode_pekerjaan);
+    }
+
+    public function getEffectiveCityAndProvinceAttribute(): array
+    {
+        return BnspReferenceService::resolveCityAndProvince(
+            $this->kode_kota,
+            $this->kode_provinsi,
+            $this->alamat_rumah
+        );
     }
 
     public function isComplete(): bool

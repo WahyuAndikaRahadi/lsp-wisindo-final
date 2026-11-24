@@ -1,0 +1,3762 @@
+{
+  "pendidikan": [
+    {
+      "code": "1",
+      "name": "SD"
+    },
+    {
+      "code": "2",
+      "name": "SMP"
+    },
+    {
+      "code": "3",
+      "name": "SMA/Sederajat"
+    },
+    {
+      "code": "4",
+      "name": "D2"
+    },
+    {
+      "code": "5",
+      "name": "D3"
+    },
+    {
+      "code": "6",
+      "name": "D4"
+    },
+    {
+      "code": "7",
+      "name": "S1"
+    },
+    {
+      "code": "8",
+      "name": "S2"
+    },
+    {
+      "code": "9",
+      "name": "S3"
+    },
+    {
+      "code": "10",
+      "name": "D1"
+    }
+  ],
+  "provinces": [
+    {
+      "code": "11",
+      "name": "Aceh"
+    },
+    {
+      "code": "12",
+      "name": "Sumatera Utara"
+    },
+    {
+      "code": "13",
+      "name": "Sumatera Barat"
+    },
+    {
+      "code": "14",
+      "name": "Riau"
+    },
+    {
+      "code": "15",
+      "name": "Jambi"
+    },
+    {
+      "code": "16",
+      "name": "Sumatera Selatan"
+    },
+    {
+      "code": "17",
+      "name": "Bengkulu"
+    },
+    {
+      "code": "18",
+      "name": "Lampung"
+    },
+    {
+      "code": "19",
+      "name": "Kepulauan Bangka Belitung"
+    },
+    {
+      "code": "21",
+      "name": "Kepulauan Riau"
+    },
+    {
+      "code": "31",
+      "name": "DKI Jakarta"
+    },
+    {
+      "code": "32",
+      "name": "Jawa Barat"
+    },
+    {
+      "code": "33",
+      "name": "Jawa Tengah"
+    },
+    {
+      "code": "34",
+      "name": "Daerah Istimewa Yogyakarta"
+    },
+    {
+      "code": "35",
+      "name": "Jawa Timur"
+    },
+    {
+      "code": "36",
+      "name": "Banten"
+    },
+    {
+      "code": "51",
+      "name": "Bali"
+    },
+    {
+      "code": "52",
+      "name": "Nusa Tenggara Barat"
+    },
+    {
+      "code": "53",
+      "name": "Nusa Tenggara Timur"
+    },
+    {
+      "code": "61",
+      "name": "Kalimantan Barat"
+    },
+    {
+      "code": "62",
+      "name": "Kalimantan Tengah"
+    },
+    {
+      "code": "63",
+      "name": "Kalimantan Selatan"
+    },
+    {
+      "code": "64",
+      "name": "Kalimantan Timur"
+    },
+    {
+      "code": "65",
+      "name": "Kalimantan Utara"
+    },
+    {
+      "code": "71",
+      "name": "Sulawesi Utara"
+    },
+    {
+      "code": "72",
+      "name": "Sulawesi Tengah"
+    },
+    {
+      "code": "73",
+      "name": "Sulawesi Selatan"
+    },
+    {
+      "code": "74",
+      "name": "Sulawesi Tenggara"
+    },
+    {
+      "code": "75",
+      "name": "Gorontalo"
+    },
+    {
+      "code": "76",
+      "name": "Sulawesi Barat"
+    },
+    {
+      "code": "81",
+      "name": "Maluku"
+    },
+    {
+      "code": "82",
+      "name": "Maluku Utara"
+    },
+    {
+      "code": "91",
+      "name": "Papua"
+    },
+    {
+      "code": "92",
+      "name": "Papua Barat"
+    }
+  ],
+  "cities": [
+    {
+      "province_code": "11",
+      "code": "1101",
+      "name": "Kab. Aceh Selatan"
+    },
+    {
+      "province_code": "11",
+      "code": "1102",
+      "name": "Kab. Aceh Tenggara"
+    },
+    {
+      "province_code": "11",
+      "code": "1103",
+      "name": "Kab. Aceh Timur"
+    },
+    {
+      "province_code": "11",
+      "code": "1104",
+      "name": "Kab. Aceh Tengah"
+    },
+    {
+      "province_code": "11",
+      "code": "1105",
+      "name": "Kab. Aceh Barat"
+    },
+    {
+      "province_code": "11",
+      "code": "1106",
+      "name": "Kab. Aceh Besar"
+    },
+    {
+      "province_code": "11",
+      "code": "1107",
+      "name": "Kab. Pidie"
+    },
+    {
+      "province_code": "11",
+      "code": "1108",
+      "name": "Kab. Aceh Utara"
+    },
+    {
+      "province_code": "11",
+      "code": "1109",
+      "name": "Kab. Simeulue"
+    },
+    {
+      "province_code": "11",
+      "code": "1110",
+      "name": "Kab. Aceh Singkil"
+    },
+    {
+      "province_code": "11",
+      "code": "1111",
+      "name": "Kab. Bireuen"
+    },
+    {
+      "province_code": "11",
+      "code": "1112",
+      "name": "Kab. Aceh Barat Daya"
+    },
+    {
+      "province_code": "11",
+      "code": "1113",
+      "name": "Kab. Gayo Lues"
+    },
+    {
+      "province_code": "11",
+      "code": "1114",
+      "name": "Kab. Aceh Jaya"
+    },
+    {
+      "province_code": "11",
+      "code": "1115",
+      "name": "Kab. Nagan Raya"
+    },
+    {
+      "province_code": "11",
+      "code": "1116",
+      "name": "Kab. Aceh Tamiang"
+    },
+    {
+      "province_code": "11",
+      "code": "1117",
+      "name": "Kab. Bener Meriah"
+    },
+    {
+      "province_code": "11",
+      "code": "1118",
+      "name": "Kab. Pidie Jaya"
+    },
+    {
+      "province_code": "11",
+      "code": "1171",
+      "name": "Kota Banda Aceh"
+    },
+    {
+      "province_code": "11",
+      "code": "1172",
+      "name": "Kota Sabang"
+    },
+    {
+      "province_code": "11",
+      "code": "1173",
+      "name": "Kota Lhokseumawe"
+    },
+    {
+      "province_code": "11",
+      "code": "1174",
+      "name": "Kota Langsa"
+    },
+    {
+      "province_code": "11",
+      "code": "1175",
+      "name": "Kota Subulussalam"
+    },
+    {
+      "province_code": "12",
+      "code": "1201",
+      "name": "Kab. Tapanuli Tengah"
+    },
+    {
+      "province_code": "12",
+      "code": "1202",
+      "name": "Kab. Tapanuli Utara"
+    },
+    {
+      "province_code": "12",
+      "code": "1203",
+      "name": "Kab. Tapanuli Selatan"
+    },
+    {
+      "province_code": "12",
+      "code": "1204",
+      "name": "Kab. Nias"
+    },
+    {
+      "province_code": "12",
+      "code": "1205",
+      "name": "Kab. Langkat"
+    },
+    {
+      "province_code": "12",
+      "code": "1206",
+      "name": "Kab. Karo"
+    },
+    {
+      "province_code": "12",
+      "code": "1207",
+      "name": "Kab. Deli Serdang"
+    },
+    {
+      "province_code": "12",
+      "code": "1208",
+      "name": "Kab. Simalungun"
+    },
+    {
+      "province_code": "12",
+      "code": "1209",
+      "name": "Kab. Asahan"
+    },
+    {
+      "province_code": "12",
+      "code": "1210",
+      "name": "Kab. Labuhanbatu"
+    },
+    {
+      "province_code": "12",
+      "code": "1211",
+      "name": "Kab. Dairi"
+    },
+    {
+      "province_code": "12",
+      "code": "1212",
+      "name": "Kab. Toba Samosir"
+    },
+    {
+      "province_code": "12",
+      "code": "1213",
+      "name": "Kab. Mandailing Natal"
+    },
+    {
+      "province_code": "12",
+      "code": "1214",
+      "name": "Kab. Nias Selatan"
+    },
+    {
+      "province_code": "12",
+      "code": "1215",
+      "name": "Kab. Pakpak Bharat"
+    },
+    {
+      "province_code": "12",
+      "code": "1216",
+      "name": "Kab. Humbang Hasundutan"
+    },
+    {
+      "province_code": "12",
+      "code": "1217",
+      "name": "Kab. Samosir"
+    },
+    {
+      "province_code": "12",
+      "code": "1218",
+      "name": "Kab. Serdang Bedagai"
+    },
+    {
+      "province_code": "12",
+      "code": "1219",
+      "name": "Kab. Batu Bara"
+    },
+    {
+      "province_code": "12",
+      "code": "1220",
+      "name": "Kab. Padang Lawas Utara"
+    },
+    {
+      "province_code": "12",
+      "code": "1221",
+      "name": "Kab. Padang Lawas"
+    },
+    {
+      "province_code": "12",
+      "code": "1222",
+      "name": "Kab. Labuhanbatu Selatan"
+    },
+    {
+      "province_code": "12",
+      "code": "1223",
+      "name": "Kab. Labuhanbatu Utara"
+    },
+    {
+      "province_code": "12",
+      "code": "1224",
+      "name": "Kab. Nias Utara"
+    },
+    {
+      "province_code": "12",
+      "code": "1225",
+      "name": "Kab. Nias Barat"
+    },
+    {
+      "province_code": "12",
+      "code": "1271",
+      "name": "Kota Medan"
+    },
+    {
+      "province_code": "12",
+      "code": "1272",
+      "name": "Kota Pematangsiantar"
+    },
+    {
+      "province_code": "12",
+      "code": "1273",
+      "name": "Kota Sibolga"
+    },
+    {
+      "province_code": "12",
+      "code": "1274",
+      "name": "Kota Tanjung Balai"
+    },
+    {
+      "province_code": "12",
+      "code": "1275",
+      "name": "Kota Binjai"
+    },
+    {
+      "province_code": "12",
+      "code": "1276",
+      "name": "Kota Tebing Tinggi"
+    },
+    {
+      "province_code": "12",
+      "code": "1277",
+      "name": "Kota Padang Sidempuan"
+    },
+    {
+      "province_code": "12",
+      "code": "1278",
+      "name": "Kota Gunung Sitoli"
+    },
+    {
+      "province_code": "13",
+      "code": "1301",
+      "name": "Kab. Pesisir Selatan"
+    },
+    {
+      "province_code": "13",
+      "code": "1302",
+      "name": "Kab. Solok"
+    },
+    {
+      "province_code": "13",
+      "code": "1303",
+      "name": "Kab. Sijunjung"
+    },
+    {
+      "province_code": "13",
+      "code": "1304",
+      "name": "Kab. Tanah Datar"
+    },
+    {
+      "province_code": "13",
+      "code": "1305",
+      "name": "Kab. Padang Pariaman"
+    },
+    {
+      "province_code": "13",
+      "code": "1306",
+      "name": "Kab. Agam"
+    },
+    {
+      "province_code": "13",
+      "code": "1307",
+      "name": "Kab. Lima Puluh Kota"
+    },
+    {
+      "province_code": "13",
+      "code": "1308",
+      "name": "Kab. Pasaman"
+    },
+    {
+      "province_code": "13",
+      "code": "1309",
+      "name": "Kab. Kepulauan Mentawai"
+    },
+    {
+      "province_code": "13",
+      "code": "1310",
+      "name": "Kab. Dharmasraya"
+    },
+    {
+      "province_code": "13",
+      "code": "1311",
+      "name": "Kab. Solok Selatan"
+    },
+    {
+      "province_code": "13",
+      "code": "1312",
+      "name": "Kab. Pasaman Barat"
+    },
+    {
+      "province_code": "13",
+      "code": "1371",
+      "name": "Kota Padang"
+    },
+    {
+      "province_code": "13",
+      "code": "1372",
+      "name": "Kota Solok"
+    },
+    {
+      "province_code": "13",
+      "code": "1373",
+      "name": "Kota Sawahlunto"
+    },
+    {
+      "province_code": "13",
+      "code": "1374",
+      "name": "Kota Padangpanjang"
+    },
+    {
+      "province_code": "13",
+      "code": "1375",
+      "name": "Kota Bukittinggi"
+    },
+    {
+      "province_code": "13",
+      "code": "1376",
+      "name": "Kota Payakumbuh"
+    },
+    {
+      "province_code": "13",
+      "code": "1377",
+      "name": "Kota Pariaman"
+    },
+    {
+      "province_code": "14",
+      "code": "1401",
+      "name": "Kab. Kampar"
+    },
+    {
+      "province_code": "14",
+      "code": "1402",
+      "name": "Kab. Indragiri Hulu"
+    },
+    {
+      "province_code": "14",
+      "code": "1403",
+      "name": "Kab. Bengkalis"
+    },
+    {
+      "province_code": "14",
+      "code": "1404",
+      "name": "Kab. Indragiri Hilir"
+    },
+    {
+      "province_code": "14",
+      "code": "1405",
+      "name": "Kab. Pelalawan"
+    },
+    {
+      "province_code": "14",
+      "code": "1406",
+      "name": "Kab. Rokan Hulu"
+    },
+    {
+      "province_code": "14",
+      "code": "1407",
+      "name": "Kab. Rokan Hilir"
+    },
+    {
+      "province_code": "14",
+      "code": "1408",
+      "name": "Kab. Siak"
+    },
+    {
+      "province_code": "14",
+      "code": "1409",
+      "name": "Kab. Kuantan Singingi"
+    },
+    {
+      "province_code": "14",
+      "code": "1410",
+      "name": "Kab. Kepulauan Meranti"
+    },
+    {
+      "province_code": "14",
+      "code": "1471",
+      "name": "Kota Pekanbaru"
+    },
+    {
+      "province_code": "14",
+      "code": "1472",
+      "name": "Kota Dumai"
+    },
+    {
+      "province_code": "15",
+      "code": "1501",
+      "name": "Kab. Kerinci"
+    },
+    {
+      "province_code": "15",
+      "code": "1502",
+      "name": "Kab. Merangin"
+    },
+    {
+      "province_code": "15",
+      "code": "1503",
+      "name": "Kab. Sarolangun"
+    },
+    {
+      "province_code": "15",
+      "code": "1504",
+      "name": "Kab. Batang Hari"
+    },
+    {
+      "province_code": "15",
+      "code": "1505",
+      "name": "Kab. Muaro Jambi"
+    },
+    {
+      "province_code": "15",
+      "code": "1506",
+      "name": "Kab. Tanjung Jabung Barat"
+    },
+    {
+      "province_code": "15",
+      "code": "1507",
+      "name": "Kab. Tanjung Jabung Timur"
+    },
+    {
+      "province_code": "15",
+      "code": "1508",
+      "name": "Kab. Bungo"
+    },
+    {
+      "province_code": "15",
+      "code": "1509",
+      "name": "Kab. Tebo"
+    },
+    {
+      "province_code": "15",
+      "code": "1571",
+      "name": "Kota Jambi"
+    },
+    {
+      "province_code": "15",
+      "code": "1572",
+      "name": "Kota Sungai Penuh"
+    },
+    {
+      "province_code": "16",
+      "code": "1601",
+      "name": "Kab. Ogan Komering Ulu"
+    },
+    {
+      "province_code": "16",
+      "code": "1602",
+      "name": "Kab. Ogan Komering Ilir"
+    },
+    {
+      "province_code": "16",
+      "code": "1603",
+      "name": "Kab. Muara Enim"
+    },
+    {
+      "province_code": "16",
+      "code": "1604",
+      "name": "Kab. Lahat"
+    },
+    {
+      "province_code": "16",
+      "code": "1605",
+      "name": "Kab. Musi Rawas"
+    },
+    {
+      "province_code": "16",
+      "code": "1606",
+      "name": "Kab. Musi Banyuasin"
+    },
+    {
+      "province_code": "16",
+      "code": "1607",
+      "name": "Kab. Banyuasin"
+    },
+    {
+      "province_code": "16",
+      "code": "1608",
+      "name": "Kab. Ogan Komering Ulu Timur"
+    },
+    {
+      "province_code": "16",
+      "code": "1609",
+      "name": "Kab. Ogan Komering Ulu Selatan"
+    },
+    {
+      "province_code": "16",
+      "code": "1610",
+      "name": "Kab. Ogan Ilir"
+    },
+    {
+      "province_code": "16",
+      "code": "1611",
+      "name": "Kab. Empat Lawang"
+    },
+    {
+      "province_code": "16",
+      "code": "1612",
+      "name": "Kab. Penukal Arab Lematang Ilir"
+    },
+    {
+      "province_code": "16",
+      "code": "1613",
+      "name": "Kab. Musi Rawas Utara"
+    },
+    {
+      "province_code": "16",
+      "code": "1671",
+      "name": "Kota Palembang"
+    },
+    {
+      "province_code": "16",
+      "code": "1672",
+      "name": "Kota Pagar Alam"
+    },
+    {
+      "province_code": "16",
+      "code": "1673",
+      "name": "Kota Lubuklinggau"
+    },
+    {
+      "province_code": "16",
+      "code": "1674",
+      "name": "Kota Prabumulih"
+    },
+    {
+      "province_code": "17",
+      "code": "1701",
+      "name": "Kab. Bengkulu Selatan"
+    },
+    {
+      "province_code": "17",
+      "code": "1702",
+      "name": "Kab. Rejang Lebong"
+    },
+    {
+      "province_code": "17",
+      "code": "1703",
+      "name": "Kab. Bengkulu Utara"
+    },
+    {
+      "province_code": "17",
+      "code": "1704",
+      "name": "Kab. Kaur"
+    },
+    {
+      "province_code": "17",
+      "code": "1705",
+      "name": "Kab. Seluma"
+    },
+    {
+      "province_code": "17",
+      "code": "1706",
+      "name": "Kab. Mukomuko"
+    },
+    {
+      "province_code": "17",
+      "code": "1707",
+      "name": "Kab. Lebong"
+    },
+    {
+      "province_code": "17",
+      "code": "1708",
+      "name": "Kab. Kepahiang"
+    },
+    {
+      "province_code": "17",
+      "code": "1709",
+      "name": "Kab. Bengkulu Tengah"
+    },
+    {
+      "province_code": "17",
+      "code": "1771",
+      "name": "Kota Bengkulu"
+    },
+    {
+      "province_code": "18",
+      "code": "1801",
+      "name": "Kab. Lampung Selatan"
+    },
+    {
+      "province_code": "18",
+      "code": "1802",
+      "name": "Kab. Lampung Tengah"
+    },
+    {
+      "province_code": "18",
+      "code": "1803",
+      "name": "Kab. Lampung Utara"
+    },
+    {
+      "province_code": "18",
+      "code": "1804",
+      "name": "Kab. Lampung Barat"
+    },
+    {
+      "province_code": "18",
+      "code": "1805",
+      "name": "Kab. Tulang Bawang"
+    },
+    {
+      "province_code": "18",
+      "code": "1806",
+      "name": "Kab. Tanggamus"
+    },
+    {
+      "province_code": "18",
+      "code": "1807",
+      "name": "Kab. Lampung Timur"
+    },
+    {
+      "province_code": "18",
+      "code": "1808",
+      "name": "Kab. Way Kanan"
+    },
+    {
+      "province_code": "18",
+      "code": "1809",
+      "name": "Kab. Pesawaran"
+    },
+    {
+      "province_code": "18",
+      "code": "1810",
+      "name": "Kab. Pringsewu"
+    },
+    {
+      "province_code": "18",
+      "code": "1811",
+      "name": "Kab. Mesuji"
+    },
+    {
+      "province_code": "18",
+      "code": "1812",
+      "name": "Kab. Tulang Bawang Barat"
+    },
+    {
+      "province_code": "18",
+      "code": "1813",
+      "name": "Kab. Pesisir Barat"
+    },
+    {
+      "province_code": "18",
+      "code": "1871",
+      "name": "Kota Bandar Lampung"
+    },
+    {
+      "province_code": "18",
+      "code": "1872",
+      "name": "Kota Metro"
+    },
+    {
+      "province_code": "19",
+      "code": "1901",
+      "name": "Kab. Bangka"
+    },
+    {
+      "province_code": "19",
+      "code": "1902",
+      "name": "Kab. Belitung"
+    },
+    {
+      "province_code": "19",
+      "code": "1903",
+      "name": "Kab. Bangka Selatan"
+    },
+    {
+      "province_code": "19",
+      "code": "1904",
+      "name": "Kab. Bangka Tengah"
+    },
+    {
+      "province_code": "19",
+      "code": "1905",
+      "name": "Kab. Bangka Barat"
+    },
+    {
+      "province_code": "19",
+      "code": "1906",
+      "name": "Kab. Belitung Timur"
+    },
+    {
+      "province_code": "19",
+      "code": "1971",
+      "name": "Kota Pangkal Pinang"
+    },
+    {
+      "province_code": "21",
+      "code": "2101",
+      "name": "Kab. Bintan"
+    },
+    {
+      "province_code": "21",
+      "code": "2102",
+      "name": "Kab. Karimun"
+    },
+    {
+      "province_code": "21",
+      "code": "2103",
+      "name": "Kab. Natuna"
+    },
+    {
+      "province_code": "21",
+      "code": "2104",
+      "name": "Kab. Lingga"
+    },
+    {
+      "province_code": "21",
+      "code": "2105",
+      "name": "Kab. Kepulauan Anambas"
+    },
+    {
+      "province_code": "21",
+      "code": "2171",
+      "name": "Kota Batam"
+    },
+    {
+      "province_code": "21",
+      "code": "2172",
+      "name": "Kota Tanjung Pinang"
+    },
+    {
+      "province_code": "31",
+      "code": "3101",
+      "name": "Administrasi Kepulauan Seribu"
+    },
+    {
+      "province_code": "31",
+      "code": "3171",
+      "name": "Kota Administrasi Jakarta Pusat"
+    },
+    {
+      "province_code": "31",
+      "code": "3172",
+      "name": "Kota Administrasi Jakarta Utara"
+    },
+    {
+      "province_code": "31",
+      "code": "3173",
+      "name": "Kota Administrasi Jakarta Barat"
+    },
+    {
+      "province_code": "31",
+      "code": "3174",
+      "name": "Kota Administrasi Jakarta Selatan"
+    },
+    {
+      "province_code": "31",
+      "code": "3175",
+      "name": "Kota Administrasi Jakarta Timur"
+    },
+    {
+      "province_code": "32",
+      "code": "3201",
+      "name": "Kab. Bogor"
+    },
+    {
+      "province_code": "32",
+      "code": "3202",
+      "name": "Kab. Sukabumi"
+    },
+    {
+      "province_code": "32",
+      "code": "3203",
+      "name": "Kab. Cianjur"
+    },
+    {
+      "province_code": "32",
+      "code": "3204",
+      "name": "Kab. Bandung"
+    },
+    {
+      "province_code": "32",
+      "code": "3205",
+      "name": "Kab. Garut"
+    },
+    {
+      "province_code": "32",
+      "code": "3206",
+      "name": "Kab. Tasikmalaya"
+    },
+    {
+      "province_code": "32",
+      "code": "3207",
+      "name": "Kab. Ciamis"
+    },
+    {
+      "province_code": "32",
+      "code": "3208",
+      "name": "Kab. Kuningan"
+    },
+    {
+      "province_code": "32",
+      "code": "3209",
+      "name": "Kab. Cirebon"
+    },
+    {
+      "province_code": "32",
+      "code": "3210",
+      "name": "Kab. Majalengka"
+    },
+    {
+      "province_code": "32",
+      "code": "3211",
+      "name": "Kab. Sumedang"
+    },
+    {
+      "province_code": "32",
+      "code": "3212",
+      "name": "Kab. Indramayu"
+    },
+    {
+      "province_code": "32",
+      "code": "3213",
+      "name": "Kab. Subang"
+    },
+    {
+      "province_code": "32",
+      "code": "3214",
+      "name": "Kab. Purwakarta"
+    },
+    {
+      "province_code": "32",
+      "code": "3215",
+      "name": "Kab. Karawang"
+    },
+    {
+      "province_code": "32",
+      "code": "3216",
+      "name": "Kab. Bekasi"
+    },
+    {
+      "province_code": "32",
+      "code": "3217",
+      "name": "Kab. Bandung Barat"
+    },
+    {
+      "province_code": "32",
+      "code": "3271",
+      "name": "Kota Bogor"
+    },
+    {
+      "province_code": "32",
+      "code": "3272",
+      "name": "Kota Sukabumi"
+    },
+    {
+      "province_code": "32",
+      "code": "3273",
+      "name": "Kota Bandung"
+    },
+    {
+      "province_code": "32",
+      "code": "3274",
+      "name": "Kota Cirebon"
+    },
+    {
+      "province_code": "32",
+      "code": "3275",
+      "name": "Kota Bekasi"
+    },
+    {
+      "province_code": "32",
+      "code": "3276",
+      "name": "Kota Depok"
+    },
+    {
+      "province_code": "32",
+      "code": "3277",
+      "name": "Kota Cimahi"
+    },
+    {
+      "province_code": "32",
+      "code": "3278",
+      "name": "Kota Tasikmalaya"
+    },
+    {
+      "province_code": "32",
+      "code": "3279",
+      "name": "Kota Banjar"
+    },
+    {
+      "province_code": "33",
+      "code": "3301",
+      "name": "Kab. Cilacap"
+    },
+    {
+      "province_code": "33",
+      "code": "3302",
+      "name": "Kab. Banyumas"
+    },
+    {
+      "province_code": "33",
+      "code": "3303",
+      "name": "Kab. Purbalingga"
+    },
+    {
+      "province_code": "33",
+      "code": "3304",
+      "name": "Kab. Banjarnegara"
+    },
+    {
+      "province_code": "33",
+      "code": "3305",
+      "name": "Kab. Kebumen"
+    },
+    {
+      "province_code": "33",
+      "code": "3306",
+      "name": "Kab. Purworejo"
+    },
+    {
+      "province_code": "33",
+      "code": "3307",
+      "name": "Kab. Wonosobo"
+    },
+    {
+      "province_code": "33",
+      "code": "3308",
+      "name": "Kab. Magelang"
+    },
+    {
+      "province_code": "33",
+      "code": "3309",
+      "name": "Kab. Boyolali"
+    },
+    {
+      "province_code": "33",
+      "code": "3310",
+      "name": "Kab. Klaten"
+    },
+    {
+      "province_code": "33",
+      "code": "3311",
+      "name": "Kab. Sukoharjo"
+    },
+    {
+      "province_code": "33",
+      "code": "3312",
+      "name": "Kab. Wonogiri"
+    },
+    {
+      "province_code": "33",
+      "code": "3313",
+      "name": "Kab. Karanganyar"
+    },
+    {
+      "province_code": "33",
+      "code": "3314",
+      "name": "Kab. Sragen"
+    },
+    {
+      "province_code": "33",
+      "code": "3315",
+      "name": "Kab. Grobogan"
+    },
+    {
+      "province_code": "33",
+      "code": "3316",
+      "name": "Kab. Blora"
+    },
+    {
+      "province_code": "33",
+      "code": "3317",
+      "name": "Kab. Rembang"
+    },
+    {
+      "province_code": "33",
+      "code": "3318",
+      "name": "Kab. Pati"
+    },
+    {
+      "province_code": "33",
+      "code": "3319",
+      "name": "Kab. Kudus"
+    },
+    {
+      "province_code": "33",
+      "code": "3320",
+      "name": "Kab. Jepara"
+    },
+    {
+      "province_code": "33",
+      "code": "3321",
+      "name": "Kab. Demak"
+    },
+    {
+      "province_code": "33",
+      "code": "3322",
+      "name": "Kab. Kab. Semarang"
+    },
+    {
+      "province_code": "33",
+      "code": "3323",
+      "name": "Kab. Temanggung"
+    },
+    {
+      "province_code": "33",
+      "code": "3324",
+      "name": "Kab. Kendal"
+    },
+    {
+      "province_code": "33",
+      "code": "3325",
+      "name": "Kab. Batang"
+    },
+    {
+      "province_code": "33",
+      "code": "3326",
+      "name": "Kab. Pekalongan"
+    },
+    {
+      "province_code": "33",
+      "code": "3327",
+      "name": "Kab. Pemalang"
+    },
+    {
+      "province_code": "33",
+      "code": "3328",
+      "name": "Kab. Tegal"
+    },
+    {
+      "province_code": "33",
+      "code": "3329",
+      "name": "Kab. Brebes"
+    },
+    {
+      "province_code": "33",
+      "code": "3371",
+      "name": "Kota Magelang"
+    },
+    {
+      "province_code": "33",
+      "code": "3372",
+      "name": "Kota Surakarta"
+    },
+    {
+      "province_code": "33",
+      "code": "3373",
+      "name": "Kota Salatiga"
+    },
+    {
+      "province_code": "33",
+      "code": "3374",
+      "name": "Kota Semarang"
+    },
+    {
+      "province_code": "33",
+      "code": "3375",
+      "name": "Kota Pekalongan"
+    },
+    {
+      "province_code": "33",
+      "code": "3376",
+      "name": "Kota Tegal"
+    },
+    {
+      "province_code": "34",
+      "code": "3401",
+      "name": "Kab. Kulon Progo"
+    },
+    {
+      "province_code": "34",
+      "code": "3402",
+      "name": "Kab. Bantul"
+    },
+    {
+      "province_code": "34",
+      "code": "3403",
+      "name": "Kab. Gunung Kidul"
+    },
+    {
+      "province_code": "34",
+      "code": "3404",
+      "name": "Kab. Sleman"
+    },
+    {
+      "province_code": "34",
+      "code": "3471",
+      "name": "Kota Yogyakarta"
+    },
+    {
+      "province_code": "35",
+      "code": "3501",
+      "name": "Kab. Pacitan"
+    },
+    {
+      "province_code": "35",
+      "code": "3502",
+      "name": "Kab. Ponorogo"
+    },
+    {
+      "province_code": "35",
+      "code": "3503",
+      "name": "Kab. Trenggalek"
+    },
+    {
+      "province_code": "35",
+      "code": "3504",
+      "name": "Kab. Tulungagung"
+    },
+    {
+      "province_code": "35",
+      "code": "3505",
+      "name": "Kab. Blitar"
+    },
+    {
+      "province_code": "35",
+      "code": "3506",
+      "name": "Kab. Kediri"
+    },
+    {
+      "province_code": "35",
+      "code": "3507",
+      "name": "Kab. Malang"
+    },
+    {
+      "province_code": "35",
+      "code": "3508",
+      "name": "Kab. Lumajang"
+    },
+    {
+      "province_code": "35",
+      "code": "3509",
+      "name": "Kab. Jember"
+    },
+    {
+      "province_code": "35",
+      "code": "3510",
+      "name": "Kab. Banyuwangi"
+    },
+    {
+      "province_code": "35",
+      "code": "3511",
+      "name": "Kab. Bondowoso"
+    },
+    {
+      "province_code": "35",
+      "code": "3512",
+      "name": "Kab. Situbondo"
+    },
+    {
+      "province_code": "35",
+      "code": "3513",
+      "name": "Kab. Probolinggo"
+    },
+    {
+      "province_code": "35",
+      "code": "3514",
+      "name": "Kab. Pasuruan"
+    },
+    {
+      "province_code": "35",
+      "code": "3515",
+      "name": "Kab. Sidoarjo"
+    },
+    {
+      "province_code": "35",
+      "code": "3516",
+      "name": "Kab. Mojokerto"
+    },
+    {
+      "province_code": "35",
+      "code": "3517",
+      "name": "Kab. Jombang"
+    },
+    {
+      "province_code": "35",
+      "code": "3518",
+      "name": "Kab. Nganjuk"
+    },
+    {
+      "province_code": "35",
+      "code": "3519",
+      "name": "Kab. Madiun"
+    },
+    {
+      "province_code": "35",
+      "code": "3520",
+      "name": "Kab. Magetan"
+    },
+    {
+      "province_code": "35",
+      "code": "3521",
+      "name": "Kab. Ngawi"
+    },
+    {
+      "province_code": "35",
+      "code": "3522",
+      "name": "Kab. Bojonegoro"
+    },
+    {
+      "province_code": "35",
+      "code": "3523",
+      "name": "Kab. Tuban"
+    },
+    {
+      "province_code": "35",
+      "code": "3524",
+      "name": "Kab. Lamongan"
+    },
+    {
+      "province_code": "35",
+      "code": "3525",
+      "name": "Kab. Gresik"
+    },
+    {
+      "province_code": "35",
+      "code": "3526",
+      "name": "Kab. Bangkalan"
+    },
+    {
+      "province_code": "35",
+      "code": "3527",
+      "name": "Kab. Sampang"
+    },
+    {
+      "province_code": "35",
+      "code": "3528",
+      "name": "Kab. Pamekasan"
+    },
+    {
+      "province_code": "35",
+      "code": "3529",
+      "name": "Kab. Sumenep"
+    },
+    {
+      "province_code": "35",
+      "code": "3571",
+      "name": "Kota Kediri"
+    },
+    {
+      "province_code": "35",
+      "code": "3572",
+      "name": "Kota Blitar"
+    },
+    {
+      "province_code": "35",
+      "code": "3573",
+      "name": "Kota Malang"
+    },
+    {
+      "province_code": "35",
+      "code": "3574",
+      "name": "Kota Probolinggo"
+    },
+    {
+      "province_code": "35",
+      "code": "3575",
+      "name": "Kota Pasuruan"
+    },
+    {
+      "province_code": "35",
+      "code": "3576",
+      "name": "Kota Mojokerto"
+    },
+    {
+      "province_code": "35",
+      "code": "3577",
+      "name": "Kota Madiun"
+    },
+    {
+      "province_code": "35",
+      "code": "3578",
+      "name": "Kota Surabaya"
+    },
+    {
+      "province_code": "35",
+      "code": "3579",
+      "name": "Kota Batu"
+    },
+    {
+      "province_code": "36",
+      "code": "3601",
+      "name": "Kab. Pandeglang"
+    },
+    {
+      "province_code": "36",
+      "code": "3602",
+      "name": "Kab. Lebak"
+    },
+    {
+      "province_code": "36",
+      "code": "3603",
+      "name": "Kab. Tangerang"
+    },
+    {
+      "province_code": "36",
+      "code": "3604",
+      "name": "Kab. Serang"
+    },
+    {
+      "province_code": "36",
+      "code": "3671",
+      "name": "Kota Tangerang"
+    },
+    {
+      "province_code": "36",
+      "code": "3672",
+      "name": "Kota Cilegon"
+    },
+    {
+      "province_code": "36",
+      "code": "3673",
+      "name": "Kota Serang"
+    },
+    {
+      "province_code": "36",
+      "code": "3674",
+      "name": "Kota Tangerang Selatan"
+    },
+    {
+      "province_code": "51",
+      "code": "5101",
+      "name": "Kab. Jembrana"
+    },
+    {
+      "province_code": "51",
+      "code": "5102",
+      "name": "Kab. Tabanan"
+    },
+    {
+      "province_code": "51",
+      "code": "5103",
+      "name": "Kab. Badung"
+    },
+    {
+      "province_code": "51",
+      "code": "5104",
+      "name": "Kab. Gianyar"
+    },
+    {
+      "province_code": "51",
+      "code": "5105",
+      "name": "Kab. Klungkung"
+    },
+    {
+      "province_code": "51",
+      "code": "5106",
+      "name": "Kab. Bangli"
+    },
+    {
+      "province_code": "51",
+      "code": "5107",
+      "name": "Kab. Karangasem"
+    },
+    {
+      "province_code": "51",
+      "code": "5108",
+      "name": "Kab. Buleleng"
+    },
+    {
+      "province_code": "51",
+      "code": "5171",
+      "name": "Kota Denpasar"
+    },
+    {
+      "province_code": "52",
+      "code": "5201",
+      "name": "Kab. Lombok Barat"
+    },
+    {
+      "province_code": "52",
+      "code": "5202",
+      "name": "Kab. Lombok Tengah"
+    },
+    {
+      "province_code": "52",
+      "code": "5203",
+      "name": "Kab. Lombok Timur"
+    },
+    {
+      "province_code": "52",
+      "code": "5204",
+      "name": "Kab. Sumbawa"
+    },
+    {
+      "province_code": "52",
+      "code": "5205",
+      "name": "Kab. Dompu"
+    },
+    {
+      "province_code": "52",
+      "code": "5206",
+      "name": "Kab. Bima"
+    },
+    {
+      "province_code": "52",
+      "code": "5207",
+      "name": "Kab. Sumbawa Barat"
+    },
+    {
+      "province_code": "52",
+      "code": "5208",
+      "name": "Kab. Lombok Utara"
+    },
+    {
+      "province_code": "52",
+      "code": "5271",
+      "name": "Kab. Kota Mataram"
+    },
+    {
+      "province_code": "52",
+      "code": "5272",
+      "name": "Kota Bima"
+    },
+    {
+      "province_code": "53",
+      "code": "5301",
+      "name": "Kab. Kupang"
+    },
+    {
+      "province_code": "53",
+      "code": "5302",
+      "name": "Kab. Timor Tengah Selatan"
+    },
+    {
+      "province_code": "53",
+      "code": "5303",
+      "name": "Kab. Timor Tengah Utara"
+    },
+    {
+      "province_code": "53",
+      "code": "5304",
+      "name": "Kab. Belu"
+    },
+    {
+      "province_code": "53",
+      "code": "5305",
+      "name": "Kab. Alor"
+    },
+    {
+      "province_code": "53",
+      "code": "5306",
+      "name": "Kab. Flores Timur"
+    },
+    {
+      "province_code": "53",
+      "code": "5307",
+      "name": "Kab. Sikka"
+    },
+    {
+      "province_code": "53",
+      "code": "5308",
+      "name": "Kab. Ende"
+    },
+    {
+      "province_code": "53",
+      "code": "5309",
+      "name": "Kab. Ngada"
+    },
+    {
+      "province_code": "53",
+      "code": "5310",
+      "name": "Kab. Manggarai"
+    },
+    {
+      "province_code": "53",
+      "code": "5311",
+      "name": "Kab. Sumba Timur"
+    },
+    {
+      "province_code": "53",
+      "code": "5312",
+      "name": "Kab. Sumba Barat"
+    },
+    {
+      "province_code": "53",
+      "code": "5313",
+      "name": "Kab. Lembata"
+    },
+    {
+      "province_code": "53",
+      "code": "5314",
+      "name": "Kab. Rote Ndao"
+    },
+    {
+      "province_code": "53",
+      "code": "5315",
+      "name": "Kab. Manggarai Barat"
+    },
+    {
+      "province_code": "53",
+      "code": "5316",
+      "name": "Kab. Nagekeo"
+    },
+    {
+      "province_code": "53",
+      "code": "5317",
+      "name": "Kab. Sumba Tengah"
+    },
+    {
+      "province_code": "53",
+      "code": "5318",
+      "name": "Kab. Sumba Barat Daya"
+    },
+    {
+      "province_code": "53",
+      "code": "5319",
+      "name": "Kab. Manggarai Timur"
+    },
+    {
+      "province_code": "53",
+      "code": "5320",
+      "name": "Kab. Sabu Raijua"
+    },
+    {
+      "province_code": "53",
+      "code": "5371",
+      "name": "Kota Kupang"
+    },
+    {
+      "province_code": "61",
+      "code": "6101",
+      "name": "Kab. Sambas"
+    },
+    {
+      "province_code": "61",
+      "code": "6102",
+      "name": "Kab. Mempawah"
+    },
+    {
+      "province_code": "61",
+      "code": "6103",
+      "name": "Kab. Sanggau"
+    },
+    {
+      "province_code": "61",
+      "code": "6104",
+      "name": "Kab. Ketapang"
+    },
+    {
+      "province_code": "61",
+      "code": "6105",
+      "name": "Kab. Sintang"
+    },
+    {
+      "province_code": "61",
+      "code": "6106",
+      "name": "Kab. Kapuas Hulu"
+    },
+    {
+      "province_code": "61",
+      "code": "6107",
+      "name": "Kab. Bengkayang"
+    },
+    {
+      "province_code": "61",
+      "code": "6108",
+      "name": "Kab. Landak"
+    },
+    {
+      "province_code": "61",
+      "code": "6109",
+      "name": "Kab. Sekadau"
+    },
+    {
+      "province_code": "61",
+      "code": "6110",
+      "name": "Kab. Melawi"
+    },
+    {
+      "province_code": "61",
+      "code": "6111",
+      "name": "Kab. Kayong Utara"
+    },
+    {
+      "province_code": "61",
+      "code": "6112",
+      "name": "Kab. Kubu Raya"
+    },
+    {
+      "province_code": "61",
+      "code": "6171",
+      "name": "Kota Pontianak"
+    },
+    {
+      "province_code": "61",
+      "code": "6172",
+      "name": "Kota Singkawang"
+    },
+    {
+      "province_code": "62",
+      "code": "6201",
+      "name": "Kab. Kotawaringin Barat"
+    },
+    {
+      "province_code": "62",
+      "code": "6202",
+      "name": "Kab. Kotawaringin Timur"
+    },
+    {
+      "province_code": "62",
+      "code": "6203",
+      "name": "Kab. Kapuas"
+    },
+    {
+      "province_code": "62",
+      "code": "6204",
+      "name": "Kab. Barito Selatan"
+    },
+    {
+      "province_code": "62",
+      "code": "6205",
+      "name": "Kab. Barito Utara"
+    },
+    {
+      "province_code": "62",
+      "code": "6206",
+      "name": "Kab. Katingan"
+    },
+    {
+      "province_code": "62",
+      "code": "6207",
+      "name": "Kab. Seruyan"
+    },
+    {
+      "province_code": "62",
+      "code": "6208",
+      "name": "Kab. Sukamara"
+    },
+    {
+      "province_code": "62",
+      "code": "6209",
+      "name": "Kab. Lamandau"
+    },
+    {
+      "province_code": "62",
+      "code": "6210",
+      "name": "Kab. Gunung Mas"
+    },
+    {
+      "province_code": "62",
+      "code": "6211",
+      "name": "Kab. Pulang Pisau"
+    },
+    {
+      "province_code": "62",
+      "code": "6212",
+      "name": "Kab. Murung Raya"
+    },
+    {
+      "province_code": "62",
+      "code": "6213",
+      "name": "Kab. Barito Timur"
+    },
+    {
+      "province_code": "62",
+      "code": "6271",
+      "name": "Kota Palangka Raya"
+    },
+    {
+      "province_code": "63",
+      "code": "6301",
+      "name": "Kab. Tanah Laut"
+    },
+    {
+      "province_code": "63",
+      "code": "6302",
+      "name": "Kab. Kotabaru"
+    },
+    {
+      "province_code": "63",
+      "code": "6303",
+      "name": "Kab. Banjar"
+    },
+    {
+      "province_code": "63",
+      "code": "6304",
+      "name": "Kab. Barito Kuala"
+    },
+    {
+      "province_code": "63",
+      "code": "6305",
+      "name": "Kab. Tapin"
+    },
+    {
+      "province_code": "63",
+      "code": "6306",
+      "name": "Kab. Hulu Sungai Selatan"
+    },
+    {
+      "province_code": "63",
+      "code": "6307",
+      "name": "Kab. Hulu Sungai Tengah"
+    },
+    {
+      "province_code": "63",
+      "code": "6308",
+      "name": "Kab. Hulu Sungai Utara"
+    },
+    {
+      "province_code": "63",
+      "code": "6309",
+      "name": "Kab. Tabalong"
+    },
+    {
+      "province_code": "63",
+      "code": "6310",
+      "name": "Kab. Tanah Bumbu"
+    },
+    {
+      "province_code": "63",
+      "code": "6311",
+      "name": "Kab. Balangan"
+    },
+    {
+      "province_code": "63",
+      "code": "6371",
+      "name": "Kota Banjarmasin"
+    },
+    {
+      "province_code": "63",
+      "code": "6372",
+      "name": "Kota Banjarbaru"
+    },
+    {
+      "province_code": "64",
+      "code": "6401",
+      "name": "Kab. Paser"
+    },
+    {
+      "province_code": "64",
+      "code": "6402",
+      "name": "Kab. Kutai Kartanegara"
+    },
+    {
+      "province_code": "64",
+      "code": "6403",
+      "name": "Kab. Berau"
+    },
+    {
+      "province_code": "64",
+      "code": "6407",
+      "name": "Kab. Kutai Barat"
+    },
+    {
+      "province_code": "64",
+      "code": "6408",
+      "name": "Kab. Kutai Timur"
+    },
+    {
+      "province_code": "64",
+      "code": "6409",
+      "name": "Kab. Penajam Paser Utara"
+    },
+    {
+      "province_code": "64",
+      "code": "6411",
+      "name": "Kab. Mahakam Ulu"
+    },
+    {
+      "province_code": "64",
+      "code": "6471",
+      "name": "Kota Balikpapan"
+    },
+    {
+      "province_code": "64",
+      "code": "6472",
+      "name": "Kota Samarinda"
+    },
+    {
+      "province_code": "64",
+      "code": "6474",
+      "name": "Kota Bontang"
+    },
+    {
+      "province_code": "65",
+      "code": "6501",
+      "name": "Kab. Bulungan"
+    },
+    {
+      "province_code": "65",
+      "code": "6502",
+      "name": "Kab. Malinau"
+    },
+    {
+      "province_code": "65",
+      "code": "6503",
+      "name": "Kab. Nunukan"
+    },
+    {
+      "province_code": "65",
+      "code": "6504",
+      "name": "Kab. Tana Tidung"
+    },
+    {
+      "province_code": "65",
+      "code": "6571",
+      "name": "Kota Tarakan"
+    },
+    {
+      "province_code": "71",
+      "code": "7101",
+      "name": "Kab. Bolaang Mongondow"
+    },
+    {
+      "province_code": "71",
+      "code": "7102",
+      "name": "Kab. Minahasa"
+    },
+    {
+      "province_code": "71",
+      "code": "7103",
+      "name": "Kab. Kepulauan Sangihe"
+    },
+    {
+      "province_code": "71",
+      "code": "7104",
+      "name": "Kab. Kepulauan Talaud"
+    },
+    {
+      "province_code": "71",
+      "code": "7105",
+      "name": "Kab. Minahasa Selatan"
+    },
+    {
+      "province_code": "71",
+      "code": "7106",
+      "name": "Kab. Minahasa Utara"
+    },
+    {
+      "province_code": "71",
+      "code": "7107",
+      "name": "Kab. Minahasa Tenggara"
+    },
+    {
+      "province_code": "71",
+      "code": "7108",
+      "name": "Kab. Bolaang Mongondow Utara"
+    },
+    {
+      "province_code": "71",
+      "code": "7109",
+      "name": "Kab. Kepulauan Siau Tagulandang Biaro"
+    },
+    {
+      "province_code": "71",
+      "code": "7110",
+      "name": "Kab. Bolaang Mongondow Timur"
+    },
+    {
+      "province_code": "71",
+      "code": "7111",
+      "name": "Kab. Bolaang Mongondow Selatan"
+    },
+    {
+      "province_code": "71",
+      "code": "7171",
+      "name": "Kota Manado"
+    },
+    {
+      "province_code": "71",
+      "code": "7172",
+      "name": "Kota Bitung"
+    },
+    {
+      "province_code": "71",
+      "code": "7173",
+      "name": "Kota Tomohon"
+    },
+    {
+      "province_code": "71",
+      "code": "7174",
+      "name": "Kota Kotamobagu"
+    },
+    {
+      "province_code": "72",
+      "code": "7201",
+      "name": "Kab. Banggai"
+    },
+    {
+      "province_code": "72",
+      "code": "7202",
+      "name": "Kab. Poso"
+    },
+    {
+      "province_code": "72",
+      "code": "7203",
+      "name": "Kab. Donggala"
+    },
+    {
+      "province_code": "72",
+      "code": "7204",
+      "name": "Kab. Toli-Toli"
+    },
+    {
+      "province_code": "72",
+      "code": "7205",
+      "name": "Kab. Buol"
+    },
+    {
+      "province_code": "72",
+      "code": "7206",
+      "name": "Kab. Morowali"
+    },
+    {
+      "province_code": "72",
+      "code": "7207",
+      "name": "Kab. Banggai Kepulauan"
+    },
+    {
+      "province_code": "72",
+      "code": "7208",
+      "name": "Kab. Parigi Moutong"
+    },
+    {
+      "province_code": "72",
+      "code": "7209",
+      "name": "Kab. Tojo Una-Una"
+    },
+    {
+      "province_code": "72",
+      "code": "7210",
+      "name": "Kab. Sigi"
+    },
+    {
+      "province_code": "72",
+      "code": "7211",
+      "name": "Kab. Banggai Laut"
+    },
+    {
+      "province_code": "72",
+      "code": "7212",
+      "name": "Kab. Morowali Utara"
+    },
+    {
+      "province_code": "72",
+      "code": "7271",
+      "name": "Kota Palu"
+    },
+    {
+      "province_code": "73",
+      "code": "7301",
+      "name": "Kab. Kepulauan Selayar"
+    },
+    {
+      "province_code": "73",
+      "code": "7302",
+      "name": "Kab. Bulukumba"
+    },
+    {
+      "province_code": "73",
+      "code": "7303",
+      "name": "Kab. Bantaeng"
+    },
+    {
+      "province_code": "73",
+      "code": "7304",
+      "name": "Kab. Jeneponto"
+    },
+    {
+      "province_code": "73",
+      "code": "7305",
+      "name": "Kab. Takalar"
+    },
+    {
+      "province_code": "73",
+      "code": "7306",
+      "name": "Kab. Gowa"
+    },
+    {
+      "province_code": "73",
+      "code": "7307",
+      "name": "Kab. Sinjai"
+    },
+    {
+      "province_code": "73",
+      "code": "7308",
+      "name": "Kab. Bone"
+    },
+    {
+      "province_code": "73",
+      "code": "7309",
+      "name": "Kab. Maros"
+    },
+    {
+      "province_code": "73",
+      "code": "7310",
+      "name": "Kab. Pangkajene dan Kepulauan"
+    },
+    {
+      "province_code": "73",
+      "code": "7311",
+      "name": "Kab. Barru"
+    },
+    {
+      "province_code": "73",
+      "code": "7312",
+      "name": "Kab. Soppeng"
+    },
+    {
+      "province_code": "73",
+      "code": "7313",
+      "name": "Kab. Wajo"
+    },
+    {
+      "province_code": "73",
+      "code": "7314",
+      "name": "Kab. Sidenreng Rappang"
+    },
+    {
+      "province_code": "73",
+      "code": "7315",
+      "name": "Kab. Pinrang"
+    },
+    {
+      "province_code": "73",
+      "code": "7316",
+      "name": "Kab. Enrekang"
+    },
+    {
+      "province_code": "73",
+      "code": "7317",
+      "name": "Kab. Luwu"
+    },
+    {
+      "province_code": "73",
+      "code": "7318",
+      "name": "Kab. Tana Toraja"
+    },
+    {
+      "province_code": "73",
+      "code": "7322",
+      "name": "Kab. Luwu Utara"
+    },
+    {
+      "province_code": "73",
+      "code": "7324",
+      "name": "Kab. Luwu Timur"
+    },
+    {
+      "province_code": "73",
+      "code": "7326",
+      "name": "Kab. Toraja Utara"
+    },
+    {
+      "province_code": "73",
+      "code": "7371",
+      "name": "Kota Makassar"
+    },
+    {
+      "province_code": "73",
+      "code": "7372",
+      "name": "Kota Parepare"
+    },
+    {
+      "province_code": "73",
+      "code": "7373",
+      "name": "Kota Palopo"
+    },
+    {
+      "province_code": "74",
+      "code": "7401",
+      "name": "Kab. Kolaka"
+    },
+    {
+      "province_code": "74",
+      "code": "7402",
+      "name": "Kab. Konawe"
+    },
+    {
+      "province_code": "74",
+      "code": "7403",
+      "name": "Kab. Muna"
+    },
+    {
+      "province_code": "74",
+      "code": "7404",
+      "name": "Kab. Buton"
+    },
+    {
+      "province_code": "74",
+      "code": "7405",
+      "name": "Kab. Konawe Selatan"
+    },
+    {
+      "province_code": "74",
+      "code": "7406",
+      "name": "Kab. Bombana"
+    },
+    {
+      "province_code": "74",
+      "code": "7407",
+      "name": "Kab. Wakatobi"
+    },
+    {
+      "province_code": "74",
+      "code": "7408",
+      "name": "Kab. Kolaka Utara"
+    },
+    {
+      "province_code": "74",
+      "code": "7409",
+      "name": "Kab. Konawe Utara"
+    },
+    {
+      "province_code": "74",
+      "code": "7410",
+      "name": "Kab. Buton Utara"
+    },
+    {
+      "province_code": "74",
+      "code": "7411",
+      "name": "Kab. Kolaka Timur"
+    },
+    {
+      "province_code": "74",
+      "code": "7412",
+      "name": "Kab. Konawe Kepulauan"
+    },
+    {
+      "province_code": "74",
+      "code": "7413",
+      "name": "Kab. Muna Barat"
+    },
+    {
+      "province_code": "74",
+      "code": "7414",
+      "name": "Kab. Buton Tengah"
+    },
+    {
+      "province_code": "74",
+      "code": "7415",
+      "name": "Kab. Buton Selatan"
+    },
+    {
+      "province_code": "74",
+      "code": "7471",
+      "name": "Kota Kendari"
+    },
+    {
+      "province_code": "74",
+      "code": "7472",
+      "name": "Kota Bau-Bau"
+    },
+    {
+      "province_code": "75",
+      "code": "7501",
+      "name": "Kab. Gorontalo"
+    },
+    {
+      "province_code": "75",
+      "code": "7502",
+      "name": "Kab. Boalemo"
+    },
+    {
+      "province_code": "75",
+      "code": "7503",
+      "name": "Kab. Bone Bolango"
+    },
+    {
+      "province_code": "75",
+      "code": "7504",
+      "name": "Kab. Pohuwato"
+    },
+    {
+      "province_code": "75",
+      "code": "7505",
+      "name": "Kab. Gorontalo Utara"
+    },
+    {
+      "province_code": "75",
+      "code": "7571",
+      "name": "Kota Gorontalo"
+    },
+    {
+      "province_code": "76",
+      "code": "7601",
+      "name": "Kab. Mamuju Utara"
+    },
+    {
+      "province_code": "76",
+      "code": "7602",
+      "name": "Kab. Mamuju"
+    },
+    {
+      "province_code": "76",
+      "code": "7603",
+      "name": "Kab. Mamasa"
+    },
+    {
+      "province_code": "76",
+      "code": "7604",
+      "name": "Kab. Polewali Mandar"
+    },
+    {
+      "province_code": "76",
+      "code": "7605",
+      "name": "Kab. Majene"
+    },
+    {
+      "province_code": "76",
+      "code": "7606",
+      "name": "Kab. Mamuju Tengah"
+    },
+    {
+      "province_code": "81",
+      "code": "8101",
+      "name": "Kab. Maluku Tengah"
+    },
+    {
+      "province_code": "81",
+      "code": "8102",
+      "name": "Kab. Maluku Tenggara"
+    },
+    {
+      "province_code": "81",
+      "code": "8103",
+      "name": "Kab. Maluku Tenggara Barat"
+    },
+    {
+      "province_code": "81",
+      "code": "8104",
+      "name": "Kab. Buru"
+    },
+    {
+      "province_code": "81",
+      "code": "8105",
+      "name": "Kab. Seram Bagian Timur"
+    },
+    {
+      "province_code": "81",
+      "code": "8106",
+      "name": "Kab. Seram Bagian Barat"
+    },
+    {
+      "province_code": "81",
+      "code": "8107",
+      "name": "Kab. Kepulauan Aru"
+    },
+    {
+      "province_code": "81",
+      "code": "8108",
+      "name": "Kab. Maluku Barat Daya"
+    },
+    {
+      "province_code": "81",
+      "code": "8109",
+      "name": "Kab. Buru Selatan"
+    },
+    {
+      "province_code": "81",
+      "code": "8171",
+      "name": "Kota Ambon"
+    },
+    {
+      "province_code": "81",
+      "code": "8172",
+      "name": "Kota Tual"
+    },
+    {
+      "province_code": "82",
+      "code": "8201",
+      "name": "Kab. Halmahera Barat"
+    },
+    {
+      "province_code": "82",
+      "code": "8202",
+      "name": "Kab. Halmahera Tengah"
+    },
+    {
+      "province_code": "82",
+      "code": "8203",
+      "name": "Kab. Halmahera Utara"
+    },
+    {
+      "province_code": "82",
+      "code": "8204",
+      "name": "Kab. Halmahera Selatan"
+    },
+    {
+      "province_code": "82",
+      "code": "8205",
+      "name": "Kab. Kepulauan Sula"
+    },
+    {
+      "province_code": "82",
+      "code": "8206",
+      "name": "Kab. Halmahera Timur"
+    },
+    {
+      "province_code": "82",
+      "code": "8207",
+      "name": "Kab. Pulau Morotai"
+    },
+    {
+      "province_code": "82",
+      "code": "8208",
+      "name": "Kab. Pulau Taliabu"
+    },
+    {
+      "province_code": "82",
+      "code": "8271",
+      "name": "Kota Ternate"
+    },
+    {
+      "province_code": "82",
+      "code": "8272",
+      "name": "Kota Tidore Kepulauan"
+    },
+    {
+      "province_code": "91",
+      "code": "9101",
+      "name": "Kab. Merauke"
+    },
+    {
+      "province_code": "91",
+      "code": "9102",
+      "name": "Kab. Jayawijaya"
+    },
+    {
+      "province_code": "91",
+      "code": "9103",
+      "name": "Kab. Jayapura"
+    },
+    {
+      "province_code": "91",
+      "code": "9104",
+      "name": "Kab. Nabire"
+    },
+    {
+      "province_code": "91",
+      "code": "9105",
+      "name": "Kab. Kepulauan Yapen"
+    },
+    {
+      "province_code": "91",
+      "code": "9106",
+      "name": "Kab. Biak Numfor"
+    },
+    {
+      "province_code": "91",
+      "code": "9107",
+      "name": "Kab. Puncak Jaya"
+    },
+    {
+      "province_code": "91",
+      "code": "9108",
+      "name": "Kab. Paniai"
+    },
+    {
+      "province_code": "91",
+      "code": "9109",
+      "name": "Kab. Mimika"
+    },
+    {
+      "province_code": "91",
+      "code": "9110",
+      "name": "Kab. Sarmi"
+    },
+    {
+      "province_code": "91",
+      "code": "9111",
+      "name": "Kab. Keerom"
+    },
+    {
+      "province_code": "91",
+      "code": "9112",
+      "name": "Kab. Pegunungan Bintang"
+    },
+    {
+      "province_code": "91",
+      "code": "9113",
+      "name": "Kab. Yahukimo"
+    },
+    {
+      "province_code": "91",
+      "code": "9114",
+      "name": "Kab. Tolikara"
+    },
+    {
+      "province_code": "91",
+      "code": "9115",
+      "name": "Kab. Waropen"
+    },
+    {
+      "province_code": "91",
+      "code": "9116",
+      "name": "Kab. Boven Digoel"
+    },
+    {
+      "province_code": "91",
+      "code": "9117",
+      "name": "Kab. Mappi"
+    },
+    {
+      "province_code": "91",
+      "code": "9118",
+      "name": "Kab. Asmat"
+    },
+    {
+      "province_code": "91",
+      "code": "9119",
+      "name": "Kab. Supiori"
+    },
+    {
+      "province_code": "91",
+      "code": "9120",
+      "name": "Kab. Mamberamo Raya"
+    },
+    {
+      "province_code": "91",
+      "code": "9121",
+      "name": "Kab. Mamberamo Tengah"
+    },
+    {
+      "province_code": "91",
+      "code": "9122",
+      "name": "Kab. Yalimo"
+    },
+    {
+      "province_code": "91",
+      "code": "9123",
+      "name": "Kab. Lanny Jaya"
+    },
+    {
+      "province_code": "91",
+      "code": "9124",
+      "name": "Kab. Nduga"
+    },
+    {
+      "province_code": "91",
+      "code": "9125",
+      "name": "Kab. Puncak"
+    },
+    {
+      "province_code": "91",
+      "code": "9126",
+      "name": "Kab. Dogiyai"
+    },
+    {
+      "province_code": "91",
+      "code": "9127",
+      "name": "Kab. Intan Jaya"
+    },
+    {
+      "province_code": "91",
+      "code": "9128",
+      "name": "Kab. Deiyai"
+    },
+    {
+      "province_code": "91",
+      "code": "9171",
+      "name": "Kota Jayapura"
+    },
+    {
+      "province_code": "92",
+      "code": "9201",
+      "name": "Kab. Sorong"
+    },
+    {
+      "province_code": "92",
+      "code": "9202",
+      "name": "Kab. Manokwari"
+    },
+    {
+      "province_code": "92",
+      "code": "9203",
+      "name": "Kab. Fakfak"
+    },
+    {
+      "province_code": "92",
+      "code": "9204",
+      "name": "Kab. Sorong Selatan"
+    },
+    {
+      "province_code": "92",
+      "code": "9205",
+      "name": "Kab. Raja Ampat"
+    },
+    {
+      "province_code": "92",
+      "code": "9206",
+      "name": "Kab. Teluk Bintuni"
+    },
+    {
+      "province_code": "92",
+      "code": "9207",
+      "name": "Kab. Teluk Wondama"
+    },
+    {
+      "province_code": "92",
+      "code": "9208",
+      "name": "Kab. Kaimana"
+    },
+    {
+      "province_code": "92",
+      "code": "9209",
+      "name": "Kab. Tambrauw"
+    },
+    {
+      "province_code": "92",
+      "code": "9210",
+      "name": "Kab. Maybrat"
+    },
+    {
+      "province_code": "92",
+      "code": "9211",
+      "name": "Kab. Manokwari Selatan"
+    },
+    {
+      "province_code": "92",
+      "code": "9212",
+      "name": "Kab. Pegunungan Arfak"
+    },
+    {
+      "province_code": "92",
+      "code": "9271",
+      "name": "Kota Sorong"
+    }
+  ],
+  "pekerjaan": [
+    {
+      "code": "1",
+      "name": "Belum/Tidak Bekerja"
+    },
+    {
+      "code": "2",
+      "name": "Mengurus Rumah Tangga"
+    },
+    {
+      "code": "3",
+      "name": "Pelajar/Mahasiswa"
+    },
+    {
+      "code": "4",
+      "name": "Pensiunan"
+    },
+    {
+      "code": "5",
+      "name": "Pegawai Negeri Sipil (PNS)"
+    },
+    {
+      "code": "6",
+      "name": "Tentara Nasional Indonesia (TNI)"
+    },
+    {
+      "code": "7",
+      "name": "Kepolisian RI (POLRI)"
+    },
+    {
+      "code": "8",
+      "name": "Perdagangan"
+    },
+    {
+      "code": "9",
+      "name": "Petani/Pekebun"
+    },
+    {
+      "code": "10",
+      "name": "Peternak"
+    },
+    {
+      "code": "11",
+      "name": "Nelayan/Perikanan"
+    },
+    {
+      "code": "12",
+      "name": "Industri"
+    },
+    {
+      "code": "13",
+      "name": "Konstruksi"
+    },
+    {
+      "code": "14",
+      "name": "Transportasi"
+    },
+    {
+      "code": "15",
+      "name": "Karyawan Swasta"
+    },
+    {
+      "code": "16",
+      "name": "Karyawan BUMN"
+    },
+    {
+      "code": "17",
+      "name": "Karyawan BUMD"
+    },
+    {
+      "code": "18",
+      "name": "Karyawan Honorer"
+    },
+    {
+      "code": "19",
+      "name": "Buruh Harian Lepas"
+    },
+    {
+      "code": "20",
+      "name": "Buruh Tani/Perkebunan"
+    },
+    {
+      "code": "21",
+      "name": "Buruh Nelayan/Perikanan"
+    },
+    {
+      "code": "22",
+      "name": "Buruh Peternakan"
+    },
+    {
+      "code": "23",
+      "name": "Pembantu Rumah Tangga"
+    },
+    {
+      "code": "24",
+      "name": "Tukang Cukur"
+    },
+    {
+      "code": "25",
+      "name": "Tukang Listrik"
+    },
+    {
+      "code": "26",
+      "name": "Tukang Batu"
+    },
+    {
+      "code": "27",
+      "name": "Tukang Kayu"
+    },
+    {
+      "code": "28",
+      "name": "Tukang Sol Sepatu"
+    },
+    {
+      "code": "29",
+      "name": "Tukang Las/Pandai Besi"
+    },
+    {
+      "code": "30",
+      "name": "Tukang Jahit"
+    },
+    {
+      "code": "31",
+      "name": "Tukang Gigi"
+    },
+    {
+      "code": "32",
+      "name": "Penata Rias"
+    },
+    {
+      "code": "33",
+      "name": "Penata Busana"
+    },
+    {
+      "code": "34",
+      "name": "Penata Rambut"
+    },
+    {
+      "code": "35",
+      "name": "Mekanik"
+    },
+    {
+      "code": "36",
+      "name": "Seniman"
+    },
+    {
+      "code": "37",
+      "name": "Tabib"
+    },
+    {
+      "code": "38",
+      "name": "Paraji"
+    },
+    {
+      "code": "39",
+      "name": "Perancang Busana"
+    },
+    {
+      "code": "40",
+      "name": "Penterjemah"
+    },
+    {
+      "code": "41",
+      "name": "Imam Masjid"
+    },
+    {
+      "code": "42",
+      "name": "Pendeta"
+    },
+    {
+      "code": "43",
+      "name": "Pastor"
+    },
+    {
+      "code": "44",
+      "name": "Wartawan"
+    },
+    {
+      "code": "45",
+      "name": "Ustadz/Mubaligh"
+    },
+    {
+      "code": "46",
+      "name": "Juru Masak"
+    },
+    {
+      "code": "47",
+      "name": "Promotor Acara"
+    },
+    {
+      "code": "48",
+      "name": "Anggora DPR-RI"
+    },
+    {
+      "code": "49",
+      "name": "Anggota DPD"
+    },
+    {
+      "code": "50",
+      "name": "Anggota BPK"
+    },
+    {
+      "code": "51",
+      "name": "Presiden"
+    },
+    {
+      "code": "52",
+      "name": "Wakil Presiden"
+    },
+    {
+      "code": "53",
+      "name": "Anggota Mahkamah"
+    },
+    {
+      "code": "54",
+      "name": "Konstitusi"
+    },
+    {
+      "code": "55",
+      "name": "Anggota Kabinet/ Kementrian"
+    },
+    {
+      "code": "56",
+      "name": "Duta Besar"
+    },
+    {
+      "code": "57",
+      "name": "Gubernur"
+    },
+    {
+      "code": "58",
+      "name": "Wakil Gubernur"
+    },
+    {
+      "code": "59",
+      "name": "Bupati"
+    },
+    {
+      "code": "60",
+      "name": "Wakil Bupati"
+    },
+    {
+      "code": "61",
+      "name": "Walikota"
+    },
+    {
+      "code": "62",
+      "name": "Wakil Walikota"
+    },
+    {
+      "code": "63",
+      "name": "Anggota DPRD Provinsi/ Anggota DPRD Kabupaten/Kota"
+    },
+    {
+      "code": "64",
+      "name": "Dosen"
+    },
+    {
+      "code": "65",
+      "name": "Guru"
+    },
+    {
+      "code": "66",
+      "name": "Pilot"
+    },
+    {
+      "code": "67",
+      "name": "Pengacara"
+    },
+    {
+      "code": "68",
+      "name": "Notaris"
+    },
+    {
+      "code": "69",
+      "name": "Arsitek"
+    },
+    {
+      "code": "70",
+      "name": "Akuntan"
+    },
+    {
+      "code": "71",
+      "name": "Konsultan"
+    },
+    {
+      "code": "72",
+      "name": "Dokter"
+    },
+    {
+      "code": "73",
+      "name": "Bidan"
+    },
+    {
+      "code": "74",
+      "name": "Perawat"
+    },
+    {
+      "code": "75",
+      "name": "Apoteker"
+    },
+    {
+      "code": "76",
+      "name": "Psikiater/Psikolog"
+    },
+    {
+      "code": "77",
+      "name": "Penyiar Televisi"
+    },
+    {
+      "code": "78",
+      "name": "Penyiar Radio"
+    },
+    {
+      "code": "79",
+      "name": "Pelaut"
+    },
+    {
+      "code": "80",
+      "name": "Peneliti"
+    },
+    {
+      "code": "81",
+      "name": "Sopir"
+    },
+    {
+      "code": "82",
+      "name": "Pialang"
+    },
+    {
+      "code": "83",
+      "name": "Paranormal"
+    },
+    {
+      "code": "84",
+      "name": "Pedagang"
+    },
+    {
+      "code": "85",
+      "name": "Perangkat Desa"
+    },
+    {
+      "code": "86",
+      "name": "Kepala Desa"
+    },
+    {
+      "code": "87",
+      "name": "Biarawati"
+    },
+    {
+      "code": "88",
+      "name": "Wiraswasta"
+    },
+    {
+      "code": "89",
+      "name": "Lainnya"
+    }
+  ],
+  "sumber_anggaran": [
+    {
+      "code": "1",
+      "name": "sumber anggaran dari APBN"
+    },
+    {
+      "code": "2",
+      "name": "sumber anggaran dari APBD"
+    },
+    {
+      "code": "3",
+      "name": "sumber anggaran biaya dari perusahaan"
+    },
+    {
+      "code": "4",
+      "name": "sumber anggaran biaya mandiri"
+    },
+    {
+      "code": "5",
+      "name": "Sumber anggaran APBN SET BNSP"
+    },
+    {
+      "code": "6",
+      "name": "Sumber anggaran APBN BLK"
+    }
+  ],
+  "kementerian": [
+    {
+      "code": "1",
+      "name": "Kementerian Koordinator Bidang Politik, Hukum, dan Keamanan"
+    },
+    {
+      "code": "2",
+      "name": "Kementerian Koordinator Bidang Perekonomian"
+    },
+    {
+      "code": "3",
+      "name": "Kementerian Koordinator Bidang Pembangunan Manusia dan Kebudayaan"
+    },
+    {
+      "code": "4",
+      "name": "Kementerian Koordinator Bidang Kemaritiman"
+    },
+    {
+      "code": "5",
+      "name": "Kementerian Dalam Negeri"
+    },
+    {
+      "code": "6",
+      "name": "Kementerian Luar Negeri"
+    },
+    {
+      "code": "7",
+      "name": "Kementerian Pertahanan"
+    },
+    {
+      "code": "8",
+      "name": "Kementerian Agama"
+    },
+    {
+      "code": "9",
+      "name": "Kementerian Hukum dan Hak Asasi Manusia"
+    },
+    {
+      "code": "10",
+      "name": "Kementerian Keuangan"
+    },
+    {
+      "code": "11",
+      "name": "Kementerian Pendidikan dan Kebudayaan"
+    },
+    {
+      "code": "12",
+      "name": "Kementerian Riset, Teknologi, dan Pendidikan Tinggi"
+    },
+    {
+      "code": "13",
+      "name": "Kementerian Sosial"
+    },
+    {
+      "code": "14",
+      "name": "Kementerian Kesehatan"
+    },
+    {
+      "code": "15",
+      "name": "Kementerian Ketenagakerjaan"
+    },
+    {
+      "code": "16",
+      "name": "Kementerian Perindustrian"
+    },
+    {
+      "code": "17",
+      "name": "Kementerian Perdagangan"
+    },
+    {
+      "code": "18",
+      "name": "Kementerian Energi dan Sumber Daya Mineral"
+    },
+    {
+      "code": "19",
+      "name": "Kementerian Pekerjaan Umum dan Perumahan Rakyat"
+    },
+    {
+      "code": "20",
+      "name": "Kementerian Perhubungan"
+    },
+    {
+      "code": "21",
+      "name": "Kementerian Komunikasi dan Informatika"
+    },
+    {
+      "code": "22",
+      "name": "Kementerian Pertanian"
+    },
+    {
+      "code": "23",
+      "name": "Kementerian Lingkungan Hidup dan Kehutanan"
+    },
+    {
+      "code": "24",
+      "name": "Kementerian Kelautan dan Perikanan"
+    },
+    {
+      "code": "25",
+      "name": "Kementerian Desa, Pembangunan Daerah Tertinggal, dan Transmigrasi"
+    },
+    {
+      "code": "26",
+      "name": "Kementerian Agraria dan Tata Ruang"
+    },
+    {
+      "code": "27",
+      "name": "Kementerian Perencanaan Pembangunan Nasional"
+    },
+    {
+      "code": "28",
+      "name": "Kementerian Pendayagunaan Aparatur Negara dan Reformasi Birokrasi"
+    },
+    {
+      "code": "29",
+      "name": "Kementerian Badan Usaha Milik Negara"
+    },
+    {
+      "code": "30",
+      "name": "Kementerian Koperasi dan Usaha Kecil dan Menengah"
+    },
+    {
+      "code": "31",
+      "name": "Kementerian Pariwisata"
+    },
+    {
+      "code": "32",
+      "name": "Kementerian Pemberdayaan Perempuan dan Perlindungan Anak"
+    },
+    {
+      "code": "33",
+      "name": "Kementerian Pemuda dan Olahraga"
+    },
+    {
+      "code": "34",
+      "name": "Kementerian Sekretariat Negara"
+    },
+    {
+      "code": "35",
+      "name": "Lembaga Sandi Negara"
+    },
+    {
+      "code": "36",
+      "name": "Badan Kepegawaian Negara"
+    },
+    {
+      "code": "37",
+      "name": "Lembaga Administrasi Negara"
+    },
+    {
+      "code": "38",
+      "name": "Lembaga Penerbangan dan Antariksa Nasional"
+    },
+    {
+      "code": "39",
+      "name": "Lembaga Ilmu Pengetahuan Indonesia"
+    },
+    {
+      "code": "40",
+      "name": "Badan Tenaga Nuklir Nasional"
+    },
+    {
+      "code": "41",
+      "name": "Badan Pusat Statistik"
+    },
+    {
+      "code": "42",
+      "name": "Arsip Nasional Republik Indonesia"
+    },
+    {
+      "code": "43",
+      "name": "Badan Informasi Geospasial"
+    },
+    {
+      "code": "44",
+      "name": "Badan Koordinasi Keluarga Berencana Nasional (BKKBN)"
+    },
+    {
+      "code": "45",
+      "name": "Badan Koordinasi Penanaman Modal"
+    },
+    {
+      "code": "46",
+      "name": "Badan Pengkajian dan Penerapan Teknologi"
+    },
+    {
+      "code": "47",
+      "name": "Badan Pemeriksa Keuangan dan Pembangunan"
+    },
+    {
+      "code": "48",
+      "name": "Perpustakaan Nasional"
+    },
+    {
+      "code": "49",
+      "name": "Badan Standarisasi Nasional"
+    },
+    {
+      "code": "50",
+      "name": "Badan Pengawas Obat dan Makanan"
+    },
+    {
+      "code": "51",
+      "name": "Lembaga Ketahanan Nasional RI"
+    },
+    {
+      "code": "52",
+      "name": "Badan Meteorologi Klimatologi dan Geofisika"
+    },
+    {
+      "code": "53",
+      "name": "Badan Narkotika Nasional"
+    },
+    {
+      "code": "54",
+      "name": "Badan Nasional Penanggulangan Bencana"
+    },
+    {
+      "code": "55",
+      "name": "Badan Nasional Penempatan dan Perlindungan Tenaga Kerja Indonesia"
+    },
+    {
+      "code": "58",
+      "name": "Lembaga Kebijakan Pengadaan Barang/Jasa Pemerintah"
+    },
+    {
+      "code": "59",
+      "name": "Badan Nasional Penanggulangan Terorisme"
+    },
+    {
+      "code": "60",
+      "name": "Badan Ekonomi Kreatif"
+    },
+    {
+      "code": "61",
+      "name": "Badan Pengawas Tenaga Nuklir"
+    },
+    {
+      "code": "62",
+      "name": "Biaya dari Pemda"
+    },
+    {
+      "code": "63",
+      "name": "MPR - RI"
+    },
+    {
+      "code": "64",
+      "name": "Sekretariat Jenderal DPR - RI"
+    },
+    {
+      "code": "65",
+      "name": "DPD - RI"
+    },
+    {
+      "code": "66",
+      "name": "MA - RI"
+    },
+    {
+      "code": "67",
+      "name": "MK - RI"
+    },
+    {
+      "code": "68",
+      "name": "Komisi Yudisial"
+    },
+    {
+      "code": "69",
+      "name": "BPK - RI"
+    },
+    {
+      "code": "70",
+      "name": "Kejaksaan Agung RI"
+    },
+    {
+      "code": "71",
+      "name": "Kepolisian RI"
+    },
+    {
+      "code": "72",
+      "name": "TNI"
+    },
+    {
+      "code": "73",
+      "name": "Sekretaris Kabinet"
+    },
+    {
+      "code": "74",
+      "name": "Arsip Nasional (ANRI)"
+    },
+    {
+      "code": "75",
+      "name": "Badan Inteligen Negara"
+    },
+    {
+      "code": "76",
+      "name": "Badan Kependudukan dan Keluarga Berencana Nasional"
+    },
+    {
+      "code": "77",
+      "name": "Badan Informasi Geospasial (BIG)"
+    },
+    {
+      "code": "78",
+      "name": "Badan Meteorologi, Klimatologi, dan Geofisika"
+    },
+    {
+      "code": "79",
+      "name": "Badan Nasional Penanggulangan Bencana (BNPB)"
+    },
+    {
+      "code": "80",
+      "name": "Badan Nasional Penempatan dan Perlindungan Tenaga Kerja Indonesia (BNP2TKI)"
+    },
+    {
+      "code": "81",
+      "name": "Badan Pengawas Keuangan dan Pembangunan (BPKP)"
+    },
+    {
+      "code": "82",
+      "name": "Badan Pengkajian dan Penerapan Teknologi (BPPT)"
+    },
+    {
+      "code": "83",
+      "name": "Badan SAR Nasional"
+    },
+    {
+      "code": "84",
+      "name": "Badan Standardisasi Nasional"
+    },
+    {
+      "code": "85",
+      "name": "Perpustakaan Nasional Republik Indonesia"
+    },
+    {
+      "code": "86",
+      "name": "Akademi Ilmu Pengetahuan Indonesia"
+    },
+    {
+      "code": "87",
+      "name": "Badan Amil Zakat Nasional"
+    },
+    {
+      "code": "88",
+      "name": "Badan Koordinasi Keamanan Laut"
+    },
+    {
+      "code": "89",
+      "name": "Badan Nasional Pengelola Perbatasan"
+    },
+    {
+      "code": "90",
+      "name": "Badan Nasional Sertifikasi Profesi"
+    },
+    {
+      "code": "91",
+      "name": "Badan Olahraga Profesional"
+    },
+    {
+      "code": "92",
+      "name": "Badan Pelaksana Pengelola Masjid Istiqlal"
+    },
+    {
+      "code": "93",
+      "name": "Badan Pendukung Pengembangan Sistem Penyediaan Air Minum"
+    },
+    {
+      "code": "94",
+      "name": "Badan Pengatur Hilir Minyak dan Gas"
+    },
+    {
+      "code": "95",
+      "name": "Badan Pengawas Pasar Tenaga Listrik"
+    },
+    {
+      "code": "96",
+      "name": "Badan Pengawas Pemilihan Umum"
+    },
+    {
+      "code": "97",
+      "name": "Badan Pengelola Dana Abadi Umat"
+    },
+    {
+      "code": "98",
+      "name": "Badan Pengembangan Wilayahan Surabaya-Madura"
+    },
+    {
+      "code": "99",
+      "name": "Badan Pengusahaan Kawasan Perdagangan Bebas dan Pelabuhan Bebas Batam"
+    },
+    {
+      "code": "100",
+      "name": "Biaya Mandiri"
+    },
+    {
+      "code": "101",
+      "name": "Badan Pengusahaan Kawasan Perdagangan Bebas dan Pelabuhan Bebas Bintan"
+    },
+    {
+      "code": "102",
+      "name": "Badan Pengusahaan Kawasan Perdagangan Bebas dan Pelabuhan Bebas Karimun"
+    },
+    {
+      "code": "103",
+      "name": "Badan Pengusahaan Kawasan Perdagangan Bebas dan Pelabuhan Sabang"
+    },
+    {
+      "code": "104",
+      "name": "Badan Perlindungan Konsumen Nasional"
+    },
+    {
+      "code": "105",
+      "name": "Badan Pertimbangan Kepegawaian"
+    },
+    {
+      "code": "106",
+      "name": "Badan Pertimbangan Kesehatan Nasional"
+    },
+    {
+      "code": "107",
+      "name": "Badan Pertimbangan Perfilman Nasional"
+    },
+    {
+      "code": "108",
+      "name": "Badan Standarisasi dan Akreditasi Nasional Keolahragaan"
+    },
+    {
+      "code": "109",
+      "name": "Dewan Energi Nasional"
+    },
+    {
+      "code": "110",
+      "name": "Dewan Jaminan Sosial Nasional"
+    },
+    {
+      "code": "111",
+      "name": "Dewan Kawasan Perdagangan Bebas dan Pelabuhan Bebas Batam"
+    },
+    {
+      "code": "112",
+      "name": "Dewan Kawasan Perdagangan Bebas dan Pelabuhan Bebas Bintan"
+    },
+    {
+      "code": "113",
+      "name": "Dewan Kawasan Perdagangan Bebas dan Pelabuhan Bebas Karimun"
+    },
+    {
+      "code": "114",
+      "name": "Dewan Ketahanan Pangan"
+    },
+    {
+      "code": "115",
+      "name": "Dewan Koperasi Indonesia"
+    },
+    {
+      "code": "116",
+      "name": "Dewan Nasional Kawasan Ekonomi Khusus"
+    },
+    {
+      "code": "117",
+      "name": "Dewan Pengupahan Nasional"
+    },
+    {
+      "code": "118",
+      "name": "Dewan Pers"
+    },
+    {
+      "code": "119",
+      "name": "Dewan Pertimbangan Otonomi Daerah"
+    },
+    {
+      "code": "120",
+      "name": "Dewan Pertimbangan Presiden"
+    },
+    {
+      "code": "121",
+      "name": "Dewan Riset Nasional"
+    },
+    {
+      "code": "122",
+      "name": "Dewan Sumber Daya Air Nasional"
+    },
+    {
+      "code": "123",
+      "name": "Dewan Teknologi Informasi dan Komunikasi Nasional"
+    },
+    {
+      "code": "124",
+      "name": "Komisi Banding Merek"
+    },
+    {
+      "code": "125",
+      "name": "Komisi Banding Paten"
+    },
+    {
+      "code": "126",
+      "name": "Komisi Informasi Pusat"
+    },
+    {
+      "code": "127",
+      "name": "Komisi Kejaksaan"
+    },
+    {
+      "code": "128",
+      "name": "Komisi Kepolisian Nasional"
+    },
+    {
+      "code": "129",
+      "name": "Komisi Nasional Anti Kekerasan Terhadap Perempuan"
+    },
+    {
+      "code": "130",
+      "name": "Komisi Nasional Hak Asasi Manusia"
+    },
+    {
+      "code": "131",
+      "name": "Komisi Nasional Lanjut Usia"
+    },
+    {
+      "code": "132",
+      "name": "Komisi Pemberantasan Korupsi"
+    },
+    {
+      "code": "133",
+      "name": "Komisi Pemilihan Umum"
+    },
+    {
+      "code": "134",
+      "name": "Komisi Pengawas Haji Indonesia"
+    },
+    {
+      "code": "135",
+      "name": "Komisi Pengawas Persaingan Usaha"
+    },
+    {
+      "code": "136",
+      "name": "Komisi Penyiaran Indonesia"
+    },
+    {
+      "code": "137",
+      "name": "Komisi Perlindungan Anak Indonesia"
+    },
+    {
+      "code": "138",
+      "name": "Komite Akreditasi Nasional"
+    },
+    {
+      "code": "139",
+      "name": "Komite Inovasi Nasional"
+    },
+    {
+      "code": "140",
+      "name": "Komite Kebijakan Percepatan Penyediaan Infrastruktur"
+    },
+    {
+      "code": "141",
+      "name": "Komite Nasional Keselamatan Transportasi"
+    },
+    {
+      "code": "142",
+      "name": "Komite Nasional Pengendalian Flu Burung (Avian Influenza) dan Kesiapsiagaan Menghadapi Pandemi Influenza"
+    },
+    {
+      "code": "143",
+      "name": "Komite Olah Raga Nasional Indonesia"
+    },
+    {
+      "code": "144",
+      "name": "Komite Privatisasi Perusahaan Perseroan"
+    },
+    {
+      "code": "145",
+      "name": "Komite Standar Akuntansi Pemerintah"
+    },
+    {
+      "code": "146",
+      "name": "Komite Standar Nasional untuk Satuan Ukuran"
+    },
+    {
+      "code": "147",
+      "name": "Konsil Kedokteran Indonesia"
+    },
+    {
+      "code": "148",
+      "name": "Lembaga Kerja Sama Tripartit"
+    },
+    {
+      "code": "149",
+      "name": "Lembaga Perlindungan Saksi dan Korban"
+    },
+    {
+      "code": "150",
+      "name": "Lembaga Produktivitas Nasional"
+    },
+    {
+      "code": "151",
+      "name": "Lembaga Sensor Film"
+    },
+    {
+      "code": "152",
+      "name": "Majelis Disiplin Tenaga Kesehatan"
+    },
+    {
+      "code": "153",
+      "name": "Ombudsman"
+    },
+    {
+      "code": "154",
+      "name": "Pusat Pelaporan dan Analisis Transaksi Keuangan"
+    },
+    {
+      "code": "155",
+      "name": "Tim Koordinasi Penanggulangan Kemiskinan"
+    },
+    {
+      "code": "156",
+      "name": "Unit Kerja Presiden Bidang Pengawasan dan Pengendalian Pembangunan(UKP- 4)"
+    },
+    {
+      "code": "157",
+      "name": "Lembaga Penyiaran Publik Radio Republik Indonesia"
+    },
+    {
+      "code": "158",
+      "name": "Lembaga Penyiaran Publik Televisi Republik Indonesia"
+    },
+    {
+      "code": "159",
+      "name": "BPJS Kesehatan"
+    },
+    {
+      "code": "160",
+      "name": "BPJS Ketenagakerjaan"
+    }
+  ]
+}

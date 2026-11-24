@@ -183,7 +183,7 @@ class MukExportService
     /**
      * Export all candidates in a schedule to Excel (SpreadsheetML .xls format).
      */
-    public function exportScheduleAsesiXls(Schedule $schedule): Response
+    public function exportScheduleAsesiXls(Schedule $schedule, array $options = []): Response
     {
         $schedule->load([
             'scheme',
@@ -192,7 +192,7 @@ class MukExportService
             'assessments.assessor.profile',
         ]);
 
-        $xml = $this->generateAsesiSpreadsheetXml($schedule->assessments, $schedule);
+        $xml = $this->generateAsesiSpreadsheetXml($schedule->assessments, $schedule, $options);
         $filename = 'REKAP-ASESI-'.preg_replace('/[^A-Za-z0-9_-]/', '_', $schedule->code ?: $schedule->id).'.xls';
 
         return response($xml, 200, [
@@ -205,7 +205,7 @@ class MukExportService
     /**
      * Export single candidate assessment to Excel (SpreadsheetML .xls format).
      */
-    public function exportAssessmentAsesiXls(Assessment $assessment): Response
+    public function exportAssessmentAsesiXls(Assessment $assessment, array $options = []): Response
     {
         $assessment->load([
             'schedule.scheme',
@@ -215,7 +215,7 @@ class MukExportService
         ]);
 
         $schedule = $assessment->schedule;
-        $xml = $this->generateAsesiSpreadsheetXml(collect([$assessment]), $schedule);
+        $xml = $this->generateAsesiSpreadsheetXml(collect([$assessment]), $schedule, $options);
         $asesiName = $assessment->asesi?->full_name ?? 'Asesi';
         $filename = 'BIODATA-ASESI-'.preg_replace('/[^A-Za-z0-9_-]/', '_', $asesiName).'.xls';
 
@@ -320,13 +320,18 @@ class MukExportService
      *
      * @param  Collection<int, Assessment>  $assessments
      */
-    public function generateAsesiSpreadsheetXml(Collection $assessments, ?Schedule $schedule = null): string
+    public function generateAsesiSpreadsheetXml(Collection $assessments, ?Schedule $schedule = null, array $options = []): string
     {
         $leadAssessor = $schedule?->assessors?->first();
         $defaultAssessorName = $leadAssessor?->full_name ?? 'Asesor LSP PrO Indo';
         $defaultAssessorReg = $leadAssessor?->profile?->no_reg ?? $leadAssessor?->assessor_registration_number ?? 'MET.000.001234 2022';
         $scheduleCode = $schedule?->code ?? '-';
         $testDate = $schedule?->date ? Carbon::parse($schedule->date)->format('d/m/Y') : '';
+
+        $selectedSumberAnggaran = $options['kode_sumber_anggaran']
+            ?? ($options['sumber_anggaran'] ?? ($schedule?->kode_sumber_anggaran ?? '1'));
+        $selectedKementerian = $options['kode_kementerian']
+            ?? ($options['kementerian'] ?? ($schedule?->kode_kementerian ?? '11'));
 
         $escape = static fn ($v) => htmlspecialchars((string) ($v ?? ''), ENT_XML1, 'UTF-8');
 
@@ -438,6 +443,21 @@ class MukExportService
                 $finalResult = ($ass->status === 'COMPLETED' ? 'K' : ($ass->final_result ?? ''));
             }
 
+            $cityProv = BnspReferenceService::resolveCityAndProvince(
+                $profile?->kode_kota,
+                $profile?->kode_provinsi,
+                $profile?->alamat_rumah,
+                $schedule?->tuk_name
+            );
+
+            $kodeKota = $profile?->kode_kota ?: ($cityProv['kode_kota'] ?? '');
+            $kodeProvinsi = $profile?->kode_provinsi ?: ($cityProv['kode_provinsi'] ?? '');
+            $kodePendidikan = $profile?->effective_kode_pendidikan ?? BnspReferenceService::resolveEducationCode($profile?->pendidikan_terakhir);
+            $kodePekerjaan = $profile?->effective_kode_pekerjaan ?? BnspReferenceService::resolveJobCode($profile?->jabatan, $profile?->kode_pekerjaan);
+
+            // Kode Jadwal sengaja dikosongkan sesuai instruksi user
+            $kodeJadwal = '';
+
             $cells = [
                 ['val' => $idx + 1, 'center' => true],
                 ['val' => $asesi?->full_name ?? '', 'center' => false],
@@ -446,18 +466,18 @@ class MukExportService
                 ['val' => $birthDate, 'center' => true],
                 ['val' => $gender, 'center' => true],
                 ['val' => $profile?->alamat_rumah ?? '', 'center' => false],
-                ['val' => '', 'center' => true], // KODE KOTA
-                ['val' => '', 'center' => true], // KODE PROVINSI
+                ['val' => $kodeKota, 'center' => true], // KODE KOTA
+                ['val' => $kodeProvinsi, 'center' => true], // KODE PROVINSI
                 ['val' => $asesi?->phone ?? $profile?->no_telepon_rumah ?? '', 'center' => true],
                 ['val' => $asesi?->email ?? '', 'center' => false],
-                ['val' => '', 'center' => true], // KODE PENDIDIKAN
-                ['val' => '', 'center' => true], // KODE PEKERJAAN
-                ['val' => '', 'center' => true], // KODE JADWAL
+                ['val' => $kodePendidikan, 'center' => true], // KODE PENDIDIKAN
+                ['val' => $kodePekerjaan, 'center' => true], // KODE PEKERJAAN
+                ['val' => $kodeJadwal, 'center' => true], // KODE JADWAL (empty)
                 ['val' => $testDate, 'center' => true],
                 ['val' => $assessorName, 'center' => false],
                 ['val' => $assessorReg, 'center' => true],
-                ['val' => '', 'center' => true], // KODE SUMBER ANGGARAN
-                ['val' => '', 'center' => true], // KODE KEMENTERIAN
+                ['val' => (string) $selectedSumberAnggaran, 'center' => true], // KODE SUMBER ANGGARAN
+                ['val' => (string) $selectedKementerian, 'center' => true], // KODE KEMENTERIAN
                 ['val' => $finalResult, 'center' => true],
             ];
 

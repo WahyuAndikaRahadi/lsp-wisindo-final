@@ -1,7 +1,28 @@
 @extends('layouts.app', ['title' => 'Dokumen MUK: ' . ($schedule->name ?? $schedule->scheme?->name)])
 
 @section('content')
-<div class="space-y-6">
+<div class="space-y-6" x-data="{
+    exportModalOpen: false,
+    sumberAnggaran: '{{ $schedule->kode_sumber_anggaran ?: '1' }}',
+    kementerianCode: '{{ $schedule->kode_kementerian ?: '11' }}',
+    kemenSearch: '',
+    kemenOpen: false,
+    kementerianList: {{ Js::from(\App\Services\BnspReferenceService::getKementerianList()) }},
+    get filteredKemen() {
+        if (!this.kemenSearch.trim()) return this.kementerianList;
+        let q = this.kemenSearch.toLowerCase();
+        return this.kementerianList.filter(k => k.name.toLowerCase().includes(q) || String(k.code).includes(q));
+    },
+    get selectedKemenName() {
+        let match = this.kementerianList.find(k => String(k.code) === String(this.kementerianCode));
+        return match ? match.name : 'Pilih Kementerian / Instansi';
+    },
+    selectKemen(k) {
+        this.kementerianCode = String(k.code);
+        this.kemenOpen = false;
+        this.kemenSearch = '';
+    }
+}">
     {{-- Header & Breadcrumbs --}}
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
@@ -84,11 +105,12 @@
                 <span>Sertifikat</span>
             </a>
 
-            <a href="{{ route('admin.dokumen-muk.export-excel-biodata', $schedule->id) }}"
-               class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 rounded-lg shadow-2xs transition min-h-[38px]">
+            <button type="button" @click="exportModalOpen = true"
+               class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 rounded-lg shadow-2xs transition min-h-[38px] cursor-pointer"
+               title="Ekspor Rekap Permohonan Blangko BNSP (Excel)">
                 <svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                <span>Excel Biodata</span>
-            </a>
+                <span>Permohonan Blangko (Excel)</span>
+            </button>
 
             <div class="h-5 w-px bg-slate-200 hidden sm:block mx-1"></div>
 
@@ -188,6 +210,124 @@
         {{-- Assessees Table Card --}}
         <div id="muk-peserta-table-container" data-ajax-container="muk-peserta" data-skeleton-cols="5" data-skeleton-rows="6">
             @include('admin.dokumen-muk._peserta_table')
+        </div>
+    </div>
+
+    {{-- Modal Ekspor Excel Permohonan Blangko BNSP --}}
+    <div x-show="exportModalOpen" 
+         x-cloak
+         class="fixed inset-0 z-50 overflow-y-auto"
+         aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div x-show="exportModalOpen" 
+                 x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+                 x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+                 class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity" 
+                 @click="exportModalOpen = false"></div>
+
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+            <div x-show="exportModalOpen" 
+                 x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                 x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                 class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-slate-200">
+                
+                <form action="{{ route('admin.dokumen-muk.export-excel-biodata', $schedule->id) }}" method="GET" target="_blank" @submit="exportModalOpen = false">
+                    <input type="hidden" name="kode_sumber_anggaran" :value="sumberAnggaran">
+                    <input type="hidden" name="kode_kementerian" :value="kementerianCode">
+
+                    <div class="px-6 py-5 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-lg shrink-0">
+                                📊
+                            </div>
+                            <div>
+                                <h3 class="text-base font-bold text-slate-900" id="modal-title">Ekspor Permohonan Blangko BNSP</h3>
+                                <p class="text-xs text-slate-500 mt-0.5">Atur parameter Sumber Anggaran &amp; Kementerian sebelum mengunduh Excel.</p>
+                            </div>
+                        </div>
+                        <button type="button" @click="exportModalOpen = false" class="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-100 transition cursor-pointer">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
+                    </div>
+
+                    <div class="p-6 space-y-5 text-xs">
+                        {{-- Sumber Anggaran --}}
+                        <div>
+                            <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                                Sumber Anggaran <span class="text-rose-500">*</span>
+                            </label>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                @foreach(\App\Services\BnspReferenceService::getSumberAnggaranList() as $sa)
+                                    <label class="flex items-start gap-2.5 p-2.5 rounded-xl border border-slate-200 hover:border-brand-500 cursor-pointer transition"
+                                           :class="sumberAnggaran === '{{ $sa['code'] }}' ? 'border-brand-600 bg-brand-50/50 text-brand-900 font-bold' : 'text-slate-700'">
+                                        <input type="radio" name="temp_sumber" value="{{ $sa['code'] }}" x-model="sumberAnggaran" class="mt-0.5 text-brand-600 focus:ring-brand-500">
+                                        <div class="leading-tight">
+                                            <span class="block text-[11px] font-mono text-slate-400">Kode {{ $sa['code'] }}</span>
+                                            <span class="text-xs">{{ $sa['name'] }}</span>
+                                        </div>
+                                    </label>
+                                @endforeach
+                            </div>
+                        </div>
+
+                        {{-- Kementerian / Lembaga --}}
+                        <div class="relative">
+                            <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                                Instansi Pemberi Anggaran / Kementerian <span class="text-rose-500">*</span>
+                            </label>
+                            <button type="button" @click="kemenOpen = !kemenOpen"
+                                    class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-xs flex items-center justify-between text-left focus:ring-2 focus:ring-brand-500 focus:outline-none cursor-pointer">
+                                <div class="truncate">
+                                    <span class="font-mono font-bold text-brand-700 bg-brand-50 px-1.5 py-0.5 rounded text-[10px] mr-1" x-text="'[' + kementerianCode + ']'"></span>
+                                    <span x-text="selectedKemenName" class="font-medium text-slate-800"></span>
+                                </div>
+                                <svg class="w-4 h-4 text-slate-400 shrink-0 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                            </button>
+
+                            {{-- Dropdown Searchable --}}
+                            <div x-show="kemenOpen" @click.away="kemenOpen = false" x-transition
+                                 class="absolute z-50 left-0 right-0 mt-1 bg-white rounded-xl border border-slate-200 shadow-2xl overflow-hidden max-h-56 flex flex-col">
+                                <div class="p-2 border-b border-slate-100 bg-slate-50">
+                                    <input type="text" x-model="kemenSearch" placeholder="Cari nama kementerian / kode (158 instansi)..." 
+                                           class="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-300 focus:outline-none focus:ring-1 focus:ring-brand-500"
+                                           @click.stop>
+                                </div>
+                                <div class="overflow-y-auto divide-y divide-slate-100 flex-1">
+                                    <template x-for="k in filteredKemen" :key="k.code">
+                                        <button type="button" @click="selectKemen(k)"
+                                                class="w-full px-3.5 py-2 text-left text-xs hover:bg-brand-50 hover:text-brand-700 transition flex items-center justify-between cursor-pointer">
+                                            <span x-text="k.name" class="font-medium text-slate-800 truncate mr-2"></span>
+                                            <span x-text="'Kode ' + k.code" class="text-[10px] font-mono text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded shrink-0"></span>
+                                        </button>
+                                    </template>
+                                    <div x-show="filteredKemen.length === 0" class="p-3 text-center text-xs text-slate-400">
+                                        Kementerian tidak ditemukan
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Notice: Kode Jadwal Dikosongkan --}}
+                        <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 text-xs flex items-start gap-2.5">
+                            <span class="text-base shrink-0">ℹ️</span>
+                            <div class="leading-relaxed">
+                                <strong>Ketentuan Kolom Kode Jadwal:</strong> Sesuai format BNSP, kolom <em>KODE JADWAL</em> sengaja dikosongkan agar Anda dapat mengisinya secara cepat dengan kode jadwal resmi dari portal BNSP.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-2.5">
+                        <button type="button" @click="exportModalOpen = false" class="px-4 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-xl hover:bg-slate-50 transition cursor-pointer">
+                            Batal
+                        </button>
+                        <button type="submit" class="px-5 py-2 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-sm transition flex items-center gap-1.5 cursor-pointer">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                            <span>Unduh Berkas Excel (.xls)</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </div>

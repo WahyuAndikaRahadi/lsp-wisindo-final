@@ -158,6 +158,71 @@
                     @error('alamat_rumah') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
                 </div>
 
+                {{-- Provinsi & Kabupaten/Kota (Sesuai Master Kode BNSP) --}}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:col-span-2"
+                     x-data="{
+                        provinces: {{ Js::from($provinces ?? \App\Services\BnspReferenceService::getProvinsiList()) }},
+                        allCities: {{ Js::from($cities ?? \App\Services\BnspReferenceService::getAllCities()) }},
+                        selectedProvince: '{{ old('kode_provinsi', $p->kode_provinsi ?? '32') }}',
+                        selectedCity: '{{ old('kode_kota', $p->kode_kota ?? '') }}',
+                        get filteredCities() {
+                            if (!this.selectedProvince) return [];
+                            return this.allCities.filter(c => String(c.province_code) === String(this.selectedProvince));
+                        },
+                        init() {
+                            if (this.selectedProvince && !document.getElementById('nama_provinsi_input').value) {
+                                let prov = this.provinces.find(p => String(p.code) === String(this.selectedProvince));
+                                if (prov) document.getElementById('nama_provinsi_input').value = prov.name;
+                            }
+                            if (this.selectedCity && !document.getElementById('nama_kota_input').value) {
+                                let city = this.allCities.find(c => String(c.code) === String(this.selectedCity));
+                                if (city) document.getElementById('nama_kota_input').value = city.name;
+                            }
+                        },
+                        updateProvince(code) {
+                            this.selectedProvince = code;
+                            let prov = this.provinces.find(p => String(p.code) === String(code));
+                            document.getElementById('nama_provinsi_input').value = prov ? prov.name : '';
+                            this.selectedCity = '';
+                            document.getElementById('nama_kota_input').value = '';
+                        },
+                        updateCity(code) {
+                            this.selectedCity = code;
+                            let city = this.allCities.find(c => String(c.code) === String(code));
+                            document.getElementById('nama_kota_input').value = city ? city.name : '';
+                        }
+                     }">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                            Provinsi <span class="text-rose-500">*</span>
+                        </label>
+                        <select name="kode_provinsi" @change="updateProvince($event.target.value)" required
+                            class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                            <option value="">-- Pilih Provinsi --</option>
+                            <template x-for="prov in provinces" :key="prov.code">
+                                <option :value="prov.code" :selected="String(prov.code) === String(selectedProvince)" x-text="prov.name"></option>
+                            </template>
+                        </select>
+                        <input type="hidden" name="nama_provinsi" id="nama_provinsi_input" value="{{ old('nama_provinsi', $p->nama_provinsi) }}">
+                        @error('kode_provinsi') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                            Kabupaten / Kota <span class="text-rose-500">*</span>
+                        </label>
+                        <select name="kode_kota" @change="updateCity($event.target.value)" required
+                            class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                            <option value="">-- Pilih Kota / Kabupaten --</option>
+                            <template x-for="city in filteredCities" :key="city.code">
+                                <option :value="city.code" :selected="String(city.code) === String(selectedCity)" x-text="city.name"></option>
+                            </template>
+                        </select>
+                        <input type="hidden" name="nama_kota" id="nama_kota_input" value="{{ old('nama_kota', $p->nama_kota) }}">
+                        @error('kode_kota') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
+                    </div>
+                </div>
+
                 <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
                         Kode Pos <span class="text-rose-500">*</span>
@@ -215,30 +280,65 @@
                         class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
                 </div>
 
-                <div>
+                <div x-data="{
+                    open: false,
+                    search: '',
+                    selectedCode: '{{ old('kode_pekerjaan', $p->kode_pekerjaan ?? ($p->jabatan ? \App\Services\BnspReferenceService::resolveJobCode($p->jabatan) : '3')) }}',
+                    selectedName: '{{ old('jabatan', $p->jabatan ?? 'Pelajar/Mahasiswa') }}',
+                    jobs: {{ Js::from($jobs ?? \App\Services\BnspReferenceService::getPekerjaanList()) }},
+                    get filteredJobs() {
+                        if (!this.search.trim()) return this.jobs;
+                        let q = this.search.toLowerCase();
+                        return this.jobs.filter(j => j.name.toLowerCase().includes(q) || String(j.code).includes(q));
+                    },
+                    init() {
+                        if (!this.selectedName && this.selectedCode) {
+                            let match = this.jobs.find(j => String(j.code) === String(this.selectedCode));
+                            if (match) this.selectedName = match.name;
+                        }
+                    },
+                    selectJob(job) {
+                        this.selectedCode = String(job.code);
+                        this.selectedName = job.name;
+                        this.open = false;
+                        this.search = '';
+                    }
+                }" class="relative">
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
                         Jabatan / Posisi / Status <span class="text-rose-500">*</span>
                     </label>
-                    @php
-                        $jobOptions = [
-                            'Pelajar / Siswa',
-                            'Mahasiswa',
-                            'Karyawan Swasta / Teknisi / Mekanik',
-                            'Pegawai Negeri / BUMN',
-                            'Wirausaha / Pemilik Usaha',
-                            'Belum Bekerja / Fresh Graduate',
-                            'Lainnya',
-                        ];
-                    @endphp
-                    <select name="jabatan" required class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
-                        <option value="">-- Pilih Jabatan / Posisi / Status --</option>
-                        @foreach($jobOptions as $opt)
-                            <option value="{{ $opt }}" {{ old('jabatan', $p->jabatan) === $opt ? 'selected' : '' }}>{{ $opt }}</option>
-                        @endforeach
-                        @if($p->jabatan && !in_array($p->jabatan, $jobOptions))
-                            <option value="{{ $p->jabatan }}" selected>{{ $p->jabatan }}</option>
-                        @endif
-                    </select>
+
+                    <input type="hidden" name="kode_pekerjaan" :value="selectedCode">
+                    <input type="hidden" name="jabatan" :value="selectedName">
+
+                    <button type="button" @click="open = !open" 
+                            class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 bg-white text-sm flex items-center justify-between text-left focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                        <span x-text="selectedName ? (selectedCode ? '[' + selectedCode + '] ' + selectedName : selectedName) : '-- Pilih Pekerjaan / Status --'" 
+                              :class="selectedName ? 'text-slate-900 font-medium' : 'text-slate-400'"></span>
+                        <svg class="w-4 h-4 text-slate-400 shrink-0 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    </button>
+
+                    {{-- Dropdown with Search & Scroll --}}
+                    <div x-show="open" @click.away="open = false" x-transition
+                         class="absolute z-30 left-0 right-0 mt-1 bg-white rounded-xl border border-slate-200 shadow-xl overflow-hidden max-h-64 flex flex-col">
+                        <div class="p-2 border-b border-slate-100 bg-slate-50">
+                            <input type="text" x-model="search" placeholder="Ketik untuk mencari pekerjaan (89 opsi BNSP)..." 
+                                   class="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-300 focus:outline-none focus:ring-1 focus:ring-brand-500"
+                                   @click.stop>
+                        </div>
+                        <div class="overflow-y-auto divide-y divide-slate-100 flex-1">
+                            <template x-for="job in filteredJobs" :key="job.code">
+                                <button type="button" @click="selectJob(job)" 
+                                        class="w-full px-3.5 py-2 text-left text-xs hover:bg-brand-50 hover:text-brand-700 transition flex items-center justify-between cursor-pointer">
+                                    <span x-text="job.name" class="font-medium text-slate-800"></span>
+                                    <span x-text="'Kode ' + job.code" class="text-[10px] font-mono text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded ml-2 shrink-0"></span>
+                                </button>
+                            </template>
+                            <div x-show="filteredJobs.length === 0" class="p-3 text-center text-xs text-slate-400">
+                                Pekerjaan tidak ditemukan dalam daftar BNSP
+                            </div>
+                        </div>
+                    </div>
                     @error('jabatan') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
                 </div>
 

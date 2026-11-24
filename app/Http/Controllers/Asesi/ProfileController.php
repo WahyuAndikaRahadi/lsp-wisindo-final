@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Asesi;
 use App\Http\Controllers\Controller;
 use App\Models\UserProfile;
 use App\Rules\ValidSignature;
+use App\Services\BnspReferenceService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -14,8 +15,11 @@ class ProfileController extends Controller
     public function edit(): View
     {
         $profile = auth()->user()->profile;
+        $provinces = BnspReferenceService::getProvinsiList();
+        $cities = BnspReferenceService::getAllCities();
+        $jobs = BnspReferenceService::getPekerjaanList();
 
-        return view('asesi.profile', compact('profile'));
+        return view('asesi.profile', compact('profile', 'provinces', 'cities', 'jobs'));
     }
 
     public function update(Request $request): RedirectResponse
@@ -45,11 +49,17 @@ class ProfileController extends Controller
                 'jenis_kelamin' => 'required|in:L,P',
                 'kebangsaan' => 'required|string|max:50',
                 'pendidikan_terakhir' => 'required|string|max:50',
+                'kode_pendidikan' => 'nullable|string|max:10',
                 'alamat_rumah' => 'required|string',
+                'kode_provinsi' => 'nullable|string|max:10',
+                'nama_provinsi' => 'nullable|string|max:100',
+                'kode_kota' => 'nullable|string|max:10',
+                'nama_kota' => 'nullable|string|max:100',
                 'kode_pos' => ['nullable', 'string', 'max:10', 'regex:/^[0-9]+$/'],
                 'no_telepon_rumah' => ['nullable', 'string', 'max:20', 'regex:/^[0-9]+$/'],
                 // Data pekerjaan: hanya jabatan yang wajib
                 'jabatan' => 'required|string|max:100',
+                'kode_pekerjaan' => 'nullable|string|max:10',
                 'nama_institusi_perusahaan' => 'nullable|string|max:255',
                 'alamat_kantor' => 'nullable|string',
                 'no_telepon_kantor' => ['nullable', 'string', 'max:20', 'regex:/^[0-9]+$/'],
@@ -114,6 +124,13 @@ class ProfileController extends Controller
         }
 
         $profileData = collect($validated)->except(['full_name', 'phone'])->toArray();
+
+        if (empty($profileData['kode_pendidikan']) && ! empty($profileData['pendidikan_terakhir'])) {
+            $profileData['kode_pendidikan'] = BnspReferenceService::resolveEducationCode($profileData['pendidikan_terakhir']);
+        }
+        if (empty($profileData['kode_pekerjaan']) && ! empty($profileData['jabatan'])) {
+            $profileData['kode_pekerjaan'] = BnspReferenceService::resolveJobCode($profileData['jabatan']);
+        }
 
         UserProfile::updateOrCreate(
             ['user_id' => $user->id],
