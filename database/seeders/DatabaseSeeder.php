@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             CorrectedQuestionBankAnswerKeySeeder::class,
             CompleteMissingAk03FeedbackSeeder::class,
             SetAllCbtScoresToPerfectSeeder::class,
+            InterviewQuestionSeeder::class,
         ]);
 
         Setting::firstOrCreate(

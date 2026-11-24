@@ -227,6 +227,18 @@ class MukDynamicDocumentService
                         return $file->getPathname();
                     }
                     break;
+                case 'ia08':
+                case 'fria08':
+                    if (str_contains($name, 'ia.08') || str_contains($name, 'ia 08') || str_contains($name, 'ia-08') || str_contains($name, 'portofolio')) {
+                        return $file->getPathname();
+                    }
+                    break;
+                case 'ia09':
+                case 'fria09':
+                    if (str_contains($name, 'ia.09') || str_contains($name, 'ia 09') || str_contains($name, 'ia-09') || str_contains($name, 'wawancara')) {
+                        return $file->getPathname();
+                    }
+                    break;
             }
         }
 

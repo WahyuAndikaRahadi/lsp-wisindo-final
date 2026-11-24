@@ -6,6 +6,7 @@ use App\Http\Controllers\Concerns\AuthorizesAssessor;
 use App\Http\Controllers\Controller;
 use App\Models\Assessment;
 use App\Models\AssessmentIaResponse;
+use App\Models\InterviewQuestion;
 use App\Models\QuestionBank;
 use App\Models\Schedule;
 use App\Models\Setting;
@@ -82,6 +83,22 @@ class InstrumentController extends Controller
             'badge' => 'Ujian CBT',
             'badge_color' => 'bg-purple-50 text-purple-700 border-purple-200',
             'route_code' => 'ia05',
+        ],
+        'IA08' => [
+            'code' => 'FR.IA.08',
+            'title' => 'Ceklis Verifikasi Portofolio (CVP)',
+            'desc' => 'Verifikasi keabsahan dokumen bukti portofolio (VATM) dan klarifikasi unjuk kerja.',
+            'badge' => 'Verifikasi Portofolio',
+            'badge_color' => 'bg-teal-50 text-teal-700 border-teal-200',
+            'route_code' => 'ia08',
+        ],
+        'IA09' => [
+            'code' => 'FR.IA.09',
+            'title' => 'Pertanyaan Wawancara (PW)',
+            'desc' => 'Daftar pertanyaan wawancara terstruktur untuk klarifikasi bukti portofolio dan pemahaman teknis.',
+            'badge' => 'Wawancara',
+            'badge_color' => 'bg-violet-50 text-violet-700 border-violet-200',
+            'route_code' => 'ia09',
         ],
     ];
 
@@ -294,6 +311,33 @@ class InstrumentController extends Controller
                             $statusLabel = 'Belum Diunggah Asesi';
                             $statusClass = 'bg-slate-100 text-slate-600 border-slate-300';
                         }
+                    } elseif ($codeUpper === 'IA08') {
+                        $hasPortfolios = ! empty($response->data_json['portfolios']);
+                        $isSignedByAssessor = ! empty($response->assessor_signed_at);
+                        if ($isSignedByAssessor) {
+                            $isCompleted = true;
+                            $statusLabel = 'Sudah Dinilai';
+                            $statusClass = 'bg-emerald-50 text-emerald-700 border-emerald-300';
+                        } elseif ($hasPortfolios) {
+                            $isCompleted = false;
+                            $statusLabel = 'Menunggu Penilaian Asesor';
+                            $statusClass = 'bg-amber-50 text-amber-800 border-amber-300';
+                        } else {
+                            $isCompleted = false;
+                            $statusLabel = 'Belum Diunggah Asesi';
+                            $statusClass = 'bg-slate-100 text-slate-600 border-slate-300';
+                        }
+                    } elseif ($codeUpper === 'IA09') {
+                        $isSignedByAssessor = ! empty($response->assessor_signed_at);
+                        if ($isSignedByAssessor) {
+                            $isCompleted = true;
+                            $statusLabel = 'Sudah Dinilai';
+                            $statusClass = 'bg-emerald-50 text-emerald-700 border-emerald-300';
+                        } else {
+                            $isCompleted = false;
+                            $statusLabel = 'Belum Dinilai';
+                            $statusClass = 'bg-slate-100 text-slate-700 border-slate-300';
+                        }
                     } else {
                         $isSignedByAssessor = ! empty($response->assessor_signed_at);
                         if ($isSignedByAssessor) {
@@ -310,15 +354,18 @@ class InstrumentController extends Controller
                     if ($codeUpper === 'IA02') {
                         $statusLabel = 'Belum Ditandatangani';
                         $statusClass = 'bg-amber-50 text-amber-700 border-amber-300';
-                    } elseif ($codeUpper === 'IA01B') {
+                    } elseif ($codeUpper === 'IA01B' || $codeUpper === 'IA08') {
                         $statusLabel = 'Belum Diunggah Asesi';
                         $statusClass = 'bg-slate-100 text-slate-600 border-slate-300';
+                    } elseif ($codeUpper === 'IA09') {
+                        $statusLabel = 'Belum Dinilai';
+                        $statusClass = 'bg-slate-100 text-slate-700 border-slate-300';
                     }
                 }
                 $inspectUrl = route('asesor.assessment.instrument', ['assessment' => $assessment->id, 'code' => $codeLower]);
             }
 
-            $hasEvidence = ! empty($response?->data_json['evidence_image_path']);
+            $hasEvidence = ! empty($response?->data_json['evidence_image_path']) || ! empty($response?->data_json['portfolios']);
 
             $user = auth()->user();
             $isSingleAssessor = $schedule->assessors->count() === 1 && $schedule->assessors->first()?->id === $user?->id;
@@ -466,6 +513,26 @@ class InstrumentController extends Controller
         $ia02Text = ($code === 'ia02') ? $instrumentService->getIa02FullText($scheme) : '';
         $ia02Html = ($code === 'ia02') ? $instrumentService->getIa02FormattedHtml($scheme) : '';
 
+        $interviewQuestions = collect();
+        if ($code === 'ia09') {
+            $interviewQuestions = InterviewQuestion::where('scheme_id', $scheme->id)
+                ->active()
+                ->ordered()
+                ->with('competencyUnit')
+                ->get();
+        }
+
+        $portfolios = $savedData['portfolios'] ?? [];
+        $savedVatm = $savedData['vatm'] ?? [];
+        $savedClarificationElements = $savedData['clarification_elements'] ?? [];
+        $savedAdditionalEvidence = $savedData['additional_evidence'] ?? '';
+        $savedRecommendation = $savedData['recommendation'] ?? 'K';
+        $savedRemediation = [
+            'unit' => $savedData['remediation_unit'] ?? '',
+            'element' => $savedData['remediation_element'] ?? '',
+            'kuk' => $savedData['remediation_kuk'] ?? '',
+        ];
+
         return view($viewName, compact(
             'assessment',
             'code',
@@ -477,6 +544,7 @@ class InstrumentController extends Controller
             'questions',
             'pmoQuestions',
             'reportSheetItems',
+            'savedData',
             'savedAnswers',
             'savedNotes',
             'savedGeneralNotes',
@@ -484,7 +552,14 @@ class InstrumentController extends Controller
             'breakdown',
             'score',
             'ia02Text',
-            'ia02Html'
+            'ia02Html',
+            'interviewQuestions',
+            'portfolios',
+            'savedVatm',
+            'savedClarificationElements',
+            'savedAdditionalEvidence',
+            'savedRecommendation',
+            'savedRemediation'
         ));
     }
 
@@ -526,6 +601,22 @@ class InstrumentController extends Controller
         $existingData = is_array($existing?->data_json)
             ? $existing->data_json
             : (json_decode($existing?->data_json ?? '[]', true) ?: []);
+
+        if ($code === 'IA08') {
+            $data = is_array($data) ? $data : [];
+            $data['portfolios'] = $existingData['portfolios'] ?? [];
+            $data['vatm'] = $request->input('vatm', []);
+            $data['clarification_elements'] = $request->input('clarification_elements', []);
+            $data['additional_evidence'] = $request->input('additional_evidence');
+            $data['recommendation'] = $request->input('recommendation', 'K');
+            $data['remediation_unit'] = $request->input('remediation_unit');
+            $data['remediation_element'] = $request->input('remediation_element');
+            $data['remediation_kuk'] = $request->input('remediation_kuk');
+        } elseif ($code === 'IA09') {
+            $data = is_array($data) ? $data : [];
+            $data['questions'] = $request->input('questions', []);
+            $data['recommendation'] = $request->input('recommendation', 'K');
+        }
 
         if (isset($existingData['evidence_image_path'])) {
             $data['evidence_image_path'] = $existingData['evidence_image_path'];

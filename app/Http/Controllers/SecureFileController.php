@@ -34,8 +34,18 @@ class SecureFileController extends Controller
             ? $response->data_json
             : (json_decode($response->data_json ?? '[]', true) ?: []);
 
-        $historyIndex = $request->query('history_index');
-        if ($historyIndex !== null && isset($data['evidence_history'][$historyIndex])) {
+        $portfolioIndex = $request->query('portfolio_index');
+        $portfolioId = $request->query('portfolio_id');
+
+        if ($portfolioIndex !== null && isset($data['portfolios'][$portfolioIndex])) {
+            $pItem = $data['portfolios'][$portfolioIndex];
+            $path = $pItem['path'] ?? null;
+            $filename = $pItem['original_name'] ?? ($path ? basename($path) : 'portofolio.pdf');
+        } elseif ($portfolioId !== null && isset($data['portfolios'])) {
+            $pItem = collect($data['portfolios'])->firstWhere('id', $portfolioId);
+            $path = $pItem['path'] ?? null;
+            $filename = $pItem['original_name'] ?? ($path ? basename($path) : 'portofolio.pdf');
+        } elseif ($historyIndex !== null && isset($data['evidence_history'][$historyIndex])) {
             $hItem = $data['evidence_history'][$historyIndex];
             $path = $hItem['path'] ?? null;
             $filename = $hItem['original_name'] ?? ($path ? basename($path) : 'file_revisi_sebelumnya.jpg');
@@ -45,7 +55,7 @@ class SecureFileController extends Controller
         }
 
         if (! $path) {
-            return $this->serveMissingFileFallback('bukti_observasi.jpg', 'Berkas bukti observasi/praktik belum diunggah.');
+            return $this->serveMissingFileFallback('bukti_portofolio.pdf', 'Berkas bukti portofolio/observasi belum diunggah.');
         }
 
         return $this->serveFile($path, $filename);

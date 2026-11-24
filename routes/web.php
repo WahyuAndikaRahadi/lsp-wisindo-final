@@ -259,6 +259,8 @@ Route::middleware(['auth', 'role:ASESI'])->prefix('asesi')->name('asesi.')->grou
         Route::get('/instrument/{code}', [Asesi\RuangUjiController::class, 'iaView'])->name('instrument.view');
         Route::post('/instrument/{code}/feedback', [Asesi\RuangUjiController::class, 'submitFeedback'])->name('instrument.feedback');
         Route::post('/instrument/{code}/upload-evidence', [Asesi\RuangUjiController::class, 'uploadEvidence'])->name('instrument.upload-evidence');
+        Route::post('/upload-portfolio', [Asesi\RuangUjiController::class, 'uploadPortfolio'])->name('upload-portfolio');
+        Route::delete('/delete-portfolio/{portfolioId}', [Asesi\RuangUjiController::class, 'deletePortfolio'])->name('delete-portfolio');
 
         Route::post('/finish', [Asesi\RuangUjiController::class, 'finish'])->name('finish');
         Route::get('/ak03', [Asesi\RuangUjiController::class, 'showAk03'])->name('ak03');
@@ -333,6 +335,12 @@ Route::middleware(['auth', 'role:ASESOR'])->prefix('asesor')->name('asesor.')->g
     Route::post('/ruang-uji/{assessment}/ia03', fn (Assessment $assessment, Request $req) => app(Asesor\InstrumentController::class)->instrumentStore($assessment, 'ia03', $req))->name('ruang-uji.ia03.store');
 
     Route::get('/ruang-uji/{assessment}/ia05', fn (Assessment $assessment) => app()->call([app(Asesor\InstrumentController::class), 'instrumentShow'], ['assessment' => $assessment, 'code' => 'ia05']))->name('ruang-uji.ia05');
+
+    Route::get('/ruang-uji/{assessment}/ia08', fn (Assessment $assessment) => app()->call([app(Asesor\InstrumentController::class), 'instrumentShow'], ['assessment' => $assessment, 'code' => 'ia08']))->name('ruang-uji.ia08');
+    Route::post('/ruang-uji/{assessment}/ia08', fn (Assessment $assessment, Request $req) => app(Asesor\InstrumentController::class)->instrumentStore($assessment, 'ia08', $req))->name('ruang-uji.ia08.store');
+
+    Route::get('/ruang-uji/{assessment}/ia09', fn (Assessment $assessment) => app()->call([app(Asesor\InstrumentController::class), 'instrumentShow'], ['assessment' => $assessment, 'code' => 'ia09']))->name('ruang-uji.ia09');
+    Route::post('/ruang-uji/{assessment}/ia09', fn (Assessment $assessment, Request $req) => app(Asesor\InstrumentController::class)->instrumentStore($assessment, 'ia09', $req))->name('ruang-uji.ia09.store');
 
     // AK02 Rekaman Asesmen (schedule-level list + per-assessment form)
     Route::get('/schedule/{schedule}/ak02', [Asesor\FinalizationController::class, 'scheduleAk02'])->name('schedule.ak02');
@@ -429,6 +437,7 @@ Route::middleware(['auth', 'role:SUPER_ADMIN,ADMIN_LSP,KOMITE_TEKNIS,TUK_ADMIN']
         Route::resource('users', Admin\UserController::class);
         Route::resource('schemes', Admin\SchemeController::class);
         Route::resource('question-banks', Admin\QuestionBankController::class);
+        Route::resource('interview-questions', Admin\InterviewQuestionController::class)->except(['create', 'show', 'edit']);
 
         // Scheme Competency Units, Elements & KUK Management
         Route::post('/schemes/{scheme}/units', [Admin\SchemeController::class, 'storeUnit'])->name('schemes.units.store');

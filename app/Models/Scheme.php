@@ -49,6 +49,11 @@ class Scheme extends Model
         return $this->hasMany(QuestionBank::class);
     }
 
+    public function interviewQuestions(): HasMany
+    {
+        return $this->hasMany(InterviewQuestion::class);
+    }
+
     public function schedules(): HasMany
     {
         return $this->hasMany(Schedule::class);
