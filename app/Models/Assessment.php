@@ -293,12 +293,28 @@ class Assessment extends Model
             }
         }
 
-        // 3. If there were asesi online tasks (like IA05 or IA01B) and they are all done, AK03 unlocks!
+        // 3. If Portfolio (IA08) is assigned, asesi must have uploaded portfolio files
+        if (in_array('IA08', $assigned, true)) {
+            $hasAsesiTask = true;
+            $respIa08 = $responses->get('IA08');
+            $hasPortfolios = false;
+            if ($respIa08) {
+                $dataJson = is_array($respIa08->data_json)
+                    ? $respIa08->data_json
+                    : (json_decode($respIa08->data_json ?? '[]', true) ?: []);
+                $hasPortfolios = ! empty($dataJson['portfolios']) || ! empty($respIa08->assessor_signed_at);
+            }
+            if (! $hasPortfolios) {
+                return false;
+            }
+        }
+
+        // 4. If there were asesi online tasks (like IA05, IA01B, or IA08) and they are all done, AK03 unlocks!
         if ($hasAsesiTask) {
             return true;
         }
 
-        // 4. If only assessor-evaluated instruments are assigned (e.g. IA01, IA02, IA03 without CBT/IA01B),
+        // 5. If only assessor-evaluated instruments are assigned (e.g. IA01, IA02, IA03, IA09),
         // check if assessor has evaluated them or if all assigned are completed
         return $this->hasCompletedAllAssignedInstruments();
     }

@@ -19,6 +19,8 @@
         'IA05' => ['code' => 'FR.IA.05', 'title' => 'Pertanyaan Tertulis Pilihan Ganda (CBT)', 'desc' => 'Ujian teori objektif CBT 20 butir acak per skema jadwal.'],
         'IA06' => ['code' => 'FR.IA.06', 'title' => 'Pertanyaan Tertulis Esai', 'desc' => 'Daftar pertanyaan tertulis uraian/studi kasus.'],
         'IA07' => ['code' => 'FR.IA.07', 'title' => 'Pertanyaan Lisan Wawancara', 'desc' => 'Wawancara pendukung pembuktian portofolio.'],
+        'IA08' => ['code' => 'FR.IA.08', 'title' => 'Ceklis Verifikasi Portofolio', 'desc' => 'Verifikasi keabsahan bukti portofolio (VATM) dan klarifikasi materi wawancara.'],
+        'IA09' => ['code' => 'FR.IA.09', 'title' => 'Pertanyaan Wawancara', 'desc' => 'Daftar pertanyaan wawancara terstruktur dan kesimpulan pencapaian.'],
         'IA11' => ['code' => 'FR.IA.11', 'title' => 'Ceklis Meninjau Instrumen', 'desc' => 'Verifikasi dan peninjauan mutu perangkat asesmen.'],
     ];
 
@@ -360,29 +362,29 @@
                                     <span class="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">Default</span>
                                 </label>
 
-                                <div class="flex items-center justify-between p-2.5 rounded-lg border border-slate-200 bg-slate-50 opacity-60 cursor-not-allowed" title="Opsi dikunci sesuai standar operasional MUK LSP PrO Indo">
+                                <div class="flex items-center justify-between p-2.5 rounded-lg border border-slate-200 bg-slate-50 opacity-60 cursor-not-allowed" title="Instrumen ini belum tersedia dalam skema sertifikasi saat ini">
                                     <div class="flex items-center space-x-2.5">
                                         <input type="checkbox" disabled class="rounded border-slate-300 text-slate-400 w-4 h-4 cursor-not-allowed">
                                         <span class="font-medium text-slate-500">Hasil Reviu Produk</span>
                                     </div>
-                                    <span class="text-[10px] font-semibold text-slate-500 bg-slate-200/80 px-2 py-0.5 rounded">Terkunci (LSP)</span>
+                                    <span class="text-[10px] font-semibold text-slate-500 bg-slate-200/80 px-2 py-0.5 rounded">Belum Tersedia</span>
                                 </div>
 
-                                <div class="flex items-center justify-between p-2.5 rounded-lg border border-slate-200 bg-slate-50 opacity-60 cursor-not-allowed" title="Opsi dikunci sesuai standar operasional MUK LSP PrO Indo">
+                                <div class="flex items-center justify-between p-2.5 rounded-lg border border-slate-200 bg-slate-50 opacity-60 cursor-not-allowed" title="Instrumen ini belum tersedia dalam skema sertifikasi saat ini">
                                     <div class="flex items-center space-x-2.5">
                                         <input type="checkbox" disabled class="rounded border-slate-300 text-slate-400 w-4 h-4 cursor-not-allowed">
                                         <span class="font-medium text-slate-500">Hasil Kegiatan Terstruktur</span>
                                     </div>
-                                    <span class="text-[10px] font-semibold text-slate-500 bg-slate-200/80 px-2 py-0.5 rounded">Terkunci (LSP)</span>
+                                    <span class="text-[10px] font-semibold text-slate-500 bg-slate-200/80 px-2 py-0.5 rounded">Belum Tersedia</span>
                                 </div>
 
-                                <div class="flex items-center justify-between p-2.5 rounded-lg border border-slate-200 bg-slate-50 opacity-60 cursor-not-allowed" title="Opsi dikunci sesuai standar operasional MUK LSP PrO Indo">
-                                    <div class="flex items-center space-x-2.5">
-                                        <input type="checkbox" disabled class="rounded border-slate-300 text-slate-400 w-4 h-4 cursor-not-allowed">
-                                        <span class="font-medium text-slate-500">Hasil Pertanyaan Wawancara</span>
-                                    </div>
-                                    <span class="text-[10px] font-semibold text-slate-500 bg-slate-200/80 px-2 py-0.5 rounded">Terkunci (LSP)</span>
-                                </div>
+                                <label class="flex items-center space-x-2.5 p-2.5 rounded-lg border border-slate-200 hover:bg-slate-50 {{ $isClosedForMe ? 'cursor-default' : 'cursor-pointer' }} transition">
+                                    <input type="checkbox" name="evidence[]" value="Hasil Pertanyaan Wawancara"
+                                        class="rounded border-slate-300 text-brand-600 focus:ring-brand-500 w-4 h-4"
+                                        @disabled($isClosedForMe)
+                                        {{ in_array('Hasil Pertanyaan Wawancara', $savedEvidence) ? 'checked' : '' }}>
+                                    <span class="font-medium text-slate-800">Hasil Pertanyaan Wawancara</span>
+                                </label>
                             </div>
                         </div>
                     </div>
@@ -457,6 +459,8 @@
                                 'IA02' => ['title' => 'FR.IA.02 - Tugas Praktik Demonstrasi', 'desc' => 'Lembar tugas fisik dan verifikasi lembar kerja'],
                                 'IA03' => ['title' => 'FR.IA.03 - Pertanyaan Pendukung Observasi (PMO)', 'desc' => 'Daftar pertanyaan lisan konfirmasi praktik'],
                                 'IA05' => ['title' => 'FR.IA.05 - Pertanyaan Tertulis (CBT 20 Soal)', 'desc' => 'Ujian teori pilihan ganda terstandar'],
+                                'IA08' => ['title' => 'FR.IA.08 - Ceklis Verifikasi Portofolio (CVP)', 'desc' => 'Verifikasi bukti portofolio (VATM) dan klarifikasi unjuk kerja'],
+                                'IA09' => ['title' => 'FR.IA.09 - Pertanyaan Wawancara (PW)', 'desc' => 'Daftar pertanyaan wawancara terstruktur dan klarifikasi portofolio'],
                             ];
                             $currentSelected = $selectedInstruments ?? ['AK01', 'IA01', 'IA01B', 'IA02', 'IA03', 'IA05'];
                         @endphp

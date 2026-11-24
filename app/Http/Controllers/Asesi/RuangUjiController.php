@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Assessment;
 use App\Models\AssessmentAk07Item;
 use App\Models\AssessmentIaResponse;
+use App\Models\InterviewQuestion;
 use App\Models\QuestionBank;
 use App\Rules\ValidSignature;
 use App\Services\AkWorkflowService;
@@ -16,6 +17,8 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class RuangUjiController extends Controller
@@ -166,6 +169,26 @@ class RuangUjiController extends Controller
                 'download_url' => null,
                 'action_url' => route('asesi.assessment.instrument.ia05', $assessment),
             ],
+            'IA08' => [
+                'code' => 'FR.IA.08',
+                'title' => 'Ceklis Verifikasi Portofolio (CVP)',
+                'desc' => 'Unggah dokumen bukti portofolio kerja/pelatihan Anda (1 - 3 berkas) untuk diverifikasi sesuai aturan bukti VATM.',
+                'badge' => 'Portofolio',
+                'badge_color' => 'bg-teal-50 text-teal-700 border-teal-200',
+                'has_download' => false,
+                'download_url' => null,
+                'action_url' => route('asesi.assessment.instrument.view', [$assessment, 'IA08']),
+            ],
+            'IA09' => [
+                'code' => 'FR.IA.09',
+                'title' => 'Pertanyaan Wawancara (PW)',
+                'desc' => 'Wawancara langsung tatap muka dengan Asesor untuk klarifikasi bukti portofolio dan pemahaman teknis unjuk kerja.',
+                'badge' => 'Wawancara',
+                'badge_color' => 'bg-violet-50 text-violet-700 border-violet-200',
+                'has_download' => false,
+                'download_url' => null,
+                'action_url' => route('asesi.assessment.instrument.view', [$assessment, 'IA09']),
+            ],
         ];
 
         $instruments = [];
@@ -250,6 +273,45 @@ class RuangUjiController extends Controller
                 $meta['progress_bar_color'] = ($hasEvaluated || $schedule->is_closed) ? 'bg-emerald-600' : 'bg-slate-400';
                 $meta['progress_text'] = ($hasEvaluated || $schedule->is_closed) ? '1 / 1 Telah Dievaluasi' : '0 / 1 Evaluasi Asesor';
                 $meta['action_label'] = 'Lihat Evaluasi Asesor';
+                $meta['action_button_class'] = ($hasEvaluated || $schedule->is_closed) ? 'bg-slate-800 hover:bg-slate-900 text-white' : 'bg-slate-700 hover:bg-slate-800 text-white';
+            } elseif ($codeUpper === 'IA08') {
+                $portfolios = $resp?->data_json['portfolios'] ?? [];
+                $hasPortfolios = ! empty($portfolios);
+                $isSignedByAssessor = ! empty($resp?->assessor_signed_at);
+
+                if ($isSignedByAssessor) {
+                    $meta['status_label'] = '✓ Telah Diverifikasi Asesor';
+                    $meta['status_badge_class'] = 'text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200';
+                    $meta['progress_percent'] = 100;
+                    $meta['progress_bar_color'] = 'bg-emerald-600';
+                    $meta['progress_text'] = count($portfolios).' Berkas Diverifikasi';
+                    $meta['action_label'] = 'Lihat Hasil Verifikasi';
+                    $meta['action_button_class'] = 'bg-slate-800 hover:bg-slate-900 text-white';
+                } elseif ($hasPortfolios) {
+                    $meta['status_label'] = 'Menunggu Verifikasi Asesor';
+                    $meta['status_badge_class'] = 'text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200';
+                    $meta['progress_percent'] = 75;
+                    $meta['progress_bar_color'] = 'bg-blue-600';
+                    $meta['progress_text'] = count($portfolios).' Berkas Diunggah';
+                    $meta['action_label'] = 'Lihat / Kelola Portofolio';
+                    $meta['action_button_class'] = 'bg-brand-600 hover:bg-brand-700 text-white';
+                } else {
+                    $meta['status_label'] = 'Belum Diunggah Asesi';
+                    $meta['status_badge_class'] = 'text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200';
+                    $meta['progress_percent'] = 0;
+                    $meta['progress_bar_color'] = 'bg-amber-500';
+                    $meta['progress_text'] = '0 / 1-3 Berkas Portofolio';
+                    $meta['action_label'] = 'Unggah Portofolio (1-3 Berkas)';
+                    $meta['action_button_class'] = 'bg-brand-600 hover:bg-brand-700 text-white';
+                }
+            } elseif ($codeUpper === 'IA09') {
+                $hasEvaluated = (bool) $resp?->assessor_signed_at;
+                $meta['status_label'] = ($hasEvaluated || $schedule->is_closed) ? '✓ Selesai Wawancara' : 'Sesi Wawancara';
+                $meta['status_badge_class'] = ($hasEvaluated || $schedule->is_closed) ? 'text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200' : 'text-violet-700 bg-violet-50 px-2 py-0.5 rounded border border-violet-200';
+                $meta['progress_percent'] = ($hasEvaluated || $schedule->is_closed) ? 100 : 0;
+                $meta['progress_bar_color'] = ($hasEvaluated || $schedule->is_closed) ? 'bg-emerald-600' : 'bg-slate-400';
+                $meta['progress_text'] = ($hasEvaluated || $schedule->is_closed) ? '1 / 1 Telah Selesai' : '0 / 1 Tatap Muka Asesor';
+                $meta['action_label'] = ($hasEvaluated || $schedule->is_closed) ? 'Lihat Hasil Wawancara' : 'Persiapan Wawancara';
                 $meta['action_button_class'] = ($hasEvaluated || $schedule->is_closed) ? 'bg-slate-800 hover:bg-slate-900 text-white' : 'bg-slate-700 hover:bg-slate-800 text-white';
             } else {
                 $hasEvaluated = (bool) $resp?->assessor_signed_at;
@@ -519,7 +581,124 @@ class RuangUjiController extends Controller
         $pmoQuestions = $instrumentService->getPmoQuestions($scheme);
         $units = $scheme->competencyUnits;
 
-        return view('asesi.ruang-uji.ia-view', compact('assessment', 'code', 'codeUpper', 'response', 'scheme', 'reportSheetItems', 'tpdData', 'pmoQuestions', 'units'));
+        $interviewQuestions = collect();
+        if ($codeUpper === 'IA09') {
+            $interviewQuestions = InterviewQuestion::where('scheme_id', $scheme->id)
+                ->active()
+                ->ordered()
+                ->with('competencyUnit')
+                ->get();
+        }
+
+        return view('asesi.ruang-uji.ia-view', compact('assessment', 'code', 'codeUpper', 'response', 'scheme', 'reportSheetItems', 'tpdData', 'pmoQuestions', 'units', 'interviewQuestions'));
+    }
+
+    public function uploadPortfolio(Assessment $assessment, Request $request): RedirectResponse
+    {
+        abort_if($assessment->asesi_id !== auth()->id(), 403);
+
+        if ($assessment->schedule && $assessment->schedule->is_closed) {
+            return back()->with('error', 'Jadwal asesmen sudah resmi ditutup.');
+        }
+
+        if (! $assessment->hasAssignedInstrument('IA08')) {
+            return redirect()->route('asesi.assessment.ruang-uji', $assessment)
+                ->with('warning', 'Instrumen FR.IA.08 tidak ditetapkan untuk asesmen ini.');
+        }
+
+        $response = AssessmentIaResponse::firstOrNew([
+            'assessment_id' => $assessment->id,
+            'instrument_code' => 'IA08',
+        ]);
+
+        if (! empty($response->assessor_signed_at)) {
+            return back()->with('error', 'Penilaian verifikasi portofolio sudah disahkan oleh asesor dan tidak dapat diubah lagi.');
+        }
+
+        $dataJson = is_array($response->data_json)
+            ? $response->data_json
+            : (json_decode($response->data_json ?? '[]', true) ?: []);
+
+        $portfolios = $dataJson['portfolios'] ?? [];
+        if (count($portfolios) >= 3) {
+            return back()->with('error', 'Maksimal 3 dokumen bukti portofolio yang dapat diunggah sesuai ketentuan asesmen.');
+        }
+
+        $request->validate([
+            'portfolio_type' => ['required', 'string', 'max:150'],
+            'portfolio_title' => ['required', 'string', 'max:255'],
+            'portfolio_file' => ['required', 'file', 'mimes:pdf,jpeg,jpg,png,webp', 'max:15360'],
+        ], [
+            'portfolio_type.required' => 'Pilih jenis dokumen portofolio.',
+            'portfolio_title.required' => 'Tuliskan nama/deskripsi ringkas dokumen portofolio.',
+            'portfolio_file.required' => 'Pilih berkas dokumen portofolio terlebih dahulu.',
+            'portfolio_file.mimes' => 'Format berkas harus berupa dokumen PDF (.pdf) atau gambar (JPG/PNG).',
+            'portfolio_file.max' => 'Ukuran berkas portofolio maksimal 15 MB.',
+        ]);
+
+        $path = $request->file('portfolio_file')->store('ia08_evidence', 'local');
+
+        $portfolios[] = [
+            'id' => (string) Str::uuid(),
+            'type' => $request->input('portfolio_type'),
+            'title' => $request->input('portfolio_title'),
+            'path' => $path,
+            'original_name' => $request->file('portfolio_file')->getClientOriginalName(),
+            'file_size' => $request->file('portfolio_file')->getSize(),
+            'uploaded_at' => now()->toIso8601String(),
+        ];
+
+        $dataJson['portfolios'] = $portfolios;
+        $response->data_json = $dataJson;
+
+        $signature = $assessment->asesi_signature ?? auth()->user()->profile?->signature_data;
+        if ($signature && empty($response->asesi_signature)) {
+            $response->asesi_signature = $signature;
+            $response->asesi_signed_at = now();
+        }
+
+        $response->save();
+
+        return back()->with('success', 'Dokumen portofolio berhasil diunggah.');
+    }
+
+    public function deletePortfolio(Assessment $assessment, string $portfolioId): RedirectResponse
+    {
+        abort_if($assessment->asesi_id !== auth()->id(), 403);
+
+        if ($assessment->schedule && $assessment->schedule->is_closed) {
+            return back()->with('error', 'Jadwal asesmen sudah resmi ditutup.');
+        }
+
+        $response = AssessmentIaResponse::where('assessment_id', $assessment->id)
+            ->where('instrument_code', 'IA08')
+            ->first();
+
+        if (! $response) {
+            return back()->with('error', 'Data respons instrumen IA08 tidak ditemukan.');
+        }
+
+        if (! empty($response->assessor_signed_at)) {
+            return back()->with('error', 'Penilaian verifikasi portofolio sudah disahkan oleh asesor dan tidak dapat diubah lagi.');
+        }
+
+        $dataJson = is_array($response->data_json)
+            ? $response->data_json
+            : (json_decode($response->data_json ?? '[]', true) ?: []);
+
+        $portfolios = $dataJson['portfolios'] ?? [];
+        $itemToDelete = collect($portfolios)->firstWhere('id', $portfolioId);
+
+        if ($itemToDelete && ! empty($itemToDelete['path'])) {
+            Storage::disk('local')->delete($itemToDelete['path']);
+        }
+
+        $updatedPortfolios = array_values(array_filter($portfolios, fn ($p) => ($p['id'] ?? '') !== $portfolioId));
+        $dataJson['portfolios'] = $updatedPortfolios;
+        $response->data_json = $dataJson;
+        $response->save();
+
+        return back()->with('success', 'Dokumen portofolio berhasil dihapus.');
     }
 
     public function submitFeedback(Assessment $assessment, $code, Request $request): RedirectResponse

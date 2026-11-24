@@ -347,6 +347,13 @@
                                     </svg>
                                     <span>Bank Soal CBT (IA05)</span>
                                 </a>
+                                <a href="{{ route('admin.interview-questions.index') }}" 
+                                   class="flex items-center space-x-3 px-3 py-2 rounded text-xs font-medium transition {{ request()->routeIs('admin.interview-questions.*') ? 'bg-lsp-input-bg text-lsp-navy font-bold border-l-4 border-lsp-navy' : 'text-slate-600 hover:text-lsp-navy hover:bg-slate-50' }}">
+                                    <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                                    </svg>
+                                    <span>Bank Soal Wawancara (IA09)</span>
+                                </a>
                                 <a href="{{ route('admin.backups.index') }}" 
                                    class="flex items-center space-x-3 px-3 py-2 rounded text-xs font-medium transition {{ request()->routeIs('admin.backups.*') ? 'bg-lsp-input-bg text-lsp-navy font-bold border-l-4 border-lsp-navy' : 'text-slate-600 hover:text-lsp-navy hover:bg-slate-50' }}">
                                     <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
