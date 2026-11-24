@@ -398,6 +398,9 @@ Route::middleware(['auth', 'role:SUPER_ADMIN,ADMIN_LSP,KOMITE_TEKNIS,TUK_ADMIN']
         Route::get('/jadwal/{jadwal}/edit', [Admin\JadwalController::class, 'edit'])->name('jadwal.edit');
         Route::match(['put', 'patch'], '/jadwal/{jadwal}', [Admin\JadwalController::class, 'update'])->name('jadwal.update');
         Route::delete('/jadwal/{jadwal}', [Admin\JadwalController::class, 'destroy'])->name('jadwal.destroy');
+
+        // Registration Token Manual Rotation
+        Route::post('/registration-token/rotate', [Admin\DashboardController::class, 'rotateRegistrationToken'])->name('registration-token.rotate');
     });
 
     Route::get('/jadwal/{jadwal}', [Admin\JadwalController::class, 'show'])->name('jadwal.show');

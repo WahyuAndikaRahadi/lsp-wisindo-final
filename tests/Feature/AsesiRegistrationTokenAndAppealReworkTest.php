@@ -141,6 +141,48 @@ class AsesiRegistrationTokenAndAppealReworkTest extends TestCase
         $this->assertMatchesRegularExpression('/^proindo\d{4}$/', $newToken);
     }
 
+    public function test_token_auto_rotates_when_expired_past_seven_days(): void
+    {
+        $initialToken = RegistrationTokenService::getCurrentToken();
+
+        // Simulate token generated 8 days ago
+        $setting = Setting::where('key', RegistrationTokenService::SETTING_KEY)->first();
+        $setting->updated_at = now()->subDays(8);
+        $setting->save();
+
+        // Calling getCurrentToken should self-heal and auto-rotate
+        $freshToken = RegistrationTokenService::getCurrentToken();
+
+        $this->assertNotEquals($initialToken, $freshToken);
+        $this->assertTrue(RegistrationTokenService::isValidFormat($freshToken));
+        $this->assertEquals($initialToken, Setting::get(RegistrationTokenService::PREVIOUS_SETTING_KEY));
+    }
+
+    public function test_previous_token_remains_valid_during_grace_period(): void
+    {
+        $oldToken = RegistrationTokenService::getCurrentToken();
+        $newToken = RegistrationTokenService::generateNewToken();
+
+        $this->assertNotEquals($oldToken, $newToken);
+        $this->assertTrue(RegistrationTokenService::validateToken($newToken));
+        $this->assertTrue(RegistrationTokenService::validateToken($oldToken));
+        $this->assertFalse(RegistrationTokenService::validateToken('proindo0000'));
+    }
+
+    public function test_admin_can_manually_rotate_registration_token(): void
+    {
+        $oldToken = RegistrationTokenService::getCurrentToken();
+
+        $response = $this->actingAs($this->admin)
+            ->post(route('admin.registration-token.rotate'));
+
+        $response->assertRedirect(route('admin.dashboard'));
+        $response->assertSessionHas('success');
+
+        $newToken = RegistrationTokenService::getCurrentToken();
+        $this->assertNotEquals($oldToken, $newToken);
+    }
+
     public function test_token_is_displayed_on_admin_dashboard_and_asesor_jadwal_views(): void
     {
         $token = RegistrationTokenService::getCurrentToken();

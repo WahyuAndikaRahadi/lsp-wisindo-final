@@ -21,9 +21,14 @@
                 <div>
                     <div class="flex items-center gap-2">
                         <span class="text-xs font-bold text-emerald-900">Token Registrasi Asesi:</span>
+                        @if(isset($tokenInfo['days_remaining']))
+                            <span class="text-[10px] font-semibold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full border border-emerald-200">
+                                Berlaku {{ $tokenInfo['days_remaining'] }} hari lagi
+                            </span>
+                        @endif
                     </div>
                     <p class="text-[11px] text-slate-500">
-                        Bagikan token ini kepada calon asesi yang membuat akun di lokasi asesmen. Token ini akan direset otomatis setiap minggu.
+                        Bagikan token ini kepada calon asesi yang membuat akun di lokasi asesmen. Token ini akan direset otomatis setiap 7 hari.
                     </p>
                 </div>
             </div>

@@ -7,6 +7,7 @@ use App\Models\Schedule;
 use App\Models\Scheme;
 use App\Models\User;
 use App\Services\RegistrationTokenService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
@@ -25,12 +26,22 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
-        $registrationToken = RegistrationTokenService::getCurrentToken();
+        $tokenInfo = RegistrationTokenService::getTokenInfo();
+        $registrationToken = $tokenInfo['token'];
 
         return view('admin.dashboard', compact(
             'stats',
             'recentSchedules',
-            'registrationToken'
+            'registrationToken',
+            'tokenInfo'
         ));
+    }
+
+    public function rotateRegistrationToken(): RedirectResponse
+    {
+        $newToken = RegistrationTokenService::generateNewToken();
+
+        return redirect()->route('admin.dashboard')
+            ->with('success', "Token registrasi asesi berhasil diacak ulang menjadi: {$newToken}");
     }
 }
