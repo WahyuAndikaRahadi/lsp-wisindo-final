@@ -284,51 +284,74 @@
                                     </label>
                                 </div>
                             </th>
-                            <th class="px-4 py-3 text-left border-r border-slate-200 w-48">No. Unit Kompetensi</th>
-                            <th class="px-4 py-3 text-left border-r border-slate-200 w-32">No. Elemen</th>
+                            <th class="px-4 py-3 text-left border-r border-slate-200 min-w-[280px] w-72 md:w-80">No. Unit Kompetensi</th>
+                            <th class="px-4 py-3 text-left border-r border-slate-200 w-28 whitespace-nowrap">No. Elemen</th>
                             <th class="px-4 py-3 text-left">Materi / Substansi Wawancara / KUK</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-200">
                         @forelse($units ?? [] as $uIdx => $unit)
-                            @foreach($unit->elements as $eIdx => $elem)
-                                @php
-                                    $elemKey = (string) $elem->id;
-                                    $isClarified = in_array($elemKey, (array) old('clarification_elements', $clarificationElements));
-                                @endphp
+                            @if($unit->elements->isEmpty())
                                 <tr class="hover:bg-slate-50/50 transition">
-                                    <td class="px-4 py-3 text-center border-r border-slate-200 align-top">
-                                        <input type="checkbox" name="clarification_elements[]" value="{{ $elem->id }}" :disabled="!isEditing"
-                                            class="clarification-checkbox rounded border-slate-300 text-brand-600 focus:ring-brand-500 w-4 h-4 cursor-pointer"
-                                            {{ $isClarified ? 'checked' : '' }}>
-                                    </td>
-                                    <td class="px-4 py-3 border-r border-slate-200 align-top">
-                                        <div class="font-mono font-bold text-slate-900">{{ $unit->code }}</div>
-                                        <div class="text-[11px] text-slate-500 mt-0.5 leading-snug">{{ $unit->title }}</div>
-                                    </td>
-                                    <td class="px-4 py-3 border-r border-slate-200 align-top font-semibold text-slate-800 whitespace-nowrap">
-                                        Elemen {{ $eIdx + 1 }}
-                                    </td>
-                                    <td class="px-4 py-3 align-top">
-                                        <div class="font-bold text-slate-900 mb-1.5 flex items-center gap-1.5">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-brand-500 shrink-0"></span>
-                                            <span>{{ $elem->title ?? $elem->name }}</span>
+                                    <td class="px-4 py-3 text-center border-r border-slate-200 align-top">-</td>
+                                    <td class="px-4 py-3 border-r border-slate-200 align-top min-w-[280px] w-72 md:w-80">
+                                        <span class="inline-block font-mono font-bold text-xs text-brand-700 bg-brand-50 border border-brand-200 px-2 py-0.5 rounded shadow-2xs">
+                                            {{ $unit->code }}
+                                        </span>
+                                        <div class="text-xs font-bold text-slate-900 leading-relaxed mt-1 break-words">
+                                            {{ $unit->title }}
                                         </div>
-                                        @if($elem->kuks && $elem->kuks->isNotEmpty())
-                                            <div class="text-[11px] text-slate-600 space-y-1.5 border-l-2 border-slate-200 pl-3 mt-1.5">
-                                                @foreach($elem->kuks as $kIdx => $kuk)
-                                                    <div class="leading-relaxed flex items-start gap-1.5">
-                                                        <span class="font-mono font-bold text-slate-800 text-[10px] px-1.5 py-0.5 rounded bg-slate-100 border border-slate-200 shrink-0">
-                                                            {{ $kuk->code_number ?: (($eIdx + 1) . '.' . ($kIdx + 1)) }}
-                                                        </span>
-                                                        <span class="text-slate-700">{{ $kuk->statement ?: $kuk->description }}</span>
-                                                    </div>
-                                                @endforeach
-                                            </div>
-                                        @endif
                                     </td>
+                                    <td class="px-4 py-3 border-r border-slate-200 align-top text-slate-400 italic" colspan="2">Belum ada elemen</td>
                                 </tr>
-                            @endforeach
+                            @else
+                                @foreach($unit->elements as $eIdx => $elem)
+                                    @php
+                                        $elemKey = (string) $elem->id;
+                                        $isClarified = in_array($elemKey, (array) old('clarification_elements', $clarificationElements));
+                                    @endphp
+                                    <tr class="hover:bg-slate-50/50 transition">
+                                        <td class="px-4 py-3 text-center border-r border-slate-200 align-top">
+                                            <input type="checkbox" name="clarification_elements[]" value="{{ $elem->id }}" :disabled="!isEditing"
+                                                class="clarification-checkbox rounded border-slate-300 text-brand-600 focus:ring-brand-500 w-4 h-4 cursor-pointer"
+                                                {{ $isClarified ? 'checked' : '' }}>
+                                        </td>
+                                        @if($eIdx === 0)
+                                            <td rowspan="{{ count($unit->elements) ?: 1 }}" class="px-4 py-3 border-r border-slate-200 align-top bg-slate-50/30 min-w-[280px] w-72 md:w-80">
+                                                <div class="sticky top-4 space-y-1.5">
+                                                    <span class="inline-block font-mono font-bold text-xs text-brand-700 bg-brand-50 border border-brand-200 px-2 py-0.5 rounded shadow-2xs">
+                                                        {{ $unit->code }}
+                                                    </span>
+                                                    <div class="text-xs font-bold text-slate-900 leading-relaxed break-words">
+                                                        {{ $unit->title }}
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        @endif
+                                        <td class="px-4 py-3 border-r border-slate-200 align-top font-semibold text-slate-800 whitespace-nowrap">
+                                            Elemen {{ $eIdx + 1 }}
+                                        </td>
+                                        <td class="px-4 py-3 align-top">
+                                            <div class="font-bold text-slate-900 mb-1.5 flex items-center gap-1.5">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-brand-500 shrink-0"></span>
+                                                <span>{{ $elem->title ?? $elem->name }}</span>
+                                            </div>
+                                            @if($elem->kuks && $elem->kuks->isNotEmpty())
+                                                <div class="text-[11px] text-slate-600 space-y-1.5 border-l-2 border-slate-200 pl-3 mt-1.5">
+                                                    @foreach($elem->kuks as $kIdx => $kuk)
+                                                        <div class="leading-relaxed flex items-start gap-1.5">
+                                                            <span class="font-mono font-bold text-slate-800 text-[10px] px-1.5 py-0.5 rounded bg-slate-100 border border-slate-200 shrink-0">
+                                                                {{ $kuk->code_number ?: (($eIdx + 1) . '.' . ($kIdx + 1)) }}
+                                                            </span>
+                                                            <span class="text-slate-700">{{ $kuk->statement ?: $kuk->description }}</span>
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            @endif
                         @empty
                             <tr>
                                 <td colspan="4" class="px-6 py-4 text-center text-slate-500 text-xs">Belum ada unit kompetensi pada skema ini.</td>

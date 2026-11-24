@@ -168,44 +168,58 @@
                 </th>
             </tr>
             <tr style="background-color: #fafafa; text-align: center; font-size: 8pt; font-weight: bold;">
-                <th style="border: 1px solid #000; padding: 3px; width: 7%;">Cek List</th>
-                <th style="border: 1px solid #000; padding: 3px; width: 23%;">No. Unit Kompetensi</th>
-                <th style="border: 1px solid #000; padding: 3px; width: 18%;">No. Elemen</th>
+                <th style="border: 1px solid #000; padding: 3px; width: 6%;">Cek List</th>
+                <th style="border: 1px solid #000; padding: 3px; width: 28%;">No. Unit Kompetensi</th>
+                <th style="border: 1px solid #000; padding: 3px; width: 14%;">No. Elemen</th>
                 <th style="border: 1px solid #000; padding: 3px; text-align: left;">Materi/substansi wawancara /KUK</th>
             </tr>
         </thead>
         <tbody>
             @foreach($scheme->competencyUnits as $uIdx => $unit)
-                @foreach($unit->elements as $eIdx => $elem)
-                    @php
-                        $elemKey = (string) $elem->id;
-                        $isChecked = in_array($elemKey, (array) $clarificationElements);
-                    @endphp
+                @if($unit->elements->isEmpty())
                     <tr>
-                        <td style="border: 1px solid #000; text-align: center; font-weight: bold; font-size: 10pt;">
-                            {{ $isChecked ? '√' : '' }}
+                        <td style="border: 1px solid #000; text-align: center; font-size: 8pt;">-</td>
+                        <td style="border: 1px solid #000; padding: 4px 6px; vertical-align: top;">
+                            <div style="font-family: monospace; font-weight: bold; font-size: 8pt;">{{ $unit->code }}</div>
+                            <div style="font-size: 7.5pt; color: #222; margin-top: 2px;">{{ $unit->title }}</div>
                         </td>
-                        <td style="border: 1px solid #000; padding: 3px 6px; font-family: monospace;">
-                            {{ $unit->code }}
-                        </td>
-                        <td style="border: 1px solid #000; padding: 3px 6px;">
-                            Elemen {{ $eIdx + 1 }}
-                        </td>
-                        <td style="border: 1px solid #000; padding: 4px 6px; font-size: 8pt; vertical-align: top;">
-                            <div style="font-weight: bold; margin-bottom: 2px;">{{ $elem->title ?? $elem->name }}</div>
-                            @if($elem->kuks && $elem->kuks->isNotEmpty())
-                                <div style="margin-top: 3px; padding-left: 6px; border-left: 1px solid #999; font-size: 7.5pt; color: #333;">
-                                    @foreach($elem->kuks as $kIdx => $kuk)
-                                        <div style="margin-bottom: 2px;">
-                                            <span style="font-family: monospace; font-weight: bold;">{{ $kuk->code_number ?: (($eIdx + 1) . '.' . ($kIdx + 1)) }}</span>
-                                            {{ $kuk->statement ?: $kuk->description }}
-                                        </div>
-                                    @endforeach
-                                </div>
-                            @endif
-                        </td>
+                        <td colspan="2" style="border: 1px solid #000; padding: 4px 6px; font-size: 8pt; color: #777; font-style: italic;">Tidak ada elemen</td>
                     </tr>
-                @endforeach
+                @else
+                    @foreach($unit->elements as $eIdx => $elem)
+                        @php
+                            $elemKey = (string) $elem->id;
+                            $isChecked = in_array($elemKey, (array) $clarificationElements);
+                        @endphp
+                        <tr>
+                            <td style="border: 1px solid #000; text-align: center; font-weight: bold; font-size: 10pt; vertical-align: top;">
+                                {{ $isChecked ? '√' : '' }}
+                            </td>
+                            @if($eIdx === 0)
+                                <td rowspan="{{ count($unit->elements) ?: 1 }}" style="border: 1px solid #000; padding: 4px 6px; vertical-align: top; background-color: #fafafa;">
+                                    <div style="font-family: monospace; font-weight: bold; font-size: 8pt; color: #000;">{{ $unit->code }}</div>
+                                    <div style="font-size: 7.5pt; color: #111; margin-top: 2px; line-height: 1.35; font-weight: 500;">{{ $unit->title }}</div>
+                                </td>
+                            @endif
+                            <td style="border: 1px solid #000; padding: 3px 6px; vertical-align: top; font-size: 8pt; white-space: nowrap;">
+                                Elemen {{ $eIdx + 1 }}
+                            </td>
+                            <td style="border: 1px solid #000; padding: 4px 6px; font-size: 8pt; vertical-align: top;">
+                                <div style="font-weight: bold; margin-bottom: 2px;">{{ $elem->title ?? $elem->name }}</div>
+                                @if($elem->kuks && $elem->kuks->isNotEmpty())
+                                    <div style="margin-top: 3px; padding-left: 6px; border-left: 1px solid #999; font-size: 7.5pt; color: #333;">
+                                        @foreach($elem->kuks as $kIdx => $kuk)
+                                            <div style="margin-bottom: 2px;">
+                                                <span style="font-family: monospace; font-weight: bold;">{{ $kuk->code_number ?: (($eIdx + 1) . '.' . ($kIdx + 1)) }}</span>
+                                                {{ $kuk->statement ?: $kuk->description }}
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @endif
+                            </td>
+                        </tr>
+                    @endforeach
+                @endif
             @endforeach
         </tbody>
     </table>

@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Assessment;
 use App\Models\AssessmentIaResponse;
+use App\Models\CompetencyUnit;
 use App\Models\Schedule;
 use App\Models\Scheme;
 use App\Models\User;
@@ -22,6 +23,8 @@ class DynamicDokumenMukTest extends TestCase
 
     private Scheme $scheme;
 
+    private CompetencyUnit $unit;
+
     private Schedule $schedule;
 
     private Assessment $assessment;
@@ -39,6 +42,12 @@ class DynamicDokumenMukTest extends TestCase
             'name' => 'Pemeliharaan Kendaraan Ringan Sistem Injeksi',
             'scheme_type' => 'KLASTER',
             'is_active' => true,
+        ]);
+
+        $this->unit = $this->scheme->competencyUnits()->create([
+            'code' => 'G.45OTO01.001.2',
+            'title' => 'Melaksanakan Keselamatan dan Kesehatan Kerja',
+            'sequence' => 1,
         ]);
 
         $this->schedule = Schedule::create([
@@ -100,6 +109,8 @@ class DynamicDokumenMukTest extends TestCase
         $resIa08->assertSee('FR.IA.08.');
         $resIa08->assertSee('CEKLIS VERIFIKASI PORTOFOLIO');
         $resIa08->assertSee($this->asesi->full_name);
+        $resIa08->assertSee($this->unit->code);
+        $resIa08->assertSee($this->unit->title);
 
         // 2. Export FR.IA.09
         $resIa09 = $this->actingAs($this->admin)
@@ -164,14 +175,8 @@ class DynamicDokumenMukTest extends TestCase
 
     public function test_ia08_section_2_displays_full_kuks_and_klarifikasi_semua_button(): void
     {
-        // Create unit, element, and KUK for scheme
-        $unit = $this->scheme->competencyUnits()->create([
-            'code' => 'G.45OTO01.001.2',
-            'title' => 'Melaksanakan Keselamatan dan Kesehatan Kerja',
-            'sequence' => 1,
-        ]);
-
-        $elem = $unit->elements()->create([
+        // Add element and KUKs to the competency unit
+        $elem = $this->unit->elements()->create([
             'title' => 'Menyiapkan prosedur Keselamatan',
             'sequence' => 1,
         ]);
@@ -200,6 +205,7 @@ class DynamicDokumenMukTest extends TestCase
         $response->assertSee('Batal Semua');
         $response->assertSee('setAllClarification');
         $response->assertSee('G.45OTO01.001.2');
+        $response->assertSee('Melaksanakan Keselamatan dan Kesehatan Kerja');
         $response->assertSee('Menyiapkan prosedur Keselamatan');
         // Assert full KUK code numbers and statements are displayed
         $response->assertSee('1.1');
@@ -210,13 +216,7 @@ class DynamicDokumenMukTest extends TestCase
 
     public function test_ia08_saves_clarification_elements_correctly(): void
     {
-        $unit = $this->scheme->competencyUnits()->create([
-            'code' => 'G.45OTO01.001.2',
-            'title' => 'Melaksanakan K3',
-            'sequence' => 1,
-        ]);
-
-        $elem = $unit->elements()->create([
+        $elem = $this->unit->elements()->create([
             'title' => 'Menyiapkan APD',
             'sequence' => 1,
         ]);
