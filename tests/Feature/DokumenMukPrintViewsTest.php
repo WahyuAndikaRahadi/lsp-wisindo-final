@@ -232,9 +232,8 @@ class DokumenMukPrintViewsTest extends TestCase
         $pdfPath = $response->baseResponse->getFile()->getPathname();
         $this->assertFileExists($pdfPath);
 
-        $python = app(MukDynamicDocumentService::class)->getPythonExecutable();
         $script = "import pymupdf, sys; doc = pymupdf.open(sys.argv[1]); text = ''.join(p.get_text() for p in doc); print(text)";
-        $extracted = shell_exec(escapeshellarg($python).' -c '.escapeshellarg($script).' '.escapeshellarg($pdfPath));
+        $extracted = $this->executePythonScript($script, $pdfPath);
 
         $this->assertStringContainsString('SMK Negeri 1 Cikarang', $extracted);
         $this->assertStringContainsString('Barat Kabupaten Bekasi', $extracted);
@@ -243,7 +242,7 @@ class DokumenMukPrintViewsTest extends TestCase
 
         // Verify letterhead is centered on both pages (Berita Acara and Attendance List)
         $centerScript = "import pymupdf, sys, json; doc = pymupdf.open(sys.argv[1]); res = [{'left': page.get_image_rects(page.get_images()[0][0])[0].x0, 'right': page.rect.width - page.get_image_rects(page.get_images()[0][0])[0].x1} for page in doc if page.get_images()]; print(json.dumps(res))";
-        $centerJson = shell_exec(escapeshellarg($python).' -c '.escapeshellarg($centerScript).' '.escapeshellarg($pdfPath));
+        $centerJson = $this->executePythonScript($centerScript, $pdfPath);
         $centerData = json_decode($centerJson, true);
         $this->assertIsArray($centerData);
         $this->assertGreaterThanOrEqual(2, count($centerData));
@@ -268,9 +267,8 @@ class DokumenMukPrintViewsTest extends TestCase
         $pdfPath = $response->baseResponse->getFile()->getPathname();
         $this->assertFileExists($pdfPath);
 
-        $python = app(MukDynamicDocumentService::class)->getPythonExecutable();
         $script = "import pymupdf, sys; doc = pymupdf.open(sys.argv[1]); text = ''.join(p.get_text() for p in doc); print(text)";
-        $extracted = shell_exec(escapeshellarg($python).' -c '.escapeshellarg($script).' '.escapeshellarg($pdfPath));
+        $extracted = $this->executePythonScript($script, $pdfPath);
 
         $this->assertStringContainsString('SMK Negeri 1 Cikarang Barat', $extracted);
         $this->assertStringContainsString('Raden Mas Sudirman', $extracted);
@@ -278,7 +276,7 @@ class DokumenMukPrintViewsTest extends TestCase
 
         // Verify letterhead is centered horizontally on assessor attendance list
         $centerScript = "import pymupdf, sys, json; doc = pymupdf.open(sys.argv[1]); res = [{'left': page.get_image_rects(page.get_images()[0][0])[0].x0, 'right': page.rect.width - page.get_image_rects(page.get_images()[0][0])[0].x1} for page in doc if page.get_images()]; print(json.dumps(res))";
-        $centerJson = shell_exec(escapeshellarg($python).' -c '.escapeshellarg($centerScript).' '.escapeshellarg($pdfPath));
+        $centerJson = $this->executePythonScript($centerScript, $pdfPath);
         $centerData = json_decode($centerJson, true);
         $this->assertIsArray($centerData);
         $this->assertNotEmpty($centerData);
@@ -332,6 +330,43 @@ class DokumenMukPrintViewsTest extends TestCase
         $response->assertSee('Apakah Proses Banding telah dijelaskan kepada Anda?');
         $response->assertSee('KEPUTUSAN BANDING OLEH ADMIN LSP / TIM BANDING:');
         $response->assertSee('DITERIMA (Hasil Asesmen Diubah/Diuji Ulang)');
+    }
+
+    public function test_ak04_is_rendered_as_blank_form_when_candidate_has_not_submitted_appeal(): void
+    {
+        // Delete appeal to simulate unsubmitted appeal
+        $this->assessment->appeals()->delete();
+        $this->assessment->unsetRelation('latestAppeal');
+
+        // 1. Test HTML print view
+        $htmlResponse = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.export-asesi', [
+            'assessment' => $this->assessment->id,
+            'type' => 'ak04',
+        ]));
+        $htmlResponse->assertOk();
+        $htmlResponse->assertSee('FR.AK.04. BANDING ASESMEN');
+        $htmlResponse->assertDontSee('√');
+        $htmlResponse->assertDontSee('Asesi menyatakan mampu mendemonstrasikan unit kompetensi');
+
+        // 2. Test Dynamic PDF endpoint
+        $pdfResponse = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.asesi-dynamic', [
+            'assessment' => $this->assessment->id,
+            'type' => 'ak04',
+        ]));
+        $pdfResponse->assertOk();
+        $this->assertEquals('application/pdf', $pdfResponse->headers->get('Content-Type'));
+
+        $pdfPath = $pdfResponse->baseResponse->getFile()->getPathname();
+        $this->assertFileExists($pdfPath);
+
+        $script = "import pymupdf, sys; doc = pymupdf.open(sys.argv[1]); text = ''.join(p.get_text() for p in doc); print(text)";
+        $extracted = $this->executePythonScript($script, $pdfPath);
+
+        $this->assertStringContainsString('FR.AK.04. BANDING ASESMEN', $extracted);
+        $this->assertStringContainsString('Tanda tangan Asesi :', $extracted);
+        $this->assertStringContainsString('Tanggal :', $extracted);
+        $this->assertStringNotContainsString('………………………………………….', $extracted);
+        $this->assertStringNotContainsString('Pengajuan banding atas hasil observasi', $extracted);
     }
 
     public function test_can_render_fr_ak07_penyesuaian_wajar(): void
@@ -647,7 +682,6 @@ class DokumenMukPrintViewsTest extends TestCase
         $pdfPath = $response->baseResponse->getFile()->getPathname();
         $this->assertFileExists($pdfPath);
 
-        $python = file_exists(base_path('venv/bin/python')) ? base_path('venv/bin/python') : (file_exists(base_path('.venv/bin/python')) ? base_path('.venv/bin/python') : 'python3');
         $script = <<<'PY'
 import pymupdf, sys, json
 doc = pymupdf.open(sys.argv[1])
@@ -661,7 +695,7 @@ res = {
 }
 print(json.dumps(res))
 PY;
-        $output = shell_exec(escapeshellarg($python).' -c '.escapeshellarg($script).' '.escapeshellarg($pdfPath));
+        $output = $this->executePythonScript($script, $pdfPath);
         $data = json_decode($output, true);
 
         $this->assertIsArray($data);
@@ -715,7 +749,6 @@ PY;
         $pdfPath = $response->baseResponse->getFile()->getPathname();
         $this->assertFileExists($pdfPath);
 
-        $python = file_exists(base_path('venv/bin/python')) ? base_path('venv/bin/python') : (file_exists(base_path('.venv/bin/python')) ? base_path('.venv/bin/python') : 'python3');
         $script = <<<'PY'
 import pymupdf, sys, json
 doc = pymupdf.open(sys.argv[1])
@@ -732,7 +765,7 @@ for p in doc:
     })
 print(json.dumps({'total_pages': len(doc), 'pages': pages_data}))
 PY;
-        $output = shell_exec(escapeshellarg($python).' -c '.escapeshellarg($script).' '.escapeshellarg($pdfPath));
+        $output = $this->executePythonScript($script, $pdfPath);
         $res = json_decode($output, true);
 
         $this->assertIsArray($res);
@@ -792,7 +825,6 @@ PY;
         $pdfPath = $response->baseResponse->getFile()->getPathname();
         $this->assertFileExists($pdfPath);
 
-        $python = file_exists(base_path('venv/bin/python')) ? base_path('venv/bin/python') : (file_exists(base_path('.venv/bin/python')) ? base_path('.venv/bin/python') : 'python3');
         $script = <<<'PY'
 import pymupdf, sys, json
 doc = pymupdf.open(sys.argv[1])
@@ -813,7 +845,7 @@ print(json.dumps({
     'has_belum_kompeten': 'belum kompeten' in text_p1,
 }))
 PY;
-        $output = shell_exec(escapeshellarg($python).' -c '.escapeshellarg($script).' '.escapeshellarg($pdfPath));
+        $output = $this->executePythonScript($script, $pdfPath);
         $res = json_decode($output, true);
 
         $this->assertIsArray($res);
@@ -822,5 +854,16 @@ PY;
         $this->assertTrue($res['has_kompeten'], 'Berita Acara must show "Kompeten" in Keterangan for competent asesi.');
         $this->assertTrue($res['has_belum_kompeten'], 'Berita Acara must show "belum kompeten" in Keterangan for not competent asesi.');
         $this->assertStringNotContainsString('Ttd Digital', $res['right_side_sig_text'], 'Kepala TUK field must not contain the phrase "ttd digital".');
+    }
+
+    private function executePythonScript(string $script, string $arg): ?string
+    {
+        $python = app(MukDynamicDocumentService::class)->getPythonExecutable();
+        $tmp = tempnam(sys_get_temp_dir(), 'py_');
+        file_put_contents($tmp, $script);
+        $output = shell_exec(escapeshellarg($python).' '.escapeshellarg($tmp).' '.escapeshellarg($arg));
+        @unlink($tmp);
+
+        return $output;
     }
 }

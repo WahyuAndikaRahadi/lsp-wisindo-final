@@ -954,18 +954,24 @@ class MukDynamicDocumentService
         $appeal = $assessment->latestAppeal;
 
         $dateAsesmen = Carbon::parse($schedule->date ?? now())->format('d/m/Y');
+        $isFilled = $appeal !== null;
+        $sigAsesi = $isFilled
+            ? ($assessment->asesi_signature ?? $asesi?->profile?->signature_data ?? $assessment->iaResponses()->whereNotNull('asesi_signature')->value('asesi_signature'))
+            : null;
 
         return [
+            'is_filled' => $isFilled,
             'asesi_nama' => $asesi?->full_name ?? '',
             'asesor_nama' => $assessor?->full_name ?? '',
             'tanggal_asesmen' => $dateAsesmen,
-            'pertanyaan_1_ya' => (bool) ($appeal?->is_process_explained ?? true),
-            'pertanyaan_2_ya' => (bool) ($appeal?->is_discussed_with_assessor ?? true),
-            'pertanyaan_3_ya' => (bool) ($appeal?->involves_other_person ?? false),
+            'pertanyaan_1_ya' => $isFilled ? (bool) $appeal->is_process_explained : null,
+            'pertanyaan_2_ya' => $isFilled ? (bool) $appeal->is_discussed_with_assessor : null,
+            'pertanyaan_3_ya' => $isFilled ? (bool) $appeal->involves_other_person : null,
             'skema_nama' => $scheme?->name ?? '',
             'skema_nomor' => $scheme?->code ?? '',
-            'alasan_banding' => $appeal?->appeal_reasons ?? '',
-            'tanggal_tanda_tangan' => $dateAsesmen,
+            'alasan_banding' => $isFilled ? ($appeal->appeal_reasons ?? '') : '',
+            'signature_asesi' => $sigAsesi,
+            'tanggal_tanda_tangan' => $isFilled ? ($appeal->appeal_date ? Carbon::parse($appeal->appeal_date)->format('d/m/Y') : $dateAsesmen) : '',
         ];
     }
 

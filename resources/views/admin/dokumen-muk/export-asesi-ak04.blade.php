@@ -46,13 +46,13 @@
         <tbody>
             <tr>
                 <td style="padding: 6px 8px;">Apakah Proses Banding telah dijelaskan kepada Anda?</td>
-                <td style="text-align: center; vertical-align: middle; font-weight: bold;">{{ ($latestAppeal?->is_process_explained ?? true) ? '√' : '' }}</td>
-                <td style="text-align: center; vertical-align: middle; font-weight: bold;">{{ !($latestAppeal?->is_process_explained ?? true) ? '√' : '' }}</td>
+                <td style="text-align: center; vertical-align: middle; font-weight: bold;">{{ ($latestAppeal && $latestAppeal->is_process_explained) ? '√' : '' }}</td>
+                <td style="text-align: center; vertical-align: middle; font-weight: bold;">{{ ($latestAppeal && !$latestAppeal->is_process_explained) ? '√' : '' }}</td>
             </tr>
             <tr>
                 <td style="padding: 6px 8px;">Apakah Anda telah mendiskusikan Banding dengan Asesor?</td>
-                <td style="text-align: center; vertical-align: middle; font-weight: bold;">{{ ($latestAppeal?->is_discussed_with_assessor ?? true) ? '√' : '' }}</td>
-                <td style="text-align: center; vertical-align: middle; font-weight: bold;">{{ !($latestAppeal?->is_discussed_with_assessor ?? true) ? '√' : '' }}</td>
+                <td style="text-align: center; vertical-align: middle; font-weight: bold;">{{ ($latestAppeal && $latestAppeal->is_discussed_with_assessor) ? '√' : '' }}</td>
+                <td style="text-align: center; vertical-align: middle; font-weight: bold;">{{ ($latestAppeal && !$latestAppeal->is_discussed_with_assessor) ? '√' : '' }}</td>
             </tr>
             <tr>
                 <td style="padding: 6px 8px;">
@@ -61,8 +61,8 @@
                         <div style="font-size: 8pt; color: #555; margin-top: 2px;">(Nama Pendamping: <strong>{{ $latestAppeal->other_person_name }}</strong>)</div>
                     @endif
                 </td>
-                <td style="text-align: center; vertical-align: middle; font-weight: bold;">{{ ($latestAppeal?->involves_other_person ?? false) ? '√' : '' }}</td>
-                <td style="text-align: center; vertical-align: middle; font-weight: bold;">{{ !($latestAppeal?->involves_other_person ?? false) ? '√' : '' }}</td>
+                <td style="text-align: center; vertical-align: middle; font-weight: bold;">{{ ($latestAppeal && $latestAppeal->involves_other_person) ? '√' : '' }}</td>
+                <td style="text-align: center; vertical-align: middle; font-weight: bold;">{{ ($latestAppeal && !$latestAppeal->involves_other_person) ? '√' : '' }}</td>
             </tr>
         </tbody>
     </table>
@@ -88,7 +88,7 @@
         Banding ini diajukan atas alasan sebagai berikut :
     </div>
     <div style="border: 1px solid #000; padding: 8px; min-height: 50px; margin-bottom: 12px; font-size: 9.5pt;">
-        {{ $latestAppeal?->appeal_reasons ?? $latestAppeal?->reason ?? 'Asesi menyatakan mampu mendemonstrasikan unit kompetensi dan memohon peninjauan ulang atas hasil uji.' }}
+        {{ $latestAppeal?->appeal_reasons ?? $latestAppeal?->reason ?? '' }}
     </div>
 
     @if($latestAppeal && $latestAppeal->contested_units)
@@ -146,15 +146,20 @@
                     Tanda tangan Asesi :
                 </div>
                 <div class="sig-box">
-                    @if($assessment->asesi_signature)
+                    @if($latestAppeal && $assessment->asesi_signature)
                         <img src="{{ $assessment->asesi_signature }}" class="sig-img" alt="TTD Asesi">
                     @else
                         <div style="height: 45px;"></div>
                     @endif
-                    <div style="border-bottom: 1px dotted #000; width: 85%;"></div>
+                    <div style="border-bottom: 1px solid #999; width: 85%;"></div>
                 </div>
                 <div style="font-size: 9pt; margin-top: 4px;">
-                    Tanggal : {{ \Carbon\Carbon::parse($schedule->date)->translatedFormat('d F Y') }}
+                    @if($latestAppeal)
+                        <strong>{{ $asesi->full_name }}</strong><br>
+                        Tanggal : {{ $latestAppeal->appeal_date ? \Carbon\Carbon::parse($latestAppeal->appeal_date)->translatedFormat('d F Y') : \Carbon\Carbon::parse($schedule->date)->translatedFormat('d F Y') }}
+                    @else
+                        Tanggal : -
+                    @endif
                 </div>
             </div>
 
@@ -167,13 +172,13 @@
                 </div>
                 <div class="sig-box">
                     <div style="height: 45px;"></div>
-                    <div style="border-bottom: 1px dotted #000; width: 85%;"></div>
+                    <div style="border-bottom: 1px solid #999; width: 85%;"></div>
                 </div>
                 <div style="font-size: 9pt; margin-top: 4px;">
                     @if($latestAppeal?->appeals_committee_chair)
                         <strong>{{ $latestAppeal->appeals_committee_chair }}</strong><br>
                     @endif
-                    Tanggal : {{ \Carbon\Carbon::parse($schedule->date)->translatedFormat('d F Y') }}
+                    Tanggal : {{ $latestAppeal?->decision_date ? \Carbon\Carbon::parse($latestAppeal->decision_date)->translatedFormat('d F Y') : '-' }}
                 </div>
             </div>
         </div>

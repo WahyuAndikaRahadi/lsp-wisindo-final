@@ -190,18 +190,14 @@ def registered_font_path(alias):
 
 
 def draw_checkmark(canvas_obj, x_center, y_bottom, size=7.0, font_name="DJ"):
-    """Draw a checkmark using DejaVu/Segoe if available, else a crisp vector path."""
-    font_path = os.path.basename(_REGISTERED_PATHS.get(font_name, "")).lower()
-    if any(k in font_path for k in ("dejavu", "segoe")):
-        canvas_obj.setFont(font_name, size)
-        canvas_obj.drawCentredString(x_center, y_bottom, "\u2713")
-        return
-
+    """Draw a crisp vector checkmark path independent of font glyph availability."""
     canvas_obj.saveState()
-    canvas_obj.setLineWidth(max(0.8, size * 0.14))
+    canvas_obj.setLineWidth(max(0.9, size * 0.14))
+    canvas_obj.setLineCap(1)
+    canvas_obj.setLineJoin(1)
     p = canvas_obj.beginPath()
-    p.moveTo(x_center - size * 0.34, y_bottom + size * 0.34)
+    p.moveTo(x_center - size * 0.32, y_bottom + size * 0.32)
     p.lineTo(x_center - size * 0.08, y_bottom + size * 0.08)
-    p.lineTo(x_center + size * 0.36, y_bottom + size * 0.64)
+    p.lineTo(x_center + size * 0.35, y_bottom + size * 0.62)
     canvas_obj.drawPath(p, stroke=1, fill=0)
     canvas_obj.restoreState()

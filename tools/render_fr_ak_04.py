@@ -7,10 +7,14 @@ Layout meniru template aslinya secara presisi piksel; tanpa watermark sesuai ins
 import os
 import sys
 import json
+import io
+import base64
+from PIL import Image
 from reportlab.pdfgen import canvas
 from reportlab.lib.colors import black, HexColor
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.lib.utils import ImageReader
 
 # Setup fonts
 try:
@@ -24,20 +28,110 @@ register_reportlab_fonts(["Cal", "Cal-B", "Cal-I", "DJ"])
 PAGE_W, PAGE_H = 595.5, 842.5
 
 DATA = {
-    "asesi_nama": "Wahyu Andika Rahadi",
-    "asesor_nama": "Drs. Budi Santoso, M.T.",
-    "tanggal_asesmen": "19/10/2026",
-    "pertanyaan_1_ya": True,
-    "pertanyaan_2_ya": True,
-    "pertanyaan_3_ya": False,
-    "skema_nama": "Maintenance Gasoline Engine Injection System",
-    "skema_nomor": "02/LSP PrO Indo/I/2026",
-    "alasan_banding": "Asesi mampu mengerjakannya dan seluruh parameter pemeriksaan injeksi telah sesuai SOP bengkel resmi.",
-    "tanggal_tanda_tangan": "20/10/2026",
+    "is_filled": False,
+    "asesi_nama": "",
+    "asesor_nama": "",
+    "tanggal_asesmen": "",
+    "pertanyaan_1_ya": None,
+    "pertanyaan_2_ya": None,
+    "pertanyaan_3_ya": None,
+    "skema_nama": "",
+    "skema_nomor": "",
+    "alasan_banding": "",
+    "signature_asesi": None,
+    "tanggal_tanda_tangan": "",
 }
+
+def clean_signature_image(raw_bytes):
+    """Clean signature image, making light background transparent and boosting ink contrast."""
+    if not raw_bytes:
+        return None
+    try:
+        im = Image.open(io.BytesIO(raw_bytes))
+        im = im.convert("RGBA")
+        w, h = im.size
+        if w == 0 or h == 0:
+            return None
+
+        corners = [im.getpixel((x, y)) for x, y in ((0, 0), (w - 1, 0), (0, h - 1), (w - 1, h - 1))]
+        corners_transparent = all(c[3] < 30 for c in corners)
+
+        out = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+        if corners_transparent:
+            for y in range(h):
+                for x in range(w):
+                    r, g, b, a = im.getpixel((x, y))
+                    if a > 20:
+                        out.putpixel((x, y), (10, 15, 30, min(255, int(a * 1.5))))
+        else:
+            bg_r = sum(c[0] for c in corners) / 4.0
+            bg_g = sum(c[1] for c in corners) / 4.0
+            bg_b = sum(c[2] for c in corners) / 4.0
+            for y in range(h):
+                for x in range(w):
+                    r, g, b, a = im.getpixel((x, y))
+                    dist_bg = ((r - bg_r)**2 + (g - bg_g)**2 + (b - bg_b)**2)**0.5
+                    if dist_bg > 40 and not (r > 215 and g > 215 and b > 215):
+                        out.putpixel((x, y), (10, 15, 30, min(255, int(a * 1.5))))
+
+        bbox = out.getbbox()
+        if bbox:
+            pad = 4
+            out = out.crop((max(0, bbox[0] - pad), max(0, bbox[1] - pad), min(w, bbox[2] + pad), min(h, bbox[3] + pad)))
+        else:
+            return None
+
+        out_io = io.BytesIO()
+        out.save(out_io, format="PNG")
+        out_io.seek(0)
+        return out_io
+    except Exception:
+        return None
+
+def draw_signature(c, sig_data, x_center=235.9, y_center=318.0, max_w=110.0, max_h=34.0):
+    """Draw cleaned transparent signature image centered at specified position."""
+    if not sig_data:
+        return
+    try:
+        if isinstance(sig_data, str) and sig_data.startswith("data:image"):
+            sig_data = sig_data.split(",", 1)[1]
+            raw = base64.b64decode(sig_data)
+        elif isinstance(sig_data, str) and os.path.isfile(sig_data):
+            with open(sig_data, "rb") as f:
+                raw = f.read()
+        elif isinstance(sig_data, (bytes, bytearray)):
+            raw = sig_data
+        else:
+            return
+
+        cleaned_io = clean_signature_image(raw)
+        if not cleaned_io:
+            return
+
+        im = Image.open(cleaned_io)
+        im_w, im_h = im.size
+        if im_w == 0 or im_h == 0:
+            return
+
+        aspect = float(im_w) / float(im_h)
+        if aspect > (max_w / max_h):
+            w = max_w
+            h = max_w / aspect
+        else:
+            h = max_h
+            w = max_h * aspect
+
+        x = x_center - (w / 2.0)
+        y = y_center - (h / 2.0)
+        cleaned_io.seek(0)
+        img = ImageReader(cleaned_io)
+        c.drawImage(img, x, y, w, h, mask="auto")
+    except Exception:
+        pass
 
 def render(dest_path):
     c = canvas.Canvas(dest_path, pagesize=(PAGE_W, PAGE_H))
+    is_filled = bool(DATA.get("is_filled", False))
     
     # Title
     c.setFont("Cal-B", 12)
@@ -107,39 +201,52 @@ def render(dest_path):
         c.setLineWidth(0.8)
         c.rect(bx, by, size, size)
         if checked:
-            draw_checkmark(c, x_center, by + 1.5, size=10.0, font_name="DJ")
+            c.saveState()
+            c.setStrokeColor(black)
+            c.setLineWidth(1.4)
+            c.setLineCap(1)
+            c.setLineJoin(1)
+            p = c.beginPath()
+            p.moveTo(x_center - size * 0.32, y_center + size * 0.05)
+            p.lineTo(x_center - size * 0.08, y_center - size * 0.25)
+            p.lineTo(x_center + size * 0.35, y_center + size * 0.32)
+            c.drawPath(p, stroke=1, fill=0)
+            c.restoreState()
             
     # Content: R4 (Pertanyaan 1)
     c.setFont("Cal", 11)
     c.drawString(x0 + 7.7, y_lines[4] - 20.0, "Apakah Proses Banding telah dijelaskan kepada Anda?")
-    draw_box((x_col1 + x_col2) / 2, y_lines[4] - 17.5, DATA["pertanyaan_1_ya"])
-    draw_box((x_col2 + x1) / 2, y_lines[4] - 17.5, not DATA["pertanyaan_1_ya"])
+    p1 = DATA.get("pertanyaan_1_ya")
+    draw_box((x_col1 + x_col2) / 2, y_lines[4] - 17.5, is_filled and p1 is True)
+    draw_box((x_col2 + x1) / 2, y_lines[4] - 17.5, is_filled and p1 is False)
     
     # Content: R5 (Pertanyaan 2)
     c.drawString(x0 + 7.7, y_lines[5] - 20.0, "Apakah Anda telah mendiskusikan Banding dengan Asesor?")
-    draw_box((x_col1 + x_col2) / 2, y_lines[5] - 17.5, DATA["pertanyaan_2_ya"])
-    draw_box((x_col2 + x1) / 2, y_lines[5] - 17.5, not DATA["pertanyaan_2_ya"])
+    p2 = DATA.get("pertanyaan_2_ya")
+    draw_box((x_col1 + x_col2) / 2, y_lines[5] - 17.5, is_filled and p2 is True)
+    draw_box((x_col2 + x1) / 2, y_lines[5] - 17.5, is_filled and p2 is False)
     
     # Content: R6 (Pertanyaan 3)
     c.drawString(x0 + 7.7, y_lines[6] - 14.5, "Apakah Anda mau melibatkan “orang lain” membantu Anda dalam Proses")
     c.drawString(x0 + 7.7, y_lines[6] - 27.5, "Banding?")
-    draw_box((x_col1 + x_col2) / 2, y_lines[6] - 17.5, DATA["pertanyaan_3_ya"])
-    draw_box((x_col2 + x1) / 2, y_lines[6] - 17.5, not DATA["pertanyaan_3_ya"])
+    p3 = DATA.get("pertanyaan_3_ya")
+    draw_box((x_col1 + x_col2) / 2, y_lines[6] - 17.5, is_filled and p3 is True)
+    draw_box((x_col2 + x1) / 2, y_lines[6] - 17.5, is_filled and p3 is False)
     
     # Content: R7 (Keputusan Asesmen)
     c.drawString(x0 + 7.7, y_lines[7] - 15.0, "Banding ini diajukan atas Keputusan Asesmen yang dibuat terhadap Skema Sertifikasi")
     c.drawString(x0 + 7.7, y_lines[7] - 28.5, "(Kualifikasi/Klaster/Okupasi) berikut :")
-    c.drawString(x0 + 7.7, y_lines[7] - 45.0, f"Skema Sertifikasi : {DATA['skema_nama']}")
-    c.drawString(x0 + 7.7, y_lines[7] - 61.5, f"No. Skema Sertifikasi : {DATA['skema_nomor']}")
+    c.drawString(x0 + 7.7, y_lines[7] - 45.0, f"Skema Sertifikasi : {DATA.get('skema_nama', '')}")
+    c.drawString(x0 + 7.7, y_lines[7] - 61.5, f"No. Skema Sertifikasi : {DATA.get('skema_nomor', '')}")
     
     # Content: R8 (Alasan Banding)
     c.drawString(x0 + 7.7, y_lines[8] - 16.0, "Banding ini diajukan atas alasan sebagai berikut :")
-    c.setFont("Cal-I", 11)
-    # wrap text
-    alasan = DATA["alasan_banding"]
-    c.drawString(x0 + 7.7, y_lines[8] - 34.0, alasan[:95])
-    if len(alasan) > 95:
-        c.drawString(x0 + 7.7, y_lines[8] - 48.0, alasan[95:190])
+    alasan = str(DATA.get("alasan_banding", "") or "").strip()
+    if is_filled and alasan:
+        c.setFont("Cal-I", 11)
+        c.drawString(x0 + 7.7, y_lines[8] - 34.0, alasan[:95])
+        if len(alasan) > 95:
+            c.drawString(x0 + 7.7, y_lines[8] - 48.0, alasan[95:190])
         
     # Content: R9 (Pemberitahuan Hak)
     c.setFont("Cal", 11)
@@ -147,10 +254,26 @@ def render(dest_path):
     c.drawString(x0 + 7.7, y_lines[9] - 29.5, "memenuhi Prinsip Asesmen.")
     
     # Content: R10 (Tanda Tangan)
-    c.drawString(x0 + 7.7, y_lines[10] - 38.0, "Tanda tangan Asesi : …………………………………………. Tanggal : …………………………….")
-    c.setFont("Cal-B", 10)
-    c.drawString(x0 + 130.0, y_lines[10] - 37.0, DATA["asesi_nama"])
-    c.drawString(x0 + 360.0, y_lines[10] - 37.0, DATA["tanggal_tanda_tangan"])
+    c.setFont("Cal", 11)
+    c.drawString(x0 + 7.7, y_lines[10] - 42.0, "Tanda tangan Asesi :")
+    c.drawString(x0 + 310.0, y_lines[10] - 42.0, "Tanggal :")
+    if is_filled:
+        sig_asesi = DATA.get("signature_asesi") or DATA.get("asesi_signature")
+        if sig_asesi:
+            draw_signature(c, sig_asesi, x_center=x0 + 205.0, y_center=y_lines[10] - 32.0, max_w=120.0, max_h=34.0)
+
+        # Name
+        if DATA.get("asesi_nama"):
+            c.setFont("Cal-B", 10)
+            if sig_asesi:
+                c.drawCentredString(x0 + 205.0, y_lines[10] - 58.0, f"({DATA['asesi_nama']})")
+            else:
+                c.drawCentredString(x0 + 205.0, y_lines[10] - 42.0, DATA["asesi_nama"])
+
+        # Date
+        if DATA.get("tanggal_tanda_tangan"):
+            c.setFont("Cal", 11)
+            c.drawString(x0 + 360.0, y_lines[10] - 42.0, DATA["tanggal_tanda_tangan"])
     
     c.showPage()
     c.save()
