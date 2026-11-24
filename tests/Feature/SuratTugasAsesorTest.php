@@ -141,10 +141,6 @@ class SuratTugasAsesorTest extends TestCase
             'start_time' => '08:00',
             'end_time' => '16:00',
             'estimated_candidates' => 45,
-            'surat_tugas_number' => '050/ST/PRO-INDO/INT/XI/2026',
-            'surat_tugas_date' => '2026-11-01',
-            'letter_city' => 'Bekasi',
-            'director_name' => 'RIDWAN',
             'selected_instruments' => ['AK01', 'IA01'],
             'assessor_ids' => [$this->assignedAssessor->id],
         ];
@@ -158,9 +154,22 @@ class SuratTugasAsesorTest extends TestCase
             'name' => 'Jadwal Baru dengan ST',
             'tuk_address' => 'Jl. Industri No. 10 Jakarta Barat',
             'estimated_candidates' => 45,
-            'surat_tugas_number' => '050/ST/PRO-INDO/INT/XI/2026',
+            'letter_city' => 'Bekasi',
             'director_name' => 'RIDWAN',
         ]);
+    }
+
+    public function test_admin_detail_page_renders_clean_layout_without_code_clutter(): void
+    {
+        $response = $this->actingAs($this->admin)
+            ->get(route('admin.jadwal.show', $this->schedule->id));
+
+        $response->assertOk();
+        $response->assertSee('Skema Sertifikasi');
+        $response->assertSee('Tempat Uji Kompetensi');
+        $response->assertSee('Waktu Pelaksanaan');
+        $response->assertSee('Peserta &amp; Surat Tugas', false);
+        $response->assertSee('Gedung SMKS Inovasi Mandiri');
     }
 
     public function test_schedule_formatted_accessors(): void
