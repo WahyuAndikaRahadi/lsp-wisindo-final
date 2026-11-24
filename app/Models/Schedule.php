@@ -122,12 +122,12 @@ class Schedule extends Model
 
     public function getFormattedTimeRangeAttribute(): string
     {
-        $start = $this->start_time ? substr($this->start_time, 0, 5) : '08.00';
+        $start = $this->start_time ? substr($this->start_time, 0, 5) : '07.00';
         $end = $this->end_time ? substr($this->end_time, 0, 5) : '17.00';
         $start = str_replace(':', '.', $start);
         $end = str_replace(':', '.', $end);
 
-        return "{$start} s/d {$end} WIB";
+        return "{$start} s/d {$end}";
     }
 
     public function getEffectiveCandidateCountAttribute(): int
@@ -168,19 +168,39 @@ class Schedule extends Model
 
     public function getEffectiveDirectorNameAttribute(): string
     {
-        $superAdmin = User::where('role', 'SUPER_ADMIN')->first();
-        if (! empty($superAdmin?->full_name)) {
-            return $superAdmin->full_name;
-        }
-
         return $this->director_name ?: 'RIDWAN';
     }
 
     public function getEffectiveDirectorSignatureAttribute(): ?string
     {
-        $superAdmin = User::where('role', 'SUPER_ADMIN')->with('profile')->first();
+        // 1. Direct explicit signature on schedule if present
+        if (! empty($this->pic_signature)) {
+            return $this->pic_signature;
+        }
+
+        // 2. Canonical official director signature with LSP stamp
+        $officialStampSig = public_path('images/ttd-direktur-stempel-lsp.png');
+        if (file_exists($officialStampSig)) {
+            return 'data:image/png;base64,'.base64_encode(file_get_contents($officialStampSig));
+        }
+
+        // 3. Fallback to Super Admin profile if available
+        $superAdmin = User::where('role', 'SUPER_ADMIN')
+            ->whereHas('profile', fn ($q) => $q->whereNotNull('signature_data')->where('signature_data', '!=', ''))
+            ->with('profile')
+            ->first();
 
         return $superAdmin?->profile?->signature_data;
+    }
+
+    public function getEffectiveAdminNameAttribute(): string
+    {
+        return $this->effective_director_name;
+    }
+
+    public function getEffectiveAdminSignatureAttribute(): ?string
+    {
+        return $this->effective_director_signature;
     }
 
     public function generateDefaultSuratTugasNumber(): string

@@ -210,29 +210,18 @@ class SuratTugasAsesorTest extends TestCase
         $editResponse->assertDontSee('Dicantumkan pada Surat Tugas Asesor');
     }
 
-    public function test_director_name_and_signature_sourced_from_super_admin(): void
+    public function test_director_name_and_signature_defaults_and_pakem(): void
     {
-        $superAdmin = User::create([
-            'full_name' => 'Dr. H. Ridwan, M.Pd.',
-            'email' => 'superadmin_st@test.com',
-            'password' => Hash::make('Password123!'),
-            'role' => 'SUPER_ADMIN',
-            'status' => 'ACTIVE',
-        ]);
-
-        $superAdmin->profile()->create([
-            'signature_data' => 'data:image/png;base64,sample-signature-base64',
-        ]);
-
-        $this->assertEquals('Dr. H. Ridwan, M.Pd.', $this->schedule->effective_director_name);
-        $this->assertEquals('data:image/png;base64,sample-signature-base64', $this->schedule->effective_director_signature);
+        $this->assertEquals('RIDWAN', $this->schedule->effective_director_name);
+        $this->assertNotNull($this->schedule->effective_director_signature);
 
         $response = $this->actingAs($this->assignedAssessor)
             ->get(route('asesor.schedule.surat-tugas', $this->schedule->id));
 
         $response->assertOk();
-        $response->assertSee('Dr. H. Ridwan, M.Pd.');
-        $response->assertSee('data:image/png;base64,sample-signature-base64');
+        $response->assertSee('RIDWAN');
+        $response->assertSee('Direktur LSP P3 PrO Indo');
+        $response->assertDontSee('Admin LSP P3 PrO Indo');
     }
 
     public function test_admin_detail_header_contains_only_surat_tugas_and_lock_buttons(): void

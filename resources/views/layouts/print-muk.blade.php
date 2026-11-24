@@ -78,6 +78,16 @@
         }
 
         @media print {
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color-adjust: exact !important;
+            }
+            img {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color-adjust: exact !important;
+            }
             /* 
              * STANDAR CETAK DOKUMEN MUK BNSP - LSP PrO INDO
              * Kertas: A4 Portrait (210mm x 297mm)
