@@ -36,6 +36,7 @@ class SecureFileController extends Controller
 
         $portfolioIndex = $request->query('portfolio_index');
         $portfolioId = $request->query('portfolio_id');
+        $historyIndex = $request->query('history_index');
 
         if ($portfolioIndex !== null && isset($data['portfolios'][$portfolioIndex])) {
             $pItem = $data['portfolios'][$portfolioIndex];
