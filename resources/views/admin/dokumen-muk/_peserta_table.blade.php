@@ -212,63 +212,109 @@
                                                             </div>
                                                         </div>
 
-                                                        {{-- Group 2: Instrumen Asesmen (IA) --}}
+                                                        {{-- Group 2: Instrumen Asesmen (IA) - Dinamis Berdasarkan FR.AK.01 --}}
+                                                        @php
+                                                            $assignedIas = $assessment->getAssignedInstruments();
+                                                        @endphp
                                                         <div class="pt-1 border-t border-slate-100">
-                                                            <div class="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                                                                Instrumen Asesmen (IA)
+                                                            <div class="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400 flex items-center justify-between">
+                                                                <span>Instrumen Asesmen (IA)</span>
+                                                                <span class="text-[9px] font-normal text-slate-400 lowercase">dinamis</span>
                                                             </div>
                                                             <div class="space-y-0.5">
-                                                                <a href="{{ route('admin.dokumen-muk.asesi-dynamic', ['assessment' => $assessment->id, 'type' => 'ia01']) }}" target="_blank"
-                                                                   class="flex items-center justify-between px-2.5 py-1.5 rounded-lg hover:bg-brand-50 text-slate-700 hover:text-brand-700 transition group text-xs">
-                                                                    <div class="flex items-center gap-2 overflow-hidden">
-                                                                        <span class="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 group-hover:bg-brand-100 group-hover:text-brand-700 text-slate-600 shrink-0">FR.IA.01</span>
-                                                                        <span class="truncate">Ceklis Observasi</span>
+                                                                @if(in_array('IA01', $assignedIas, true))
+                                                                    <a href="{{ route('admin.dokumen-muk.asesi-dynamic', ['assessment' => $assessment->id, 'type' => 'ia01']) }}" target="_blank"
+                                                                       class="flex items-center justify-between px-2.5 py-1.5 rounded-lg hover:bg-brand-50 text-slate-700 hover:text-brand-700 transition group text-xs">
+                                                                        <div class="flex items-center gap-2 overflow-hidden">
+                                                                            <span class="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 group-hover:bg-brand-100 group-hover:text-brand-700 text-slate-600 shrink-0">FR.IA.01</span>
+                                                                            <span class="truncate">Ceklis Observasi</span>
+                                                                        </div>
+                                                                        <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-brand-600 shrink-0 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                                                    </a>
+                                                                @endif
+
+                                                                @if(in_array('IA01B', $assignedIas, true))
+                                                                    <a href="{{ route('admin.dokumen-muk.asesi-dynamic', ['assessment' => $assessment->id, 'type' => 'ia01b']) }}" target="_blank"
+                                                                       class="flex items-center justify-between px-2.5 py-1.5 rounded-lg hover:bg-brand-50 text-slate-700 hover:text-brand-700 transition group text-xs">
+                                                                        <div class="flex items-center gap-2 overflow-hidden">
+                                                                            <span class="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 group-hover:bg-brand-100 group-hover:text-brand-700 text-slate-600 shrink-0">FR.IA.01B</span>
+                                                                            <span class="truncate">Report Sheet</span>
+                                                                            @if($hasIa01b)
+                                                                                <span class="px-1.5 py-0.2 rounded text-[9px] font-semibold bg-emerald-100 text-emerald-700">Bukti Ada</span>
+                                                                            @endif
+                                                                        </div>
+                                                                        <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-brand-600 shrink-0 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                                                    </a>
+                                                                @endif
+
+                                                                @if(in_array('IA02', $assignedIas, true))
+                                                                    <a href="{{ route('admin.dokumen-muk.asesi-dynamic', ['assessment' => $assessment->id, 'type' => 'ia02']) }}" target="_blank"
+                                                                       class="flex items-center justify-between px-2.5 py-1.5 rounded-lg hover:bg-brand-50 text-slate-700 hover:text-brand-700 transition group text-xs">
+                                                                        <div class="flex items-center gap-2 overflow-hidden">
+                                                                            <span class="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 group-hover:bg-brand-100 group-hover:text-brand-700 text-slate-600 shrink-0">FR.IA.02</span>
+                                                                            <span class="truncate">Tugas Praktik Demonstrasi</span>
+                                                                        </div>
+                                                                        <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-brand-600 shrink-0 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                                                    </a>
+                                                                @endif
+
+                                                                @if(in_array('IA03', $assignedIas, true))
+                                                                    <a href="{{ route('admin.dokumen-muk.asesi-dynamic', ['assessment' => $assessment->id, 'type' => 'ia03']) }}" target="_blank"
+                                                                       class="flex items-center justify-between px-2.5 py-1.5 rounded-lg hover:bg-brand-50 text-slate-700 hover:text-brand-700 transition group text-xs">
+                                                                        <div class="flex items-center gap-2 overflow-hidden">
+                                                                            <span class="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 group-hover:bg-brand-100 group-hover:text-brand-700 text-slate-600 shrink-0">FR.IA.03</span>
+                                                                            <span class="truncate">Pertanyaan Lisan</span>
+                                                                        </div>
+                                                                        <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-brand-600 shrink-0 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                                                    </a>
+                                                                @endif
+
+                                                                @if(in_array('IA05', $assignedIas, true))
+                                                                    <a href="{{ route('admin.dokumen-muk.asesi-fixed', ['assessment' => $assessment->id, 'type' => 'ia05a']) }}" target="_blank"
+                                                                       class="flex items-center justify-between px-2.5 py-1.5 rounded-lg hover:bg-brand-50 text-slate-700 hover:text-brand-700 transition group text-xs">
+                                                                        <div class="flex items-center gap-2 overflow-hidden">
+                                                                            <span class="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-cyan-50 text-cyan-700 border border-cyan-200 shrink-0">FR.IA.05.A</span>
+                                                                            <span class="truncate">Lembar Soal (Master PDF)</span>
+                                                                        </div>
+                                                                        <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-brand-600 shrink-0 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                                                    </a>
+                                                                    <a href="{{ route('admin.dokumen-muk.asesi-dynamic', ['assessment' => $assessment->id, 'type' => 'ia05c']) }}" target="_blank"
+                                                                       class="flex items-center justify-between px-2.5 py-1.5 rounded-lg hover:bg-brand-50 text-slate-700 hover:text-brand-700 transition group text-xs">
+                                                                        <div class="flex items-center gap-2 overflow-hidden">
+                                                                            <span class="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-cyan-50 text-cyan-700 border border-cyan-200 shrink-0">FR.IA.05.C</span>
+                                                                            <span class="truncate">Lembar Jawaban Asesi</span>
+                                                                        </div>
+                                                                        <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-brand-600 shrink-0 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                                                    </a>
+                                                                @endif
+
+                                                                @if(in_array('IA08', $assignedIas, true))
+                                                                    <a href="{{ route('admin.dokumen-muk.export-asesi', ['assessment' => $assessment->id, 'type' => 'ia08']) }}" target="_blank"
+                                                                       class="flex items-center justify-between px-2.5 py-1.5 rounded-lg hover:bg-brand-50 text-slate-700 hover:text-brand-700 transition group text-xs">
+                                                                        <div class="flex items-center gap-2 overflow-hidden">
+                                                                            <span class="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-purple-50 text-purple-700 border border-purple-200 shrink-0">FR.IA.08</span>
+                                                                            <span class="truncate">Ceklis Verifikasi Portofolio (CVP)</span>
+                                                                        </div>
+                                                                        <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-brand-600 shrink-0 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                                                    </a>
+                                                                @endif
+
+                                                                @if(in_array('IA09', $assignedIas, true))
+                                                                    <a href="{{ route('admin.dokumen-muk.export-asesi', ['assessment' => $assessment->id, 'type' => 'ia09']) }}" target="_blank"
+                                                                       class="flex items-center justify-between px-2.5 py-1.5 rounded-lg hover:bg-brand-50 text-slate-700 hover:text-brand-700 transition group text-xs">
+                                                                        <div class="flex items-center gap-2 overflow-hidden">
+                                                                            <span class="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-200 shrink-0">FR.IA.09</span>
+                                                                            <span class="truncate">Pertanyaan Wawancara (PW)</span>
+                                                                        </div>
+                                                                        <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-brand-600 shrink-0 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                                                    </a>
+                                                                @endif
+
+                                                                @if(empty($assignedIas))
+                                                                    <div class="px-2.5 py-2 text-center text-[11px] text-slate-400 italic">
+                                                                        Belum ada instrumen FR.IA yang dipilih di FR.AK.01
                                                                     </div>
-                                                                    <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-brand-600 shrink-0 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-                                                                </a>
-                                                                <a href="{{ route('admin.dokumen-muk.asesi-dynamic', ['assessment' => $assessment->id, 'type' => 'ia01b']) }}" target="_blank"
-                                                                   class="flex items-center justify-between px-2.5 py-1.5 rounded-lg hover:bg-brand-50 text-slate-700 hover:text-brand-700 transition group text-xs">
-                                                                    <div class="flex items-center gap-2 overflow-hidden">
-                                                                        <span class="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 group-hover:bg-brand-100 group-hover:text-brand-700 text-slate-600 shrink-0">FR.IA.01B</span>
-                                                                        <span class="truncate">Report Sheet</span>
-                                                                        @if($hasIa01b)
-                                                                            <span class="px-1.5 py-0.2 rounded text-[9px] font-semibold bg-emerald-100 text-emerald-700">Bukti Ada</span>
-                                                                        @endif
-                                                                    </div>
-                                                                    <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-brand-600 shrink-0 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-                                                                </a>
-                                                                <a href="{{ route('admin.dokumen-muk.asesi-dynamic', ['assessment' => $assessment->id, 'type' => 'ia02']) }}" target="_blank"
-                                                                   class="flex items-center justify-between px-2.5 py-1.5 rounded-lg hover:bg-brand-50 text-slate-700 hover:text-brand-700 transition group text-xs">
-                                                                    <div class="flex items-center gap-2 overflow-hidden">
-                                                                        <span class="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 group-hover:bg-brand-100 group-hover:text-brand-700 text-slate-600 shrink-0">FR.IA.02</span>
-                                                                        <span class="truncate">Tugas Praktik Demonstrasi</span>
-                                                                    </div>
-                                                                    <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-brand-600 shrink-0 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-                                                                </a>
-                                                                <a href="{{ route('admin.dokumen-muk.asesi-dynamic', ['assessment' => $assessment->id, 'type' => 'ia03']) }}" target="_blank"
-                                                                   class="flex items-center justify-between px-2.5 py-1.5 rounded-lg hover:bg-brand-50 text-slate-700 hover:text-brand-700 transition group text-xs">
-                                                                    <div class="flex items-center gap-2 overflow-hidden">
-                                                                        <span class="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 group-hover:bg-brand-100 group-hover:text-brand-700 text-slate-600 shrink-0">FR.IA.03</span>
-                                                                        <span class="truncate">Pertanyaan Lisan</span>
-                                                                    </div>
-                                                                    <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-brand-600 shrink-0 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-                                                                </a>
-                                                                <a href="{{ route('admin.dokumen-muk.asesi-fixed', ['assessment' => $assessment->id, 'type' => 'ia05a']) }}" target="_blank"
-                                                                   class="flex items-center justify-between px-2.5 py-1.5 rounded-lg hover:bg-brand-50 text-slate-700 hover:text-brand-700 transition group text-xs">
-                                                                    <div class="flex items-center gap-2 overflow-hidden">
-                                                                        <span class="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-cyan-50 text-cyan-700 border border-cyan-200 shrink-0">FR.IA.05.A</span>
-                                                                        <span class="truncate">Lembar Soal (Master PDF)</span>
-                                                                    </div>
-                                                                    <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-brand-600 shrink-0 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-                                                                </a>
-                                                                <a href="{{ route('admin.dokumen-muk.asesi-dynamic', ['assessment' => $assessment->id, 'type' => 'ia05c']) }}" target="_blank"
-                                                                   class="flex items-center justify-between px-2.5 py-1.5 rounded-lg hover:bg-brand-50 text-slate-700 hover:text-brand-700 transition group text-xs">
-                                                                    <div class="flex items-center gap-2 overflow-hidden">
-                                                                        <span class="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-cyan-50 text-cyan-700 border border-cyan-200 shrink-0">FR.IA.05.C</span>
-                                                                        <span class="truncate">Lembar Jawaban Asesi</span>
-                                                                    </div>
-                                                                    <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-brand-600 shrink-0 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-                                                                </a>
+                                                                @endif
                                                             </div>
                                                         </div>
 

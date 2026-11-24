@@ -134,15 +134,23 @@
                 <span>MAPA.02</span>
             </a>
 
-            <a href="{{ route('admin.dokumen-muk.fixed', ['schedule' => $schedule->id, 'type' => 'ia02']) }}" target="_blank"
-               class="inline-flex items-center gap-1 px-2.5 py-2 text-xs font-medium bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-lg border border-slate-200 transition min-h-[38px]" title="Fixed Master PDF: FR.IA.02 Tugas Praktik Demonstrasi">
-                <span>IA.02</span>
-            </a>
+            @php
+                $effectiveScheduleIas = $schedule->getEffectiveInstruments();
+            @endphp
 
-            <a href="{{ route('admin.dokumen-muk.fixed', ['schedule' => $schedule->id, 'type' => 'ia05b']) }}" target="_blank"
-               class="inline-flex items-center gap-1 px-2.5 py-2 text-xs font-medium bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-lg border border-slate-200 transition min-h-[38px]" title="Fixed Master PDF: FR.IA.05.B Kunci Jawaban">
-                <span>IA.05.B Kunci</span>
-            </a>
+            @if(in_array('IA02', $effectiveScheduleIas, true))
+                <a href="{{ route('admin.dokumen-muk.fixed', ['schedule' => $schedule->id, 'type' => 'ia02']) }}" target="_blank"
+                   class="inline-flex items-center gap-1 px-2.5 py-2 text-xs font-medium bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-lg border border-slate-200 transition min-h-[38px]" title="Fixed Master PDF: FR.IA.02 Tugas Praktik Demonstrasi">
+                    <span>IA.02</span>
+                </a>
+            @endif
+
+            @if(in_array('IA05', $effectiveScheduleIas, true))
+                <a href="{{ route('admin.dokumen-muk.fixed', ['schedule' => $schedule->id, 'type' => 'ia05b']) }}" target="_blank"
+                   class="inline-flex items-center gap-1 px-2.5 py-2 text-xs font-medium bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-lg border border-slate-200 transition min-h-[38px]" title="Fixed Master PDF: FR.IA.05.B Kunci Jawaban">
+                    <span>IA.05.B Kunci</span>
+                </a>
+            @endif
         </div>
     </div>
 

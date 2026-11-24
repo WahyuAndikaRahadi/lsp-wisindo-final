@@ -673,7 +673,7 @@
          x-transition:leave-end="opacity-0"
          class="fixed inset-0 z-50 overflow-y-auto bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-4"
          @keydown.escape.window="modalOpen = false">
-        <div class="relative w-full max-w-5xl bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-200 flex flex-col max-h-[92vh]"
+        <div class="relative w-full max-w-6xl bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-200 flex flex-col max-h-[94vh]"
              @click.away="modalOpen = false">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between items-start gap-2.5 px-4 sm:px-6 py-3.5 sm:py-4 border-b border-slate-200 bg-slate-50">
                 <div class="flex items-center gap-2 min-w-0">
@@ -691,10 +691,10 @@
             </div>
             <div class="p-4 bg-slate-900/5 flex-1 flex items-center justify-center overflow-auto min-h-[350px]">
                 <template x-if="modalType === 'image'">
-                    <img :src="modalSrc" class="max-h-[78vh] w-auto max-w-full rounded shadow object-contain">
+                    <img :src="modalSrc" class="max-h-[82vh] w-auto max-w-full rounded shadow object-contain">
                 </template>
                 <template x-if="modalType === 'pdf'">
-                    <iframe :src="modalSrc" class="w-full h-[78vh] rounded border border-slate-300 bg-white shadow-inner"></iframe>
+                    <iframe :src="modalSrc" class="w-full h-[85vh] rounded border border-slate-300 bg-white shadow-inner"></iframe>
                 </template>
                 <template x-if="modalType === 'doc'">
                     <div class="text-center p-8 bg-white rounded-xl border border-slate-200 shadow-sm max-w-md mx-auto space-y-4">

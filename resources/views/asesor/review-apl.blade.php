@@ -716,23 +716,28 @@
     </div>
 
     {{-- MODAL LIGHTBOX IMAGE & PDF VIEWER --}}
-    <div x-show="modalOpen" x-cloak class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4">
-        <div @click.away="modalOpen = false" class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full overflow-hidden border border-slate-200 flex flex-col max-h-[92vh]">
+    <div x-show="modalOpen" x-cloak class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4">
+        <div @click.away="modalOpen = false" class="bg-white rounded-2xl shadow-2xl max-w-6xl w-full overflow-hidden border border-slate-200 flex flex-col max-h-[94vh]">
             <div class="px-6 py-4 bg-slate-900 text-white flex items-center justify-between">
                 <div class="flex items-center gap-2 truncate pr-4">
                     <span class="text-sm" x-text="modalType === 'pdf' ? '📄' : (modalType === 'doc' ? '📝' : '🖼️')"></span>
                     <h3 class="text-sm font-bold truncate" x-text="modalTitle">Pratinjau Dokumen</h3>
                 </div>
-                <button type="button" @click="modalOpen = false" class="text-slate-400 hover:text-white p-1 rounded-lg">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                </button>
+                <div class="flex items-center gap-2">
+                    <a :href="modalSrc" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-200 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-lg transition">
+                        <span>Tab Baru ↗</span>
+                    </a>
+                    <button type="button" @click="modalOpen = false" class="text-slate-400 hover:text-white p-1 rounded-lg">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
             </div>
             <div class="p-3 bg-slate-100 flex items-center justify-center overflow-auto flex-1 min-h-[350px]">
                 <template x-if="modalType === 'pdf'">
-                    <iframe :src="modalSrc" class="w-full h-[72vh] rounded-lg border border-slate-300 bg-white" title="Pratinjau Dokumen PDF"></iframe>
+                    <iframe :src="modalSrc" class="w-full h-[85vh] rounded-lg border border-slate-300 bg-white" title="Pratinjau Dokumen PDF"></iframe>
                 </template>
                 <template x-if="modalType === 'image'">
-                    <img :src="modalSrc" alt="Preview Dokumen" class="max-w-full max-h-[70vh] object-contain rounded-lg shadow-sm">
+                    <img :src="modalSrc" alt="Preview Dokumen" class="max-w-full max-h-[82vh] object-contain rounded-lg shadow-sm">
                 </template>
                 <template x-if="modalType === 'doc'">
                     <div class="text-center p-8 bg-white rounded-xl border border-slate-200 shadow-sm max-w-md my-auto">

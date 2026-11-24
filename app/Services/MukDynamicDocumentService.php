@@ -2791,6 +2791,14 @@ class MukDynamicDocumentService
             return $this->exportUploadedIa01b($assessment, $download);
         }
 
+        if (in_array($normType, ['ia08', 'fria08', 'ia09', 'fria09'], true)) {
+            $targetCode = in_array($normType, ['ia08', 'fria08'], true) ? 'ia08' : 'ia09';
+            $data = app(MukExportService::class)->getAsesiExportData($assessment);
+            $data['exportType'] = $targetCode;
+
+            return view("admin.dokumen-muk.export-asesi-{$targetCode}", $data);
+        }
+
         $schedule = $assessment->schedule;
         $asesiName = $assessment->asesi?->full_name ?? 'Asesi';
         $filePath = $this->generateDynamicPdf($docType, $schedule, $assessment);
@@ -2873,71 +2881,114 @@ class MukDynamicDocumentService
             Log::warning("Unified MUK: Gagal generate AK.07: {$e->getMessage()}");
         }
 
-        // 6. FR.IA milik asesi
+        // 6. FR.IA milik asesi (Hanya sertakan instrumen yang dipilih pada FR.AK.01)
         // 6a. FR.IA.01 - Ceklis Observasi
-        try {
-            $filesToMerge[] = $this->generateDynamicPdf('ia01', $schedule, $assessment);
-        } catch (\Throwable $e) {
-            Log::warning("Unified MUK: Gagal generate IA.01: {$e->getMessage()}");
+        if ($assessment->hasAssignedInstrument('IA01')) {
+            try {
+                $filesToMerge[] = $this->generateDynamicPdf('ia01', $schedule, $assessment);
+            } catch (\Throwable $e) {
+                Log::warning("Unified MUK: Gagal generate IA.01: {$e->getMessage()}");
+            }
         }
 
         // 6b. FR.IA.01B - Report Sheet
-        try {
-            $uploadedIa01b = $this->getUploadedIa01bPath($assessment);
-            if ($uploadedIa01b && File::isFile($uploadedIa01b)) {
-                $filesToMerge[] = $uploadedIa01b;
-            } else {
-                $ia01bTpl = $this->getDynamicFilePath($scheme, 'ia01b') ?? $fixedService->getFixedFilePath($scheme, 'ia01b');
-                if ($ia01bTpl && File::isFile($ia01bTpl)) {
-                    $filesToMerge[] = $ia01bTpl;
+        if ($assessment->hasAssignedInstrument('IA01B')) {
+            try {
+                $uploadedIa01b = $this->getUploadedIa01bPath($assessment);
+                if ($uploadedIa01b && File::isFile($uploadedIa01b)) {
+                    $filesToMerge[] = $uploadedIa01b;
+                } else {
+                    $ia01bTpl = $this->getDynamicFilePath($scheme, 'ia01b') ?? $fixedService->getFixedFilePath($scheme, 'ia01b');
+                    if ($ia01bTpl && File::isFile($ia01bTpl)) {
+                        $filesToMerge[] = $ia01bTpl;
+                    }
                 }
+            } catch (\Throwable $e) {
+                Log::warning("Unified MUK: Gagal memuat IA.01B: {$e->getMessage()}");
             }
-        } catch (\Throwable $e) {
-            Log::warning("Unified MUK: Gagal memuat IA.01B: {$e->getMessage()}");
         }
 
         // 6c. FR.IA.02 - Tugas Praktik Demonstrasi
-        try {
-            $filesToMerge[] = $this->generateDynamicPdf('ia02', $schedule, $assessment);
-        } catch (\Throwable $e) {
-            $ia02Fixed = $fixedService->getFixedFilePath($scheme, 'ia02');
-            if ($ia02Fixed && File::isFile($ia02Fixed)) {
-                $filesToMerge[] = $ia02Fixed;
-            } else {
-                Log::warning("Unified MUK: Gagal generate IA.02: {$e->getMessage()}");
+        if ($assessment->hasAssignedInstrument('IA02')) {
+            try {
+                $filesToMerge[] = $this->generateDynamicPdf('ia02', $schedule, $assessment);
+            } catch (\Throwable $e) {
+                $ia02Fixed = $fixedService->getFixedFilePath($scheme, 'ia02');
+                if ($ia02Fixed && File::isFile($ia02Fixed)) {
+                    $filesToMerge[] = $ia02Fixed;
+                } else {
+                    Log::warning("Unified MUK: Gagal generate IA.02: {$e->getMessage()}");
+                }
             }
         }
 
         // 6d. FR.IA.03 - Pertanyaan Lisan
-        try {
-            $filesToMerge[] = $this->generateDynamicPdf('ia03', $schedule, $assessment);
-        } catch (\Throwable $e) {
-            Log::warning("Unified MUK: Gagal generate IA.03: {$e->getMessage()}");
+        if ($assessment->hasAssignedInstrument('IA03')) {
+            try {
+                $filesToMerge[] = $this->generateDynamicPdf('ia03', $schedule, $assessment);
+            } catch (\Throwable $e) {
+                Log::warning("Unified MUK: Gagal generate IA.03: {$e->getMessage()}");
+            }
         }
 
-        // 6e. FR.IA.05.A - Lembar Soal Pilihan Ganda (jika ada pada skema)
-        try {
-            $ia05aPath = $fixedService->getFixedFilePath($scheme, 'ia05a');
-            if ($ia05aPath && File::isFile($ia05aPath)) {
-                $filesToMerge[] = $ia05aPath;
-            } else {
-                $dynIa05a = $this->generateDynamicPdf('ia05a', $schedule, $assessment);
-                if ($dynIa05a && File::isFile($dynIa05a)) {
-                    $filesToMerge[] = $dynIa05a;
+        // 6e & 6f. FR.IA.05 (A & C) - Pilihan Ganda & CBT Asesi (jika dipilih)
+        if ($assessment->hasAssignedInstrument('IA05')) {
+            try {
+                $ia05aPath = $fixedService->getFixedFilePath($scheme, 'ia05a');
+                if ($ia05aPath && File::isFile($ia05aPath)) {
+                    $filesToMerge[] = $ia05aPath;
+                } else {
+                    $dynIa05a = $this->generateDynamicPdf('ia05a', $schedule, $assessment);
+                    if ($dynIa05a && File::isFile($dynIa05a)) {
+                        $filesToMerge[] = $dynIa05a;
+                    }
                 }
+            } catch (\Throwable $e) {
+                Log::info("Unified MUK: IA.05.A dilewati untuk skema {$scheme->name}");
             }
-        } catch (\Throwable $e) {
-            Log::info("Unified MUK: IA.05.A dilewati untuk skema {$scheme->name}");
+
+            try {
+                $dynIa05c = $this->generateDynamicPdf('ia05c', $schedule, $assessment);
+                if ($dynIa05c && File::isFile($dynIa05c)) {
+                    $filesToMerge[] = $dynIa05c;
+                }
+            } catch (\Throwable $e) {
+                Log::info("Unified MUK: IA.05.C dilewati untuk skema {$scheme->name}");
+            }
         }
 
-        // 6f. FR.IA.05.C - Lembar Jawaban CBT Asesi (jika ada pada skema)
-        try {
-            $dynIa05c = $this->generateDynamicPdf('ia05c', $schedule, $assessment);
-            if ($dynIa05c && File::isFile($dynIa05c)) {
-                $filesToMerge[] = $dynIa05c;
+        // 6g. FR.IA.08 - Ceklis Verifikasi Portofolio (jika dipilih)
+        if ($assessment->hasAssignedInstrument('IA08')) {
+            try {
+                $ia08Fixed = $fixedService->getFixedFilePath($scheme, 'ia08');
+                if ($ia08Fixed && File::isFile($ia08Fixed)) {
+                    $filesToMerge[] = $ia08Fixed;
+                } else {
+                    $dynIa08 = $this->generateDynamicPdf('ia08', $schedule, $assessment);
+                    if ($dynIa08 && File::isFile($dynIa08)) {
+                        $filesToMerge[] = $dynIa08;
+                    }
+                }
+            } catch (\Throwable $e) {
+                Log::info("Unified MUK: IA.08 dilewati: {$e->getMessage()}");
             }
-        } catch (\Throwable $e) {
-            Log::info("Unified MUK: IA.05.C dilewati untuk skema {$scheme->name}");
+        }
+
+        // 6h. FR.IA.09 - Pertanyaan Wawancara (jika dipilih)
+        if ($assessment->hasAssignedInstrument('IA09')) {
+            try {
+                $ia09Fixed = $fixedService->getFixedFilePath($scheme, 'ia09');
+                if ($ia09Fixed && File::isFile($ia09Fixed)) {
+                    $filesToMerge[] = $ia09Fixed;
+                } else {
+                    $dynIa09 = $this->generateDynamicPdf('ia09', $schedule, $assessment);
+                    if ($dynIa09 && File::isFile($dynIa09)) {
+                        $filesToMerge[] = $dynIa09;
+                    }
+                }
+            } catch (\Throwable $e) {
+                Log::info("Unified MUK: IA.09 dilewati: {$e->getMessage()}");
+            }
         }
 
         // 7. FR.AK.02 - Rekaman Asesmen Kompetensi
