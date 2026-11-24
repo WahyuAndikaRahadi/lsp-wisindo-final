@@ -86,7 +86,7 @@
         <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 space-y-4">
             <h2 class="text-base font-bold text-slate-900">Jadwal Pelaksanaan & Kuota Peserta</h2>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="block text-sm font-semibold text-slate-700 mb-1">Tanggal Mulai <span class="text-rose-500">*</span></label>
@@ -99,7 +99,6 @@
                     <div>
                         <label class="block text-sm font-semibold text-slate-700 mb-1">Tanggal Selesai</label>
                         <input type="date" name="end_date" value="{{ old('end_date', $jadwal->end_date ? \Carbon\Carbon::parse($jadwal->end_date)->format('Y-m-d') : '') }}" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
-                        <p class="text-[11px] text-slate-400 mt-1">Kosongkan jika 1 hari.</p>
                         @error('end_date')
                             <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
                         @enderror
@@ -123,18 +122,13 @@
                         @enderror
                     </div>
                 </div>
-            </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-3 border-t border-slate-100">
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-1">Perkiraan Jumlah Peserta (Siswa)</label>
                     <input type="number" name="estimated_candidates" min="0" value="{{ old('estimated_candidates', $jadwal->estimated_candidates ?? 0) }}" placeholder="Contoh: 88" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
                     @error('estimated_candidates')
                         <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
                     @enderror
-                </div>
-                <div class="flex items-center text-xs text-slate-500 leading-relaxed">
-                    Dicantumkan pada Surat Tugas Asesor (contoh: <em>88 siswa</em>). Jika diisi 0 atau dikosongkan, sistem akan otomatis mencantumkan jumlah riil asesi yang terdaftar.
                 </div>
             </div>
         </div>

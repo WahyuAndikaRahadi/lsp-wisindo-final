@@ -183,6 +183,33 @@ class SuratTugasAsesorTest extends TestCase
         $response->assertSee($this->schedule->surat_tugas_number);
     }
 
+    public function test_asesor_index_page_does_not_leak_javascript_attributes(): void
+    {
+        $response = $this->actingAs($this->assignedAssessor)
+            ->get(route('asesor.jadwal.index'));
+
+        $response->assertOk();
+        $response->assertSee('initSuratTugasModal');
+        $response->assertDontSee("Gagal memuat dokumen Surat Tugas Asesor. Pastikan Anda memiliki akses ke jadwal ini.</div>'", false);
+    }
+
+    public function test_admin_form_does_not_contain_removed_helper_texts(): void
+    {
+        $createResponse = $this->actingAs($this->admin)
+            ->get(route('admin.jadwal.create'));
+
+        $createResponse->assertOk();
+        $createResponse->assertDontSee('Kosongkan jika 1 hari.');
+        $createResponse->assertDontSee('Dicantumkan pada Surat Tugas Asesor');
+
+        $editResponse = $this->actingAs($this->admin)
+            ->get(route('admin.jadwal.edit', $this->schedule->id));
+
+        $editResponse->assertOk();
+        $editResponse->assertDontSee('Kosongkan jika 1 hari.');
+        $editResponse->assertDontSee('Dicantumkan pada Surat Tugas Asesor');
+    }
+
     public function test_director_name_and_signature_sourced_from_super_admin(): void
     {
         $superAdmin = User::create([

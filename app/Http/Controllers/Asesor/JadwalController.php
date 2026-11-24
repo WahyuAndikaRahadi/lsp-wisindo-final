@@ -99,11 +99,7 @@ class JadwalController extends Controller
 
     public function suratTugas(Request $request, Schedule $schedule): View
     {
-        $user = auth()->user();
-
-        // Check if the assessor is assigned to this schedule
-        $isAssigned = $schedule->assessors()->where('users.id', $user->id)->exists();
-        abort_unless($isAssigned, 403, 'Anda tidak ditugaskan pada jadwal asesmen ini.');
+        $this->authorizeAssessorSchedule($schedule);
 
         $schedule->load(['scheme', 'assessors', 'assessments']);
 

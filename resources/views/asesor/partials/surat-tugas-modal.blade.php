@@ -1,52 +1,64 @@
-<div x-data="{
-        suratTugasOpen: false,
-        suratTugasLoading: false,
-        suratTugasHtml: '',
-        currentScheduleId: null,
-        openModal(id) {
-            this.currentScheduleId = id;
-            this.suratTugasOpen = true;
-            this.suratTugasLoading = true;
-            this.suratTugasHtml = '';
-            
-            fetch(`/asesor/schedule/${id}/surat-tugas?modal=1`, {
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'Accept': 'text/html'
+<script>
+    if (typeof window.initSuratTugasModal !== 'function') {
+        window.initSuratTugasModal = function () {
+            return {
+                suratTugasOpen: false,
+                suratTugasLoading: false,
+                suratTugasError: false,
+                suratTugasHtml: '',
+                currentScheduleId: null,
+                openModal(id) {
+                    this.currentScheduleId = id;
+                    this.suratTugasOpen = true;
+                    this.suratTugasLoading = true;
+                    this.suratTugasError = false;
+                    this.suratTugasHtml = '';
+                    
+                    fetch(`/asesor/schedule/${id}/surat-tugas?modal=1`, {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'text/html'
+                        }
+                    })
+                    .then(res => {
+                        if (!res.ok) {
+                            throw new Error('Gagal memuat dokumen');
+                        }
+                        return res.text();
+                    })
+                    .then(html => {
+                        this.suratTugasHtml = html;
+                        this.suratTugasLoading = false;
+                    })
+                    .catch(err => {
+                        this.suratTugasError = true;
+                        this.suratTugasLoading = false;
+                    });
+                },
+                printDoc() {
+                    if (!this.currentScheduleId) return;
+                    let iframe = document.getElementById('print-surat-tugas-frame');
+                    if (!iframe) {
+                        iframe = document.createElement('iframe');
+                        iframe.id = 'print-surat-tugas-frame';
+                        iframe.style.position = 'fixed';
+                        iframe.style.right = '0';
+                        iframe.style.bottom = '0';
+                        iframe.style.width = '0';
+                        iframe.style.height = '0';
+                        iframe.style.border = '0';
+                        document.body.appendChild(iframe);
+                    }
+                    iframe.src = `/asesor/schedule/${this.currentScheduleId}/surat-tugas?autoprint=1`;
                 }
-            })
-            .then(res => {
-                if (!res.ok) throw new Error('Gagal memuat dokumen');
-                return res.text();
-            })
-            .then(html => {
-                this.suratTugasHtml = html;
-                this.suratTugasLoading = false;
-            })
-            .catch(err => {
-                this.suratTugasHtml = '<div class=\"p-6 text-center text-rose-600 font-semibold text-xs\">Gagal memuat dokumen Surat Tugas Asesor. Pastikan Anda memiliki akses ke jadwal ini.</div>';
-                this.suratTugasLoading = false;
-            });
-        },
-        printDoc() {
-            if (!this.currentScheduleId) return;
-            let iframe = document.getElementById('print-surat-tugas-frame');
-            if (!iframe) {
-                iframe = document.createElement('iframe');
-                iframe.id = 'print-surat-tugas-frame';
-                iframe.style.position = 'fixed';
-                iframe.style.right = '0';
-                iframe.style.bottom = '0';
-                iframe.style.width = '0';
-                iframe.style.height = '0';
-                iframe.style.border = '0';
-                document.body.appendChild(iframe);
-            }
-            iframe.src = `/asesor/schedule/${this.currentScheduleId}/surat-tugas?autoprint=1`;
-        }
-    }"
-    @open-surat-tugas.window="openModal($event.detail.scheduleId)"
-    @keydown.escape.window="suratTugasOpen = false">
+            };
+        };
+    }
+</script>
+
+<div x-data="window.initSuratTugasModal()"
+     @open-surat-tugas.window="openModal($event.detail.scheduleId)"
+     @keydown.escape.window="suratTugasOpen = false">
 
     {{-- Modal Overlay & Container --}}
     <div x-show="suratTugasOpen" 
@@ -73,7 +85,7 @@
                 <div class="flex items-center space-x-2">
                     <button type="button"
                             @click="printDoc()"
-                            :disabled="suratTugasLoading"
+                            :disabled="suratTugasLoading || suratTugasError"
                             class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-600 hover:bg-brand-500 disabled:opacity-50 text-white text-xs font-bold rounded-lg shadow-xs transition cursor-pointer"
                             title="Cetak Surat Tugas">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -101,8 +113,19 @@
                     <p class="text-xs text-slate-500 font-medium">Memuat dokumen resmi Surat Tugas Asesor...</p>
                 </div>
 
+                {{-- Error State --}}
+                <div x-show="!suratTugasLoading && suratTugasError" class="py-12 px-6 text-center space-y-2 bg-white rounded-xl border border-rose-200">
+                    <div class="w-10 h-10 mx-auto rounded-full bg-rose-50 text-rose-600 flex items-center justify-center">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
+                    </div>
+                    <p class="text-xs font-bold text-rose-700">Gagal memuat dokumen Surat Tugas Asesor</p>
+                    <p class="text-[11px] text-slate-500">Pastikan Anda memiliki hak akses penugasan pada jadwal asesmen ini.</p>
+                </div>
+
                 {{-- Document Paper Container --}}
-                <div x-show="!suratTugasLoading" 
+                <div x-show="!suratTugasLoading && !suratTugasError" 
                      class="bg-white rounded-xl shadow-md border border-slate-200 p-4 sm:p-8 max-w-3xl mx-auto overflow-x-auto"
                      x-html="suratTugasHtml">
                 </div>
@@ -119,7 +142,8 @@
                     </button>
                     <button type="button" 
                             @click="printDoc()" 
-                            class="px-3.5 py-1.5 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-lg text-xs transition shadow-2xs flex items-center gap-1.5 cursor-pointer">
+                            :disabled="suratTugasLoading || suratTugasError"
+                            class="px-3.5 py-1.5 bg-brand-600 hover:bg-brand-700 disabled:opacity-50 text-white font-bold rounded-lg text-xs transition shadow-2xs flex items-center gap-1.5 cursor-pointer">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
                         </svg>
