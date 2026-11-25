@@ -18,6 +18,16 @@
             el.checked = true;
             el.dispatchEvent(new Event('change', { bubbles: true }));
         });
+        const summaryText = target === 'ya' ? 'Sesuai' : 'Tidak Sesuai';
+        document.querySelectorAll('textarea[name*="[candidate_answer_summary]"]').forEach(el => {
+            el.value = summaryText;
+            el.dispatchEvent(new Event('input', { bubbles: true }));
+        });
+        if (target === 'ya') {
+            this.recommendation = 'K';
+        } else if (target === 'tidak') {
+            this.recommendation = 'BK';
+        }
     }
 }">
     @if($isScheduleClosed)

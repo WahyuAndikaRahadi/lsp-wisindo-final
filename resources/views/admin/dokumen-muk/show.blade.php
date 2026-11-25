@@ -135,17 +135,6 @@
                 <span>FR.AK.06 (Tinjauan)</span>
             </a>
 
-            {{-- Fixed Master PDF --}}
-            <a href="{{ route('admin.dokumen-muk.fixed', ['schedule' => $schedule->id, 'type' => 'cover']) }}" target="_blank"
-               class="inline-flex items-center gap-1 px-2.5 py-2 text-xs font-medium bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-lg border border-slate-200 transition min-h-[38px]" title="Fixed Master PDF: Cover MUK">
-                <span>Cover</span>
-            </a>
-
-            <a href="{{ route('admin.dokumen-muk.fixed', ['schedule' => $schedule->id, 'type' => 'daftar-periksa']) }}" target="_blank"
-               class="inline-flex items-center gap-1 px-2.5 py-2 text-xs font-medium bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-lg border border-slate-200 transition min-h-[38px]" title="Fixed Master PDF: Daftar Periksa">
-                <span>Periksa</span>
-            </a>
-
             <a href="{{ route('admin.dokumen-muk.dynamic', ['schedule' => $schedule->id, 'type' => 'mapa01']) }}" target="_blank"
                class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 rounded-lg shadow-2xs transition min-h-[38px]" title="FR.MAPA.01 Merencanakan Aktivitas dan Proses Asesmen (Data Asesor)">
                 <span>FR.MAPA.01</span>

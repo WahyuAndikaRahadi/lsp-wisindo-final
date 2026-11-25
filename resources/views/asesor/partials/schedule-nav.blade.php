@@ -68,16 +68,6 @@
             <span class="hidden sm:inline">Jadwal</span>
         </a>
 
-        <button type="button"
-                @click="$dispatch('open-surat-tugas', { scheduleId: {{ $schedule->id }} })"
-                class="inline-flex items-center space-x-1.5 px-3 py-2 text-xs font-bold text-slate-700 bg-slate-50 hover:bg-slate-100 hover:text-slate-900 border border-slate-200 rounded-lg transition mr-1 shrink-0 cursor-pointer"
-                title="Buka Dokumen Resmi Surat Tugas Asesor">
-            <svg class="w-4 h-4 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-            </svg>
-            <span>Surat Tugas</span>
-        </button>
-
         @php
             $isClosedForMe = $schedule->isClosedForAssessor();
         @endphp
@@ -114,5 +104,3 @@
         @endforeach
     </div>
 </div>
-
-@include('asesor.partials.surat-tugas-modal')
