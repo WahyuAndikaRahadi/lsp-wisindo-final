@@ -191,6 +191,8 @@ class BnspBlangkoExportTest extends TestCase
 
         $response->assertOk();
         $response->assertHeader('Content-Type', 'application/vnd.ms-excel; charset=UTF-8');
+        $response->assertHeader('Content-Disposition', 'attachment; filename="'.$this->schedule->name.'.xls"');
+        $this->assertStringNotContainsString('REKAP-ASESI', (string) $response->headers->get('Content-Disposition'));
 
         $content = $response->getContent();
 

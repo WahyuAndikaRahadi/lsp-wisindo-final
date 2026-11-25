@@ -232,7 +232,7 @@
                  x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                  class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-slate-200">
                 
-                <form action="{{ route('admin.dokumen-muk.export-excel-biodata', $schedule->id) }}" method="GET" target="_blank" @submit="exportModalOpen = false">
+                <form action="{{ route('admin.dokumen-muk.export-excel-biodata', $schedule->id) }}" method="GET" data-no-loading="true" @submit="exportModalOpen = false; if (window.Notiflix && Notiflix.Notify) { Notiflix.Notify.info('Mengunduh berkas Excel permohonan blangko...'); }">
                     <input type="hidden" name="kode_sumber_anggaran" :value="sumberAnggaran">
                     <input type="hidden" name="kode_kementerian" :value="kementerianCode">
 

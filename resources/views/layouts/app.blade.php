@@ -888,6 +888,11 @@
                     return false;
                 }
 
+                // Skip double-submit lock and loading pulse for data-no-loading forms (e.g. downloads, filters)
+                if (form.hasAttribute('data-no-loading')) {
+                    return;
+                }
+
                 if (form.dataset.submitting === 'true') {
                     e.preventDefault();
                     return false;
@@ -896,7 +901,6 @@
                 form.dataset.submitting = 'true';
 
                 // Contextual Loading Pulse
-                if (!form.hasAttribute('data-no-loading')) {
                     var loadingText = form.getAttribute('data-loading-text') ||
                         (e.submitter && e.submitter.getAttribute('data-loading-text'));
 

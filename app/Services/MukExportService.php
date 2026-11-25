@@ -193,11 +193,14 @@ class MukExportService
         ]);
 
         $xml = $this->generateAsesiSpreadsheetXml($schedule->assessments, $schedule, $options);
-        $filename = 'REKAP-ASESI-'.preg_replace('/[^A-Za-z0-9_-]/', '_', $schedule->code ?: $schedule->id).'.xls';
+        $rawScheduleName = trim((string) ($schedule->name ?: $schedule->code ?: 'Jadwal_'.$schedule->id));
+        $cleanScheduleName = preg_replace('~[/\\\\:*?"<>|;]+~', ' ', $rawScheduleName);
+        $cleanScheduleName = trim(preg_replace('/\s+/', ' ', $cleanScheduleName));
+        $filename = ($cleanScheduleName ?: 'Jadwal_'.$schedule->id).'.xls';
 
         return response($xml, 200, [
             'Content-Type' => 'application/vnd.ms-excel; charset=UTF-8',
-            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
+            'Content-Disposition' => 'attachment; filename="'.str_replace('"', '', $filename).'"',
             'Cache-Control' => 'max-age=0',
         ]);
     }
