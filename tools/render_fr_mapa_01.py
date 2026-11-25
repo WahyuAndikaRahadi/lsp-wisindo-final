@@ -883,6 +883,12 @@ def render_mapa_overlay(master_pdf_path, data, dest_path):
     # Tidak mengubah nama siapapun dan tidak memasukkan tanda tangan asesor/sistem.
 
     os.makedirs(os.path.dirname(os.path.abspath(dest_path)), exist_ok=True)
+    meta = doc.metadata or {}
+    meta["title"] = f"FR.MAPA.01 ({asesi_name})" if asesi_name else f"FR.MAPA.01 - {skema_nama}"
+    meta["author"] = "LSP PrO Indo"
+    meta["subject"] = "FR.MAPA.01 Merencanakan Aktivitas dan Proses Asesmen"
+    meta["creator"] = "LSP PrO Indo MUK System"
+    doc.set_metadata(meta)
     doc.save(dest_path, deflate=True)
     doc.close()
     print(f"OK -> Berhasil generate FR.MAPA.01: {dest_path}")

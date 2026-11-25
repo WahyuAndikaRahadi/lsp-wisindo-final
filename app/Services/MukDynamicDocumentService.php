@@ -1158,6 +1158,34 @@ class MukDynamicDocumentService
     }
 
     /**
+     * Build specific payload for FR.MAPA.02 (Peta Instrumen Asesmen).
+     */
+    public function buildMapa02Data(Schedule $schedule, ?Assessment $assessment = null): array
+    {
+        $schedule->loadMissing(['scheme.competencyUnits', 'assessors']);
+        $scheme = $assessment?->scheme ?? $schedule->scheme;
+        $mapaData = $assessment?->mapa01_data ?? $schedule->mapa01_data ?? [];
+        $ak01Data = $assessment?->ak01_data ?? $schedule->ak01_data ?? [];
+
+        $effectiveInstruments = $schedule->getEffectiveInstruments();
+        if (empty($effectiveInstruments)) {
+            $effectiveInstruments = $ak01Data['selected_instruments'] ?? $schedule->selected_instruments ?? [];
+        }
+
+        $pendekatan = $mapaData['pendekatan_asesi'] ?? 'Hasil pelatihan dan / atau pendidikan, dimana Kurikulum dan fasilitas praktek mampu telusur terhadap standar kompetensi';
+
+        return [
+            'schedule_id' => $schedule->id,
+            'skema_nama' => $scheme?->name ?? 'Engine Junior Technician',
+            'skema_nomor' => $scheme?->code ?? '01/LSP PrO Indo/I/2026',
+            'selected_instruments' => $effectiveInstruments,
+            'potensi_asesi' => $pendekatan,
+            'pendekatan_asesi' => $pendekatan,
+            'mapa_data' => $mapaData,
+        ];
+    }
+
+    /**
      * Build specific payload for FR.AK.07 (Ceklis Penyesuaian yang Wajar dan Beralasan).
      */
     public function buildAk07Data(Schedule $schedule, Assessment $assessment): array
@@ -2837,6 +2865,18 @@ class MukDynamicDocumentService
                 }
             }
 
+            if (in_array($normType, ['mapa02', 'frmapa02', 'mapa2'], true)) {
+                $script = base_path('tools/render_fr_mapa_02.py');
+                if (File::isFile($script)) {
+                    $mapa02Payload = $this->buildMapa02Data($schedule, $assessment);
+                    $masterPdf = app(MukFixedDocumentService::class)->getFixedFilePath($schedule->scheme, 'mapa02')
+                        ?? base_path('lsp-document-fixed/MUK SKEMA 1 Engine Junior Technician/4. FR.MAPA.02. Peta Instrumen Asesmen.pdf');
+                    if ($this->runGeneratorWithPayload($python, $script, $mapa02Payload, 'muk_mapa02', $outputPath, $normType, $masterPdf)) {
+                        return $outputPath;
+                    }
+                }
+            }
+
             if ($normType === 'ak01') {
                 $script = base_path('tools/render_fr_ak_01.py');
                 if (File::isFile($script)) {
@@ -3075,6 +3115,8 @@ class MukDynamicDocumentService
                 'mapa01' => 'tests/Fixtures/muk/FR_MAPA_01_generated.pdf',
                 'mapa' => 'tests/Fixtures/muk/FR_MAPA_01_generated.pdf',
                 'frmapa01' => 'tests/Fixtures/muk/FR_MAPA_01_generated.pdf',
+                'mapa02' => 'tests/Fixtures/muk/FR_MAPA_02_generated.pdf',
+                'frmapa02' => 'tests/Fixtures/muk/FR_MAPA_02_generated.pdf',
                 'ak01' => 'tests/Fixtures/muk/FR_AK_01_generated.pdf',
                 'ak02' => 'tests/Fixtures/muk/FR_AK_02_generated.pdf',
                 'ak03' => 'tests/Fixtures/muk/FR_AK_03_generated.pdf',
@@ -3193,7 +3235,12 @@ class MukDynamicDocumentService
     public function exportSchedule(Schedule $schedule, string $docType, bool $download = false): BinaryFileResponse
     {
         $filePath = $this->generateDynamicPdf($docType, $schedule);
-        $filename = strtoupper(str_replace(['_', ' '], '-', $docType)).'-'.preg_replace('/[^A-Za-z0-9_-]/', '_', $schedule->name).'.pdf';
+        $norm = strtolower(str_replace(['_', ' ', '-', '.'], '', $docType));
+        if (in_array($norm, ['mapa02', 'frmapa02', 'mapa2'], true)) {
+            $filename = 'FR.MAPA.02 Peta Instrumen Asesmen - '.preg_replace('/[^A-Za-z0-9_-]/', '_', $schedule->scheme?->name ?? $schedule->name).'.pdf';
+        } else {
+            $filename = strtoupper(str_replace(['_', ' '], '-', $docType)).'-'.preg_replace('/[^A-Za-z0-9_-]/', '_', $schedule->name).'.pdf';
+        }
 
         return response()->file($filePath, [
             'Content-Type' => 'application/pdf',
@@ -3223,6 +3270,10 @@ class MukDynamicDocumentService
             $filename = "FR.IA.08 ({$asesiName}).pdf";
         } elseif (in_array($norm, ['ia09', 'fria09', 'pw'], true)) {
             $filename = "FR.IA.09 ({$asesiName}).pdf";
+        } elseif (in_array($norm, ['ak02', 'frak02'], true)) {
+            $filename = "FR.AK.02 ({$asesiName}).pdf";
+        } elseif (in_array($norm, ['mapa02', 'frmapa02', 'mapa2'], true)) {
+            $filename = "FR.MAPA.02 ({$asesiName}).pdf";
         } else {
             $filename = strtoupper(str_replace(['_', ' '], '-', $docType)).'-'.preg_replace('/[^A-Za-z0-9_-]/', '_', $asesiName).'.pdf';
         }

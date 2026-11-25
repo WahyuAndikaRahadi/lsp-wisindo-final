@@ -166,7 +166,7 @@ class DokumenMukController extends Controller
             }
         }
 
-        if (in_array($targetType, ['ak05', 'ak06', 'mapa', 'mapa01'], true) || $request->query('source') === 'dynamic' || ($request->query('format') === 'pdf' && in_array($targetType, ['ba', 'hadir-asesor', 'hadir-asesi', 'mapa', 'mapa01'], true))) {
+        if ($request->query('format') !== 'html' && (in_array($targetType, ['ak05', 'ak06', 'mapa', 'mapa01', 'mapa02', 'frmapa02'], true) || $request->query('source') === 'dynamic' || ($request->query('format') === 'pdf' && in_array($targetType, ['ba', 'hadir-asesor', 'hadir-asesi', 'mapa', 'mapa01', 'mapa02', 'frmapa02'], true)))) {
             return $this->dynamicService->exportSchedule($schedule, $targetType, $request->boolean('download'));
         }
 
@@ -256,8 +256,8 @@ class DokumenMukController extends Controller
             return $this->exporter->exportAssessmentAsesiXls($assessment);
         }
 
-        $dynamicTypes = ['apl01', 'apl02', 'ak01', 'ak02', 'ak03', 'ak04', 'ak05', 'ak07', 'ia01', 'ia01b', 'ia02', 'ia03', 'ia05a', 'ia05c', 'ia08', 'ia09', 'pernyataan', 'mapa', 'mapa01', 'frmapa01'];
-        if ($request->query('format') !== 'html' && (in_array($targetType, ['ia08', 'ia09', 'ia01b', 'ak05', 'mapa', 'mapa01', 'frmapa01'], true) || $request->query('source') === 'dynamic' || ($request->query('format') === 'pdf' && in_array($targetType, $dynamicTypes, true)))) {
+        $dynamicTypes = ['apl01', 'apl02', 'ak01', 'ak02', 'ak03', 'ak04', 'ak05', 'ak07', 'ia01', 'ia01b', 'ia02', 'ia03', 'ia05a', 'ia05c', 'ia08', 'ia09', 'pernyataan', 'mapa', 'mapa01', 'frmapa01', 'mapa02', 'frmapa02'];
+        if ($request->query('format') !== 'html' && (in_array($targetType, ['ia08', 'ia09', 'ia01b', 'ak05', 'mapa', 'mapa01', 'frmapa01', 'mapa02', 'frmapa02'], true) || $request->query('source') === 'dynamic' || ($request->query('format') === 'pdf' && in_array($targetType, $dynamicTypes, true)))) {
             return $this->dynamicService->exportAssessment($assessment, $targetType, $request->boolean('download'));
         }
 
@@ -377,7 +377,7 @@ class DokumenMukController extends Controller
     {
         $download = $request->boolean('download', false);
         $normType = strtolower(str_replace(['_', ' ', '-', '.'], '', $type));
-        if (in_array($normType, ['ia05c', 'fria05c'], true)) {
+        if (in_array($normType, ['ia05c', 'fria05c', 'mapa02', 'frmapa02', 'mapa2'], true)) {
             return $this->dynamicService->exportSchedule($schedule, $normType, $download);
         }
 
@@ -396,7 +396,7 @@ class DokumenMukController extends Controller
 
         $download = $request->boolean('download', false);
         $normType = strtolower(str_replace(['_', ' ', '-', '.'], '', $type));
-        if (in_array($normType, ['ia05c', 'fria05c'], true)) {
+        if (in_array($normType, ['ia05c', 'fria05c', 'mapa02', 'frmapa02', 'mapa2'], true)) {
             return $this->dynamicService->exportAssessment($assessment, $normType, $download);
         }
 

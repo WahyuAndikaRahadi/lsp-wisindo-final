@@ -359,4 +359,34 @@ class DynamicDokumenMukTest extends TestCase
         $this->assertEquals([$elem->id], $savedIa08->data_json['clarification_elements']);
         $this->assertEquals('K', $savedIa08->data_json['recommendation']);
     }
+
+    public function test_admin_can_export_dynamic_mapa02_from_fixed_route(): void
+    {
+        $response = $this->actingAs($this->admin)
+            ->get(route('admin.dokumen-muk.fixed', [
+                'schedule' => $this->schedule->id,
+                'type' => 'mapa02',
+            ]));
+
+        $response->assertOk();
+        $this->assertStringContainsString('application/pdf', $response->headers->get('Content-Type') ?? '');
+        $this->assertStringContainsString('FR.MAPA.02', $response->headers->get('Content-Disposition') ?? '');
+    }
+
+    public function test_mapa02_html_view_displays_all_5_potensi_asesi_categories(): void
+    {
+        $response = $this->actingAs($this->admin)
+            ->get(route('admin.dokumen-muk.export', [
+                'schedule' => $this->schedule->id,
+                'type' => 'mapa02',
+                'format' => 'html',
+            ]));
+
+        $response->assertOk();
+        $response->assertSee('Hasil pelatihan/pendidikan (berbasis kompetensi)');
+        $response->assertSee('Hasil pelatihan/pendidikan (belum berbasis kompetensi)');
+        $response->assertSee('Pekerja berpengalaman (tempat kerja berbasis kompetensi)');
+        $response->assertSee('Pekerja berpengalaman (tempat kerja belum berbasis kompetensi)');
+        $response->assertSee('Pelatihan/belajar mandiri (otodidak)');
+    }
 }

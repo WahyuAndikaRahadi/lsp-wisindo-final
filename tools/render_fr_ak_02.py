@@ -690,6 +690,12 @@ def render_master_overlay(master_pdf_path, data, dest_path):
                 shape_sig.commit()
 
     os.makedirs(os.path.dirname(os.path.abspath(dest_path)), exist_ok=True)
+    meta = doc.metadata or {}
+    meta["title"] = f"FR.AK.02 ({asesi_name})" if asesi_name else "FR.AK.02 Rekaman Asesmen Kompetensi"
+    meta["author"] = "LSP PrO Indo"
+    meta["subject"] = "FR.AK.02 Rekaman Asesmen Kompetensi"
+    meta["creator"] = "LSP PrO Indo MUK System"
+    doc.set_metadata(meta)
     doc.save(dest_path)
     doc.close()
     print(f"OK -> Sukses generate FR.AK.02 (Multi-Scheme Master Overlay {total_pages} Halaman): {dest_path}")
