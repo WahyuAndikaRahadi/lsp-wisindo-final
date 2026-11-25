@@ -64,9 +64,9 @@ def draw_header_box(canvas_obj):
     x0 = MARGIN  # 36.0
     x1 = PAGE_W - MARGIN  # 559.27
     box_w = x1 - x0  # 523.27
-    box_h = 58.0
+    box_h = 56.0
     top_y = PAGE_H - 24.0  # 817.89
-    bot_y = top_y - box_h  # 759.89
+    bot_y = top_y - box_h  # 761.89
 
     # Outer border
     canvas_obj.setLineWidth(0.65)
@@ -74,7 +74,7 @@ def draw_header_box(canvas_obj):
     canvas_obj.rect(x0, bot_y, box_w, box_h, fill=0, stroke=1)
 
     # Vertical divider line
-    div_w = 78.0
+    div_w = 88.0
     x_div = x0 + div_w
     canvas_obj.line(x_div, bot_y, x_div, top_y)
 
@@ -84,8 +84,8 @@ def draw_header_box(canvas_obj):
             im = Image.open(LOGO_PATH)
             im_w, im_h = im.size
             aspect = float(im_w) / float(im_h) if im_h > 0 else 1.13
-            logo_h = 48.0
-            logo_w = logo_h * aspect  # ~54.2 pt
+            logo_h = 44.0
+            logo_w = logo_h * aspect  # ~49.7 pt
             logo_x = x0 + (div_w - logo_w) / 2.0
             logo_y = bot_y + (box_h - logo_h) / 2.0
             canvas_obj.drawImage(LOGO_PATH, logo_x, logo_y, width=logo_w, height=logo_h, mask='auto')
@@ -93,8 +93,8 @@ def draw_header_box(canvas_obj):
             pass
 
     # Title in right compartment
-    header_html = '<font size="12" name="Cal"><b>L</b>embaga <b>S</b>ertifikasi <b>P</b>rofesi <b>P</b>raktisi <b>O</b>tomotif &nbsp;<b>LSP-PrO Indo</b></font>'
-    s_kop = ParagraphStyle('HeaderKopBox', fontName='Cal', fontSize=12, leading=15, alignment=1)
+    header_html = '<font size="11.5" name="Cal"><b>L</b>embaga <b>S</b>ertifikasi <b>P</b>rofesi <b>P</b>raktisi <b>O</b>tomotif &nbsp;&nbsp;<b>LSP-PrO Indo</b></font>'
+    s_kop = ParagraphStyle('HeaderKopBox', fontName='Cal', fontSize=11.5, leading=15, alignment=1)
     p = Paragraph(header_html, s_kop)
     avail_w = x1 - x_div - 8.0
     w, h = p.wrap(avail_w, box_h)
@@ -231,6 +231,9 @@ def get_static_signature_flowable(img_filename, target_h=30.0, max_w=85.0):
 
 def generate_pdf(data, output_path):
     """Build the FR.IA.09 PDF document with Kop on every page, larger font size, and no footer."""
+    asesi_nama = data.get("asesi_nama", "Asesi")
+    doc_title = f"FR.IA.09 ({asesi_nama})"
+
     doc = SimpleDocTemplate(
         output_path,
         pagesize=(PAGE_W, PAGE_H),
@@ -238,6 +241,8 @@ def generate_pdf(data, output_path):
         rightMargin=MARGIN,
         topMargin=92.0,
         bottomMargin=30.0,
+        title=doc_title,
+        author="LSP PrO Indo",
     )
 
     base_styles = getSampleStyleSheet()
@@ -449,6 +454,7 @@ def generate_pdf(data, output_path):
         ]
     ]
 
+    is_assessed = data.get("is_assessed", True)
     chk = '<font name="Cal-B" size="12"><b>\u221a</b></font>'
 
     for idx, q in enumerate(questions):
@@ -457,13 +463,11 @@ def generate_pdf(data, output_path):
         q_text = q.get("question_text", "")
         q_desc = f"{evidence_ctx} {q_text}" if q_text else evidence_ctx
 
-        ans_summary = q.get("candidate_answer_summary")
-        if not ans_summary:
-            ans_summary = "Asesi menjelaskan dengan benar dan sesuai SOP manual perbaikan."
+        ans_summary = (q.get("candidate_answer_summary") or "") if is_assessed else ""
 
-        is_achieved_val = str(q.get("is_achieved", "YA")).upper()
-        is_ya = is_achieved_val in ["YA", "1", "TRUE", "K"]
-        is_tidak = is_achieved_val in ["TIDAK", "TDK", "0", "FALSE", "BK"]
+        is_achieved_val = str(q.get("is_achieved") or "").upper() if is_assessed else ""
+        is_ya = is_assessed and (is_achieved_val in ["YA", "1", "TRUE", "K"])
+        is_tidak = is_assessed and (is_achieved_val in ["TIDAK", "TDK", "0", "FALSE", "BK"])
 
         ya_icon = chk if is_ya else ""
         tidak_icon = chk if is_tidak else ""
@@ -499,7 +503,7 @@ def generate_pdf(data, output_path):
     asesi_sig_data = data.get("signature_asesi")
     asesor_sig_data = data.get("signature_asesor")
     tgl_asesi = data.get("tanggal_ttd_asesi") or tanggal
-    tgl_asesor = data.get("tanggal_ttd_asesor") or tanggal
+    tgl_asesor = data.get("tanggal_ttd_asesor") or (tanggal if data.get("is_assessed", True) else "........................")
     asesor_no_reg = data.get("asesor_no_reg") or "-"
 
     asesi_sig_clean = clean_signature_image(asesi_sig_data)
@@ -511,7 +515,7 @@ def generate_pdf(data, output_path):
     else:
         asesi_sig_flowable = Spacer(1, 35)
 
-    asesor_sig_clean = clean_signature_image(asesor_sig_data)
+    asesor_sig_clean = clean_signature_image(asesor_sig_data) if is_assessed else None
     if asesor_sig_clean:
         try:
             asesor_sig_flowable = RLImage(io.BytesIO(asesor_sig_clean), width=105, height=36)
@@ -652,6 +656,19 @@ def generate_pdf(data, output_path):
     story.append(KeepTogether(footer_flowables))
 
     doc.build(story, canvasmaker=HeaderEveryPageCanvas)
+
+    try:
+        import pymupdf as fitz
+        fdoc = fitz.open(output_path)
+        meta = fdoc.metadata or {}
+        meta["title"] = doc_title
+        meta["author"] = "LSP PrO Indo"
+        fdoc.set_metadata(meta)
+        fdoc.save(output_path, incremental=True, encryption=fitz.PDF_ENCRYPT_KEEP)
+        fdoc.close()
+    except Exception:
+        pass
+
     return output_path
 
 

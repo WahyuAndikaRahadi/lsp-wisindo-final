@@ -1,6 +1,6 @@
 @extends('layouts.print-muk')
 
-@section('title', 'FR.IA.09 Pertanyaan Wawancara - ' . $asesi->full_name)
+@section('title', 'FR.IA.09 (' . $asesi->full_name . ')')
 @section('doc-title', 'FR.IA.09 Pertanyaan Wawancara')
 
 @section('content')
@@ -8,7 +8,10 @@
     $ia09Response = $iaResponses->firstWhere('instrument_code', 'IA09');
     $savedData = is_array($ia09Response?->data_json) ? $ia09Response->data_json : (json_decode($ia09Response?->data_json ?? '[]', true) ?: []);
     $savedQuestionsData = $savedData['questions'] ?? [];
-    $recommendation = $savedData['recommendation'] ?? 'K';
+    $isAssessed = ! empty($ia09Response?->assessor_signed_at)
+        || (! empty($ia09Response?->assessor_signature))
+        || (! empty($savedQuestionsData) && collect($savedQuestionsData)->contains(fn ($q) => ! empty($q['candidate_answer_summary']) || ! empty($q['is_achieved'])));
+    $recommendation = $isAssessed ? ($savedData['recommendation'] ?? '') : '';
 
     // Fetch questions from database for this scheme
     $dbQuestions = \App\Models\InterviewQuestion::where('scheme_id', $scheme->id)->active()->ordered()->get();
@@ -116,9 +119,10 @@
             @forelse($dbQuestions as $idx => $q)
                 @php
                     $savedQ = $savedQuestionsData[$q->id] ?? [];
-                    $ansSummary = $savedQ['candidate_answer_summary'] ?? 'Asesi menjelaskan dengan benar dan sesuai SOP manual perbaikan.';
-                    $achieved = strtoupper((string)($savedQ['is_achieved'] ?? 'YA'));
-                    $isYa = in_array($achieved, ['YA', '1', 'TRUE']);
+                    $ansSummary = $isAssessed ? ($savedQ['candidate_answer_summary'] ?? ($q->expected_answer ?: '')) : '';
+                    $achieved = $isAssessed ? strtoupper((string)($savedQ['is_achieved'] ?? '')) : '';
+                    $isYa = $isAssessed && in_array($achieved, ['YA', '1', 'TRUE', 'K']);
+                    $isTidak = $isAssessed && in_array($achieved, ['TIDAK', 'TDK', '0', 'FALSE', 'BK']);
                 @endphp
                 <tr>
                     <td style="border: 1px solid #000; text-align: center; font-weight: bold; vertical-align: top; padding: 4px;">
@@ -144,7 +148,7 @@
                         {{ $isYa ? '√' : '' }}
                     </td>
                     <td style="border: 1px solid #000; text-align: center; font-weight: bold; vertical-align: middle;">
-                        {{ ! $isYa ? '√' : '' }}
+                        {{ $isTidak ? '√' : '' }}
                     </td>
                 </tr>
             @empty
@@ -226,13 +230,15 @@
                         <td style="vertical-align: top;">:</td>
                         <td>
                             @php
-                                $asesorSig = $ia09Response?->assessor_signature ?? $assessment->assessor_signature ?? $leadAssessor?->profile?->signature_data ?? $assessor?->profile?->signature_data;
+                                $asesorSig = $isAssessed ? ($ia09Response?->assessor_signature ?? $assessment->assessor_signature ?? $leadAssessor?->profile?->signature_data ?? $assessor?->profile?->signature_data) : null;
                             @endphp
                             @if($asesorSig)
                                 <img src="{{ $asesorSig }}" style="max-height: 48px; max-width: 130px; object-fit: contain; display: block;" alt="TTD Asesor">
+                            @else
+                                <div style="height: 38px;"></div>
                             @endif
                             <div style="font-size: 7.5pt; color: #555; margin-top: 2px;">
-                                {{ \Carbon\Carbon::parse($schedule->date)->isoFormat('D MMMM Y') }}
+                                {{ $isAssessed ? \Carbon\Carbon::parse($ia09Response?->assessor_signed_at ?? $schedule->date)->isoFormat('D MMMM Y') : '........................' }}
                             </div>
                         </td>
                     </tr>

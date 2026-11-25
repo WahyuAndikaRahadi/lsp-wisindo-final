@@ -1,20 +1,25 @@
 @extends('layouts.print-muk')
 
-@section('title', 'FR.IA.08 Ceklis Verifikasi Portofolio - ' . $asesi->full_name)
+@section('title', 'FR.IA.08 (' . $asesi->full_name . ')')
 @section('doc-title', 'FR.IA.08 Ceklis Verifikasi Portofolio')
 
 @section('content')
 @php
     $ia08Response = $iaResponses->firstWhere('instrument_code', 'IA08');
     $savedData = is_array($ia08Response?->data_json) ? $ia08Response->data_json : (json_decode($ia08Response?->data_json ?? '[]', true) ?: []);
+    $isAssessed = ! empty($ia08Response?->assessor_signed_at) 
+        || (! empty($ia08Response?->assessor_signature))
+        || (! empty($savedData['vatm']) && is_array($savedData['vatm']) && count($savedData['vatm']) > 0)
+        || (! empty($savedData['recommendation']) && in_array(strtoupper((string) $savedData['recommendation']), ['K', 'BK', 'KOMPETEN', 'BELUM_KOMPETEN'], true));
+
     $portfolios = $savedData['portfolios'] ?? [];
-    $vatmData = $savedData['vatm'] ?? [];
-    $clarificationElements = $savedData['clarification_elements'] ?? [];
-    $additionalEvidence = $savedData['additional_evidence'] ?? '';
-    $recommendation = $savedData['recommendation'] ?? 'K';
-    $remediationUnit = $savedData['remediation_unit'] ?? '';
-    $remediationElement = $savedData['remediation_element'] ?? '';
-    $remediationKuk = $savedData['remediation_kuk'] ?? '';
+    $vatmData = $isAssessed ? ($savedData['vatm'] ?? []) : [];
+    $clarificationElements = $isAssessed ? ($savedData['clarification_elements'] ?? []) : [];
+    $additionalEvidence = $isAssessed ? ($savedData['additional_evidence'] ?? '') : '..................................................................';
+    $recommendation = $isAssessed ? ($savedData['recommendation'] ?? '') : '';
+    $remediationUnit = $isAssessed ? ($savedData['remediation_unit'] ?? '') : '.....';
+    $remediationElement = $isAssessed ? ($savedData['remediation_element'] ?? '') : '.....';
+    $remediationKuk = $isAssessed ? ($savedData['remediation_kuk'] ?? '') : '.......';
 
     $defaultPortfolios = [
         ['type' => 'Surat Pengalaman Kerja', 'title' => 'Surat Pengalaman Kerja minimal 2 tahun di bidang otomotif'],
@@ -136,10 +141,10 @@
             @foreach($displayPortfolios as $idx => $p)
                 @php
                     $pId = $p['id'] ?? $idx;
-                    $v = $vatmData[$pId]['v'] ?? ($vatmData[$idx]['v'] ?? 'YA');
-                    $a = $vatmData[$pId]['a'] ?? ($vatmData[$idx]['a'] ?? 'YA');
-                    $t = $vatmData[$pId]['t'] ?? ($vatmData[$idx]['t'] ?? 'YA');
-                    $m = $vatmData[$pId]['m'] ?? ($vatmData[$idx]['m'] ?? 'YA');
+                    $v = $vatmData[$pId]['v'] ?? ($vatmData[$idx]['v'] ?? '');
+                    $a = $vatmData[$pId]['a'] ?? ($vatmData[$idx]['a'] ?? '');
+                    $t = $vatmData[$pId]['t'] ?? ($vatmData[$idx]['t'] ?? '');
+                    $m = $vatmData[$pId]['m'] ?? ($vatmData[$idx]['m'] ?? '');
                 @endphp
                 <tr>
                     <td style="border: 1px solid #000; padding: 5px 6px;">
@@ -314,13 +319,15 @@
                         <td style="vertical-align: top;">:</td>
                         <td>
                             @php
-                                $asesorSig = $ia08Response?->assessor_signature ?? $assessment->assessor_signature ?? $leadAssessor?->profile?->signature_data ?? $assessor?->profile?->signature_data;
+                                $asesorSig = $isAssessed ? ($ia08Response?->assessor_signature ?? $assessment->assessor_signature ?? $leadAssessor?->profile?->signature_data ?? $assessor?->profile?->signature_data) : null;
                             @endphp
                             @if($asesorSig)
                                 <img src="{{ $asesorSig }}" style="max-height: 48px; max-width: 130px; object-fit: contain; display: block;" alt="TTD Asesor">
+                            @else
+                                <div style="height: 38px;"></div>
                             @endif
                             <div style="font-size: 7.5pt; color: #555; margin-top: 2px;">
-                                {{ \Carbon\Carbon::parse($schedule->date)->isoFormat('D MMMM Y') }}
+                                {{ $isAssessed ? \Carbon\Carbon::parse($ia08Response?->assessor_signed_at ?? $schedule->date)->isoFormat('D MMMM Y') : '........................' }}
                             </div>
                         </td>
                     </tr>

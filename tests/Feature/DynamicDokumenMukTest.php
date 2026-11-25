@@ -5,9 +5,11 @@ namespace Tests\Feature;
 use App\Models\Assessment;
 use App\Models\AssessmentIaResponse;
 use App\Models\CompetencyUnit;
+use App\Models\InterviewQuestion;
 use App\Models\Schedule;
 use App\Models\Scheme;
 use App\Models\User;
+use App\Services\MukDynamicDocumentService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -101,25 +103,37 @@ class DynamicDokumenMukTest extends TestCase
 
     public function test_dokumen_muk_exports_ia08_and_ia09_successfully(): void
     {
-        // 1. Export FR.IA.08
+        // 1. Export FR.IA.08 PDF stream
         $resIa08 = $this->actingAs($this->admin)
             ->get(route('admin.dokumen-muk.export-asesi', [$this->assessment, 'ia08']));
 
         $resIa08->assertOk();
-        $resIa08->assertSee('FR.IA.08.');
-        $resIa08->assertSee('CEKLIS VERIFIKASI PORTOFOLIO');
-        $resIa08->assertSee($this->asesi->full_name);
-        $resIa08->assertSee($this->unit->code);
-        $resIa08->assertSee($this->unit->title);
+        $this->assertEquals('application/pdf', $resIa08->headers->get('Content-Type'));
+        $this->assertStringContainsString('filename="FR.IA.08 ('.$this->asesi->full_name.').pdf"', (string) $resIa08->headers->get('Content-Disposition'));
 
-        // 2. Export FR.IA.09
+        // HTML format
+        $resIa08Html = $this->actingAs($this->admin)
+            ->get(route('admin.dokumen-muk.export-asesi', ['assessment' => $this->assessment->id, 'type' => 'ia08', 'format' => 'html']));
+        $resIa08Html->assertOk();
+        $resIa08Html->assertSee('FR.IA.08 ('.$this->asesi->full_name.')');
+        $resIa08Html->assertSee('CVP - CEKLIS VERIFIKASI PORTOFOLIO');
+        $resIa08Html->assertSee($this->asesi->full_name);
+
+        // 2. Export FR.IA.09 PDF stream
         $resIa09 = $this->actingAs($this->admin)
             ->get(route('admin.dokumen-muk.export-asesi', [$this->assessment, 'ia09']));
 
         $resIa09->assertOk();
-        $resIa09->assertSee('FR.IA.09.');
-        $resIa09->assertSee('PERTANYAAN WAWANCARA');
-        $resIa09->assertSee($this->asesi->full_name);
+        $this->assertEquals('application/pdf', $resIa09->headers->get('Content-Type'));
+        $this->assertStringContainsString('filename="FR.IA.09 ('.$this->asesi->full_name.').pdf"', (string) $resIa09->headers->get('Content-Disposition'));
+
+        // HTML format
+        $resIa09Html = $this->actingAs($this->admin)
+            ->get(route('admin.dokumen-muk.export-asesi', ['assessment' => $this->assessment->id, 'type' => 'ia09', 'format' => 'html']));
+        $resIa09Html->assertOk();
+        $resIa09Html->assertSee('FR.IA.09 ('.$this->asesi->full_name.')');
+        $resIa09Html->assertSee('PW - PERTANYAAN WAWANCARA');
+        $resIa09Html->assertSee($this->asesi->full_name);
     }
 
     public function test_asesi_dynamic_route_supports_ia08_and_ia09(): void
@@ -128,13 +142,114 @@ class DynamicDokumenMukTest extends TestCase
             ->get(route('admin.dokumen-muk.asesi-dynamic', ['assessment' => $this->assessment->id, 'type' => 'ia08']));
 
         $resDynamicIa08->assertOk();
-        $resDynamicIa08->assertSee('FR.IA.08.');
+        $this->assertEquals('application/pdf', $resDynamicIa08->headers->get('Content-Type'));
+
+        $resPdfIa08 = $this->actingAs($this->admin)
+            ->get(route('admin.dokumen-muk.export-asesi', ['assessment' => $this->assessment->id, 'type' => 'ia08', 'format' => 'pdf']));
+
+        $resPdfIa08->assertOk();
+        $this->assertEquals('application/pdf', $resPdfIa08->headers->get('Content-Type'));
 
         $resDynamicIa09 = $this->actingAs($this->admin)
             ->get(route('admin.dokumen-muk.asesi-dynamic', ['assessment' => $this->assessment->id, 'type' => 'ia09']));
 
         $resDynamicIa09->assertOk();
-        $resDynamicIa09->assertSee('FR.IA.09.');
+        $this->assertEquals('application/pdf', $resDynamicIa09->headers->get('Content-Type'));
+    }
+
+    public function test_ia08_and_ia09_blank_when_not_assessed(): void
+    {
+        $q = InterviewQuestion::create([
+            'scheme_id' => $this->scheme->id,
+            'order' => 1,
+            'evidence_context' => 'Sesuai bukti 1',
+            'question_text' => 'Jelaskan prosedur K3.',
+            'expected_answer' => 'Pakai APD.',
+            'is_active' => true,
+        ]);
+
+        $service = app(MukDynamicDocumentService::class);
+
+        // IA08 blank check
+        $ia08Payload = $service->buildIa08Data($this->schedule, $this->assessment);
+        $this->assertFalse($ia08Payload['is_assessed']);
+        $this->assertEmpty($ia08Payload['vatm']);
+        $this->assertEmpty($ia08Payload['clarification_elements']);
+        $this->assertSame('', $ia08Payload['recommendation']);
+        $this->assertNull($ia08Payload['signature_asesor']);
+
+        // IA09 blank check
+        $ia09Payload = $service->buildIa09Data($this->schedule, $this->assessment);
+        $this->assertFalse($ia09Payload['is_assessed']);
+        $this->assertSame('', $ia09Payload['recommendation']);
+        $this->assertNull($ia09Payload['signature_asesor']);
+        $this->assertNotEmpty($ia09Payload['questions']);
+        $this->assertSame('', $ia09Payload['questions'][0]['candidate_answer_summary']);
+        $this->assertSame('', $ia09Payload['questions'][0]['is_achieved']);
+    }
+
+    public function test_ia08_and_ia09_filled_when_assessed(): void
+    {
+        $q = InterviewQuestion::create([
+            'scheme_id' => $this->scheme->id,
+            'order' => 1,
+            'evidence_context' => 'Sesuai bukti 1',
+            'question_text' => 'Jelaskan prosedur K3.',
+            'expected_answer' => 'Pakai APD.',
+            'is_active' => true,
+        ]);
+
+        // Evaluate IA08
+        AssessmentIaResponse::create([
+            'assessment_id' => $this->assessment->id,
+            'instrument_code' => 'IA08',
+            'assessor_signed_at' => now(),
+            'assessor_signature' => 'data:image/png;base64,sample',
+            'data_json' => [
+                'vatm' => [
+                    'p1' => ['v' => 'YA', 'a' => 'YA', 't' => 'YA', 'm' => 'YA'],
+                ],
+                'clarification_elements' => ['1'],
+                'recommendation' => 'K',
+                'additional_evidence' => 'Semua bukti valid',
+            ],
+        ]);
+
+        // Evaluate IA09
+        AssessmentIaResponse::create([
+            'assessment_id' => $this->assessment->id,
+            'instrument_code' => 'IA09',
+            'assessor_signed_at' => now(),
+            'assessor_signature' => 'data:image/png;base64,sample',
+            'data_json' => [
+                'questions' => [
+                    $q->id => [
+                        'candidate_answer_summary' => 'Asesi menjawab dengan lengkap dan benar.',
+                        'is_achieved' => 'YA',
+                    ],
+                ],
+                'recommendation' => 'K',
+                'assessor_notes' => 'Sangat kompeten.',
+            ],
+        ]);
+
+        $service = app(MukDynamicDocumentService::class);
+
+        // IA08 filled check
+        $ia08Payload = $service->buildIa08Data($this->schedule, $this->assessment);
+        $this->assertTrue($ia08Payload['is_assessed']);
+        $this->assertNotEmpty($ia08Payload['vatm']);
+        $this->assertEquals(['1'], $ia08Payload['clarification_elements']);
+        $this->assertEquals('K', $ia08Payload['recommendation']);
+        $this->assertNotNull($ia08Payload['signature_asesor']);
+
+        // IA09 filled check
+        $ia09Payload = $service->buildIa09Data($this->schedule, $this->assessment);
+        $this->assertTrue($ia09Payload['is_assessed']);
+        $this->assertEquals('K', $ia09Payload['recommendation']);
+        $this->assertNotNull($ia09Payload['signature_asesor']);
+        $this->assertEquals('Asesi menjawab dengan lengkap dan benar.', $ia09Payload['questions'][0]['candidate_answer_summary']);
+        $this->assertEquals('YA', $ia09Payload['questions'][0]['is_achieved']);
     }
 
     public function test_ia08_asesor_view_contains_enlarged_preview_modal_and_buka_berkas_controls(): void

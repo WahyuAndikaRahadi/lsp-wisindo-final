@@ -61,9 +61,9 @@ def draw_header_box(canvas_obj):
     x0 = MARGIN  # 36.0
     x1 = PAGE_W - MARGIN  # 559.27
     box_w = x1 - x0  # 523.27
-    box_h = 58.0
+    box_h = 56.0
     top_y = PAGE_H - 24.0  # 817.89
-    bot_y = top_y - box_h  # 759.89
+    bot_y = top_y - box_h  # 761.89
 
     # Outer border
     canvas_obj.setLineWidth(0.65)
@@ -71,7 +71,7 @@ def draw_header_box(canvas_obj):
     canvas_obj.rect(x0, bot_y, box_w, box_h, fill=0, stroke=1)
 
     # Vertical divider line
-    div_w = 78.0
+    div_w = 88.0
     x_div = x0 + div_w
     canvas_obj.line(x_div, bot_y, x_div, top_y)
 
@@ -81,8 +81,8 @@ def draw_header_box(canvas_obj):
             im = Image.open(LOGO_PATH)
             im_w, im_h = im.size
             aspect = float(im_w) / float(im_h) if im_h > 0 else 1.13
-            logo_h = 48.0
-            logo_w = logo_h * aspect  # ~54.2 pt
+            logo_h = 44.0
+            logo_w = logo_h * aspect  # ~49.7 pt
             logo_x = x0 + (div_w - logo_w) / 2.0
             logo_y = bot_y + (box_h - logo_h) / 2.0
             canvas_obj.drawImage(LOGO_PATH, logo_x, logo_y, width=logo_w, height=logo_h, mask='auto')
@@ -90,8 +90,8 @@ def draw_header_box(canvas_obj):
             pass
 
     # Title in right compartment
-    header_html = '<font size="12" name="Cal"><b>L</b>embaga <b>S</b>ertifikasi <b>P</b>rofesi <b>P</b>raktisi <b>O</b>tomotif &nbsp;<b>LSP-PrO Indo</b></font>'
-    s_kop = ParagraphStyle('HeaderKopBox', fontName='Cal', fontSize=12, leading=15, alignment=1)
+    header_html = '<font size="11.5" name="Cal"><b>L</b>embaga <b>S</b>ertifikasi <b>P</b>rofesi <b>P</b>raktisi <b>O</b>tomotif &nbsp;&nbsp;<b>LSP-PrO Indo</b></font>'
+    s_kop = ParagraphStyle('HeaderKopBox', fontName='Cal', fontSize=11.5, leading=15, alignment=1)
     p = Paragraph(header_html, s_kop)
     avail_w = x1 - x_div - 8.0
     w, h = p.wrap(avail_w, box_h)
@@ -201,6 +201,9 @@ def clean_signature_image(raw_bytes_or_path):
 
 def generate_pdf(data, output_path):
     """Build the FR.IA.08 PDF document with Kop on every page, larger font size, and no footer."""
+    asesi_nama = data.get("asesi_nama", "Asesi")
+    doc_title = f"FR.IA.08 ({asesi_nama})"
+
     # topMargin leaves clean space for repeating kop surat box (height 44pt starting at top 26pt, bot 70pt)
     doc = SimpleDocTemplate(
         output_path,
@@ -209,6 +212,8 @@ def generate_pdf(data, output_path):
         rightMargin=MARGIN,
         topMargin=92.0,
         bottomMargin=30.0,
+        title=doc_title,
+        author="LSP PrO Indo",
     )
 
     base_styles = getSampleStyleSheet()
@@ -363,7 +368,10 @@ def generate_pdf(data, output_path):
             {"id": "p3", "type": "Work Order", "title": "Work Order (Surat Perintah Kerja) perbaikan kendaraan"},
         ]
 
-    vatm_data = data.get("vatm", {})
+    is_assessed = data.get("is_assessed", True)
+    vatm_data = data.get("vatm")
+    if not isinstance(vatm_data, dict):
+        vatm_data = {}
 
     w_col0 = 195.27
     w_vatm = 41.0
@@ -393,27 +401,36 @@ def generate_pdf(data, output_path):
 
     for idx, p in enumerate(portfolios):
         p_id = str(p.get("id", idx))
-        p_eval = vatm_data.get(p_id, vatm_data.get(str(idx), {}))
-
-        v_val = str(p_eval.get("v", "")).upper()
-        a_val = str(p_eval.get("a", "")).upper()
-        t_val = str(p_eval.get("t", "")).upper()
-        m_val = str(p_eval.get("m", "")).upper()
+        p_eval = vatm_data.get(p_id, vatm_data.get(str(idx), {})) if isinstance(vatm_data, dict) else {}
 
         chk = '<font name="Cal-B" size="11"><b>\u221a</b></font>'
-        box = '<font name="Cal" size="9.5" color="#777777">\u25a1</font>'
 
-        v_ya = chk if v_val == "YA" else (box if v_val == "" else "")
-        v_tdk = chk if v_val in ["TIDAK", "TDK"] else (box if v_val == "" else "")
+        if is_assessed and isinstance(p_eval, dict):
+            v_val = str(p_eval.get("v", "")).upper()
+            a_val = str(p_eval.get("a", "")).upper()
+            t_val = str(p_eval.get("t", "")).upper()
+            m_val = str(p_eval.get("m", "")).upper()
 
-        a_ya = chk if a_val == "YA" else (box if a_val == "" else "")
-        a_tdk = chk if a_val in ["TIDAK", "TDK"] else (box if a_val == "" else "")
+            v_ya = chk if v_val == "YA" else ""
+            v_tdk = chk if v_val in ["TIDAK", "TDK"] else ""
 
-        t_ya = chk if t_val == "YA" else (box if t_val == "" else "")
-        t_tdk = chk if t_val in ["TIDAK", "TDK"] else (box if t_val == "" else "")
+            a_ya = chk if a_val == "YA" else ""
+            a_tdk = chk if a_val in ["TIDAK", "TDK"] else ""
 
-        m_ya = chk if m_val == "YA" else (box if m_val == "" else "")
-        m_tdk = chk if m_val in ["TIDAK", "TDK"] else (box if m_val == "" else "")
+            t_ya = chk if t_val == "YA" else ""
+            t_tdk = chk if t_val in ["TIDAK", "TDK"] else ""
+
+            m_ya = chk if m_val == "YA" else ""
+            m_tdk = chk if m_val in ["TIDAK", "TDK"] else ""
+        else:
+            v_ya = ""
+            v_tdk = ""
+            a_ya = ""
+            a_tdk = ""
+            t_ya = ""
+            t_tdk = ""
+            m_ya = ""
+            m_tdk = ""
 
         p_type = p.get("type", "Portofolio")
         p_title = p.get("title") or p.get("original_name") or f"Dokumen Bukti {idx + 1}"
@@ -450,7 +467,11 @@ def generate_pdf(data, output_path):
     # =========================================================================
     # TABLE 5: TINDAK LANJUT KLARIFIKASI WAWANCARA (Transparan, font 9.5pt)
     # =========================================================================
-    clarification_elements = set(str(e) for e in data.get("clarification_elements", []))
+    clarif_raw = data.get("clarification_elements") or []
+    if isinstance(clarif_raw, (list, tuple, set)):
+        clarification_elements = set(str(e) for e in clarif_raw)
+    else:
+        clarification_elements = set()
     units = data.get("units", [])
 
     w_chk = 38.0
@@ -492,8 +513,8 @@ def generate_pdf(data, output_path):
             elem_num = elem.get("number", "")
             elem_name = elem.get("name") or elem.get("title") or f"Elemen {elem_num}"
 
-            is_checked = (elem_id in clarification_elements) or elem.get("is_checked", False)
-            chk_icon = '<font name="Cal-B" size="11"><b>\u221a</b></font>' if is_checked else '<font name="Cal" size="9.5" color="#777777">\u25a1</font>'
+            is_checked = is_assessed and ((elem_id in clarification_elements) or elem.get("is_checked", False))
+            chk_icon = '<font name="Cal-B" size="11"><b>\u221a</b></font>' if is_checked else ''
 
             kuks = elem.get("kuks", [])
             kuk_lines = []
@@ -534,10 +555,10 @@ def generate_pdf(data, output_path):
     bottom_flowables = []
 
     # Table 6: Bukti tambahan & Rekomendasi Asesor (2 kolom persis docx)
-    additional_evidence = data.get("additional_evidence") or ".................................................................."
-    rec_val = str(data.get("recommendation", "")).upper()
-    is_k = rec_val in ["K", "KOMPETEN"]
-    is_bk = rec_val in ["BK", "BELUM_KOMPETEN", "BELUM KOMPETEN"]
+    additional_evidence = (data.get("additional_evidence") if is_assessed else None) or ".................................................................."
+    rec_val = str(data.get("recommendation", "")).upper() if is_assessed else ""
+    is_k = is_assessed and (rec_val in ["K", "KOMPETEN"])
+    is_bk = is_assessed and (rec_val in ["BK", "BELUM_KOMPETEN", "BELUM KOMPETEN"])
 
     box_k = '<font name="Cal-B" size="11"><b>[\u221a]</b></font>' if is_k else '<font name="Cal" size="9.5"><b>[&nbsp;&nbsp;]</b></font>'
     box_bk = '<font name="Cal-B" size="11"><b>[\u221a]</b></font>' if is_bk else '<font name="Cal" size="9.5"><b>[&nbsp;&nbsp;]</b></font>'
@@ -589,7 +610,7 @@ def generate_pdf(data, output_path):
     asesi_sig_data = data.get("signature_asesi")
     asesor_sig_data = data.get("signature_asesor")
     tgl_asesi = data.get("tanggal_ttd_asesi") or tanggal
-    tgl_asesor = data.get("tanggal_ttd_asesor") or tanggal
+    tgl_asesor = data.get("tanggal_ttd_asesor") or (tanggal if data.get("is_assessed", True) else "........................")
     asesor_no_reg = data.get("asesor_no_reg") or "-"
 
     asesi_sig_clean = clean_signature_image(asesi_sig_data)
@@ -601,7 +622,7 @@ def generate_pdf(data, output_path):
     else:
         asesi_sig_flowable = Spacer(1, 35)
 
-    asesor_sig_clean = clean_signature_image(asesor_sig_data)
+    asesor_sig_clean = clean_signature_image(asesor_sig_data) if is_assessed else None
     if asesor_sig_clean:
         try:
             asesor_sig_flowable = RLImage(io.BytesIO(asesor_sig_clean), width=105, height=38)
@@ -658,6 +679,19 @@ def generate_pdf(data, output_path):
     story.append(KeepTogether(bottom_flowables))
 
     doc.build(story, canvasmaker=HeaderEveryPageCanvas)
+
+    try:
+        import pymupdf as fitz
+        fdoc = fitz.open(output_path)
+        meta = fdoc.metadata or {}
+        meta["title"] = doc_title
+        meta["author"] = "LSP PrO Indo"
+        fdoc.set_metadata(meta)
+        fdoc.save(output_path, incremental=True, encryption=fitz.PDF_ENCRYPT_KEEP)
+        fdoc.close()
+    except Exception:
+        pass
+
     return output_path
 
 

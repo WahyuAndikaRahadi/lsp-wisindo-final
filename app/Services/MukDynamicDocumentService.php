@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Assessment;
 use App\Models\AssessmentIaResponse;
+use App\Models\InterviewQuestion;
 use App\Models\QuestionBank;
 use App\Models\Schedule;
 use App\Models\Scheme;
@@ -1840,6 +1841,272 @@ class MukDynamicDocumentService
     }
 
     /**
+     * Build specific payload for FR.IA.08 (CVP - Ceklis Verifikasi Portofolio).
+     *
+     * @return array<string, mixed>
+     */
+    public function buildIa08Data(Schedule $schedule, Assessment $assessment): array
+    {
+        $asesi = $assessment->asesi;
+        $profile = $asesi?->profile;
+        $assessor = $assessment->assessor ?? $schedule->assessors->first();
+        $assessorProfile = $assessor?->profile;
+        $scheme = $assessment->scheme ?? $assessment->schedule?->scheme ?? $schedule->scheme;
+
+        $tgl = $assessment->registered_at
+            ? Carbon::parse($assessment->registered_at)->locale('id')->translatedFormat('d F Y')
+            : ($schedule->date ? Carbon::parse($schedule->date)->locale('id')->translatedFormat('d F Y') : Carbon::now()->locale('id')->translatedFormat('d F Y'));
+
+        $ia08Response = $assessment->iaResponses?->firstWhere('instrument_code', 'IA08')
+            ?? AssessmentIaResponse::where('assessment_id', $assessment->id)->where('instrument_code', 'IA08')->first();
+
+        $savedData = is_array($ia08Response?->data_json)
+            ? $ia08Response->data_json
+            : (json_decode($ia08Response?->data_json ?? '[]', true) ?: []);
+
+        // Assessor has evaluated only if signed or explicitly submitted VATM / recommendation
+        $isAssessed = ! empty($ia08Response?->assessor_signed_at)
+            || (! empty($ia08Response?->assessor_signature))
+            || (! empty($savedData['vatm']) && is_array($savedData['vatm']) && count($savedData['vatm']) > 0)
+            || (! empty($savedData['recommendation']) && in_array(strtoupper((string) $savedData['recommendation']), ['K', 'BK', 'KOMPETEN', 'BELUM_KOMPETEN'], true));
+
+        $tglAsesor = ($isAssessed && $ia08Response?->assessor_signed_at)
+            ? Carbon::parse($ia08Response->assessor_signed_at)->locale('id')->translatedFormat('d F Y')
+            : ($isAssessed ? $tgl : '........................');
+
+        $tglAsesi = $ia08Response?->asesi_signed_at
+            ? Carbon::parse($ia08Response->asesi_signed_at)->locale('id')->translatedFormat('d F Y')
+            : ($assessment->asesi_signed_at ? Carbon::parse($assessment->asesi_signed_at)->locale('id')->translatedFormat('d F Y') : $tgl);
+
+        $tukType = $schedule->ak01_data['tuk_type'] ?? ($schedule->tuk_type ?? 'Sewaktu/Tempat Kerja/Mandiri*');
+        $tukName = $schedule->tuk_name;
+
+        $signatureAssessor = null;
+        if ($isAssessed) {
+            $signatureAssessor = $ia08Response?->assessor_signature ?? $assessment->assessor_signature ?? $assessorProfile?->signature_data;
+            if (! $signatureAssessor && $assessorProfile?->signature_path) {
+                $sigDiskPath = storage_path('app/public/'.$assessorProfile->signature_path);
+                if (File::isFile($sigDiskPath)) {
+                    $signatureAssessor = $sigDiskPath;
+                }
+            }
+        }
+
+        $signatureAsesi = $ia08Response?->asesi_signature ?? $assessment->asesi_signature ?? $profile?->signature_data;
+        if (! $signatureAsesi && $profile?->signature_path) {
+            $sigDiskPath = storage_path('app/public/'.$profile->signature_path);
+            if (File::isFile($sigDiskPath)) {
+                $signatureAsesi = $sigDiskPath;
+            }
+        }
+
+        $assessorReg = $assessor?->assessor_registration_number
+            ?: ($assessorProfile?->met_reg_number
+                ?: ($assessorProfile?->no_reg ?: '-'));
+
+        $portfolios = $savedData['portfolios'] ?? [];
+        if (empty($portfolios)) {
+            $portfolios = [
+                ['id' => 'p1', 'type' => 'Surat Pengalaman Kerja', 'title' => 'Surat Pengalaman Kerja minimal 2 tahun di bidang otomotif'],
+                ['id' => 'p2', 'type' => 'Sertifikat Kompetensi', 'title' => 'Sertifikat Pelatihan / Kompetensi Teknis Otomotif'],
+                ['id' => 'p3', 'type' => 'Work Order', 'title' => 'Work Order (Surat Perintah Kerja) perbaikan kendaraan'],
+                ['id' => 'p4', 'type' => 'Log Book', 'title' => 'Log Book (Buku catatan pekerjaan)'],
+            ];
+        }
+
+        $vatmData = $isAssessed ? ($savedData['vatm'] ?? []) : [];
+        $clarificationElements = $isAssessed ? ($savedData['clarification_elements'] ?? []) : [];
+        $additionalEvidence = $isAssessed ? ($savedData['additional_evidence'] ?? '') : '..................................................................';
+        $recommendation = $isAssessed ? ($savedData['recommendation'] ?? '') : '';
+        $remediationUnit = $isAssessed ? ($savedData['remediation_unit'] ?? '') : '.....';
+        $remediationElement = $isAssessed ? ($savedData['remediation_element'] ?? '') : '.....';
+        $remediationKuk = $isAssessed ? ($savedData['remediation_kuk'] ?? '') : '.......';
+
+        // Units, Elements & KUKs mapping
+        $schemeUnits = $scheme ? $scheme->competencyUnits()
+            ->with(['elements.kuks' => fn ($q) => $q->orderBy('sequence')->orderBy('id')])
+            ->orderBy('sequence')
+            ->orderBy('id')
+            ->get() : collect();
+
+        $unitsData = [];
+        foreach ($schemeUnits as $uIdx => $u) {
+            $elementsData = [];
+            foreach ($u->elements as $eIdx => $el) {
+                $kuksData = [];
+                foreach ($el->kuks as $kIdx => $k) {
+                    $kuksData[] = [
+                        'code' => $k->code_number ?: (($eIdx + 1).'.'.($kIdx + 1)),
+                        'statement' => $k->statement ?: $k->description,
+                    ];
+                }
+                $elemKey = (string) $el->id;
+                $isChecked = $isAssessed && (in_array($elemKey, (array) $clarificationElements, true) || in_array((int) $elemKey, (array) $clarificationElements, true));
+                $elementsData[] = [
+                    'id' => $el->id,
+                    'number' => $eIdx + 1,
+                    'name' => $el->title ?? $el->name,
+                    'is_checked' => $isChecked,
+                    'kuks' => $kuksData,
+                ];
+            }
+            $unitsData[] = [
+                'id' => $u->id,
+                'number' => $uIdx + 1,
+                'code' => $u->code,
+                'title' => $u->title,
+                'elements' => $elementsData,
+            ];
+        }
+
+        return [
+            'is_assessed' => $isAssessed,
+            'skema_nama' => $scheme?->name ?? 'Skema Sertifikasi',
+            'skema_nomor' => $scheme?->muk_code ?? ($scheme?->code ?? '-'),
+            'tuk_nama' => $tukName ?? '',
+            'tuk_type' => $tukType,
+            'asesor_nama' => $assessor?->full_name ?? '-',
+            'asesor_no_reg' => $assessorReg,
+            'asesi_nama' => $asesi?->full_name ?? '-',
+            'asesi_nik' => $profile?->nik ?? '-',
+            'tanggal' => $tgl,
+            'tanggal_ttd_asesi' => $tglAsesi,
+            'tanggal_ttd_asesor' => $tglAsesor,
+            'portfolios' => $portfolios,
+            'vatm' => $vatmData,
+            'clarification_elements' => $clarificationElements,
+            'units' => $unitsData,
+            'additional_evidence' => $additionalEvidence,
+            'recommendation' => $recommendation,
+            'remediation_unit' => $remediationUnit,
+            'remediation_element' => $remediationElement,
+            'remediation_kuk' => $remediationKuk,
+            'signature_asesi' => $signatureAsesi,
+            'signature_asesor' => $signatureAssessor,
+        ];
+    }
+
+    /**
+     * Build specific payload for FR.IA.09 (Pertanyaan Wawancara).
+     *
+     * @return array<string, mixed>
+     */
+    public function buildIa09Data(Schedule $schedule, Assessment $assessment): array
+    {
+        $asesi = $assessment->asesi;
+        $profile = $asesi?->profile;
+        $assessor = $assessment->assessor ?? $schedule->assessors->first();
+        $assessorProfile = $assessor?->profile;
+        $scheme = $assessment->scheme ?? $assessment->schedule?->scheme ?? $schedule->scheme;
+
+        $tgl = $assessment->registered_at
+            ? Carbon::parse($assessment->registered_at)->locale('id')->translatedFormat('d F Y')
+            : ($schedule->date ? Carbon::parse($schedule->date)->locale('id')->translatedFormat('d F Y') : Carbon::now()->locale('id')->translatedFormat('d F Y'));
+
+        $ia09Response = $assessment->iaResponses?->firstWhere('instrument_code', 'IA09')
+            ?? AssessmentIaResponse::where('assessment_id', $assessment->id)->where('instrument_code', 'IA09')->first();
+
+        $savedData = is_array($ia09Response?->data_json)
+            ? $ia09Response->data_json
+            : (json_decode($ia09Response?->data_json ?? '[]', true) ?: []);
+
+        $savedQuestionsData = $savedData['questions'] ?? [];
+
+        // Assessor has evaluated only if signed or explicitly answered questions
+        $isAssessed = ! empty($ia09Response?->assessor_signed_at)
+            || (! empty($ia09Response?->assessor_signature))
+            || (! empty($savedQuestionsData) && collect($savedQuestionsData)->contains(fn ($q) => ! empty($q['candidate_answer_summary']) || ! empty($q['is_achieved'])));
+
+        $tglAsesor = ($isAssessed && $ia09Response?->assessor_signed_at)
+            ? Carbon::parse($ia09Response->assessor_signed_at)->locale('id')->translatedFormat('d F Y')
+            : ($isAssessed ? $tgl : '........................');
+
+        $tglAsesi = $ia09Response?->asesi_signed_at
+            ? Carbon::parse($ia09Response->asesi_signed_at)->locale('id')->translatedFormat('d F Y')
+            : ($assessment->asesi_signed_at ? Carbon::parse($assessment->asesi_signed_at)->locale('id')->translatedFormat('d F Y') : $tgl);
+
+        $tukType = $schedule->ak01_data['tuk_type'] ?? ($schedule->tuk_type ?? 'Sewaktu/Tempat Kerja/Mandiri*');
+        $tukName = $schedule->tuk_name;
+
+        $signatureAssessor = null;
+        if ($isAssessed) {
+            $signatureAssessor = $ia09Response?->assessor_signature ?? $assessment->assessor_signature ?? $assessorProfile?->signature_data;
+            if (! $signatureAssessor && $assessorProfile?->signature_path) {
+                $sigDiskPath = storage_path('app/public/'.$assessorProfile->signature_path);
+                if (File::isFile($sigDiskPath)) {
+                    $signatureAssessor = $sigDiskPath;
+                }
+            }
+        }
+
+        $signatureAsesi = $ia09Response?->asesi_signature ?? $assessment->asesi_signature ?? $profile?->signature_data;
+        if (! $signatureAsesi && $profile?->signature_path) {
+            $sigDiskPath = storage_path('app/public/'.$profile->signature_path);
+            if (File::isFile($sigDiskPath)) {
+                $signatureAsesi = $sigDiskPath;
+            }
+        }
+
+        $assessorReg = $assessor?->assessor_registration_number
+            ?: ($assessorProfile?->met_reg_number
+                ?: ($assessorProfile?->no_reg ?: '-'));
+
+        $portfolios = [
+            ['order' => '1.', 'title' => 'Surat pengalaman kerja di bagian Engine Junior technician minimal 2 tahun'],
+            ['order' => '2.', 'title' => 'Sertifikat Kompetensi Engine Junior technician'],
+            ['order' => '3.', 'title' => 'Work Order  ( surat perintah kerja )'],
+            ['order' => '4.', 'title' => 'Log Book ( Buku catatan pekerjaan )'],
+        ];
+
+        $savedRecommendation = $isAssessed ? ($savedData['recommendation'] ?? '') : '';
+
+        $dbQuestions = InterviewQuestion::where('scheme_id', $scheme?->id)->active()->ordered()->get();
+        $questionsPayload = [];
+        foreach ($dbQuestions as $idx => $q) {
+            $savedQ = $savedQuestionsData[$q->id] ?? [];
+            if ($isAssessed) {
+                $ansSummary = $savedQ['candidate_answer_summary'] ?? ($q->expected_answer ?: '');
+                $achievedRaw = strtoupper((string) ($savedQ['is_achieved'] ?? 'YA'));
+                $achieved = in_array($achievedRaw, ['YA', '1', 'TRUE', 'K'], true) ? 'YA' : 'TIDAK';
+            } else {
+                $ansSummary = '';
+                $achieved = '';
+            }
+
+            $questionsPayload[] = [
+                'id' => $q->id,
+                'order' => $q->order ?? ($idx + 1),
+                'evidence_context' => $q->evidence_context ?: 'Sesuai dengan bukti no. …… yang Anda ajukan, ……...',
+                'question_text' => $q->question_text,
+                'expected_answer' => $q->expected_answer,
+                'candidate_answer_summary' => $ansSummary,
+                'is_achieved' => $achieved,
+            ];
+        }
+
+        return [
+            'is_assessed' => $isAssessed,
+            'skema_nama' => $scheme?->name ?? 'Engine Junior Technician',
+            'skema_nomor' => $scheme?->muk_code ?? ($scheme?->code ?? '01/LSP PrO Indo/I/2026'),
+            'tuk_nama' => $tukName ?? 'SMKS Pasundan Subang',
+            'tuk_type' => $tukType,
+            'asesor_nama' => $assessor?->full_name ?? '-',
+            'asesor_no_reg' => $assessorReg,
+            'asesi_nama' => $asesi?->full_name ?? '-',
+            'asesi_nik' => $profile?->nik ?? '-',
+            'tanggal' => $tgl,
+            'tanggal_ttd_asesi' => $tglAsesi,
+            'tanggal_ttd_asesor' => $tglAsesor,
+            'portfolios' => $portfolios,
+            'questions' => $questionsPayload,
+            'recommendation' => $savedRecommendation,
+            'assessor_notes' => $isAssessed ? ($savedData['assessor_notes'] ?? ($ia09Response?->assessor_notes ?? '')) : '',
+            'signature_asesi' => $signatureAsesi,
+            'signature_asesor' => $signatureAssessor,
+        ];
+    }
+
+    /**
      * Build specific payload for FR.AK.05 (Laporan Asesmen).
      *
      * @return array<string, mixed>
@@ -2724,6 +2991,32 @@ class MukDynamicDocumentService
                 }
             }
 
+            if (in_array($normType, ['ia08', 'fria08'], true)) {
+                $script = base_path('tools/render_fr_ia_08.py');
+                if (File::isFile($script)) {
+                    $targetAssessment = $assessment ?? $schedule->assessments->first();
+                    if ($targetAssessment) {
+                        $ia08Payload = $this->buildIa08Data($schedule, $targetAssessment);
+                        if ($this->runGeneratorWithPayload($python, $script, $ia08Payload, 'muk_ia08', $outputPath, $normType)) {
+                            return $outputPath;
+                        }
+                    }
+                }
+            }
+
+            if (in_array($normType, ['ia09', 'fria09', 'pw'], true)) {
+                $script = base_path('tools/render_fr_ia_09.py');
+                if (File::isFile($script)) {
+                    $targetAssessment = $assessment ?? $schedule->assessments->first();
+                    if ($targetAssessment) {
+                        $ia09Payload = $this->buildIa09Data($schedule, $targetAssessment);
+                        if ($this->runGeneratorWithPayload($python, $script, $ia09Payload, 'muk_ia09', $outputPath, $normType)) {
+                            return $outputPath;
+                        }
+                    }
+                }
+            }
+
             // 2. Scheme-specific master PDF overlay via PyMuPDF
             $masterPdf = $this->getDynamicFilePath($schedule->scheme, $normType);
             if ($masterPdf && File::isFile($masterPdf)) {
@@ -2774,6 +3067,10 @@ class MukDynamicDocumentService
                 'ia01' => 'tests/Fixtures/muk/FR_IA_01_generated.pdf',
                 'ia03' => 'tests/Fixtures/muk/FR_IA_03_generated.pdf',
                 'ia05c' => 'tests/Fixtures/muk/FR_IA_05_C_generated.pdf',
+                'ia08' => 'tests/Fixtures/muk/FR_IA_08_generated.pdf',
+                'fria08' => 'tests/Fixtures/muk/FR_IA_08_generated.pdf',
+                'ia09' => 'tests/Fixtures/muk/FR_IA_09_generated.pdf',
+                'fria09' => 'tests/Fixtures/muk/FR_IA_09_generated.pdf',
                 'daftarperiksa' => 'tests/Fixtures/muk/DAFTAR_PERIKSA_generated.pdf',
             ];
 
@@ -2898,18 +3195,17 @@ class MukDynamicDocumentService
             return $this->exportUploadedIa01b($assessment, $download);
         }
 
-        if (in_array($normType, ['ia08', 'fria08', 'ia09', 'fria09'], true)) {
-            $targetCode = in_array($normType, ['ia08', 'fria08'], true) ? 'ia08' : 'ia09';
-            $data = app(MukExportService::class)->getAsesiExportData($assessment);
-            $data['exportType'] = $targetCode;
-
-            return view("admin.dokumen-muk.export-asesi-{$targetCode}", $data);
-        }
-
         $schedule = $assessment->schedule;
         $asesiName = $assessment->asesi?->full_name ?? 'Asesi';
         $filePath = $this->generateDynamicPdf($docType, $schedule, $assessment);
-        $filename = strtoupper(str_replace(['_', ' '], '-', $docType)).'-'.preg_replace('/[^A-Za-z0-9_-]/', '_', $asesiName).'.pdf';
+        $norm = strtolower(str_replace(['_', ' ', '-', '.'], '', $docType));
+        if (in_array($norm, ['ia08', 'fria08'], true)) {
+            $filename = "FR.IA.08 ({$asesiName}).pdf";
+        } elseif (in_array($norm, ['ia09', 'fria09', 'pw'], true)) {
+            $filename = "FR.IA.09 ({$asesiName}).pdf";
+        } else {
+            $filename = strtoupper(str_replace(['_', ' '], '-', $docType)).'-'.preg_replace('/[^A-Za-z0-9_-]/', '_', $asesiName).'.pdf';
+        }
 
         return response()->file($filePath, [
             'Content-Type' => 'application/pdf',
