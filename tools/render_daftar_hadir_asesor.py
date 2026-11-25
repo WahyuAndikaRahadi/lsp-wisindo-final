@@ -132,8 +132,8 @@ DATA = {
     "tanggal_uji": "19 Oktober 2026",
     "tanggal_dokumen": "19 Oktober 2026",
     "jumlah_asesi": "10 (Sepuluh) orang",
-    "penanggungjawab_nama": "H. Ahmad Fauzi, S.Pd., M.M.",
-    "penanggungjawab_jabatan": "Kepala TUK Sewaktu",
+    "penanggungjawab_nama": "",
+    "penanggungjawab_jabatan": "",
     "signature_penanggungjawab": None,
     "asesor": [],
 }
@@ -346,7 +346,7 @@ def render_page(c, chunk, chunk_offset, batch_idx, total_batches):
         if rd["as_info"]:
             as_info = rd["as_info"]
             draw_multiline(c, rd["lines_nama"], cols[1] + 6.0, y_mid, 10.0, "Lib", 8.5, Y, align="left")
-            draw_multiline(c, rd["lines_met"], (cols[2] + cols[3]) / 2.0, y_mid, 10.0, "Lib", 8.5, Y, align="center", col_right=cols[3])
+            draw_multiline(c, rd["lines_met"], cols[2], y_mid, 10.0, "Lib", 8.5, Y, align="center", col_right=cols[3])
 
             sig_num = str(global_no)
             is_odd = (global_no % 2 != 0)
@@ -370,9 +370,11 @@ def render_page(c, chunk, chunk_offset, batch_idx, total_batches):
 
     c.setFont("Lib", 8.5)
     c.drawString(324.0, Y(y_sig + 39.0), "Nama")
-    c.drawString(396.0, Y(y_sig + 39.0), f": {DATA.get('penanggungjawab_nama', '')}")
+    pj_nama = str(DATA.get("penanggungjawab_nama") or "").strip()
+    c.drawString(396.0, Y(y_sig + 39.0), f": {pj_nama}" if pj_nama else ":")
     c.drawString(324.0, Y(y_sig + 54.0), "Jabatan")
-    c.drawString(396.0, Y(y_sig + 54.0), f": {DATA.get('penanggungjawab_jabatan', '')}")
+    pj_jabatan = str(DATA.get("penanggungjawab_jabatan") or "").strip()
+    c.drawString(396.0, Y(y_sig + 54.0), f": {pj_jabatan}" if pj_jabatan else ":")
     c.drawString(324.0, Y(y_sig + 69.0), "Tanda tangan")
     c.drawString(396.0, Y(y_sig + 69.0), ":")
 

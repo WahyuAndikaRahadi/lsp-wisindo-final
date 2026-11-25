@@ -130,8 +130,8 @@ DATA = {
     "tanggal_dokumen": "19 Oktober 2026",
     "asesor_nama": "Drs. Budi Santoso, M.T.",
     "asesor_no_reg": "MET.000.001234 2022",
-    "penanggungjawab_nama": "H. Ahmad Fauzi, S.Pd., M.M.",
-    "penanggungjawab_jabatan": "Kepala TUK Sewaktu",
+    "penanggungjawab_nama": "",
+    "penanggungjawab_jabatan": "",
     "signature_asesor": None,
     "signature_penanggungjawab": None,
     "peserta": [],
@@ -349,15 +349,17 @@ def render_page_1(c, chunk, chunk_offset, batch_idx, total_batches, assessor_inf
     c.drawString(135.0, Y1(y_sig + 60.0), f": {asesor_no_reg}")
     c.drawString(65.0, Y1(y_sig + 75.0), "Tanda tangan")
 
-    drawn_asesor = draw_signature(c, sig_asesor, x_left=135.0, y_bottom=Y1(y_sig + 106.0), max_w=120.0, max_h=34.0)
+    drawn_asesor = draw_signature(c, sig_asesor, x_left=95.0, y_bottom=Y1(y_sig + 106.0), max_w=120.0, max_h=34.0)
     if not drawn_asesor:
         c.drawString(135.0, Y1(y_sig + 75.0), ": [Ttd Digital]")
     c.drawString(65.0, Y1(y_sig + 115.0), "………………………………….")
 
     c.drawString(330.0, Y1(y_sig + 45.0), "Nama")
-    c.drawString(405.0, Y1(y_sig + 45.0), f": {DATA.get('penanggungjawab_nama', '')}")
+    pj_nama = str(DATA.get("penanggungjawab_nama") or "").strip()
+    c.drawString(405.0, Y1(y_sig + 45.0), f": {pj_nama}" if pj_nama else ":")
     c.drawString(330.0, Y1(y_sig + 60.0), "Jabatan")
-    c.drawString(405.0, Y1(y_sig + 60.0), f": {DATA.get('penanggungjawab_jabatan', '')}")
+    pj_jabatan = str(DATA.get("penanggungjawab_jabatan") or "").strip()
+    c.drawString(405.0, Y1(y_sig + 60.0), f": {pj_jabatan}" if pj_jabatan else ":")
     c.drawString(330.0, Y1(y_sig + 75.0), "Tanda tangan")
     c.drawString(405.0, Y1(y_sig + 75.0), ":")
 
@@ -509,9 +511,9 @@ def render_page_2(c, chunk, chunk_offset, batch_idx, total_batches, assessor_inf
     c.drawString(cols[0] + 30.0, Y2(y_sig2 + 42.0), f"No. Reg          :  {asesor_no_reg}")
     c.drawString(cols[0] + 30.0, Y2(y_sig2 + 56.0), "Tanda tangan :")
 
-    drawn_asesor_p2 = draw_signature(c, sig_asesor, x_left=cols[0] + 95.0, y_bottom=Y2(y_sig2 + 86.0), max_w=110.0, max_h=30.0)
+    drawn_asesor_p2 = draw_signature(c, sig_asesor, x_left=cols[0] + 60.0, y_bottom=Y2(y_sig2 + 86.0), max_w=110.0, max_h=30.0)
     if not drawn_asesor_p2:
-        c.drawString(cols[0] + 95.0, Y2(y_sig2 + 56.0), "[Ttd Digital]")
+        c.drawString(cols[0] + 60.0, Y2(y_sig2 + 56.0), "[Ttd Digital]")
 
     c.drawString(cols[0] + 30.0, Y2(y_sig2 + 94.0), "………………………………….")
 

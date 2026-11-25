@@ -76,9 +76,19 @@
                 <div class="text-xs sm:text-sm font-bold text-slate-900 leading-snug">
                     {{ $jadwal->tuk_name }}
                 </div>
+                @if($jadwal->effective_tuk_city)
+                    <div class="text-[11px] font-medium text-slate-700">
+                        {{ $jadwal->effective_tuk_city }}{{ $jadwal->nama_provinsi ? ', ' . $jadwal->nama_provinsi : '' }}
+                    </div>
+                @endif
                 <div class="text-[11px] text-slate-500 line-clamp-1" title="{{ $jadwal->effective_tuk_address }}">
                     {{ $jadwal->effective_tuk_address }}
                 </div>
+                @if($jadwal->pic_name)
+                    <div class="text-[11px] text-slate-600 mt-1">
+                        PJ: <span class="font-medium text-slate-800">{{ $jadwal->pic_name }}</span>{{ $jadwal->pic_tuk_position ? ' - ' . $jadwal->pic_tuk_position : '' }}
+                    </div>
+                @endif
             </div>
 
             {{-- Waktu Pelaksanaan --}}

@@ -702,7 +702,7 @@ def render_page_2(c, data, page_idx=1, total_pages=2):
 
 
 def render(dest_path, payload=None):
-    """Render full FR.AK.06 document per assessor (2 pages per assessor)."""
+    """Render full FR.AK.06 document (single copy: exactly 2 pages)."""
     data = dict(DATA)
     if payload:
         data.update(payload)
@@ -721,23 +721,32 @@ def render(dest_path, payload=None):
             "rekomendasi_dimensi": data.get("rekomendasi_dimensi", ""),
         }]
 
-    total_pages = len(assessors) * 2
+    # Only one copy of FR.AK.06 is generated for the assessment schedule.
+    # Select the assessor who submitted the review, or default to the first assessor.
+    chosen_assessor = None
+    for a in assessors:
+        if a.get("is_submitted"):
+            chosen_assessor = a
+            break
+    if not chosen_assessor and assessors:
+        chosen_assessor = assessors[0]
+    if not chosen_assessor:
+        chosen_assessor = {}
+
+    merged_data = dict(data)
+    merged_data.update(chosen_assessor)
+
+    total_pages = 2
     c = canvas.Canvas(dest_path, pagesize=(PAGE_W, PAGE_H))
 
-    for as_idx, as_data in enumerate(assessors):
-        merged_data = dict(data)
-        merged_data.update(as_data)
+    render_page_1(c, merged_data, page_idx=0, total_pages=total_pages)
+    c.showPage()
 
-        p1_idx = as_idx * 2
-        render_page_1(c, merged_data, page_idx=p1_idx, total_pages=total_pages)
-        c.showPage()
-
-        p2_idx = as_idx * 2 + 1
-        render_page_2(c, merged_data, page_idx=p2_idx, total_pages=total_pages)
-        c.showPage()
+    render_page_2(c, merged_data, page_idx=1, total_pages=total_pages)
+    c.showPage()
 
     c.save()
-    print(f"OK -> Sukses generate FR.AK.06 Meninjau Proses Asesmen ({total_pages} halaman, {len(assessors)} asesor): {dest_path}")
+    print(f"OK -> Sukses generate FR.AK.06 Meninjau Proses Asesmen ({total_pages} halaman): {dest_path}")
 
 
 if __name__ == "__main__":

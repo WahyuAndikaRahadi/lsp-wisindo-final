@@ -186,12 +186,12 @@
                             <tr>
                                 <td style="width: 28%;">Nama</td>
                                 <td style="width: 4%;">:</td>
-                                <td style="width: 68%;"><strong>{{ $schedule->pic_tuk_name ?? '........................................' }}</strong></td>
+                                <td style="width: 68%;"><strong>{{ $schedule->pic_tuk_name ?? '' }}</strong></td>
                             </tr>
                             <tr>
                                 <td>Jabatan</td>
                                 <td>:</td>
-                                <td>{{ $schedule->pic_tuk_position ?? 'Penanggung Jawab TUK' }}</td>
+                                <td>{{ $schedule->pic_tuk_position ?? '' }}</td>
                             </tr>
                             <tr>
                                 <td colspan="3" style="padding-top: 6px;">Tanda tangan :</td>

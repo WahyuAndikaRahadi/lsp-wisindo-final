@@ -8,6 +8,7 @@ use App\Models\Schedule;
 use App\Models\Scheme;
 use App\Models\User;
 use App\Services\AkWorkflowService;
+use App\Services\BnspReferenceService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -71,8 +72,10 @@ class JadwalController extends Controller
     {
         $schemes = Scheme::active()->get();
         $assessors = User::where('role', 'ASESOR')->where('status', 'ACTIVE')->orderBy('full_name', 'asc')->get();
+        $provinces = BnspReferenceService::getProvinsiList();
+        $cities = BnspReferenceService::getAllCities();
 
-        return view('admin.jadwal.create', compact('schemes', 'assessors'));
+        return view('admin.jadwal.create', compact('schemes', 'assessors', 'provinces', 'cities'));
     }
 
     public function store(Request $request): RedirectResponse
@@ -82,8 +85,16 @@ class JadwalController extends Controller
             'scheme_id' => 'required|exists:m_schemes,id',
             'tuk_name' => 'nullable|string|max:255',
             'tuk_address' => 'nullable|string|max:500',
+            'kode_provinsi' => 'nullable|string|max:10',
+            'nama_provinsi' => 'nullable|string|max:100',
+            'kode_kota' => 'nullable|string|max:10',
+            'nama_kota' => 'nullable|string|max:100',
+            'tuk_city' => 'nullable|string|max:100',
             'date' => 'required|date',
             'end_date' => 'nullable|date|after_or_equal:date',
+            'pic_name' => 'nullable|string|max:255',
+            'pic_position' => 'nullable|string|max:100',
+            'jabatan' => 'nullable|string|max:100',
             'start_time' => 'nullable|string',
             'end_time' => 'nullable|string',
             'duration_minutes' => 'nullable|integer|min:1',
@@ -101,11 +112,34 @@ class JadwalController extends Controller
 
         $code = $request->input('code') ?: strtoupper(Str::random(8));
 
+        $cityProv = BnspReferenceService::resolveCityAndProvince(
+            $validated['kode_kota'] ?? null,
+            $validated['kode_provinsi'] ?? null,
+            $validated['tuk_address'] ?? null,
+            $validated['tuk_name'] ?? null
+        );
+
+        $kodeKota = $validated['kode_kota'] ?? ($cityProv['kode_kota'] ?? null);
+        $namaKota = $validated['nama_kota'] ?? ($cityProv['nama_kota'] ?? null);
+        $kodeProvinsi = $validated['kode_provinsi'] ?? ($cityProv['kode_provinsi'] ?? '32');
+        $namaProvinsi = $validated['nama_provinsi'] ?? ($cityProv['nama_provinsi'] ?? 'Jawa Barat');
+        $tukCity = $namaKota ?: ($validated['tuk_city'] ?? null);
+
+        $position = $validated['pic_position'] ?? ($validated['jabatan'] ?? null);
+
         $schedule = Schedule::create([
             'name' => $validated['name'],
             'scheme_id' => $validated['scheme_id'],
             'tuk_name' => $validated['tuk_name'] ?? null,
             'tuk_address' => ! empty($validated['tuk_address']) ? $validated['tuk_address'] : '-',
+            'kode_provinsi' => $kodeProvinsi,
+            'nama_provinsi' => $namaProvinsi,
+            'kode_kota' => $kodeKota,
+            'nama_kota' => $namaKota,
+            'tuk_city' => $tukCity,
+            'pic_name' => $validated['pic_name'] ?? null,
+            'pic_position' => $position,
+            'jabatan' => $position,
             'date' => $validated['date'],
             'end_date' => ! empty($validated['end_date']) ? $validated['end_date'] : $validated['date'],
             'start_time' => $validated['start_time'] ?? null,
@@ -172,7 +206,23 @@ class JadwalController extends Controller
         $assessors = User::where('role', 'ASESOR')->where('status', 'ACTIVE')->orderBy('full_name', 'asc')->get();
         $jadwal->load('assessors');
 
-        return view('admin.jadwal.edit', compact('jadwal', 'schemes', 'assessors'));
+        if (empty($jadwal->kode_kota) && (! empty($jadwal->tuk_address) || ! empty($jadwal->tuk_city) || ! empty($jadwal->tuk_name))) {
+            $resolved = BnspReferenceService::resolveCityAndProvince(
+                null,
+                null,
+                $jadwal->tuk_address,
+                $jadwal->tuk_city ?: $jadwal->tuk_name
+            );
+            $jadwal->kode_kota = $resolved['kode_kota'] ?? null;
+            $jadwal->nama_kota = $resolved['nama_kota'] ?? null;
+            $jadwal->kode_provinsi = $resolved['kode_provinsi'] ?? '32';
+            $jadwal->nama_provinsi = $resolved['nama_provinsi'] ?? 'Jawa Barat';
+        }
+
+        $provinces = BnspReferenceService::getProvinsiList();
+        $cities = BnspReferenceService::getAllCities();
+
+        return view('admin.jadwal.edit', compact('jadwal', 'schemes', 'assessors', 'provinces', 'cities'));
     }
 
     public function update(Request $request, Schedule $jadwal): RedirectResponse
@@ -182,8 +232,16 @@ class JadwalController extends Controller
             'scheme_id' => 'required|exists:m_schemes,id',
             'tuk_name' => 'nullable|string|max:255',
             'tuk_address' => 'nullable|string|max:500',
+            'kode_provinsi' => 'nullable|string|max:10',
+            'nama_provinsi' => 'nullable|string|max:100',
+            'kode_kota' => 'nullable|string|max:10',
+            'nama_kota' => 'nullable|string|max:100',
+            'tuk_city' => 'nullable|string|max:100',
             'date' => 'required|date',
             'end_date' => 'nullable|date|after_or_equal:date',
+            'pic_name' => 'nullable|string|max:255',
+            'pic_position' => 'nullable|string|max:100',
+            'jabatan' => 'nullable|string|max:100',
             'start_time' => 'nullable|string',
             'end_time' => 'nullable|string',
             'duration_minutes' => 'nullable|integer|min:1',
@@ -216,6 +274,25 @@ class JadwalController extends Controller
         }
         if (empty($validated['director_name'])) {
             $validated['director_name'] = 'RIDWAN';
+        }
+
+        $cityProv = BnspReferenceService::resolveCityAndProvince(
+            $validated['kode_kota'] ?? $jadwal->kode_kota,
+            $validated['kode_provinsi'] ?? $jadwal->kode_provinsi,
+            $validated['tuk_address'] ?? $jadwal->tuk_address,
+            $validated['tuk_name'] ?? $jadwal->tuk_name
+        );
+
+        $validated['kode_kota'] = $validated['kode_kota'] ?? ($cityProv['kode_kota'] ?? $jadwal->kode_kota);
+        $validated['nama_kota'] = $validated['nama_kota'] ?? ($cityProv['nama_kota'] ?? $jadwal->nama_kota);
+        $validated['kode_provinsi'] = $validated['kode_provinsi'] ?? ($cityProv['kode_provinsi'] ?? $jadwal->kode_provinsi);
+        $validated['nama_provinsi'] = $validated['nama_provinsi'] ?? ($cityProv['nama_provinsi'] ?? $jadwal->nama_provinsi);
+        $validated['tuk_city'] = $validated['nama_kota'] ?: ($validated['tuk_city'] ?? $jadwal->tuk_city);
+
+        if (array_key_exists('pic_position', $validated) || array_key_exists('jabatan', $validated)) {
+            $pos = $validated['pic_position'] ?? ($validated['jabatan'] ?? null);
+            $validated['pic_position'] = $pos;
+            $validated['jabatan'] = $pos;
         }
 
         $jadwal->update($validated);

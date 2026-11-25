@@ -60,6 +60,90 @@
                 </div>
             </div>
 
+            {{-- Wilayah TUK: Provinsi & Kabupaten/Kota (Sesuai Master Kode BNSP / Profil Asesi) --}}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4"
+                 x-data="{
+                    provinces: {{ Js::from($provinces ?? \App\Services\BnspReferenceService::getProvinsiList()) }},
+                    allCities: {{ Js::from($cities ?? \App\Services\BnspReferenceService::getAllCities()) }},
+                    selectedProvince: '{{ old('kode_provinsi', $jadwal->kode_provinsi ?? '32') }}',
+                    selectedCity: '{{ old('kode_kota', $jadwal->kode_kota ?? '') }}',
+                    get filteredCities() {
+                        if (!this.selectedProvince) return [];
+                        return this.allCities.filter(c => String(c.province_code) === String(this.selectedProvince));
+                    },
+                    init() {
+                        if (this.selectedProvince && !document.getElementById('tuk_nama_provinsi_input').value) {
+                            let prov = this.provinces.find(p => String(p.code) === String(this.selectedProvince));
+                            if (prov) document.getElementById('tuk_nama_provinsi_input').value = prov.name;
+                        }
+                        if (this.selectedCity && !document.getElementById('tuk_nama_kota_input').value) {
+                            let city = this.allCities.find(c => String(c.code) === String(this.selectedCity));
+                            if (city) document.getElementById('tuk_nama_kota_input').value = city.name;
+                        }
+                    },
+                    updateProvince(code) {
+                        this.selectedProvince = code;
+                        let prov = this.provinces.find(p => String(p.code) === String(code));
+                        document.getElementById('tuk_nama_provinsi_input').value = prov ? prov.name : '';
+                        this.selectedCity = '';
+                        document.getElementById('tuk_nama_kota_input').value = '';
+                    },
+                    updateCity(code) {
+                        this.selectedCity = code;
+                        let city = this.allCities.find(c => String(c.code) === String(code));
+                        document.getElementById('tuk_nama_kota_input').value = city ? city.name : '';
+                    }
+                 }">
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">
+                        Provinsi TUK <span class="text-rose-500">*</span>
+                    </label>
+                    <select name="kode_provinsi" @change="updateProvince($event.target.value)" required
+                        class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                        <option value="">-- Pilih Provinsi TUK --</option>
+                        <template x-for="prov in provinces" :key="prov.code">
+                            <option :value="prov.code" :selected="String(prov.code) === String(selectedProvince)" x-text="prov.name"></option>
+                        </template>
+                    </select>
+                    <input type="hidden" name="nama_provinsi" id="tuk_nama_provinsi_input" value="{{ old('nama_provinsi', $jadwal->nama_provinsi) }}">
+                    @error('kode_provinsi') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">
+                        Kabupaten / Kota TUK (District) <span class="text-rose-500">*</span>
+                    </label>
+                    <select name="kode_kota" @change="updateCity($event.target.value)" required
+                        class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                        <option value="">-- Pilih Kota / Kabupaten TUK --</option>
+                        <template x-for="city in filteredCities" :key="city.code">
+                            <option :value="city.code" :selected="String(city.code) === String(selectedCity)" x-text="city.name"></option>
+                        </template>
+                    </select>
+                    <input type="hidden" name="nama_kota" id="tuk_nama_kota_input" value="{{ old('nama_kota', $jadwal->nama_kota) }}">
+                    @error('kode_kota') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
+                </div>
+            </div>
+
+            {{-- Penanggung Jawab TUK & Jabatan --}}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Nama Penanggung Jawab TUK <span class="text-xs font-normal text-slate-400">(Opsional)</span></label>
+                    <input type="text" name="pic_name" value="{{ old('pic_name', $jadwal->pic_name) }}" placeholder="Contoh: Dr. H. Mulyadi, M.Pd." class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                    @error('pic_name')
+                        <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Jabatan <span class="text-xs font-normal text-slate-400">(Opsional)</span></label>
+                    <input type="text" name="pic_position" value="{{ old('pic_position', old('jabatan', $jadwal->pic_position ?: $jadwal->jabatan)) }}" placeholder="Contoh: Kepala Sekolah / Kepala TUK" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                    @error('pic_position')
+                        <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+            </div>
+
             <div>
                 <label class="block text-sm font-semibold text-slate-700 mb-1">Asesor yang Ditugaskan (Multi-select) <span class="text-rose-500">*</span></label>
                 @php

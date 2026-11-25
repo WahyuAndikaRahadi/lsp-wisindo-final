@@ -24,6 +24,13 @@ class Schedule extends Model
         'tuk_id',
         'tuk_name',
         'tuk_address',
+        'kode_provinsi',
+        'nama_provinsi',
+        'kode_kota',
+        'nama_kota',
+        'tuk_city',
+        'kode_pekerjaan',
+        'jabatan',
         'date',
         'end_date',
         'start_time',
@@ -83,7 +90,7 @@ class Schedule extends Model
 
     public function getPicTukPositionAttribute(): ?string
     {
-        return $this->pic_position;
+        return $this->pic_position ?: $this->jabatan;
     }
 
     public function getPicTukSignatureAttribute(): ?string
@@ -159,6 +166,11 @@ class Schedule extends Model
         }
 
         return $this->tuk_address ?: '-';
+    }
+
+    public function getEffectiveTukCityAttribute(): ?string
+    {
+        return $this->nama_kota ?: ($this->tuk_city ?: null);
     }
 
     public function getFormattedSuratTugasDateAttribute(): string

@@ -294,8 +294,8 @@ class MukDynamicDocumentService
             'asesor_nama' => $leadAssessor?->full_name ?? 'Asesor LSP PrO Indo',
             'asesor_no_reg' => $leadAssessor?->assessor_registration_number ?? $leadAssessor?->profile?->no_reg ?? 'MET.000.001234 2022',
             'tanggal_dokumen' => $formattedDate,
-            'penanggungjawab_nama' => $schedule->pic_name ?? 'H. Ahmad Fauzi, S.Pd., M.M.',
-            'penanggungjawab_jabatan' => $schedule->pic_position ?? 'Kepala TUK',
+            'penanggungjawab_nama' => $schedule->pic_name ?? '',
+            'penanggungjawab_jabatan' => $schedule->pic_position ?? ($schedule->jabatan ?? ''),
             'signature_penanggungjawab' => $schedule->pic_signature,
             'signature_asesor' => $leadAssessor?->profile?->signature_data,
         ];
@@ -2447,7 +2447,27 @@ class MukDynamicDocumentService
             ];
         }
 
-        $firstAssessor = reset($assessorsPayload);
+        $selectedAssessor = null;
+        $reviewerId = $review['reviewer_id'] ?? null;
+        if ($reviewerId !== null) {
+            foreach ($assessorsPayload as $ap) {
+                if ((int) $ap['asesor_id'] === (int) $reviewerId) {
+                    $selectedAssessor = $ap;
+                    break;
+                }
+            }
+        }
+        if (! $selectedAssessor) {
+            foreach ($assessorsPayload as $ap) {
+                if (! empty($ap['is_submitted'])) {
+                    $selectedAssessor = $ap;
+                    break;
+                }
+            }
+        }
+        if (! $selectedAssessor) {
+            $selectedAssessor = reset($assessorsPayload);
+        }
 
         return [
             'skema_nama' => $scheme?->name ?? 'Maintenance Gasoline Engine Injection System',
@@ -2455,16 +2475,16 @@ class MukDynamicDocumentService
             'skema_tipe' => strtoupper((string) ($scheme?->scheme_type ?? 'KLASTER')),
             'tuk_nama' => $tukName,
             'tuk_tipe' => $tukType,
-            'asesor_nama' => $firstAssessor['asesor_nama'] ?? '',
-            'asesor_no_reg' => $firstAssessor['asesor_no_reg'] ?? '',
-            'signature_asesor' => $firstAssessor['signature_asesor'] ?? null,
-            'tanggal' => $firstAssessor['tanggal'] ?? '',
-            'is_submitted' => $firstAssessor['is_submitted'] ?? false,
-            'template_type' => $firstAssessor['template_type'] ?? '',
-            'catatan_peninjau' => $firstAssessor['catatan_peninjau'] ?? '',
-            'rekomendasi_prosedur' => $firstAssessor['rekomendasi_prosedur'] ?? '',
-            'rekomendasi_dimensi' => $firstAssessor['rekomendasi_dimensi'] ?? '',
-            'assessors' => $assessorsPayload,
+            'asesor_nama' => $selectedAssessor['asesor_nama'] ?? '',
+            'asesor_no_reg' => $selectedAssessor['asesor_no_reg'] ?? '',
+            'signature_asesor' => $selectedAssessor['signature_asesor'] ?? null,
+            'tanggal' => $selectedAssessor['tanggal'] ?? '',
+            'is_submitted' => $selectedAssessor['is_submitted'] ?? false,
+            'template_type' => $selectedAssessor['template_type'] ?? '',
+            'catatan_peninjau' => $selectedAssessor['catatan_peninjau'] ?? '',
+            'rekomendasi_prosedur' => $selectedAssessor['rekomendasi_prosedur'] ?? '',
+            'rekomendasi_dimensi' => $selectedAssessor['rekomendasi_dimensi'] ?? '',
+            'assessors' => [$selectedAssessor],
         ];
     }
 
