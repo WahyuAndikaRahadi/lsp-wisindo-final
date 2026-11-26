@@ -39,28 +39,28 @@
     @endif
 
     {{-- Schedule Details Card --}}
-    <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+    <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-sm">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
             <div>
-                <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Skema Sertifikasi</span>
-                <p class="text-slate-900 font-bold mt-1 text-sm">{{ $schedule->scheme->name }}</p>
-                <span class="font-mono text-xs text-brand-700 bg-brand-50 px-2 py-0.5 rounded border border-brand-200 mt-1 inline-block">
+                <span class="text-xs font-semibold text-slate-500">Skema Sertifikasi</span>
+                <p class="text-slate-900 font-bold mt-0.5 text-sm">{{ $schedule->scheme->name }}</p>
+                <span class="font-mono text-[11px] text-brand-700 bg-brand-50 px-2 py-0.5 rounded border border-brand-200 mt-1 inline-block">
                     {{ $schedule->scheme->code }}
                 </span>
             </div>
             <div>
-                <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Tempat Uji Kompetensi (TUK)</span>
-                <p class="text-slate-900 font-bold mt-1 text-sm">{{ $schedule->tuk_name }}</p>
+                <span class="text-xs font-semibold text-slate-500">Tempat Uji Kompetensi (TUK)</span>
+                <p class="text-slate-900 font-bold mt-0.5 text-sm">{{ $schedule->tuk_name }}</p>
                 <p class="text-xs text-slate-500 mt-0.5">{{ $schedule->code }}</p>
             </div>
             <div>
-                <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Waktu Pelaksanaan</span>
-                <p class="text-slate-900 font-bold mt-1 text-sm">{{ \Carbon\Carbon::parse($schedule->date)->isoFormat('dddd, D MMMM Y') }}</p>
+                <span class="text-xs font-semibold text-slate-500">Waktu Pelaksanaan</span>
+                <p class="text-slate-900 font-bold mt-0.5 text-sm">{{ \Carbon\Carbon::parse($schedule->date)->isoFormat('dddd, D MMMM Y') }}</p>
                 <p class="text-xs text-slate-500 mt-0.5">{{ substr($schedule->start_time, 0, 5) }} - {{ substr($schedule->end_time, 0, 5) }} WIB</p>
             </div>
             <div>
-                <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Asesor</span>
-                <p class="text-slate-900 font-bold mt-1 text-sm">{{ $assessment->assessor?->full_name ?? 'Tim Asesor LSP' }}</p>
+                <span class="text-xs font-semibold text-slate-500">Asesor</span>
+                <p class="text-slate-900 font-bold mt-0.5 text-sm">{{ $assessment->assessor?->full_name ?? 'Tim Asesor LSP' }}</p>
                 <span class="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 mt-1 inline-block">
                     Status: {{ $assessment->status === 'COMPLETED' ? 'SELESAI' : 'AKTIF' }}
                 </span>
@@ -70,20 +70,20 @@
 
     {{-- Selected Instruments Heading --}}
     <div>
-        <h2 class="text-lg font-black text-slate-900 tracking-tight">Instrumen Asesmen</h2>
+        <h2 class="text-base sm:text-lg font-bold text-slate-900 tracking-tight">Instrumen Asesmen</h2>
         <p class="text-xs text-slate-500">Daftar instrumen asesmen yang ditetapkan untuk Anda</p>
     </div>
 
     {{-- Grid of Selected Instruments --}}
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
         @forelse($instruments as $inst)
             <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-sm flex flex-col justify-between hover:shadow-md transition">
                 <div class="space-y-3">
-                    <div class="flex items-center justify-between">
-                        <span class="font-mono text-xs font-bold px-2.5 py-1 rounded border {{ $inst['badge_color'] }}">
+                    <div class="flex items-center justify-between gap-2">
+                        <span class="font-mono text-xs font-bold px-2 py-0.5 rounded border {{ $inst['badge_color'] }} shrink-0">
                             {{ $inst['code'] }}
                         </span>
-                        <span class="text-xs font-semibold {{ $inst['status_badge_class'] }}">
+                        <span class="text-xs font-semibold {{ $inst['status_badge_class'] }} truncate">
                             {{ $inst['status_label'] }}
                         </span>
                     </div>

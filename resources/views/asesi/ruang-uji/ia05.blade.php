@@ -76,43 +76,39 @@
             }
         @endphp
         <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-            <div class="px-6 py-4 bg-slate-900 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800">
+            <div class="px-4 sm:px-6 py-3.5 sm:py-4 bg-slate-900 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 border-b border-slate-800">
                 <div>
-                    <span class="text-xs font-mono font-bold text-purple-400 uppercase tracking-wider block">Hasil Evaluasi CBT Online</span>
-                    <h2 class="text-base sm:text-lg font-bold text-white">Ringkasan Nilai &amp; Rekomendasi Ujian Teori</h2>
+                    <span class="text-xs font-mono font-bold text-purple-400 uppercase tracking-wider block">FR.IA.05</span>
+                    <h2 class="text-sm sm:text-base font-bold text-white">Ringkasan Hasil Evaluasi CBT</h2>
                 </div>
-                <span class="inline-flex items-center px-4 py-1.5 rounded-full text-xs font-black shadow-xs {{ $isPassed ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-rose-100 text-rose-800 border border-rose-300' }}">
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold shadow-xs {{ $isPassed ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-rose-100 text-rose-800 border border-rose-300' }}">
                     {{ $isPassed ? '✓ KOMPETEN (K)' : '✕ BELUM KOMPETEN (BK)' }}
                 </span>
             </div>
-            <div class="p-4 sm:p-6 grid grid-cols-2 sm:grid-cols-4 gap-4 bg-slate-50/50">
-                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs">
-                    <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Nilai Akhir CBT</span>
-                    <div class="mt-1 text-2xl font-black font-mono {{ $isPassed ? 'text-emerald-700' : 'text-rose-700' }}">
+            <div class="p-4 sm:p-6 grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 bg-slate-50/50">
+                <div class="bg-white p-3.5 sm:p-4 rounded-xl border border-slate-200 shadow-2xs">
+                    <span class="text-[11px] font-semibold text-slate-500">Nilai CBT</span>
+                    <div class="mt-1 text-xl sm:text-2xl font-black font-mono {{ $isPassed ? 'text-emerald-700' : 'text-rose-700' }}">
                         {{ number_format($score, 1) }} <span class="text-xs font-normal text-slate-500">/ 100</span>
                     </div>
-                    <span class="text-[10px] text-slate-400 font-medium">Berdasarkan koreksi otomatis</span>
                 </div>
-                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs">
-                    <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Standar Minimal (KKM)</span>
-                    <div class="mt-1 text-2xl font-black font-mono text-slate-800">
+                <div class="bg-white p-3.5 sm:p-4 rounded-xl border border-slate-200 shadow-2xs">
+                    <span class="text-[11px] font-semibold text-slate-500">Standar Minimal (KKM)</span>
+                    <div class="mt-1 text-xl sm:text-2xl font-black font-mono text-slate-800">
                         {{ number_format($passingGrade, 1) }}
                     </div>
-                    <span class="text-[10px] text-slate-400 font-medium">Batas kelulusan teori</span>
                 </div>
-                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs">
-                    <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Jawaban Benar</span>
-                    <div class="mt-1 text-2xl font-black font-mono text-emerald-600">
+                <div class="bg-white p-3.5 sm:p-4 rounded-xl border border-slate-200 shadow-2xs">
+                    <span class="text-[11px] font-semibold text-slate-500">Jawaban Benar</span>
+                    <div class="mt-1 text-xl sm:text-2xl font-black font-mono text-emerald-600">
                         {{ $correctCount }} <span class="text-xs font-normal text-slate-500">/ {{ $questions->count() }}</span>
                     </div>
-                    <span class="text-[10px] text-slate-400 font-medium">{{ round(($correctCount / max(1, $questions->count())) * 100) }}% ketepatan</span>
                 </div>
-                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs">
-                    <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Status Kelulusan</span>
-                    <div class="mt-1 text-base font-black {{ $isPassed ? 'text-emerald-700' : 'text-rose-700' }}">
-                        {{ $isPassed ? 'Memenuhi Standar' : 'Di Bawah Standar' }}
+                <div class="bg-white p-3.5 sm:p-4 rounded-xl border border-slate-200 shadow-2xs">
+                    <span class="text-[11px] font-semibold text-slate-500">Status Rekomendasi</span>
+                    <div class="mt-1 text-xs sm:text-sm font-black {{ $isPassed ? 'text-emerald-700' : 'text-rose-700' }}">
+                        {{ $isPassed ? 'KOMPETEN (K)' : 'BELUM KOMPETEN (BK)' }}
                     </div>
-                    <span class="text-[10px] text-slate-500 font-semibold">{{ $isPassed ? 'Rekomendasi K' : 'Rekomendasi BK' }}</span>
                 </div>
             </div>
         </div>
@@ -154,8 +150,8 @@
                             {{-- Panel Header --}}
                             <div class="flex flex-wrap items-center justify-between pb-3 border-b border-slate-100 gap-2">
                                 <div class="flex items-center gap-2">
-                                    <span class="px-3 py-1 bg-brand-50 text-brand-700 text-xs font-bold rounded-lg border border-brand-200 font-mono">
-                                        Soal No. {{ $index + 1 }} dari {{ $questions->count() }}
+                                    <span class="px-2.5 py-1 bg-brand-50 text-brand-700 text-xs font-bold rounded-lg border border-brand-200 font-mono">
+                                        Soal #{{ $index + 1 }} / {{ $questions->count() }}
                                     </span>
                                     @if($isSubmitted)
                                         @if($savedVal === null || $savedVal === '')

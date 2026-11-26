@@ -214,18 +214,18 @@ class RuangUjiController extends Controller
                 $isPassed = $score >= $passingGrade;
 
                 if ($isDone) {
-                    $meta['status_label'] = ($isPassed ? '✓ Kompeten (K)' : 'Belum Kompeten (BK)')." • {$score}/100";
+                    $meta['status_label'] = $isPassed ? '✓ Kompeten (K)' : 'Belum Kompeten (BK)';
                     $meta['status_badge_class'] = $isPassed
                         ? 'text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200'
                         : 'text-rose-700 bg-rose-50 px-2 py-0.5 rounded border border-rose-200';
                 } else {
-                    $meta['status_label'] = 'Ujian Teori CBT';
+                    $meta['status_label'] = 'Ujian CBT';
                     $meta['status_badge_class'] = 'text-purple-700 bg-purple-50 px-2 py-0.5 rounded border border-purple-200';
                 }
                 $meta['progress_percent'] = ($isDone || $schedule->is_closed) ? 100 : 0;
                 $meta['progress_bar_color'] = ($isDone || $schedule->is_closed) ? ($isPassed ? 'bg-emerald-600' : 'bg-rose-500') : 'bg-purple-600';
-                $meta['progress_text'] = ($isDone || $schedule->is_closed) ? ($isPassed ? 'Lulus KKM (≥ '.$passingGrade.')' : 'Di Bawah KKM (< '.$passingGrade.')') : '0 / 1 Belum Ujian';
-                $meta['action_label'] = ($isDone || $schedule->is_closed) ? 'Lihat Hasil CBT' : 'Mulai Kerjakan CBT';
+                $meta['progress_text'] = ($isDone || $schedule->is_closed) ? "Nilai: {$score}/100" : 'Belum Ujian';
+                $meta['action_label'] = ($isDone || $schedule->is_closed) ? 'Lihat Hasil CBT' : 'Mulai CBT';
                 $meta['action_button_class'] = ($isDone || $schedule->is_closed) ? 'bg-slate-800 hover:bg-slate-900 text-white' : 'bg-brand-600 hover:bg-brand-700 text-white';
             } elseif ($codeUpper === 'IA02') {
                 $hasSigned = (bool) $resp?->asesi_signed_at || (bool) $resp?->assessor_signed_at;
@@ -233,8 +233,8 @@ class RuangUjiController extends Controller
                 $meta['status_badge_class'] = 'text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200';
                 $meta['progress_percent'] = 100;
                 $meta['progress_bar_color'] = 'bg-emerald-600';
-                $meta['progress_text'] = 'Instruksi Kerja Praktik';
-                $meta['action_label'] = 'Lihat Praktik Demonstrasi';
+                $meta['progress_text'] = 'Instruksi Praktik';
+                $meta['action_label'] = 'Lihat Praktik';
                 $meta['action_button_class'] = $schedule->is_closed ? 'bg-slate-800 hover:bg-slate-900 text-white' : 'bg-brand-600 hover:bg-brand-700 text-white';
             } elseif ($codeUpper === 'IA01') {
                 $hasEvaluated = (bool) $resp?->assessor_signed_at || ! empty($resp?->assessor_notes);
@@ -248,13 +248,13 @@ class RuangUjiController extends Controller
                         ? 'text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200'
                         : 'text-rose-700 bg-rose-50 px-2 py-0.5 rounded border border-rose-200';
                 } else {
-                    $meta['status_label'] = $schedule->is_closed ? 'Observasi Praktik Selesai' : 'Observasi Praktik';
+                    $meta['status_label'] = $schedule->is_closed ? 'Observasi Selesai' : 'Observasi Praktik';
                     $meta['status_badge_class'] = 'text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200';
                 }
                 $meta['progress_percent'] = ($hasEvaluated || $schedule->is_closed) ? 100 : 0;
                 $meta['progress_bar_color'] = ($hasEvaluated || $schedule->is_closed) ? ($recIa01 === 'K' ? 'bg-emerald-600' : 'bg-rose-500') : 'bg-slate-400';
-                $meta['progress_text'] = ($hasEvaluated || $schedule->is_closed) ? '1 / 1 Telah Dievaluasi' : '0 / 1 Evaluasi Asesor';
-                $meta['action_label'] = 'Lihat Evaluasi Asesor';
+                $meta['progress_text'] = ($hasEvaluated || $schedule->is_closed) ? 'Telah Dievaluasi' : 'Menunggu Asesor';
+                $meta['action_label'] = 'Lihat Observasi';
                 $meta['action_button_class'] = ($hasEvaluated || $schedule->is_closed) ? 'bg-slate-800 hover:bg-slate-900 text-white' : 'bg-slate-700 hover:bg-slate-800 text-white';
             } elseif ($codeUpper === 'IA01B') {
                 $hasEvidence = ! empty($resp?->data_json['evidence_image_path']);
@@ -276,15 +276,15 @@ class RuangUjiController extends Controller
                     $meta['progress_percent'] = 75;
                     $meta['progress_bar_color'] = 'bg-blue-600';
                     $meta['progress_text'] = 'Menunggu Evaluasi';
-                    $meta['action_label'] = 'Lihat Lembar Pemeriksaan';
+                    $meta['action_label'] = 'Lihat Report Sheet';
                     $meta['action_button_class'] = 'bg-brand-600 hover:bg-brand-700 text-white';
                 } else {
-                    $meta['status_label'] = ($hasEvidence || $schedule->is_closed) ? '✓ Lembar Fisik Diunggah' : 'Unggah Lembar Fisik';
+                    $meta['status_label'] = ($hasEvidence || $schedule->is_closed) ? '✓ Terunggah' : 'Wajib Unggah';
                     $meta['status_badge_class'] = ($hasEvidence || $schedule->is_closed) ? 'text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200' : 'text-cyan-700 bg-cyan-50 px-2 py-0.5 rounded border border-cyan-200';
                     $meta['progress_percent'] = ($hasEvidence || $schedule->is_closed) ? 100 : 0;
                     $meta['progress_bar_color'] = ($hasEvidence || $schedule->is_closed) ? 'bg-emerald-600' : 'bg-blue-500';
-                    $meta['progress_text'] = ($hasEvidence || $schedule->is_closed) ? '1 / 1 Terunggah' : '0 / 1 Belum Diunggah';
-                    $meta['action_label'] = ($hasEvidence || $schedule->is_closed) ? 'Lihat Lembar Pemeriksaan' : 'Unggah Lembar Fisik';
+                    $meta['progress_text'] = ($hasEvidence || $schedule->is_closed) ? '1 Berkas Terunggah' : 'Belum Diunggah';
+                    $meta['action_label'] = ($hasEvidence || $schedule->is_closed) ? 'Lihat Report Sheet' : 'Unggah Report Sheet';
                     $meta['action_button_class'] = ($hasEvidence || $schedule->is_closed) ? 'bg-slate-800 hover:bg-slate-900 text-white' : 'bg-brand-600 hover:bg-brand-700 text-white';
                 }
             } elseif ($codeUpper === 'IA03') {
@@ -302,8 +302,8 @@ class RuangUjiController extends Controller
                 }
                 $meta['progress_percent'] = ($hasEvaluated || $schedule->is_closed) ? 100 : 0;
                 $meta['progress_bar_color'] = ($hasEvaluated || $schedule->is_closed) ? ($recIa03 === 'K' ? 'bg-emerald-600' : 'bg-rose-500') : 'bg-slate-400';
-                $meta['progress_text'] = ($hasEvaluated || $schedule->is_closed) ? '1 / 1 Telah Dievaluasi' : '0 / 1 Evaluasi Asesor';
-                $meta['action_label'] = 'Lihat Evaluasi Asesor';
+                $meta['progress_text'] = ($hasEvaluated || $schedule->is_closed) ? 'Telah Dievaluasi' : 'Menunggu Asesor';
+                $meta['action_label'] = 'Lihat Pertanyaan';
                 $meta['action_button_class'] = ($hasEvaluated || $schedule->is_closed) ? 'bg-slate-800 hover:bg-slate-900 text-white' : 'bg-slate-700 hover:bg-slate-800 text-white';
             } elseif ($codeUpper === 'IA08') {
                 $portfolios = $resp?->data_json['portfolios'] ?? [];
@@ -319,23 +319,23 @@ class RuangUjiController extends Controller
                     $meta['progress_percent'] = 100;
                     $meta['progress_bar_color'] = $recIa08 === 'K' ? 'bg-emerald-600' : 'bg-rose-500';
                     $meta['progress_text'] = count($portfolios).' Berkas Diverifikasi';
-                    $meta['action_label'] = 'Lihat Hasil Verifikasi';
+                    $meta['action_label'] = 'Lihat Portofolio';
                     $meta['action_button_class'] = 'bg-slate-800 hover:bg-slate-900 text-white';
                 } elseif ($hasPortfolios) {
-                    $meta['status_label'] = 'Menunggu Verifikasi Asesor';
+                    $meta['status_label'] = 'Menunggu Verifikasi';
                     $meta['status_badge_class'] = 'text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200';
                     $meta['progress_percent'] = 75;
                     $meta['progress_bar_color'] = 'bg-blue-600';
-                    $meta['progress_text'] = count($portfolios).' Berkas Diunggah';
-                    $meta['action_label'] = 'Lihat / Kelola Portofolio';
+                    $meta['progress_text'] = count($portfolios).' Berkas Terunggah';
+                    $meta['action_label'] = 'Kelola Portofolio';
                     $meta['action_button_class'] = 'bg-brand-600 hover:bg-brand-700 text-white';
                 } else {
-                    $meta['status_label'] = 'Belum Diunggah Asesi';
+                    $meta['status_label'] = 'Wajib Unggah';
                     $meta['status_badge_class'] = 'text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200';
                     $meta['progress_percent'] = 0;
                     $meta['progress_bar_color'] = 'bg-amber-500';
-                    $meta['progress_text'] = '0 / 1-3 Berkas Portofolio';
-                    $meta['action_label'] = 'Unggah Portofolio (1-3 Berkas)';
+                    $meta['progress_text'] = '0 / 3 Berkas';
+                    $meta['action_label'] = 'Unggah Portofolio';
                     $meta['action_button_class'] = 'bg-brand-600 hover:bg-brand-700 text-white';
                 }
             } elseif ($codeUpper === 'IA09') {
@@ -348,13 +348,13 @@ class RuangUjiController extends Controller
                         ? 'text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200'
                         : 'text-rose-700 bg-rose-50 px-2 py-0.5 rounded border border-rose-200';
                 } else {
-                    $meta['status_label'] = 'Sesi Wawancara';
+                    $meta['status_label'] = 'Wawancara';
                     $meta['status_badge_class'] = 'text-violet-700 bg-violet-50 px-2 py-0.5 rounded border border-violet-200';
                 }
                 $meta['progress_percent'] = ($hasEvaluated || $schedule->is_closed) ? 100 : 0;
                 $meta['progress_bar_color'] = ($hasEvaluated || $schedule->is_closed) ? ($recIa09 === 'K' ? 'bg-emerald-600' : 'bg-rose-500') : 'bg-slate-400';
-                $meta['progress_text'] = ($hasEvaluated || $schedule->is_closed) ? '1 / 1 Telah Selesai' : '0 / 1 Tatap Muka Asesor';
-                $meta['action_label'] = ($hasEvaluated || $schedule->is_closed) ? 'Lihat Hasil Wawancara' : 'Persiapan Wawancara';
+                $meta['progress_text'] = ($hasEvaluated || $schedule->is_closed) ? 'Telah Selesai' : 'Menunggu Asesor';
+                $meta['action_label'] = 'Lihat Wawancara';
                 $meta['action_button_class'] = ($hasEvaluated || $schedule->is_closed) ? 'bg-slate-800 hover:bg-slate-900 text-white' : 'bg-slate-700 hover:bg-slate-800 text-white';
             } else {
                 $hasEvaluated = (bool) $resp?->assessor_signed_at;

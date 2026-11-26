@@ -35,11 +35,11 @@
                     @endphp
                     @if($isRevisionRequestedHeader)
                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-100 text-rose-800 border border-rose-200">
-                            ⚠️ Wajib Revisi Berkas
+                            ⚠️ Perlu Revisi Berkas
                         </span>
                     @elseif($evidencePathHeader)
                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
-                            ✓ Berkas Terunggah
+                            ✓ Terunggah
                         </span>
                     @else
                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-900 border border-amber-200">
@@ -57,11 +57,11 @@
                         </span>
                     @elseif($hasPortfoliosHeader)
                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-100 text-blue-800 border border-blue-200">
-                            Menunggu Verifikasi Asesor
+                            Menunggu Verifikasi
                         </span>
                     @else
                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-900 border border-amber-200">
-                            Wajib Unggah Portofolio
+                            Wajib Unggah
                         </span>
                     @endif
                 @elseif(strtoupper($code) === 'IA09')
@@ -74,7 +74,7 @@
                         </span>
                     @else
                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-violet-100 text-violet-800 border border-violet-200">
-                            Menunggu Sesi Wawancara
+                            Menunggu Wawancara
                         </span>
                     @endif
                 @elseif(strtoupper($code) === 'IA01')
@@ -89,7 +89,7 @@
                         </span>
                     @else
                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-100 text-blue-800 border border-blue-200">
-                            Menunggu Observasi Asesor
+                            Menunggu Observasi
                         </span>
                     @endif
                 @elseif(strtoupper($code) === 'IA03')
@@ -102,13 +102,13 @@
                         </span>
                     @else
                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200">
-                            Menunggu Sesi Lisan
+                            Menunggu Asesor
                         </span>
                     @endif
                 @else
                     @if($hasEvaluatedHeader)
                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
-                            ✓ Diverifikasi Asesor
+                            ✓ Diverifikasi
                         </span>
                     @else
                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200">
@@ -119,7 +119,7 @@
             </div>
         </div>
         <div>
-            <h1 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-snug">
+            <h1 class="text-base sm:text-2xl font-black text-slate-900 tracking-tight leading-snug">
                 @if(strtoupper($code) === 'IA01')
                     FR.IA.01. CEKLIS OBSERVASI AKTIVITAS PRAKTIK
                 @elseif(strtoupper($code) === 'IA01B')
@@ -166,99 +166,47 @@
             {{-- Status Rekomendasi Hasil Observasi --}}
             @if($isAssessedIa01)
                 <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                    <div class="px-6 py-4 bg-slate-900 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800">
+                    <div class="px-4 sm:px-6 py-3.5 sm:py-4 bg-slate-900 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 border-b border-slate-800">
                         <div>
-                            <span class="text-xs font-mono font-bold text-blue-400 uppercase tracking-wider block">Transparansi Penilaian FR.IA.01</span>
+                            <span class="text-xs font-mono font-bold text-blue-400 uppercase tracking-wider block">FR.IA.01</span>
                             <h3 class="text-sm sm:text-base font-bold text-white">Rekomendasi Hasil Observasi Praktik</h3>
                         </div>
-                        <span class="inline-flex items-center px-3.5 py-1.5 rounded-full text-xs font-black shadow-xs {{ $recommendationIa01 === 'K' ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-rose-100 text-rose-800 border border-rose-300' }}">
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold shadow-xs {{ $recommendationIa01 === 'K' ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-rose-100 text-rose-800 border border-rose-300' }}">
                             {{ $recommendationIa01 === 'K' ? '✓ KOMPETEN (K)' : '✕ BELUM KOMPETEN (BK)' }}
                         </span>
                     </div>
 
-                    <div class="p-4 sm:p-6 bg-slate-50/50 border-b border-slate-100">
-                        <div class="p-4 rounded-xl {{ $recommendationIa01 === 'K' ? 'bg-emerald-50 border border-emerald-200 text-emerald-950' : 'bg-rose-50 border border-rose-200 text-rose-950' }} text-xs space-y-1">
-                            <span class="font-bold text-sm block">
-                                {{ $recommendationIa01 === 'K' ? 'Pencapaian: Seluruh Kriteria Unjuk Kerja Terpenuhi' : 'Pencapaian: Terdapat Kriteria Unjuk Kerja yang Belum Terpenuhi' }}
+                    <div class="p-4 sm:p-6 space-y-4">
+                        <div class="p-4 rounded-xl {{ $recommendationIa01 === 'K' ? 'bg-emerald-50 border border-emerald-200 text-emerald-950' : 'bg-rose-50 border border-rose-200 text-rose-950' }} text-xs sm:text-sm leading-relaxed space-y-1">
+                            <span class="font-bold block text-sm sm:text-base">
+                                {{ $recommendationIa01 === 'K' ? 'Rekomendasi: Kompeten (K)' : 'Rekomendasi: Belum Kompeten (BK)' }}
                             </span>
-                            <p class="leading-relaxed">
+                            <p class="text-xs sm:text-sm text-slate-700">
                                 {{ $recommendationIa01 === 'K' 
-                                    ? 'Berdasarkan observasi langsung terhadap aktivitas unjuk kerja di tempat uji kompetensi (TUK), Anda direkomendasikan KOMPETEN (K) pada instrumen FR.IA.01.' 
-                                    : 'Berdasarkan observasi langsung terhadap aktivitas unjuk kerja, Anda direkomendasikan BELUM KOMPETEN (BK) pada instrumen FR.IA.01. Silakan perhatikan kriteria yang ditandai BK pada tabel di bawah.' }}
+                                    ? 'Berdasarkan observasi langsung terhadap aktivitas unjuk kerja demonstrasi praktik di TUK, Anda direkomendasikan KOMPETEN (K) pada instrumen FR.IA.01.' 
+                                    : 'Berdasarkan observasi langsung terhadap aktivitas unjuk kerja demonstrasi praktik di TUK, Anda direkomendasikan BELUM KOMPETEN (BK) pada instrumen FR.IA.01.' }}
                             </p>
                         </div>
-                    </div>
 
-                    {{-- Tabel Detail Observasi Tiap Unit & KUK --}}
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-xs">
-                            <thead class="bg-slate-50 text-slate-700 uppercase tracking-wider font-bold border-b border-slate-200">
-                                <tr>
-                                    <th class="px-4 py-3 text-center w-12 border-r border-slate-200">No</th>
-                                    <th class="px-4 py-3 text-left border-r border-slate-200">Kriteria Unjuk Kerja (KUK)</th>
-                                    <th class="px-4 py-3 text-center w-24 border-r border-slate-200">Pencapaian</th>
-                                    <th class="px-4 py-3 text-left w-64">Catatan Observasi</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-slate-100">
-                                @php $kukCounter = 1; @endphp
-                                @foreach($units as $unit)
-                                    <tr class="bg-slate-100/80 font-bold text-slate-800">
-                                        <td colspan="4" class="px-4 py-2.5">
-                                            <div class="flex items-center gap-2">
-                                                <span class="font-mono text-brand-700 bg-brand-50 px-2 py-0.5 rounded border border-brand-200">{{ $unit->code }}</span>
-                                                <span>{{ $unit->title ?? $unit->name }}</span>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    @foreach($unit->elements as $elem)
-                                        <tr class="bg-slate-50 text-slate-700 font-semibold text-[11px]">
-                                            <td colspan="4" class="px-4 py-1.5 pl-8 italic">
-                                                Elemen: {{ $elem->title ?? $elem->name }}
-                                            </td>
-                                        </tr>
-                                        @foreach($elem->kuks as $kuk)
-                                            @php
-                                                $kukData = $savedKuks[$kuk->id] ?? [];
-                                                $result = $kukData['result'] ?? ($isAssessedIa01 ? 'K' : '-');
-                                                $kukNote = $kukData['note'] ?? '-';
-                                                $isK = strtoupper((string)$result) === 'K';
-                                            @endphp
-                                            <tr class="hover:bg-slate-50/50 transition">
-                                                <td class="px-4 py-2.5 text-center font-bold text-slate-400 font-mono border-r border-slate-200 align-top">
-                                                    {{ $kukCounter++ }}
-                                                </td>
-                                                <td class="px-4 py-2.5 border-r border-slate-200 align-top">
-                                                    <span class="font-mono text-[10px] text-slate-500 font-bold block">{{ $kuk->code_number ?? $kuk->code ?? '' }}</span>
-                                                    <span class="text-slate-900 leading-relaxed">{{ $kuk->statement ?? $kuk->criteria }}</span>
-                                                </td>
-                                                <td class="px-4 py-2.5 text-center align-middle border-r border-slate-200">
-                                                    <span class="inline-flex items-center px-2 py-0.5 rounded font-black text-xs {{ $isK ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-rose-100 text-rose-800 border border-rose-300' }}">
-                                                        {{ $isK ? 'K' : 'BK' }}
-                                                    </span>
-                                                </td>
-                                                <td class="px-4 py-2.5 text-slate-600 align-top italic text-[11px]">
-                                                    {{ $kukNote ?: '-' }}
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    @endforeach
-                                @endforeach
-                            </tbody>
-                        </table>
+                        @if(! empty($response?->assessor_notes))
+                            <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs">
+                                <span class="font-bold text-slate-700 block mb-1">Catatan Observasi Asesor:</span>
+                                <p class="text-slate-800 whitespace-pre-line">{{ $response->assessor_notes }}</p>
+                            </div>
+                        @endif
                     </div>
                 </div>
             @else
-                <div class="bg-blue-50 border-2 border-blue-200 rounded-2xl p-5 text-blue-950 space-y-2 shadow-xs">
+                <div class="bg-blue-50 border border-blue-200 rounded-2xl p-4 sm:p-5 text-blue-950 space-y-2">
                     <div class="flex items-center gap-3">
-                        <span class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-lg shrink-0">📋</span>
+                        <span class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-sm shrink-0">📋</span>
                         <div>
-                            <h3 class="text-sm sm:text-base font-bold text-blue-950">Observasi Aktivitas Unjuk Kerja di Tempat Kerja / TUK</h3>
-                            <p class="text-xs text-blue-800 mt-0.5">Asesor mengobservasi demonstrasi praktik Anda berdasarkan kriteria unjuk kerja pada skema sertifikasi.</p>
+                            <h3 class="text-sm sm:text-base font-bold text-blue-950">Observasi Demonstrasi Praktik</h3>
+                            <p class="text-xs text-blue-800 mt-0.5">Asesor mengobservasi demonstrasi unjuk kerja Anda langsung di TUK.</p>
                         </div>
                     </div>
-                    <p class="text-xs text-slate-600 leading-relaxed pl-13">
-                        Setelah Asesor selesai melaksanakan observasi dan menandatangani hasil asesmen, seluruh pencapaian unit kompetensi dan rekomendasi Kompeten (K) / Belum Kompeten (BK) Anda akan ditampilkan di sini.
+                    <p class="text-xs text-slate-600 leading-relaxed sm:pl-11">
+                        Hasil rekomendasi akhir Kompeten (K) atau Belum Kompeten (BK) akan tampil di sini setelah observasi selesai dan disahkan oleh asesor.
                     </p>
                 </div>
             @endif
@@ -459,73 +407,63 @@
         <div class="space-y-6">
             @if($isAssessedIa03)
                 <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                    <div class="px-6 py-4 bg-slate-900 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800">
+                    <div class="px-4 sm:px-6 py-3.5 sm:py-4 bg-slate-900 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 border-b border-slate-800">
                         <div>
-                            <span class="text-xs font-mono font-bold text-amber-400 uppercase tracking-wider block">Transparansi Penilaian FR.IA.03</span>
+                            <span class="text-xs font-mono font-bold text-amber-400 uppercase tracking-wider block">FR.IA.03</span>
                             <h3 class="text-sm sm:text-base font-bold text-white">Rekomendasi Hasil Pertanyaan Mendukung Observasi</h3>
                         </div>
-                        <span class="inline-flex items-center px-3.5 py-1.5 rounded-full text-xs font-black shadow-xs {{ $recommendationIa03 === 'K' ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-rose-100 text-rose-800 border border-rose-300' }}">
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold shadow-xs {{ $recommendationIa03 === 'K' ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-rose-100 text-rose-800 border border-rose-300' }}">
                             {{ $recommendationIa03 === 'K' ? '✓ KOMPETEN (K)' : '✕ BELUM KOMPETEN (BK)' }}
                         </span>
                     </div>
 
                     @if(empty($pmoQuestions) || count($pmoQuestions) === 0)
-                        <div class="p-8 text-center text-slate-500 text-xs">
+                        <div class="p-6 text-center text-slate-500 text-xs">
                             Data pertanyaan lisan pendukung observasi tidak ditemukan.
                         </div>
                     @else
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-xs">
-                                <thead class="bg-slate-50 text-slate-700 uppercase tracking-wider font-bold border-b border-slate-200">
-                                    <tr>
-                                        <th class="px-4 py-3 text-center w-12 border-r border-slate-200">No</th>
-                                        <th class="px-4 py-3 text-left border-r border-slate-200">Daftar Pertanyaan Lisan</th>
-                                        <th class="px-4 py-3 text-center w-36 border-r border-slate-200">Pencapaian</th>
-                                        <th class="px-4 py-3 text-left w-64">Tanggapan / Catatan</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-slate-100">
-                                    @foreach($pmoQuestions as $idx => $q)
-                                        @php
-                                            $qId = $q['id'] ?? $idx;
-                                            $qData = $savedQuestionsDataIa03[$qId] ?? ($savedQuestionsDataIa03[$idx] ?? []);
-                                            $pencapaian = $qData['pencapaian'] ?? ($qData['result'] ?? 'M');
-                                            $isMemuaskan = in_array(strtoupper((string)$pencapaian), ['M', 'YA', '1', 'KOMPETEN']);
-                                            $qNote = $qData['notes'] ?? ($qData['note'] ?? '-');
-                                        @endphp
-                                        <tr class="hover:bg-slate-50/50 transition">
-                                            <td class="px-4 py-3 text-center font-bold text-slate-400 font-mono border-r border-slate-200 align-top">
-                                                {{ $idx + 1 }}
-                                            </td>
-                                            <td class="px-4 py-3 border-r border-slate-200 align-top space-y-1">
-                                                <div class="font-medium text-slate-900 leading-relaxed">{{ $q['question'] ?? ($q['text'] ?? '-') }}</div>
-                                            </td>
-                                            <td class="px-4 py-3 text-center align-middle border-r border-slate-200">
-                                                <span class="inline-flex items-center px-2 py-0.5 rounded font-black text-xs {{ $isMemuaskan ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-rose-100 text-rose-800 border border-rose-300' }}">
-                                                    {{ $isMemuaskan ? '✓ Memuaskan (M)' : '✕ Tidak Memuaskan (TM)' }}
-                                                </span>
-                                            </td>
-                                            <td class="px-4 py-3 text-slate-600 align-top italic text-[11px]">
-                                                {{ $qNote ?: '-' }}
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
+                        <div class="p-4 sm:p-6 space-y-3">
+                            <div class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                                Daftar Pertanyaan Lisan
+                            </div>
+                            <div class="space-y-3">
+                                @foreach($pmoQuestions as $idx => $q)
+                                    @php
+                                        $qId = $q['id'] ?? $idx;
+                                        $qData = $savedQuestionsDataIa03[$qId] ?? ($savedQuestionsDataIa03[$idx] ?? []);
+                                        $qNote = $qData['notes'] ?? ($qData['note'] ?? null);
+                                    @endphp
+                                    <div class="p-3.5 sm:p-4 rounded-xl border border-slate-200 bg-slate-50/50 space-y-2">
+                                        <div class="flex items-start gap-2.5">
+                                            <span class="px-2 py-0.5 rounded text-[11px] font-bold font-mono bg-amber-100 text-amber-900 border border-amber-200 shrink-0">
+                                                #{{ $idx + 1 }}
+                                            </span>
+                                            <p class="text-xs sm:text-sm font-medium text-slate-900 leading-relaxed flex-1">
+                                                {{ $q['question'] ?? ($q['text'] ?? '-') }}
+                                            </p>
+                                        </div>
+                                        @if(! empty($qNote) && $qNote !== '-')
+                                            <div class="sm:ml-8 text-xs text-slate-600 bg-white p-2.5 rounded-lg border border-slate-200/80">
+                                                <span class="font-semibold text-slate-700">Catatan Tanggapan:</span> {{ $qNote }}
+                                            </div>
+                                        @endif
+                                    </div>
+                                @endforeach
+                            </div>
                         </div>
                     @endif
                 </div>
             @else
-                <div class="bg-amber-50 border-2 border-amber-200 rounded-2xl p-5 text-amber-950 space-y-2 shadow-xs">
+                <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 sm:p-5 text-amber-950 space-y-2">
                     <div class="flex items-center gap-3">
-                        <span class="w-10 h-10 rounded-full bg-amber-600 text-white flex items-center justify-center font-bold text-lg shrink-0">💬</span>
+                        <span class="w-8 h-8 rounded-full bg-amber-600 text-white flex items-center justify-center font-bold text-sm shrink-0">💬</span>
                         <div>
-                            <h3 class="text-sm sm:text-base font-bold text-amber-950">Pertanyaan Mendukung Observasi (Lisan / PMO)</h3>
-                            <p class="text-xs text-amber-800 mt-0.5">Pertanyaan lisan diajukan langsung oleh Asesor untuk mengonfirmasi aspek pengetahuan unjuk kerja.</p>
+                            <h3 class="text-sm sm:text-base font-bold text-amber-950">Pertanyaan Mendukung Observasi (PMO)</h3>
+                            <p class="text-xs text-amber-800 mt-0.5">Pertanyaan lisan diajukan langsung oleh Asesor saat sesi observasi.</p>
                         </div>
                     </div>
-                    <p class="text-xs text-slate-600 leading-relaxed pl-13">
-                        Setelah Asesor menyelesaikan sesi tanya jawab dan menginputkan rekomendasi Kompeten (K) / Belum Kompeten (BK), seluruh pencapaian Anda akan ditampilkan di sini.
+                    <p class="text-xs text-slate-600 leading-relaxed sm:pl-11">
+                        Rekomendasi akhir Kompeten (K) atau Belum Kompeten (BK) akan tampil di sini setelah sesi tanya jawab disahkan oleh asesor.
                     </p>
                 </div>
             @endif
@@ -627,7 +565,61 @@
                         Belum ada berkas dokumen portofolio yang diunggah. Silakan unggah minimal 1 dokumen melalui form di atas.
                     </div>
                 @else
-                    <div class="overflow-x-auto">
+                    {{-- Mobile Cards (< sm) --}}
+                    <div class="block sm:hidden divide-y divide-slate-100">
+                        @foreach($portfolios as $idx => $p)
+                            @php
+                                $pId = $p['id'] ?? $idx;
+                                $v = $vatmData[$pId]['v'] ?? ($vatmData[$idx]['v'] ?? null);
+                                $a = $vatmData[$pId]['a'] ?? ($vatmData[$idx]['a'] ?? null);
+                                $t = $vatmData[$pId]['t'] ?? ($vatmData[$idx]['t'] ?? null);
+                                $m = $vatmData[$pId]['m'] ?? ($vatmData[$idx]['m'] ?? null);
+                                $viewUrl = route('secure-file.evidence', ['response' => $response?->id ?? 0, 'portfolio_index' => $idx]);
+                            @endphp
+                            <div class="p-4 space-y-2.5">
+                                <div class="flex items-start justify-between gap-2">
+                                    <div class="space-y-1 flex-1">
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-teal-50 text-teal-800 border border-teal-200">
+                                            {{ $p['type'] ?? 'Portofolio' }}
+                                        </span>
+                                        <h4 class="font-bold text-slate-900 text-xs sm:text-sm leading-snug">{{ $p['title'] ?? '-' }}</h4>
+                                        <div class="text-[11px] text-slate-500">
+                                            <span>{{ $p['original_name'] ?? '-' }}</span>
+                                            @if(!empty($p['uploaded_at']))
+                                                <span>&bull; {{ \Carbon\Carbon::parse($p['uploaded_at'])->isoFormat('D MMM Y, HH:mm') }} WIB</span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    @if(! $isAssessed && ! $assessment->schedule?->is_closed)
+                                        <form action="{{ route('asesi.assessment.delete-portfolio', [$assessment, $pId]) }}" method="POST" onsubmit="return confirm('Hapus dokumen portofolio ini?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="p-1.5 text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded-lg transition" title="Hapus Portofolio">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                            </button>
+                                        </form>
+                                    @endif
+                                </div>
+                                @if($isAssessed && $v)
+                                    <div class="flex items-center gap-1.5 text-[10px] font-mono">
+                                        <span class="px-2 py-0.5 rounded font-bold {{ $v === 'YA' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800' }}">V: {{ $v }}</span>
+                                        <span class="px-2 py-0.5 rounded font-bold {{ $a === 'YA' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800' }}">A: {{ $a }}</span>
+                                        <span class="px-2 py-0.5 rounded font-bold {{ $t === 'YA' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800' }}">T: {{ $t }}</span>
+                                        <span class="px-2 py-0.5 rounded font-bold {{ $m === 'YA' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800' }}">M: {{ $m }}</span>
+                                    </div>
+                                @endif
+                                <div>
+                                    <button type="button" @click="viewDocument('{{ $viewUrl }}', '{{ addslashes($p['title']) }}', 'pdf')"
+                                        class="w-full inline-flex items-center justify-center gap-1 px-3 py-1.5 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition">
+                                        <span>Lihat Berkas</span>
+                                    </button>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+
+                    {{-- Desktop Table (>= sm) --}}
+                    <div class="hidden sm:block overflow-x-auto">
                         <table class="w-full text-xs">
                             <thead class="bg-slate-50/80 text-slate-700 uppercase tracking-wider font-bold border-b border-slate-200">
                                 <tr>
@@ -743,86 +735,75 @@
 
         <div class="space-y-6">
             @if(! $isAssessedIa09)
-                {{-- Banner Rahasia Sebelum Penilaian --}}
-                <div class="bg-violet-50 border-2 border-violet-300 rounded-2xl p-5 text-violet-950 space-y-2.5 shadow-xs">
+                {{-- Banner Menunggu Wawancara --}}
+                <div class="bg-violet-50 border border-violet-200 rounded-2xl p-4 sm:p-5 text-violet-950 space-y-2">
                     <div class="flex items-center gap-3">
-                        <span class="w-10 h-10 rounded-full bg-violet-600 text-white flex items-center justify-center font-bold text-lg shrink-0">🔒</span>
+                        <span class="w-8 h-8 rounded-full bg-violet-600 text-white flex items-center justify-center font-bold text-sm shrink-0">🔒</span>
                         <div>
                             <h3 class="text-sm sm:text-base font-bold text-violet-950">Materi Pertanyaan Bersifat Rahasia (Wawancara Tatap Muka)</h3>
-                            <p class="text-xs text-violet-800 mt-0.5">Pertanyaan wawancara diajukan langsung secara lisan oleh Asesor saat sesi wawancara berlangsung.</p>
+                            <p class="text-xs text-violet-800 mt-0.5">Pertanyaan wawancara diajukan langsung oleh Asesor saat sesi tatap muka.</p>
                         </div>
                     </div>
-                    <p class="text-xs text-slate-700 leading-relaxed pl-13">
-                        Sesuai standar operasional MUK BNSP, instrumen <strong>FR.IA.09 (Pertanyaan Wawancara)</strong> dilakukan secara tatap muka (head-to-head) untuk mengonfirmasi unjuk kerja dan pembuktian portofolio Anda.
-                        Setelah asesor menyelesaikan sesi wawancara dan merekam penilaian, seluruh rincian pertanyaan, kesimpulan tanggapan, dan hasil pencapaian Anda akan ditampilkan di sini secara transparan.
+                    <p class="text-xs text-slate-600 leading-relaxed sm:pl-11">
+                        Rekomendasi akhir Kompeten (K) atau Belum Kompeten (BK) beserta rangkuman wawancara akan tampil di sini setelah sesi selesai disahkan oleh asesor.
                     </p>
                 </div>
             @else
-                {{-- Transparansi Penuh Hasil Wawancara Pasca Dinilai Asesor --}}
+                {{-- Hasil Wawancara Pasca Dinilai Asesor --}}
                 <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                    <div class="px-6 py-4 bg-slate-900 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800">
+                    <div class="px-4 sm:px-6 py-3.5 sm:py-4 bg-slate-900 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 border-b border-slate-800">
                         <div>
                             <span class="text-xs font-mono font-bold text-violet-400 uppercase tracking-wider block">Transparansi Penilaian FR.IA.09</span>
                             <h3 class="text-sm sm:text-base font-bold text-white">Hasil Tanya Jawab Wawancara Terstruktur</h3>
                         </div>
-                        <span class="inline-flex items-center px-3.5 py-1.5 rounded-full text-xs font-black shadow-xs {{ $recommendationIa09 === 'K' ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-rose-100 text-rose-800 border border-rose-300' }}">
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold shadow-xs {{ $recommendationIa09 === 'K' ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-rose-100 text-rose-800 border border-rose-300' }}">
                             {{ $recommendationIa09 === 'K' ? '✓ KOMPETEN (K)' : '✕ BELUM KOMPETEN (BK)' }}
                         </span>
                     </div>
 
                     @if($interviewQuestions->isEmpty())
-                        <div class="p-8 text-center text-slate-500 text-xs">
+                        <div class="p-6 text-center text-slate-500 text-xs">
                             Data pertanyaan wawancara tidak ditemukan.
                         </div>
                     @else
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-xs">
-                                <thead class="bg-slate-50 text-slate-700 uppercase tracking-wider font-bold border-b border-slate-200">
-                                    <tr>
-                                        <th class="px-4 py-3 text-center w-12 border-r border-slate-200">No</th>
-                                        <th class="px-4 py-3 text-left border-r border-slate-200 w-44">Konteks Bukti / Unit</th>
-                                        <th class="px-4 py-3 text-left border-r border-slate-200">Pertanyaan Wawancara</th>
-                                        <th class="px-4 py-3 text-left border-r border-slate-200 w-64">Kesimpulan Tanggapan Anda</th>
-                                        <th class="px-4 py-3 text-center w-24">Pencapaian</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-slate-100">
-                                    @foreach($interviewQuestions as $idx => $q)
-                                        @php
-                                            $savedQ = $savedQuestionsData[$q->id] ?? [];
-                                            $ansSummary = $savedQ['candidate_answer_summary'] ?? '-';
-                                            $achieved = $savedQ['is_achieved'] ?? 'YA';
-                                            $isAchieved = in_array(strtoupper((string)$achieved), ['YA', '1', 'TRUE']);
-                                        @endphp
-                                        <tr class="hover:bg-slate-50/50 transition">
-                                            <td class="px-4 py-3 text-center font-bold text-slate-500 font-mono border-r border-slate-200 align-top">
-                                                {{ $q->order ?? ($idx + 1) }}
-                                            </td>
-                                            <td class="px-4 py-3 border-r border-slate-200 align-top">
-                                                @if($q->evidence_context)
-                                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-violet-50 text-violet-800 border border-violet-200 mb-1">
-                                                        {{ $q->evidence_context }}
-                                                    </span>
-                                                @endif
-                                                @if($q->competencyUnit)
-                                                    <div class="font-mono font-bold text-slate-800 text-[10px]">{{ $q->competencyUnit->code }}</div>
-                                                @endif
-                                            </td>
-                                            <td class="px-4 py-3 border-r border-slate-200 align-top">
-                                                <div class="font-medium text-slate-900 leading-relaxed">{{ $q->question_text }}</div>
-                                            </td>
-                                            <td class="px-4 py-3 border-r border-slate-200 align-top text-slate-700 leading-relaxed italic">
-                                                "{{ $ansSummary }}"
-                                            </td>
-                                            <td class="px-4 py-3 text-center align-middle">
-                                                <span class="inline-flex items-center px-2 py-1 rounded font-bold text-[11px] {{ $isAchieved ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800' }}">
-                                                    {{ $isAchieved ? '✓ Ya' : '✕ Tidak' }}
+                        <div class="p-4 sm:p-6 space-y-3">
+                            <div class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                                Pertanyaan Wawancara &amp; Tanggapan
+                            </div>
+                            <div class="space-y-3">
+                                @foreach($interviewQuestions as $idx => $q)
+                                    @php
+                                        $savedQ = $savedQuestionsData[$q->id] ?? [];
+                                        $ansSummary = $savedQ['candidate_answer_summary'] ?? null;
+                                    @endphp
+                                    <div class="p-3.5 sm:p-4 rounded-xl border border-slate-200 bg-slate-50/50 space-y-2">
+                                        <div class="flex flex-wrap items-center gap-2">
+                                            <span class="px-2 py-0.5 rounded text-[11px] font-bold font-mono bg-violet-100 text-violet-900 border border-violet-200">
+                                                #{{ $q->order ?? ($idx + 1) }}
+                                            </span>
+                                            @if($q->evidence_context)
+                                                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-200 text-slate-800">
+                                                    {{ $q->evidence_context }}
                                                 </span>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
+                                            @endif
+                                            @if($q->competencyUnit)
+                                                <span class="font-mono text-[10px] font-bold text-slate-600">
+                                                    {{ $q->competencyUnit->code }}
+                                                </span>
+                                            @endif
+                                        </div>
+                                        <p class="text-xs sm:text-sm font-medium text-slate-900 leading-relaxed">
+                                            {{ $q->question_text }}
+                                        </p>
+                                        @if(! empty($ansSummary) && $ansSummary !== '-')
+                                            <div class="text-xs text-slate-700 bg-white p-2.5 rounded-lg border border-slate-200/80 leading-relaxed">
+                                                <span class="font-semibold text-slate-600 block text-[11px] mb-0.5">Kesimpulan Tanggapan:</span>
+                                                "{{ $ansSummary }}"
+                                            </div>
+                                        @endif
+                                    </div>
+                                @endforeach
+                            </div>
                         </div>
                     @endif
                 </div>

@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Assessment;
 use App\Models\AssessmentIaResponse;
 use App\Models\CompetencyUnit;
+use App\Models\InterviewQuestion;
 use App\Models\Kuk;
 use App\Models\QuestionBank;
 use App\Models\Schedule;
@@ -302,7 +303,9 @@ class AsesiCbtAndIaTransparencyTest extends TestCase
         AssessmentIaResponse::create([
             'assessment_id' => $this->assessment->id,
             'instrument_code' => 'IA03',
-            'data_json' => ['recommendation' => 'BK', 'questions' => []],
+            'data_json' => ['recommendation' => 'BK', 'questions' => [
+                0 => ['pencapaian' => 'TM', 'notes' => 'Kurang paham'],
+            ]],
             'assessor_signed_at' => now(),
             'assessor_signature' => 'sig_data',
             'assessor_notes' => 'Catatan lisan perlu belajar lagi',
@@ -312,10 +315,51 @@ class AsesiCbtAndIaTransparencyTest extends TestCase
         $resIa01->assertStatus(200);
         $resIa01->assertSee('KOMPETEN (K)');
         $resIa01->assertSee('Rekomendasi Hasil Observasi Praktik');
+        // KUK and unit competence table should not be displayed to asesi
+        $resIa01->assertDontSee('Kriteria unjuk kerja pertama');
 
         $resIa03 = $this->actingAs($this->asesi)->get(route('asesi.assessment.instrument.view', ['assessment' => $this->assessment, 'code' => 'IA03']));
         $resIa03->assertStatus(200);
         $resIa03->assertSee('BELUM KOMPETEN (BK)');
         $resIa03->assertSee('Rekomendasi Hasil Pertanyaan Mendukung Observasi');
+        // Per-question pencapaian should NOT be shown to asesi
+        $resIa03->assertDontSee('Memuaskan (M)');
+        $resIa03->assertDontSee('Tidak Memuaskan (TM)');
+    }
+
+    public function test_asesi_ia09_view_transparency_hides_per_question_pencapaian(): void
+    {
+        $interviewQ = InterviewQuestion::create([
+            'scheme_id' => $this->scheme->id,
+            'question_text' => 'Bagaimana prosedur penanganan darurat?',
+            'evidence_context' => 'Konteks Uji',
+            'order' => 1,
+            'is_active' => true,
+        ]);
+
+        AssessmentIaResponse::create([
+            'assessment_id' => $this->assessment->id,
+            'instrument_code' => 'IA09',
+            'data_json' => [
+                'recommendation' => 'K',
+                'questions' => [
+                    $interviewQ->id => [
+                        'candidate_answer_summary' => 'Menjawab dengan runtut dan sesuai SOP',
+                        'is_achieved' => 'YA',
+                    ],
+                ],
+            ],
+            'assessor_signed_at' => now(),
+            'assessor_signature' => 'sig_data',
+        ]);
+
+        $resIa09 = $this->actingAs($this->asesi)->get(route('asesi.assessment.instrument.view', ['assessment' => $this->assessment, 'code' => 'IA09']));
+        $resIa09->assertStatus(200);
+        $resIa09->assertSee('KOMPETEN (K)');
+        $resIa09->assertSee('Bagaimana prosedur penanganan darurat?');
+        $resIa09->assertSee('Menjawab dengan runtut dan sesuai SOP');
+        // Per-question pencapaian Ya/Tidak badge should NOT be shown
+        $resIa09->assertDontSee('✓ Ya');
+        $resIa09->assertDontSee('✕ Tidak');
     }
 }
