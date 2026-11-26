@@ -212,7 +212,7 @@ class AssessmentWorkflowOverhaulTest extends TestCase
         Storage::disk('public')->assertExists($question->question_image);
     }
 
-    public function test_cbt_score_is_hidden_from_candidate_view(): void
+    public function test_cbt_score_and_transparency_on_candidate_view(): void
     {
         $asesi = User::factory()->create(['role' => 'ASESI']);
         $assessment = Assessment::create([
@@ -235,15 +235,13 @@ class AssessmentWorkflowOverhaulTest extends TestCase
         // Check candidate IA05 page
         $resCbt = $this->actingAs($asesi)->get(route('asesi.assessment.instrument.ia05', $assessment));
         $resCbt->assertOk();
-        $resCbt->assertDontSee('18.33%');
-        $resCbt->assertDontSee('BELUM KOMPETEN');
-        $resCbt->assertSee('Jawaban CBT Telah Terkirim');
+        $resCbt->assertSee('18.3');
+        $resCbt->assertSee('BELUM KOMPETEN (BK)');
 
         // Check candidate Hub page
         $resHub = $this->actingAs($asesi)->get(route('asesi.assessment.ruang-uji', $assessment));
         $resHub->assertOk();
-        $resHub->assertDontSee('Skor: 18.33%');
-        $resHub->assertSee('✓ Selesai CBT');
+        $resHub->assertSee('Belum Kompeten (BK)');
     }
 
     public function test_assessor_can_bulk_save_fr_ak02_records(): void
