@@ -474,7 +474,7 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {{-- Opsi A --}}
                             <div class="bg-white p-3 rounded-lg border border-slate-200">
-                                <label class="block text-xs font-bold text-slate-700 mb-1">A. Ijazah SMK Otomotif</label>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">A. Ijazah SMK Perhotelan / Pariwisata / Terkait</label>
                                 <input type="file" name="proofs[IJAZAH_SMK]" accept="image/jpeg,image/png,image/jpg,image/webp,application/pdf,.jpg,.jpeg,.png,.webp,.pdf" class="block w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" @disabled($isAplLocked)>
                                 @if(isset($existingProofs['IJAZAH_SMK']))
                                     @php $proof = $existingProofs['IJAZAH_SMK']; @endphp
@@ -532,7 +532,7 @@
 
                             {{-- Opsi C --}}
                             <div class="bg-white p-3 rounded-lg border border-slate-200">
-                                <label class="block text-xs font-bold text-slate-700 mb-1">C. Ijazah SMA + Sertifikat Pelatihan Otomotif</label>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">C. Ijazah SMA/Sederajat + Sertifikat Pelatihan Terkait</label>
                                 <input type="file" name="proofs[IJAZAH_SMA_SERTIFIKAT]" accept="image/jpeg,image/png,image/jpg,image/webp,application/pdf,.jpg,.jpeg,.png,.webp,.pdf" class="block w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" @disabled($isAplLocked)>
                                 @if(isset($existingProofs['IJAZAH_SMA_SERTIFIKAT']))
                                     @php $proof = $existingProofs['IJAZAH_SMA_SERTIFIKAT']; @endphp
@@ -561,7 +561,7 @@
 
                             {{-- Opsi D --}}
                             <div class="bg-white p-3 rounded-lg border border-slate-200">
-                                <label class="block text-xs font-bold text-slate-700 mb-1">D. Surat Pengalaman Kerja Bengkel Otomotif</label>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">D. Surat Pengalaman Kerja Industri Perhotelan / Restoran</label>
                                 <input type="file" name="proofs[PENGALAMAN_KERJA]" accept="image/jpeg,image/png,image/jpg,image/webp,application/pdf,.jpg,.jpeg,.png,.webp,.pdf" class="block w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" @disabled($isAplLocked)>
                                 @if(isset($existingProofs['PENGALAMAN_KERJA']))
                                     @php $proof = $existingProofs['PENGALAMAN_KERJA']; @endphp
@@ -691,7 +691,7 @@
                         </button>
                         <select @change="setDefaultProof($event.target.value)" class="px-3 py-1.5 bg-white text-slate-800 rounded-lg text-xs font-medium border border-indigo-200 shadow-2xs focus:ring-2 focus:ring-indigo-300 focus:outline-none cursor-pointer">
                             <option value="">-- Set Bukti Semua --</option>
-                            <option value="IJAZAH_SMK">Ijazah SMK Otomotif</option>
+                            <option value="IJAZAH_SMK">Ijazah SMK Perhotelan / Pariwisata</option>
                             <option value="SURAT_SISWA_AKTIF">Surat Keterangan Siswa Aktif</option>
                             <option value="IJAZAH_SMA_SERTIFIKAT">Ijazah + Sertifikat</option>
                             <option value="PENGALAMAN_KERJA">Surat Pengalaman Kerja</option>
@@ -771,7 +771,7 @@
                                             <div class="space-y-1">
                                                 <span class="text-[11px] font-semibold text-slate-500 md:hidden block">Bukti Pendukung:</span>
                                                 <select name="kuks[{{ $kuk->id }}][proof_type]" class="select-proof w-full text-xs border border-slate-300 rounded-lg px-2.5 py-2 bg-white text-slate-800 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:outline-none transition shadow-2xs" @disabled($isAplLocked)>
-                                                    <option value="IJAZAH_SMK" @selected($proof === 'IJAZAH_SMK')>Ijazah SMK Otomotif</option>
+                                                    <option value="IJAZAH_SMK" @selected($proof === 'IJAZAH_SMK')>Ijazah SMK Perhotelan / Pariwisata</option>
                                                     <option value="SURAT_SISWA_AKTIF" @selected($proof === 'SURAT_SISWA_AKTIF')>Surat Keterangan Siswa Aktif</option>
                                                     <option value="IJAZAH_SMA_SERTIFIKAT" @selected($proof === 'IJAZAH_SMA_SERTIFIKAT')>Ijazah SMA + Sertifikat Pelatihan</option>
                                                     <option value="PENGALAMAN_KERJA" @selected($proof === 'PENGALAMAN_KERJA')>Surat Pengalaman Kerja</option>

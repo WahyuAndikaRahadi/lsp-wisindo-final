@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Scheme;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -46,7 +47,9 @@ class UserController extends Controller
 
     public function create(): View
     {
-        return view('admin.users.create');
+        $schemes = Scheme::active()->orderBy('name')->get();
+
+        return view('admin.users.create', compact('schemes'));
     }
 
     public function store(Request $request): RedirectResponse
@@ -56,16 +59,25 @@ class UserController extends Controller
             'email' => 'required|email|unique:users,email',
             'phone' => ['nullable', 'string', 'max:20', 'regex:/^[0-9]+$/'],
             'password' => ['required', 'string', Password::min(8)->letters()->numbers()],
-            'role' => 'required|in:SUPER_ADMIN,ADMIN_LSP,ASESOR,ASESI,KOMITE_TEKNIS',
+            'role' => 'required|in:SUPER_ADMIN,ADMIN_LSP,ASESOR,ASESI,KOMITE_TEKNIS,TUK_ADMIN',
             'status' => 'required|in:ACTIVE,INACTIVE,SUSPENDED',
             'assessor_registration_number' => 'nullable|string|max:50',
+            'scheme_ids' => 'nullable|array',
+            'scheme_ids.*' => 'exists:m_schemes,id',
         ], [
             'phone.regex' => 'Nomor telepon/WhatsApp hanya boleh berupa angka.',
         ]);
 
+        $schemeIds = $validated['scheme_ids'] ?? [];
+        unset($validated['scheme_ids']);
+
         $validated['password'] = Hash::make($validated['password']);
 
-        User::create($validated);
+        $user = User::create($validated);
+
+        if ($user->role === 'ASESOR' && ! empty($schemeIds)) {
+            $user->schemes()->sync($schemeIds);
+        }
 
         return redirect()->route('admin.users.index')
             ->with('success', 'User berhasil dibuat.');
@@ -80,7 +92,10 @@ class UserController extends Controller
 
     public function edit(User $user): View
     {
-        return view('admin.users.edit', compact('user'));
+        $schemes = Scheme::active()->orderBy('name')->get();
+        $selectedSchemeIds = $user->schemes()->pluck('m_schemes.id')->toArray();
+
+        return view('admin.users.edit', compact('user', 'schemes', 'selectedSchemeIds'));
     }
 
     public function update(Request $request, User $user): RedirectResponse
@@ -90,12 +105,17 @@ class UserController extends Controller
             'email' => ['required', 'email', Rule::unique('users')->ignore($user->id)],
             'phone' => ['nullable', 'string', 'max:20', 'regex:/^[0-9]+$/'],
             'password' => ['nullable', 'string', Password::min(8)->letters()->numbers()],
-            'role' => 'required|in:SUPER_ADMIN,ADMIN_LSP,ASESOR,ASESI,KOMITE_TEKNIS',
+            'role' => 'required|in:SUPER_ADMIN,ADMIN_LSP,ASESOR,ASESI,KOMITE_TEKNIS,TUK_ADMIN',
             'status' => 'required|in:ACTIVE,INACTIVE,SUSPENDED',
             'assessor_registration_number' => 'nullable|string|max:50',
+            'scheme_ids' => 'nullable|array',
+            'scheme_ids.*' => 'exists:m_schemes,id',
         ], [
             'phone.regex' => 'Nomor telepon/WhatsApp hanya boleh berupa angka.',
         ]);
+
+        $schemeIds = $validated['scheme_ids'] ?? [];
+        unset($validated['scheme_ids']);
 
         if (empty($validated['password'])) {
             unset($validated['password']);
@@ -104,6 +124,12 @@ class UserController extends Controller
         }
 
         $user->update($validated);
+
+        if ($user->role === 'ASESOR') {
+            $user->schemes()->sync($schemeIds);
+        } else {
+            $user->schemes()->detach();
+        }
 
         return redirect()->route('admin.users.show', $user->id)
             ->with('success', 'User berhasil diperbarui.');
@@ -133,7 +159,7 @@ class UserController extends Controller
     {
         abort_unless(auth()->user()->isRole('SUPER_ADMIN'), 403);
 
-        $defaultPassword = 'proindo123';
+        $defaultPassword = 'wisindo123';
         $user->update([
             'password' => Hash::make($defaultPassword),
         ]);

@@ -51,7 +51,7 @@ class RegistrationTokenService
         }
 
         $digits = str_pad((string) random_int(1000, 9999), 4, '0', STR_PAD_LEFT);
-        $token = 'proindo'.$digits;
+        $token = 'wisindo'.$digits;
 
         Setting::set(
             self::SETTING_KEY,
@@ -88,11 +88,11 @@ class RegistrationTokenService
     }
 
     /**
-     * Check if a token string has the expected format (proindo followed by 4 digits).
+     * Check if a token string has the expected format (wisindo or proindo followed by 4 digits).
      */
     public static function isValidFormat(string $token): bool
     {
-        return (bool) preg_match('/^proindo[0-9]{4}$/i', trim($token));
+        return (bool) preg_match('/^(wisindo|proindo)[0-9]{4}$/i', trim($token));
     }
 
     /**

@@ -37,6 +37,7 @@ class Schedule extends Model
         'end_time',
         'duration_minutes',
         'estimated_candidates',
+        'meeting_link',
         'surat_tugas_date',
         'letter_city',
         'director_name',

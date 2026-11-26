@@ -34,6 +34,11 @@ class Scheme extends Model
         ];
     }
 
+    public function getCategoryAttribute(): string
+    {
+        return 'Pariwisata & Perhotelan';
+    }
+
     public function competencyUnits(): HasMany
     {
         return $this->hasMany(CompetencyUnit::class);

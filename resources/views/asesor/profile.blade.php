@@ -182,7 +182,7 @@
                         Institusi / Perusahaan / Lembaga
                     </label>
                     <input type="text" name="nama_institusi_perusahaan" value="{{ old('nama_institusi_perusahaan', $p->nama_institusi_perusahaan) }}"
-                        placeholder="Contoh: LSP PrO Indo / PT. Otomotif Indonesia"
+                        placeholder="Contoh: LSP Wisindo / Hotel Grand Nusantara"
                         class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
                 </div>
 
@@ -191,7 +191,7 @@
                         Jabatan / Profesi
                     </label>
                     <input type="text" name="jabatan" value="{{ old('jabatan', $p->jabatan) }}"
-                        placeholder="Contoh: Asesor Kompetensi Otomotif"
+                        placeholder="Contoh: Asesor Kompetensi Pariwisata & Perhotelan"
                         class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
                 </div>
 

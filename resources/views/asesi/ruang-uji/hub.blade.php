@@ -38,6 +38,33 @@
         </div>
     @endif
 
+    {{-- AJJ Video Meeting Banner (Zoom / Google Meet) --}}
+    @if(!empty($schedule->meeting_link))
+        <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-blue-900 rounded-2xl p-4 sm:p-5 text-white shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border border-blue-900/50">
+            <div class="flex items-center space-x-3.5">
+                <div class="p-3 bg-white/10 rounded-xl backdrop-blur-xs text-blue-300 shrink-0">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                </div>
+                <div>
+                    <div class="flex items-center space-x-2">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-500/20 text-blue-200 border border-blue-400/30 uppercase tracking-wider">Asesmen Jarak Jauh (AJJ)</span>
+                        <span class="text-xs text-emerald-400 font-semibold flex items-center gap-1">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                            Tautan Aktif
+                        </span>
+                    </div>
+                    <h3 class="text-base sm:text-lg font-black text-white mt-1">Ruang Tatap Muka Online Asesmen</h3>
+                    <p class="text-xs text-blue-100/90 mt-0.5">Bergabunglah ke ruang virtual Zoom / Google Meet untuk sesi wawancara &amp; observasi bersama Asesor.</p>
+                </div>
+            </div>
+            <a href="{{ $schedule->meeting_link }}" target="_blank" rel="noopener noreferrer"
+               class="w-full sm:w-auto px-5 py-3 bg-blue-600 hover:bg-blue-500 active:scale-95 text-white font-black text-xs sm:text-sm rounded-xl shadow-lg transition flex items-center justify-center space-x-2 shrink-0 cursor-pointer">
+                <span>Masuk Ruang Zoom / Meet AJJ</span>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+            </a>
+        </div>
+    @endif
+
     {{-- Schedule Details Card --}}
     <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-sm">
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">

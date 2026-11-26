@@ -1,0 +1,2606 @@
+{
+  "scheme": {
+    "code": "SKM-FO-03",
+    "name": "Skema Sertifikasi Okupasi Receptionist Hotel",
+    "scheme_type": "OKUPASI",
+    "version": "1.0",
+    "description": "Skema Sertifikasi Okupasi Receptionist Hotel (Nomor Skema: 448/PAR/2026)",
+    "passing_grade_theory": 75.0
+  },
+  "units": [
+    {
+      "code": "I.55HDR00.148.3",
+      "title": "Melakukan Kerja dalam Lingkungan Sosial yang Beragam",
+      "standard_reference": "SKKNI Nomor 125 Tahun 2024",
+      "sequence": 1,
+      "elements": [
+        {
+          "title": "Melakukan komunikasi dengan tamu dan kolega dari latar belakang yang beragam",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Tamu dan kolega dengan latar belakang budaya yang berbeda diperlakukan dengan hormat.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Keberagaman budaya dipertimbangkan dalam melakukan komunikasi lisan dan nonlisan.",
+              "sequence": 2
+            },
+            {
+              "code_number": "1.3",
+              "statement": "Penggunaan bahasa isyarat dan kata-kata sederhana digunakan dalam melakukan komunikasi dengan tamu dan kolega jika terjadi hambatan bahasa.",
+              "sequence": 3
+            },
+            {
+              "code_number": "1.4",
+              "statement": "Sumber-sumber informasi terkait budaya diperoleh dari kolega untuk tujuan komunikasi yang efektif.",
+              "sequence": 4
+            }
+          ]
+        },
+        {
+          "title": "Menangani kesalahpahaman antar budaya",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Kesalahpahaman terkait keberagaman budaya di tempat kerja diidentifikasi.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Kesulitan dan kesalahpahaman yang timbul karena keberagaman budaya disampaikan dan dicari bantuan pada pihak yang tepat.",
+              "sequence": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.149.3",
+      "title": "Mengikuti Standar Keselamatan dan Kesehatan Kerja",
+      "standard_reference": "SKKNI Nomor 125 Tahun 2024",
+      "sequence": 2,
+      "elements": [
+        {
+          "title": "Melaksanakan prosedur keselamatan dan kesehatan di tempat kerja",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Prosedur keselamatan dan kesehatan kerja diikuti secara benar sesuai dengan prosedur.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Pelanggaran prosedur keselamatan dan kesehatan diproses dengan segera.",
+              "sequence": 2
+            },
+            {
+              "code_number": "1.3",
+              "statement": "Sikap dan kejadian yang mencurigakan dilaporkan segera kepada pihak yang tepat.",
+              "sequence": 3
+            }
+          ]
+        },
+        {
+          "title": "Menangani situasi darurat",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Potensi situasi darurat segera ditindak lanjuti dalam ruang lingkup tanggung jawab individu.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Prosedur keadaan darurat dipatuhi sesuai standar.",
+              "sequence": 2
+            },
+            {
+              "code_number": "2.3",
+              "statement": "Bantuan dicari dengan segera dari kolega.",
+              "sequence": 3
+            },
+            {
+              "code_number": "2.4",
+              "statement": "Rincian situasi darurat secara akurat dilaporkan sesuai dengan prosedur.",
+              "sequence": 4
+            }
+          ]
+        },
+        {
+          "title": "Menjaga standar presentasi perorangan yang aman",
+          "sequence": 3,
+          "kuks": [
+            {
+              "code_number": "3.1",
+              "statement": "Penampilan diri yang pantas dan dijaga sesuai dengan prosedur keselamatan dan kesehatan kerja.",
+              "sequence": 1
+            },
+            {
+              "code_number": "3.2",
+              "statement": "Sikap yang profesional ditampilkan sesuai dengan prosedur keselamatan dan kesehatan kerja.",
+              "sequence": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.155.3",
+      "title": "Menyediakan Pertolongan Pertama",
+      "standard_reference": "SKKNI Nomor 125 Tahun 2024",
+      "sequence": 3,
+      "elements": [
+        {
+          "title": "Memilih dan menata peralatan",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Situasi darurat dikenali secara cepat dan benar.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Situasi dinilai secara cepat untuk tindakan yang dibutuhkan.",
+              "sequence": 2
+            },
+            {
+              "code_number": "1.3",
+              "statement": "Bantuan layanan darurat dari kolega dan tamu diorganisir.",
+              "sequence": 3
+            }
+          ]
+        },
+        {
+          "title": "Memberikan perawatan yang tepat",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Kondisi fisik pasien dinilai dari tanda-tanda vital yang dapat dilihat.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Pertolongan pertama diberikan untuk kondisi fisik dan mental kolega dan tamu sesuai dengan standar.",
+              "sequence": 2
+            }
+          ]
+        },
+        {
+          "title": "Memonitor situasi",
+          "sequence": 3,
+          "kuks": [
+            {
+              "code_number": "3.1",
+              "statement": "Peralatan dibersihkan setelah digunakan sesuai dengan standar.",
+              "sequence": 1
+            },
+            {
+              "code_number": "3.2",
+              "statement": "Informasi tentang kondisi kolega dan tamu disampaikan secara jelas pada pelayan kesehatan.",
+              "sequence": 2
+            }
+          ]
+        },
+        {
+          "title": "Menyiapkan laporan insiden",
+          "sequence": 4,
+          "kuks": [
+            {
+              "code_number": "4.1",
+              "statement": "Situasi darurat didokumentasikan sesuai dengan prosedur perusahaan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "4.2",
+              "statement": "Laporan dibuat secara jelas dan akurat.",
+              "sequence": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.168.3",
+      "title": "Melakukan komunikasi Secara Lisan dalam Bahasa Inggris pada Tingkat Operasional Dasar",
+      "standard_reference": "SKKNI Nomor 125 Tahun 2024",
+      "sequence": 4,
+      "elements": [
+        {
+          "title": "Berpartisipasi dalam percakapan sederhana dengan rekan kerja",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Kalimat pembuka percakapan dalam Bahasa Inggris digunakan dan ditanggapi dengan tepat.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Topik pembicaraan umum dikomentari.",
+              "sequence": 2
+            },
+            {
+              "code_number": "1.3",
+              "statement": "Kegiatan operasional sebelumnya dibicarakan dengan rekan kerja.",
+              "sequence": 3
+            },
+            {
+              "code_number": "1.4",
+              "statement": "Kalimat penutup yang tepat digunakan untuk mengakhiri percakapan.",
+              "sequence": 4
+            }
+          ]
+        },
+        {
+          "title": "Menanggapi permintaan dan instruksi verbal",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Permintaan dan instruksi atasan dipahami dan dikonfirmasi.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Pengulangan dan klarifikasi terhadap permintaan dan instruksi diminta kepada yang memberi instruksi.",
+              "sequence": 2
+            }
+          ]
+        },
+        {
+          "title": "Membuat permintaan sederhana",
+          "sequence": 3,
+          "kuks": [
+            {
+              "code_number": "3.1",
+              "statement": "Kalimat permintaan yang sopan digunakan dengan benar.",
+              "sequence": 1
+            },
+            {
+              "code_number": "3.2",
+              "statement": "Ucapan terima kasih disampaikan dengan sopan dan benar.",
+              "sequence": 2
+            },
+            {
+              "code_number": "3.3",
+              "statement": "Permintaan yang tidak direspons diterima dan ditanggapi dengan baik.",
+              "sequence": 3
+            }
+          ]
+        },
+        {
+          "title": "Menjelaskan prosedur rutin",
+          "sequence": 4,
+          "kuks": [
+            {
+              "code_number": "4.1",
+              "statement": "Tahapan dalam pekerjaan rutin dijelaskan dengan tepat sesuai urutannya.",
+              "sequence": 1
+            },
+            {
+              "code_number": "4.2",
+              "statement": "Pengecualian dalam tahapan pekerjaan rutin dijelaskan dengan tepat.",
+              "sequence": 2
+            },
+            {
+              "code_number": "4.3",
+              "statement": "Saran untuk meningkatkan layanan prosedur rutin disampaikan.",
+              "sequence": 3
+            }
+          ]
+        },
+        {
+          "title": "Mengidentifikasi bentuk ekspresi dalam bahasa Inggris",
+          "sequence": 5,
+          "kuks": [
+            {
+              "code_number": "5.1",
+              "statement": "Kalimat formal dibuat digunakan sesuai dengan tata bahasa Inggris.",
+              "sequence": 1
+            },
+            {
+              "code_number": "5.2",
+              "statement": "Kalimat pertanyaan terbuka dan tertutup dibedakan dengan jelas.",
+              "sequence": 2
+            },
+            {
+              "code_number": "5.3",
+              "statement": "Bentuk ungkapan informal dalam bahasa Inggris diidentifikasi dengan tepat.",
+              "sequence": 3
+            }
+          ]
+        },
+        {
+          "title": "Mengungkapkan kesukaan",
+          "sequence": 6,
+          "kuks": [
+            {
+              "code_number": "6.1",
+              "statement": "Topik suka dan tidak suka dibicarakan dengan rekan kerja.",
+              "sequence": 1
+            },
+            {
+              "code_number": "6.2",
+              "statement": "Preferensi dan alasannya didiskusikan.",
+              "sequence": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.169.3",
+      "title": "Melakukan Tugas Perlindungan Anak yang Relevan dengan Industri Pariwisata",
+      "standard_reference": "SKKNI Nomor 125 Tahun 2024",
+      "sequence": 5,
+      "elements": [
+        {
+          "title": "Mengidentifikasi masalah eksploitasi seksual anak",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Masalah eksploitasi anak diidentifikasi.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Dampak eksploitasi seksual anak dijelaskan.",
+              "sequence": 2
+            }
+          ]
+        },
+        {
+          "title": "Menjelaskan tindakan untuk mencegah eksploitasi seksual anak",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Aturan yang berkaitan dengan eksploitasi seksual anak diidentifikasi.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Aturan yang berkaitan dengan eksploitasi seksual anak dijelaskan.",
+              "sequence": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.161.3",
+      "title": "Membangun dan Memelihara Tempat Kerja yang Aman",
+      "standard_reference": "SKKNI Nomor 125 Tahun 2024",
+      "sequence": 6,
+      "elements": [
+        {
+          "title": "Memelihara tempat kerja yang aman",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Kebijakan keamanan dikembangkan secara jelas sesuai prosedur.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Tanggung jawab serta keamanan diidentifikasi secara jelas dan dicantumkan dalam rincian keterangan kerja.",
+              "sequence": 2
+            },
+            {
+              "code_number": "1.3",
+              "statement": "Informasi tentang sistem dan prosedur keamanan kerja diterangkan dalam media yang dapat diakses oleh karyawan.",
+              "sequence": 3
+            }
+          ]
+        },
+        {
+          "title": "Memelihara prosedur untuk mengidentifikasi bahaya dan risiko",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Bahaya dan Risiko potensial diidentifikasi sesuai prosedur.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Prosedur bahaya dan Risiko dikembangkan sesuai dengan sistem kerja.",
+              "sequence": 2
+            },
+            {
+              "code_number": "2.3",
+              "statement": "Kegiatan monitoring dilakukan dalam pelaksanaan prosedur.",
+              "sequence": 3
+            }
+          ]
+        },
+        {
+          "title": "Memelihara catatan sistem keamanan kerja",
+          "sequence": 3,
+          "kuks": [
+            {
+              "code_number": "3.1",
+              "statement": "Catatan system keamanan kerja disimpan sesuai prosedur.",
+              "sequence": 1
+            },
+            {
+              "code_number": "3.2",
+              "statement": "Catatan system keamanan kerja dipantau secara berkala sesuai prosedur.",
+              "sequence": 2
+            }
+          ]
+        },
+        {
+          "title": "Mengevaluasi sistem keamanan kerja",
+          "sequence": 4,
+          "kuks": [
+            {
+              "code_number": "4.1",
+              "statement": "Keefektifan sistem keamanan kerja dievaluasi sesuai prosedur.",
+              "sequence": 1
+            },
+            {
+              "code_number": "4.2",
+              "statement": "Hasil evaluasi system keamanan kerja dikembangkan sesuai prosedur.",
+              "sequence": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.153.3",
+      "title": "Mengikuti Prosedur Kebersihan di Tempat Kerja",
+      "standard_reference": "SKKNI Nomor 125 Tahun 2024",
+      "sequence": 7,
+      "elements": [
+        {
+          "title": "Mengidentifikasi dan mencegah risiko kebersihan",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Risiko kebersihan diidentifikasi secepatnya.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Tindakan diambil untuk meminimalkan atau menghilangkan risiko kebersihan sesuai dengan standar perusahaan.",
+              "sequence": 2
+            }
+          ]
+        },
+        {
+          "title": "Mengikuti prosedur kebersihan",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Prosedur kebersihan tempat kerja diikuti secara baik sesuai dengan standar perusahaan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Penanganan dan penyimpanan seluruh barang dilengkapi sesuai dengan standar perusahaan.",
+              "sequence": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.215.3",
+      "title": "Membaca dan Menulis Bahasa Inggris pada Tingkat Lanjut",
+      "standard_reference": "SKKNI Nomor 125 Tahun 2024",
+      "sequence": 8,
+      "elements": [
+        {
+          "title": "Mengenali tujuan dari berbagai jenis surat bisnis di tempat kerja",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Tujuan berbagai surat bisnis diidentifikasi.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Tujuan bisnis untuk surat pelanggan diidentifikasi.",
+              "sequence": 2
+            },
+            {
+              "code_number": "1.3",
+              "statement": "Tujuan surat untuk atasan diidentifikasi.",
+              "sequence": 3
+            }
+          ]
+        },
+        {
+          "title": "Memahami ketentuan menulis surat bisnis dalam bahasa Inggris",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Format yang sesuai untuk surat bisnis diidentifikasi.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Pentingnya nada saat menulis surat bisnis dalam bahasa Inggris dijelaskan.",
+              "sequence": 2
+            },
+            {
+              "code_number": "2.3",
+              "statement": "Pemilihan kata-kata bahasa Inggris untuk surat bisnis didiskusikan dengan kolega atau atasan.",
+              "sequence": 3
+            },
+            {
+              "code_number": "2.4",
+              "statement": "Tanggapan terhadap surat bisnis direncanakan.",
+              "sequence": 4
+            }
+          ]
+        },
+        {
+          "title": "Menerapkan ketentuan menulis surat bisnis dalam bahasa Inggris",
+          "sequence": 3,
+          "kuks": [
+            {
+              "code_number": "3.1",
+              "statement": "Format yang sesuai untuk surat bisnis dalam bahasa Inggris diterapkan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "3.2",
+              "statement": "Kata yang ramah dan tepat digunakan saat menulis bisnis surat dalam bahasa Inggris.",
+              "sequence": 2
+            },
+            {
+              "code_number": "3.3",
+              "statement": "Jenis bahasa yang tepat digunakan dalam surat bisnis sesuai tata bahasa.",
+              "sequence": 3
+            }
+          ]
+        },
+        {
+          "title": "Menulis risalah rapat dengan efektif",
+          "sequence": 4,
+          "kuks": [
+            {
+              "code_number": "4.1",
+              "statement": "Tujuan dan pembaca teks diidentifikasi.",
+              "sequence": 1
+            },
+            {
+              "code_number": "4.2",
+              "statement": "Format risalah yang tepat digunakan.",
+              "sequence": 2
+            },
+            {
+              "code_number": "4.3",
+              "statement": "Tanggal dan lokasi rapat dan daftar peserta rapat dimasukkan.",
+              "sequence": 3
+            },
+            {
+              "code_number": "4.4",
+              "statement": "Kontribusi peserta rapat dinyatakan.",
+              "sequence": 4
+            },
+            {
+              "code_number": "4.5",
+              "statement": "Rekomendasi inti rapat diidentifikasi dan dicatat.",
+              "sequence": 5
+            },
+            {
+              "code_number": "4.6",
+              "statement": "Kaidah ejaan tanda baca dan tata bahasa yang umum dalam bisnis diikuti.",
+              "sequence": 6
+            }
+          ]
+        },
+        {
+          "title": "Menyediakan terjemahan informal secara tertulis",
+          "sequence": 5,
+          "kuks": [
+            {
+              "code_number": "5.1",
+              "statement": "Makna dokumen ditafsirkan untuk menyampaikan ide dengan mempertimbangkan kepekaan budaya.",
+              "sequence": 1
+            },
+            {
+              "code_number": "5.2",
+              "statement": "Integritas terjemahan dipastikan dengan tidak menambah atau mengurangi maknanya.",
+              "sequence": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.213.3",
+      "title": "Melakukan Komunikasi secara Lisan dalam Bahasa Inggris pada Tingkat Operasional Menengah",
+      "standard_reference": "SKKNI Nomor 125 Tahun 2024",
+      "sequence": 9,
+      "elements": [
+        {
+          "title": "Melakukan komunikasi dengan tamu dan kolega mengenai kegiatan rutin dan tidak rutin",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Keluhan tamu ditanggapi.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Konflik di lokasi kegiatan ditangani.",
+              "sequence": 2
+            },
+            {
+              "code_number": "1.3",
+              "statement": "Kejadian atau permintaan tiba-tiba ditanggapi.",
+              "sequence": 3
+            },
+            {
+              "code_number": "1.4",
+              "statement": "Informasi secara rinci dan saran diberikan.",
+              "sequence": 4
+            },
+            {
+              "code_number": "1.5",
+              "statement": "Bantuan yang merupakan tanggung jawabnya diberikan.",
+              "sequence": 5
+            },
+            {
+              "code_number": "1.6",
+              "statement": "Hal-hal yang merupakan tanggung jawabnya dinegosiasikan.",
+              "sequence": 6
+            },
+            {
+              "code_number": "1.7",
+              "statement": "Penjelasan mengenai kebutuhan kolega dan tamu diinformasikan.",
+              "sequence": 7
+            },
+            {
+              "code_number": "1.8",
+              "statement": "Informasi faktual disampaikan.",
+              "sequence": 8
+            },
+            {
+              "code_number": "1.9",
+              "statement": "Bantuan yang diperlukan dari sumber yang tepat dan atau orang lain diidentifikasi.",
+              "sequence": 9
+            },
+            {
+              "code_number": "1.10",
+              "statement": "Informasi yang jelas dan mudah diikuti dengan kecepatan yang tepat dan urutan yang benar disampaikan.",
+              "sequence": 10
+            },
+            {
+              "code_number": "1.11",
+              "statement": "Informasi tambahan yang sesuai dengan kebutuhan tamu dan kolega disampaikan.",
+              "sequence": 11
+            },
+            {
+              "code_number": "1.12",
+              "statement": "Instruksi secara rinci diinformasikan.",
+              "sequence": 12
+            }
+          ]
+        },
+        {
+          "title": "Melakukan diskusi dalam kelompok",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Pelaksanaan diskusi disesuaikan",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Prosedur dan tata cara yang tepat diamati.",
+              "sequence": 2
+            },
+            {
+              "code_number": "2.3",
+              "statement": "Pendapat diberikan.",
+              "sequence": 3
+            },
+            {
+              "code_number": "2.4",
+              "statement": "Strategi mengkonfirmasi, menjelaskan pengertian, dan membuat tambahan konstruktif mengenai apa yang dikatakan disampaikan dalam diskusi.",
+              "sequence": 4
+            },
+            {
+              "code_number": "2.5",
+              "statement": "Umpan balik dan dukungan pada peserta lain diberikan.",
+              "sequence": 5
+            }
+          ]
+        },
+        {
+          "title": "Membuat presentasi lisan",
+          "sequence": 3,
+          "kuks": [
+            {
+              "code_number": "3.1",
+              "statement": "Presentasi dibuat sesuai dengan pertemuan atau diskusi.",
+              "sequence": 1
+            },
+            {
+              "code_number": "3.2",
+              "statement": "Presentasi disiapkan berdasarkan prinsip-prinsip pembelajaran orang dewasa.",
+              "sequence": 2
+            },
+            {
+              "code_number": "3.3",
+              "statement": "Presentasi disajikan.",
+              "sequence": 3
+            },
+            {
+              "code_number": "3.4",
+              "statement": "Umpan balik ditanggapi dan menjawab pertanyaan apabila diperlukan.",
+              "sequence": 4
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.214.3",
+      "title": "Membaca dan Menulis dalam Bahasa Inggris pada Tingkat Operasional Menengah",
+      "standard_reference": "SKKNI Nomor 125 Tahun 2024",
+      "sequence": 10,
+      "elements": [
+        {
+          "title": "Membuat peraturan dan petunjuk",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Tujuan peraturan dan petunjuk diidentifikasi dan dikonfirmasikan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Format penulisan peraturan dan petunjuk ditentukan sesuai dengan ketentuan.",
+              "sequence": 2
+            },
+            {
+              "code_number": "1.3",
+              "statement": "Pilihan kata untuk petunjuk dan peraturan ditentukan sesuai dengan standar.",
+              "sequence": 3
+            },
+            {
+              "code_number": "1.4",
+              "statement": "Tipe petunjuk dan peraturan yang dibutuhkan dibuat.",
+              "sequence": 4
+            },
+            {
+              "code_number": "1.5",
+              "statement": "Proses interpretasi dan pencatatan peraturan dan petunjuk dibuat dan didokumentasikan.",
+              "sequence": 5
+            },
+            {
+              "code_number": "1.6",
+              "statement": "Peraturan dan petunjuk ditetapkan sesuai dengan kebutuhan.",
+              "sequence": 6
+            }
+          ]
+        },
+        {
+          "title": "Mengidentifikasi metode penilaian",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Kriteria untuk membuat penilaian didefinisikan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Format proses penilaian dan pencatatan hasil akhir dirancang.",
+              "sequence": 2
+            },
+            {
+              "code_number": "2.3",
+              "statement": "Konteks dan lokasi penilaian diterapkan dan ditetapkan.",
+              "sequence": 3
+            },
+            {
+              "code_number": "2.4",
+              "statement": "Pengembangan, pelaksanaan, dan peninjauan biaya penilaian diperkirakan.",
+              "sequence": 4
+            },
+            {
+              "code_number": "2.5",
+              "statement": "Fasilitas dan sumber–sumber fisik yang dibutuhkan untuk melaksanakan penilaian diidentifikasi dan didokumentasikan.",
+              "sequence": 5
+            },
+            {
+              "code_number": "2.6",
+              "statement": "Jumlah penilai dan dukungan yang dibutuhkan untuk melaksanakan proses penilaian ditentukan.",
+              "sequence": 6
+            },
+            {
+              "code_number": "2.7",
+              "statement": "Metode penilaian yang akan digunakan dipilih dan penyesuaian yang diperbolehkan diajukan sesuai dengan kebutuhan.",
+              "sequence": 7
+            },
+            {
+              "code_number": "2.8",
+              "statement": "Aturan untuk pembuktian kebenaran keputusan penilaian ditentukan.",
+              "sequence": 8
+            }
+          ]
+        },
+        {
+          "title": "Mengidentifikasi saran penilaian yang tersedia",
+          "sequence": 3,
+          "kuks": [
+            {
+              "code_number": "3.1",
+              "statement": "Saran penilaian yang tersedia diidentifikasi dan dievaluasi.",
+              "sequence": 1
+            },
+            {
+              "code_number": "3.2",
+              "statement": "Daftar spesialis dikumpulkan untuk mengkritik saran penilaian.",
+              "sequence": 2
+            },
+            {
+              "code_number": "3.3",
+              "statement": "Penyesuaian terhadap sarana dan metode dibuat sesuai dengan saran penilaian.",
+              "sequence": 3
+            }
+          ]
+        },
+        {
+          "title": "Melakukan evaluasi percobaan metode dan saran penilaian",
+          "sequence": 4,
+          "kuks": [
+            {
+              "code_number": "4.1",
+              "statement": "Saran dan metode penilaian diuji coba dengan sampel dari kelompok target.",
+              "sequence": 1
+            },
+            {
+              "code_number": "4.2",
+              "statement": "Penyesuaian yang dibolehkan terhadap metode dan saran penilaian direncanakan.",
+              "sequence": 2
+            },
+            {
+              "code_number": "4.3",
+              "statement": "Penilai diidentifikasi untuk mengatur sarana penilaian dalam cara yang konsisten.",
+              "sequence": 3
+            },
+            {
+              "code_number": "4.4",
+              "statement": "Saran dan metode penilaian diatur  terhadap sampel target.",
+              "sequence": 4
+            },
+            {
+              "code_number": "4.5",
+              "statement": "Tanggapan dari sampel target dan penilai disusun dan dianalisis.",
+              "sequence": 5
+            },
+            {
+              "code_number": "4.6",
+              "statement": "Kepantasan metode penilaian dan kemudahan dalam penggunaan serta tingkat bahasa sarana penilaian ditentukan.",
+              "sequence": 6
+            },
+            {
+              "code_number": "4.7",
+              "statement": "Peningkatan dan perubahan terhadap metode saran dan penilaian dievaluasi.",
+              "sequence": 7
+            }
+          ]
+        },
+        {
+          "title": "Mendokumentasikan prosedur penilaian",
+          "sequence": 5,
+          "kuks": [
+            {
+              "code_number": "5.1",
+              "statement": "Prasangka yang dapat mempengaruhi keputusan penilaian diidentifikasi dan didokumentasikan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "5.2",
+              "statement": "Penyesuaian terhadap metode dan sarana penilaian untuk memenuhi karakteristik orang yang dinilai harus didokumentasikan.",
+              "sequence": 2
+            },
+            {
+              "code_number": "5.3",
+              "statement": "Kriteria untuk membuat keputusan tentang apakah sudah terampil atau belum ditinjau ulang dan disesuaikan.",
+              "sequence": 3
+            },
+            {
+              "code_number": "5.4",
+              "statement": "Prosedur penilaian dan instruksi didokumentasikan",
+              "sequence": 4
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.156.3",
+      "title": "Melaksanakan Prosedur Administrasi",
+      "standard_reference": "SKKNI Nomor 125 Tahun 2024",
+      "sequence": 11,
+      "elements": [
+        {
+          "title": "Memproses dokumen kantor",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Dokumen diproses sesuai dengan prosedur perusahaan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Peralatan dan perlengkapan digunakan secara benar.",
+              "sequence": 2
+            },
+            {
+              "code_number": "1.3",
+              "statement": "Kesalahan penggunaan peralatan  dan perlengkapan diperbaiki  sesuai dengan prosedur perusahaan.",
+              "sequence": 3
+            }
+          ]
+        },
+        {
+          "title": "Membuat dokumen korespondensi yang sederhana",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Topik korespondensi ditentukan sesuai kebutuhan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Teks ditulis dengan menggunakan bahasa yang tepat dan jelas.",
+              "sequence": 2
+            },
+            {
+              "code_number": "2.3",
+              "statement": "Dokumen korespondensi diperiksa kembali sebelum dikirim.",
+              "sequence": 3
+            }
+          ]
+        },
+        {
+          "title": "Menjaga sistem dokumen",
+          "sequence": 3,
+          "kuks": [
+            {
+              "code_number": "3.1",
+              "statement": "Peralatan yang digunakan dan dibersihkan sesuai dengan standar.",
+              "sequence": 1
+            },
+            {
+              "code_number": "3.2",
+              "statement": "Dokumen diarsipkan sesuai dengan prosedur.",
+              "sequence": 2
+            },
+            {
+              "code_number": "3.3",
+              "statement": "Referensi dan indeks dokumen disusun sesuai dengan prosedur perusahaan.",
+              "sequence": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.177.3",
+      "title": "Mencari dan Mendapatkan Data Komputer",
+      "standard_reference": "SKKNI Nomor 125 Tahun 2024",
+      "sequence": 12,
+      "elements": [
+        {
+          "title": "Membuka berkas",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Komputer dihidupkan sesuai prosedur.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Aplikasi yang sesuai dipilih.",
+              "sequence": 2
+            },
+            {
+              "code_number": "1.3",
+              "statement": "Berkas dibuka sesuai kebutuhan.",
+              "sequence": 3
+            }
+          ]
+        },
+        {
+          "title": "Mengambil dan mengubah data",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Data yang diambil di tempatkan di dalam berkas.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Kebutuhan pengeditan diidentifikasi sesuai kebutuhan.",
+              "sequence": 2
+            },
+            {
+              "code_number": "2.3",
+              "statement": "Data disimpan sesuai prosedur.",
+              "sequence": 3
+            }
+          ]
+        },
+        {
+          "title": "Menutup dan mengeluarkan berkas",
+          "sequence": 3,
+          "kuks": [
+            {
+              "code_number": "3.1",
+              "statement": "Berkas ditutup sesuai dengan prosedur.",
+              "sequence": 1
+            },
+            {
+              "code_number": "3.2",
+              "statement": "Komputer dimatikan sesuai prosedur",
+              "sequence": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.195.3",
+      "title": "Menyimpan Catatan Keuangan",
+      "standard_reference": "SKKNI Nomor 125 Tahun 2024",
+      "sequence": 13,
+      "elements": [
+        {
+          "title": "Membuat ayat-ayat jurnal",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Jurnal dipilih untuk ayat yang dimaksud.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Ayat-ayat jurnal ditempatkan secara benar dan tepat sesuai dengan ketentuan.",
+              "sequence": 2
+            },
+            {
+              "code_number": "1.3",
+              "statement": "Ayat-ayat jurnal didukung dengan keterangan dan referensi silang untuk mendukung dokumen.",
+              "sequence": 3
+            },
+            {
+              "code_number": "1.4",
+              "statement": "Ketidakteraturan dicatat dan ditindaklanjuti untuk mencari solusi dalam jangka waktu yang telah ditentukan.",
+              "sequence": 4
+            },
+            {
+              "code_number": "1.5",
+              "statement": "Penyesuaian ayat-ayat jurnal dicatat secara benar sesuai ketentuan.",
+              "sequence": 5
+            },
+            {
+              "code_number": "1.6",
+              "statement": "Sumber dokumen diarsipkan secara benar sesuai dengan ketentuan.",
+              "sequence": 6
+            }
+          ]
+        },
+        {
+          "title": "Menyesuaikan rekening",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Dokumen transaksi dan rekening neraca diperiksa secara teliti sesuai dengan ketentuan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Ketidaksesuaian diidentifikasi dan dilaporkan sesuai dengan tingkat tanggung jawab individu.",
+              "sequence": 2
+            },
+            {
+              "code_number": "2.3",
+              "statement": "Kesalahan dalam dokumen diperbaiki atau dilaporkan.",
+              "sequence": 3
+            },
+            {
+              "code_number": "2.4",
+              "statement": "Data transaksi dicatat pada sistem pembukuan sesuai dengan prosedur.",
+              "sequence": 4
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.004.3",
+      "title": "Memproses Transaksi Keuangan",
+      "standard_reference": "SKKNI Nomor 125 Tahun 2024",
+      "sequence": 14,
+      "elements": [
+        {
+          "title": "Memproses tanda terima dan pembayaran",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Pemeriksaan transaksi dilaksanakan secara teliti sesuai dengan standar.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Laporan keuangan disiapkan dan diperiksa sesuai dengan standar.",
+              "sequence": 2
+            },
+            {
+              "code_number": "1.3",
+              "statement": "Pelaksanaan system keuangan dikontrol sesuai dengan standar.",
+              "sequence": 3
+            },
+            {
+              "code_number": "1.4",
+              "statement": "Transaksi keuangan dimonitor sesuai standar.",
+              "sequence": 4
+            },
+            {
+              "code_number": "1.5",
+              "statement": "Perbedaan pada laporan keuangan dicari solusi sesuai standar.",
+              "sequence": 5
+            }
+          ]
+        },
+        {
+          "title": "Memindahkan keuntungan dari mesin register atau terminal",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Laporan keuangan diselesaikan sesuai jangka waktu yang telah ditetapkan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Penyelesaian laporan keuangan diteruskan kepada pihak yang terkait.",
+              "sequence": 2
+            },
+            {
+              "code_number": "2.3",
+              "statement": "Pembacaan mesin register atau terminal dilaksanakan",
+              "sequence": 3
+            },
+            {
+              "code_number": "2.4",
+              "statement": "Dokumen kas dan nonkas  disimpan  sesuai dengan standar.",
+              "sequence": 4
+            }
+          ]
+        },
+        {
+          "title": "Mencocokkan keuntungan",
+          "sequence": 3,
+          "kuks": [
+            {
+              "code_number": "3.1",
+              "statement": "Kas dihitung secara teliti.",
+              "sequence": 1
+            },
+            {
+              "code_number": "3.2",
+              "statement": "Dokumen nonkas dihitung secara akurat.",
+              "sequence": 2
+            },
+            {
+              "code_number": "3.3",
+              "statement": "Jumlah kas di terminal dan transaksi nonkas ditentukan secara akurat.",
+              "sequence": 3
+            },
+            {
+              "code_number": "3.4",
+              "statement": "Keuntungan dicatat sesuai dengan standar.",
+              "sequence": 4
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.175.3",
+      "title": "Menyampaikan Informasi Produk, Layanan, dan Fasilitas Hotel",
+      "standard_reference": "SKKNI Nomor 125 Tahun 2024",
+      "sequence": 15,
+      "elements": [
+        {
+          "title": "Memberikan informasi sederhana mengenai produk hotel",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Produk hotel diidentifikasi sesuai kebutuhan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Informasi mengenai produk hotel dijelaskan sesuai dengan prosedur.",
+              "sequence": 2
+            }
+          ]
+        },
+        {
+          "title": "Memberikan informasi sederhana tentang fasilitas dan layanan hotel",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Fasilitas dan layanan hotel diidentifikasi sesuai kebutuhan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Informasi mengenai pelayanan hotel dijelaskan sesuai dengan prosedur.",
+              "sequence": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.158.3",
+      "title": "Menerima dan Menyimpan Barang",
+      "standard_reference": "SKKNI Nomor 125 Tahun 2024",
+      "sequence": 16,
+      "elements": [
+        {
+          "title": "Mengambil kiriman persediaan",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Persediaan yang datang diperiksa sesuai pesanan secara seksama terhadap pesanan dan dokumentasi pengiriman sesuai dengan prosedur perusahaan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Persediaan diidentifikasi secara seksama, dicatat, dan dikomunikasikan pada orang yang tepat.",
+              "sequence": 2
+            },
+            {
+              "code_number": "1.3",
+              "statement": "Ketidaksesuaian ditindaklanjuti sesuai kebijakan perusahaan.",
+              "sequence": 3
+            }
+          ]
+        },
+        {
+          "title": "Menyimpan persediaan",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Persediaan disimpan ke tempat penyimpanan dengan aman.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.1",
+              "statement": "Jumlah persediaan dicatat secara akurat sesuai prosedur perusahaan.",
+              "sequence": 2
+            },
+            {
+              "code_number": "2.3",
+              "statement": "Persediaan diberi label sesuai dengan prosedur perusahaan.",
+              "sequence": 3
+            }
+          ]
+        },
+        {
+          "title": "Melakukan rotasi dan penjagaan persediaan",
+          "sequence": 3,
+          "kuks": [
+            {
+              "code_number": "3.1",
+              "statement": "Persediaan dirotasi sesuai dengan kebijakan perusahaan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "3.2",
+              "statement": "Persediaan dipindahkan sesuai dengan aturan keselamatan dan kesehatan.",
+              "sequence": 2
+            },
+            {
+              "code_number": "3.3",
+              "statement": "Kelebihan persediaan ditempatkan di gudang sesuai dengan kebijakan perusahaan.",
+              "sequence": 3
+            },
+            {
+              "code_number": "3.4",
+              "statement": "Tempat penyimpanan dijaga dengan aman sesuai dengan peraturan perusahaan.",
+              "sequence": 4
+            },
+            {
+              "code_number": "3.5",
+              "statement": "Masalah yang timbul segera diidentifikasi dan dilaporkan.",
+              "sequence": 5
+            },
+            {
+              "code_number": "3.6",
+              "statement": "Sistem pencatatan persediaan digunakan Sesuai dengan prinsip akuntansi dan ketentuan perusahaan.",
+              "sequence": 6
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.150.3",
+      "title": "Mengembangkan Pengetahuan tentang Industri Perhotelan",
+      "standard_reference": "SKKNI Nomor 125 Tahun 2024",
+      "sequence": 17,
+      "elements": [
+        {
+          "title": "Mencari informasi tentang industri perhotelan",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Sumber informasi diakses dan ditingkatkan secara benar.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Informasi tentang industri digunakan dengan benar pada aktivitas kerja harian.",
+              "sequence": 2
+            }
+          ]
+        },
+        {
+          "title": "Meningkatkan pengetahuan bidang industri perhotelan",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Informasi industry perhotelan diperbaharui melalui riset secara formal atau nonformal.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Informasi terbaru aktivitas kerja harian disampaikan kepada kolega terkait.",
+              "sequence": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.179.3",
+      "title": "Mempromosikan Produk dan Jasa Kepada Tamu",
+      "standard_reference": "SKKNI Nomor 125 Tahun 2024",
+      "sequence": 18,
+      "elements": [
+        {
+          "title": "Mengembangkan pengetahuan produk dan/atau jasa sesuai permintaan dan pasar",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Kesempatan yang ada diambil untuk mengembangkan pengetahuan tentang produk dan/atau jasa.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Riset formal dan informal digunakan untuk memperbaharui pengetahuan produk dan/atau jasa.",
+              "sequence": 2
+            },
+            {
+              "code_number": "1.3",
+              "statement": "Umpan balik dari pelanggan dan observasi di tempat kerja digunakan untuk mengevaluasi produk dan/atau jasa serta kegiatan promosi.",
+              "sequence": 3
+            },
+            {
+              "code_number": "1.4",
+              "statement": "Pengetahuan yang diperoleh digunakan bersama dengan rekan kerja untuk meningkatkan efektivitas penjualan dalam tim.",
+              "sequence": 4
+            },
+            {
+              "code_number": "1.5",
+              "statement": "Informasi yang diperoleh dari pengalaman tempat kerja dan kontak langsung kepada orang yang berkepentingan dipertimbangkan dalam perencanaan yang akan datang.",
+              "sequence": 5
+            },
+            {
+              "code_number": "1.6",
+              "statement": "Perubahan-perubahan untuk memenuhi keinginan pelanggan harus diidentifikasi.",
+              "sequence": 6
+            },
+            {
+              "code_number": "1.7",
+              "statement": "Ide penyesuaian produk dan jasa untuk memenuhi kebutuhan pelanggan disarankan untuk orang yang berkepentingan  menurut kebijakan.",
+              "sequence": 7
+            }
+          ]
+        },
+        {
+          "title": "Mendorong pelanggan menggunakan dan membeli produk dan jasa",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Informasi akurat tentang produk dan/atau jasa ditawarkan kepada pelanggan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Teknik penjualan digunakan untuk mendorong penggunaan dan pembelian produk jasa.",
+              "sequence": 2
+            },
+            {
+              "code_number": "2.3",
+              "statement": "Kemungkinan adanya 'extras' dan ‘adds on’ diinformasikan kepada pelanggan.",
+              "sequence": 3
+            },
+            {
+              "code_number": "2.4",
+              "statement": "Produkdan layanan dipromosikan sesuai dengan tujuan dan fokus promosi perusahaan.",
+              "sequence": 4
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.151.3",
+      "title": "Memperbaharui Pengetahuan Lokal",
+      "standard_reference": "SKKNI Nomor 125 Tahun 2024",
+      "sequence": 19,
+      "elements": [
+        {
+          "title": "Mengembangkan pengetahuan lokal",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Sumber-sumber informasi mengenai area lokal diidentifikasi dan diakses secara benar.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Informasi dicatat dan diarsipkan untuk penggunaan selanjutnya.",
+              "sequence": 2
+            },
+            {
+              "code_number": "1.3",
+              "statement": "Informasi yang secara umum diminta oleh tamu diidentifikasi dan diperoleh secara benar.",
+              "sequence": 3
+            }
+          ]
+        },
+        {
+          "title": "Memperbaharui pengetahuan lokal",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Riset informasi formal dan informal digunakan untuk memperbaharui pengetahuan lokal.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Pengetahuan yang telah diperbaharui disampaikan kepada tamu dan rekan kerja secara tepat dan digunakan untuk kepentingan aktivitas sehari-hari.",
+              "sequence": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.001.3",
+      "title": "Mengoperasikan Sistem Komputer Reservasi",
+      "standard_reference": "SKKNI Nomor 125 Tahun 2024",
+      "sequence": 20,
+      "elements": [
+        {
+          "title": "Mengakses dan menggunakan informasi dari sistem computer reservasi",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Sistem komputer reservasi diakses sesuai dengan standar.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Sistem komputer reservasi digunakan sesuai dengan standar.",
+              "sequence": 2
+            }
+          ]
+        },
+        {
+          "title": "Membuat dan memproses reservasi melalui sistem komputer reservasi",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Reservasi baru dibuat dengan teliti sesuai dengan standar.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Semua data disiapkan dan dicatat dengan teliti sesuai dengan kebutuhan.",
+              "sequence": 2
+            },
+            {
+              "code_number": "2.3",
+              "statement": "Reservasi diperbaharui dan disimpan dengan teliti sesuai kebutuhan.",
+              "sequence": 3
+            },
+            {
+              "code_number": "2.4",
+              "statement": "Data reservasi dicetak dengan tepat apabila diperlukan.",
+              "sequence": 4
+            }
+          ]
+        },
+        {
+          "title": "Mengirim dan menerima komunikasi melalui sistem computer reservasi",
+          "sequence": 3,
+          "kuks": [
+            {
+              "code_number": "3.1",
+              "statement": "Komunikasi dengan kolega dibuat dan diproses melalui sistem komputer reservasi.",
+              "sequence": 1
+            },
+            {
+              "code_number": "3.2",
+              "statement": "Komunikasi dengan kolega diakses pada waktu yang tepat.",
+              "sequence": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.147.3",
+      "title": "Melakukan Kerjasama dengan Kolega dan Tamu",
+      "standard_reference": "SKKNI Nomor 125 Tahun 2024",
+      "sequence": 21,
+      "elements": [
+        {
+          "title": "Melakukan komunikasi di tempat kerja",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Komunikasi dengan kolega dan tamu menggunakan intonasi dan bahasa tubuh yang sopan dilaksanakan secara profesional.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Komunikasi dua arah dilaksanakan secara aktif dan efektif.",
+              "sequence": 2
+            },
+            {
+              "code_number": "1.3",
+              "statement": "Konflik dan potensi konflik diidentifikasi dengan bantuan dari kolega untuk penyelesaiannya.",
+              "sequence": 3
+            }
+          ]
+        },
+        {
+          "title": "Memberikan bantuan untuk tamu internal dan eksternal",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Kebutuhan dan harapan tamu, termasuk kebutuhan tertentu diidentifikasi sesuai dengan standar perusahaan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Kebutuhan dan permintaan tamu dipenuhi dalam jangka waktu yang cepat sesuai prosedur perusahaan.",
+              "sequence": 2
+            },
+            {
+              "code_number": "2.3",
+              "statement": "Keluhan tamu diidentifikasi dan ditangani secara profesional untuk penyelesaiannya sesuai prosedur perusahaan.",
+              "sequence": 3
+            }
+          ]
+        },
+        {
+          "title": "Menjaga standar kinerja presentasi persona",
+          "sequence": 3,
+          "kuks": [
+            {
+              "code_number": "3.1",
+              "statement": "Standar kerja digunakan dalam melakukan pekerjaan yang berhubungan dengan tamu dan kolega.",
+              "sequence": 1
+            },
+            {
+              "code_number": "3.2",
+              "statement": "Standar kebersihan, kesehatan dan kelestarian lingkungan diterapkan dalam meningkatkan kinerja sesuai prosedur.",
+              "sequence": 2
+            },
+            {
+              "code_number": "3.3",
+              "statement": "Pakaian yang sopan digunakan dalam menunjang kinerja sesuai dengan  standar perusahaan.",
+              "sequence": 3
+            }
+          ]
+        },
+        {
+          "title": "Melakukan kerja dalam tim",
+          "sequence": 4,
+          "kuks": [
+            {
+              "code_number": "4.1",
+              "statement": "Kepercayaan, dukungan dan toleransi dilaksanakan dalam aktivitas sehari-hari untuk mencapai tujuan kerja tim.",
+              "sequence": 1
+            },
+            {
+              "code_number": "4.2",
+              "statement": "Tujuan kerja tim secara bersama diidentifikasi.",
+              "sequence": 2
+            },
+            {
+              "code_number": "4.3",
+              "statement": "Tanggung jawab serta tugas individu diidentifikasi dan diselesaikan sesuai prioritas dalam waktu yang ditentukan.",
+              "sequence": 3
+            },
+            {
+              "code_number": "4.4",
+              "statement": "Bantuan diminta dan ditawarkan dari dan kepada anggota tim untuk memenuhi tujuan kerja.",
+              "sequence": 4
+            },
+            {
+              "code_number": "4.5",
+              "statement": "Umpan balik dan informasi dari anggota tim lain diterima.",
+              "sequence": 5
+            },
+            {
+              "code_number": "4.6",
+              "statement": "Perubahan tanggung jawab dari anggota tim didiskusikan untuk memenuhi tujuan kerja.",
+              "sequence": 6
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.009.3",
+      "title": "Melakukan Komunikasi Melalui Telepon dan Email",
+      "standard_reference": "SKKNI Nomor 125 Tahun 2024",
+      "sequence": 22,
+      "elements": [
+        {
+          "title": "Menjawab panggilan telepon masuk",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Telepon dijawab secara cepat, jelas, dan sesuai dengan standar perusahaan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Bantuan yang sopan ditawarkan kepada penelepon dan tujuan menelepon ditentukan secara jelas.",
+              "sequence": 2
+            },
+            {
+              "code_number": "1.3",
+              "statement": "Keterangan rinci diulang pada penelepon untuk konfirmasi.",
+              "sequence": 3
+            },
+            {
+              "code_number": "1.4",
+              "statement": "Pertanyaan penelepon dijawab serta diteruskan orang yang tepat.",
+              "sequence": 4
+            },
+            {
+              "code_number": "1.5",
+              "statement": "Permintaan dicatat secara akurat dan disampaikan pada departemen atau orang yang tepat untuk tindaklanjuti.",
+              "sequence": 5
+            },
+            {
+              "code_number": "1.6",
+              "statement": "Produk dan layanan perusahaan dipromosikan.",
+              "sequence": 6
+            },
+            {
+              "code_number": "1.7",
+              "statement": "Pesan disampaikan secara akurat kepada orang yang dimaksud dalam waktu yang sudah ditetapkan.",
+              "sequence": 7
+            },
+            {
+              "code_number": "1.8",
+              "statement": "Panggilan telepon yang bersifat mengancam dan mencurigakan dilaporkan kepada orang yang   tepat sesuai dengan standar perusahaan.",
+              "sequence": 8
+            }
+          ]
+        },
+        {
+          "title": "Membuat panggilan telepon",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Nomor telepon diperoleh secara akurat.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Tujuan pemanggilan dibuat secara jelas sebelum telepon.",
+              "sequence": 2
+            },
+            {
+              "code_number": "2.3",
+              "statement": "Perlengkapan digunakan secara baik untuk melakukan hubungan komunikasi secara jelas dengan tamu.",
+              "sequence": 3
+            },
+            {
+              "code_number": "2.4",
+              "statement": "Pada saat menelepon dilakukan dengan sikap yang baik.",
+              "sequence": 4
+            }
+          ]
+        },
+        {
+          "title": "Melakukan komunikasi melalui email",
+          "sequence": 3,
+          "kuks": [
+            {
+              "code_number": "3.1",
+              "statement": "Koneksi internet disambungkan dengan baik.",
+              "sequence": 1
+            },
+            {
+              "code_number": "3.2",
+              "statement": "Email dibuka dengan alamat dan kode akses yang benar.",
+              "sequence": 2
+            },
+            {
+              "code_number": "3.3",
+              "statement": "Semua email masuk diperiksa dan dibaca dengan teliti.",
+              "sequence": 3
+            },
+            {
+              "code_number": "3.3",
+              "statement": "Email masuk dijawab dengan baik dan benar sesuai standar perusahaan.",
+              "sequence": 4
+            },
+            {
+              "code_number": "3.4",
+              "statement": "Permintaan dalam email dilaksanakan dan disampaikan kepada bagian terkait",
+              "sequence": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.152.3",
+      "title": "Menangani Situasi Konflik",
+      "standard_reference": "SKKNI Nomor 125 Tahun 2024",
+      "sequence": 23,
+      "elements": [
+        {
+          "title": "Mengidentifikasi situasi konflik",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Potensi konflik diidentifikasi dan diambil tindakan penyelesaian sesuai standar perusahaan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Keselamatan tamu diidentifikasi secara cepat sesuai prosedur.",
+              "sequence": 2
+            }
+          ]
+        },
+        {
+          "title": "Memecahkan situasi konflik",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Solusi konflik diambil dalam ruang lingkup tanggung jawab individu.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Komunikasi efektif digunakan untuk membantu dalam penanganan konflik.",
+              "sequence": 2
+            },
+            {
+              "code_number": "2.3",
+              "statement": "Teknik pemecahan konflik dilaksanakan sesuai prosedur.",
+              "sequence": 3
+            }
+          ]
+        },
+        {
+          "title": "Memberi tanggapan terhadap keluhan tamu yang berpotensi menjadi konflik",
+          "sequence": 3,
+          "kuks": [
+            {
+              "code_number": "3.1",
+              "statement": "Keluhan tamu ditangani secara profesional sesuai prosedur.",
+              "sequence": 1
+            },
+            {
+              "code_number": "3.2",
+              "statement": "Tanggung jawab diambil untuk memecahkan masalah keluhan.",
+              "sequence": 2
+            },
+            {
+              "code_number": "3.3",
+              "statement": "Keluhan dikonfirmasi kepada tamu.",
+              "sequence": 3
+            },
+            {
+              "code_number": "3.4",
+              "statement": "Dokumen keluhan yang dilengkapi secara akurat.",
+              "sequence": 4
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.157.3",
+      "title": "Menyajikan Informasi",
+      "standard_reference": "SKKNI Nomor 125 Tahun 2024",
+      "sequence": 24,
+      "elements": [
+        {
+          "title": "Mencari informasi",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Sumber informasi yang valid dan sesuai kebutuhan diidentifikasi.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Sumber informasi diakses.",
+              "sequence": 2
+            },
+            {
+              "code_number": "1.3",
+              "statement": "Informasi yang sesuai dikumpulkan.",
+              "sequence": 3
+            }
+          ]
+        },
+        {
+          "title": "Menyiapkan dan menyajikan informasi",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Informasi dipilih sesuai dengan kebutuhan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Informasi disajikan dengan jelas dan akurat.",
+              "sequence": 2
+            },
+            {
+              "code_number": "2.3",
+              "statement": "Informasi disediakan bagi orang yang  tepat sesuai waktu yang ditentukan.",
+              "sequence": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.166.3",
+      "title": "Memulai Percakapan dan Mengembangkan Hubungan Baik dengan Tamu",
+      "standard_reference": "SKKNI Nomor 125 Tahun 2024",
+      "sequence": 25,
+      "elements": [
+        {
+          "title": "Menyediakan dan meminta informasi tentang topik yang sudah familiar",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Teknik percakapan ditangani untuk memeriksa pemahaman.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Tata Bahasa yang tepat digunakan untuk menyampaikan maksud dengan jelas.",
+              "sequence": 2
+            },
+            {
+              "code_number": "1.3",
+              "statement": "Informasi lisan dengan dialog singkat diberikan dalam menanggapi permintaan tamu.",
+              "sequence": 3
+            }
+          ]
+        },
+        {
+          "title": "Menunjukkan pemahaman atas struktur percakapan tidak resmi",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Percakapan tidak resmi dibuka dan ditutup secara tepat.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Teknik klarifikasi dan timbal balik digunakan.",
+              "sequence": 2
+            }
+          ]
+        },
+        {
+          "title": "Menanggapi keluhan secara tepat",
+          "sequence": 3,
+          "kuks": [
+            {
+              "code_number": "3.1",
+              "statement": "Pemahaman didemonstrasikan dengan mengulangi kalimat keluhan tersebut.",
+              "sequence": 1
+            },
+            {
+              "code_number": "3.2",
+              "statement": "Tindakan yang tepat ditawarkan untuk memecahkan masalah keluhan.",
+              "sequence": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.003.3",
+      "title": "Menyediakan Layanan Akomodasi Front Desk",
+      "standard_reference": "SKKNI Nomor 125 Tahun 2024",
+      "sequence": 26,
+      "elements": [
+        {
+          "title": "Menyiapkan kedatangan tamu",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Peralatan dan perlengkapan kedatangan tamu di area front desk disiapkan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Daftar kedatangan tamu diperiksa sebelum tamu tiba.",
+              "sequence": 2
+            },
+            {
+              "code_number": "1.3",
+              "statement": "Kamar dialokasikan sesuai dengan permintaan tamu.",
+              "sequence": 3
+            },
+            {
+              "code_number": "1.4",
+              "statement": "Reservasi yang tidak pasti ditindaklanjuti sesuai dengan standar.",
+              "sequence": 4
+            },
+            {
+              "code_number": "1.5",
+              "statement": "Daftar kedatangan tamu disusun dan didistribusikan kepada departemen yang terkait sesuai dengan standar.",
+              "sequence": 5
+            }
+          ]
+        },
+        {
+          "title": "Menyambut dan mendaftarkan tamu",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Tamu disambut dengan sopan sesuai standar.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Rincian reservasi dikonfirmasikan kepada tamu sesuai dengan standar.",
+              "sequence": 2
+            },
+            {
+              "code_number": "2.3",
+              "statement": "Informasi dan saran tentang fasilitas dan layanan Hotel ditawarkan secara proaktif.",
+              "sequence": 3
+            },
+            {
+              "code_number": "2.4",
+              "statement": "Standar pendaftaran bagi tamu dengan dan tanpa reservasi diikuti dan dilengkapi secara benar dalam jangka waktu yang dapat diterima serta sesuai dengan standar.",
+              "sequence": 4
+            },
+            {
+              "code_number": "2.5",
+              "statement": "Standar akuntansi diikuti secara baik dan benar sesuai standar.",
+              "sequence": 5
+            },
+            {
+              "code_number": "2.6",
+              "statement": "Rincian yang berkaitan dengan kunci kamar, surat tamu, pesan, dan fasilitas safety deposit diterangkan secara jelas kepada tamu.",
+              "sequence": 6
+            },
+            {
+              "code_number": "2.7",
+              "statement": "Kelebihan pemesanan diselesaikan secara benar sesuai dengan standar dan ketidaknyamanan tamu diminimalisasi.",
+              "sequence": 7
+            },
+            {
+              "code_number": "2.8",
+              "statement": "Kedatangan tamu dimonitor dan diperiksa sesuai dengan expected arrival list dan dilaporkan apabila terdapat  penyimpangan  sesuai dengan standar.",
+              "sequence": 8
+            }
+          ]
+        },
+        {
+          "title": "Mengorganisasikan keberangkatan tamu",
+          "sequence": 3,
+          "kuks": [
+            {
+              "code_number": "3.1",
+              "statement": "Daftar keberangkatan ditinjau.",
+              "sequence": 1
+            },
+            {
+              "code_number": "3.2",
+              "statement": "Kembali dan diperiksa keakurasiannya.  Informasi keberangkatan tamu diperoleh dari departemen lain untuk memudahkan persiapan tagihan.",
+              "sequence": 2
+            },
+            {
+              "code_number": "3.3",
+              "statement": "Tagihan tamu dibuat dan diperiksa dengan baik sesuai peraturan perusahaan.",
+              "sequence": 3
+            },
+            {
+              "code_number": "3.4",
+              "statement": "Tagihan tamu diterangkan secara jelas dan diproses sesuai dengan standar.",
+              "sequence": 4
+            },
+            {
+              "code_number": "3.5",
+              "statement": "Kunci kamar diambil kembali dari tamu dan diproses sesuai dengan standar.",
+              "sequence": 5
+            },
+            {
+              "code_number": "3.6",
+              "statement": "Permintaan tamu untuk bantuan keberangkatan dilakukan dengan sopan sesuai dengan standar.",
+              "sequence": 6
+            },
+            {
+              "code_number": "3.7",
+              "statement": "Express check-out diproses sesuai dengan standar.",
+              "sequence": 7
+            },
+            {
+              "code_number": "3.8",
+              "statement": "Standar untuk check-out tamu grup diikuti secara benar.",
+              "sequence": 8
+            }
+          ]
+        },
+        {
+          "title": "Menyiapkan catatan dan laporan Front Office",
+          "sequence": 4,
+          "kuks": [
+            {
+              "code_number": "4.1",
+              "statement": "Catatan Front Office diperbaharui secara baik dan benar serta disiapkan dalam batas waktu yang telah ditetapkan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "4.2",
+              "statement": "Kebijakan perusahaan untuk pergantian kamar, no-show, perpanjangan masa tinggal, dan keberangkatan yang dipercepat ditindaklanjuti secara benar.",
+              "sequence": 2
+            },
+            {
+              "code_number": "4.3",
+              "statement": "Laporan Front Office didistribusikan pada departemen yang bersangkutan dalam jangka waktu yang telah ditentukan.",
+              "sequence": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.006.3",
+      "title": "Melaksanakan Audit Malam",
+      "standard_reference": "SKKNI Nomor 125 Tahun 2024",
+      "sequence": 27,
+      "elements": [
+        {
+          "title": "Memonitor standar keuangan",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Pemeriksaan transaksi dilaksanakan secara teliti sesuai dengan standar perusahaan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Laporan keuangan setiap outlet diperiksa sesuai dengan standar perusahaan.",
+              "sequence": 2
+            },
+            {
+              "code_number": "1.3",
+              "statement": "Pelaksanaan sistem keuangan dikontrol sesuai dengan standar perusahaan.",
+              "sequence": 3
+            },
+            {
+              "code_number": "1.4",
+              "statement": "Standar keuangan dimonitor dan diinput sesuai dengan standar perusahaan.",
+              "sequence": 4
+            },
+            {
+              "code_number": "1.5",
+              "statement": "Adanya perbedaan yang timbul pada laporan keuangan dipecahkan sesuai dengan tanggung jawab kerja.",
+              "sequence": 5
+            }
+          ]
+        },
+        {
+          "title": "Menyelesaikan laporan keuangan",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Laporan keuangan diselesaikan dalam jangka waktu yang telah ditetapkan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Penyelesaian laporan keuangan diteruskan kepada pihak yang terkait.",
+              "sequence": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.002.3",
+      "title": "Menerima dan Memproses Reservasi",
+      "standard_reference": "SKKNI Nomor 125 Tahun 2024",
+      "sequence": 28,
+      "elements": [
+        {
+          "title": "Menerima permintaan reservasi",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Reservasi diterima sesuai dengan standar.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Informasi fasilitas dan layanan Hotel ditawarkan secara proaktif sesuai dengan standar.",
+              "sequence": 2
+            },
+            {
+              "code_number": "1.3",
+              "statement": "Ketersediaan reservasi ditentukan secara benar dan disarankan secara sopan kepada tamu.",
+              "sequence": 3
+            },
+            {
+              "code_number": "1.4",
+              "statement": "Pilihan alternatif ditawarkan jika reservasi yang diminta tidak tersedia termasuk pilihan daftar tunggu.",
+              "sequence": 4
+            },
+            {
+              "code_number": "1.5",
+              "statement": "Informasi biaya dan bentuk-bentuk produk lain dijawab secara tepat.",
+              "sequence": 5
+            }
+          ]
+        },
+        {
+          "title": "Mencatat rincian reservasi",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Data tamu dicatat pada saat pemesanan secara baik dan benar sesuai standar.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Profil atau riwayat tamu diperiksa untuk membantu dalam membuat reservasi dan untuk peningkatan layanan konsumen.",
+              "sequence": 2
+            },
+            {
+              "code_number": "2.3",
+              "statement": "Rincian pembayaran dicatat secara akurat sesuai dengan standar.",
+              "sequence": 3
+            },
+            {
+              "code_number": "2.4",
+              "statement": "Permintaan khusus tamu dicatat secara jelas sesuai dengan standar.",
+              "sequence": 4
+            },
+            {
+              "code_number": "2.5",
+              "statement": "Keterangan rinci dikonfirmasikan dan disetujui oleh tamu.",
+              "sequence": 5
+            },
+            {
+              "code_number": "2.6",
+              "statement": "Data reservasi dilengkapi dan diarsip dengan baik untuk mempermudah akses pencarian.",
+              "sequence": 6
+            }
+          ]
+        },
+        {
+          "title": "Memperbaharui reservasi",
+          "sequence": 3,
+          "kuks": [
+            {
+              "code_number": "3.1",
+              "statement": "Perubahan data pemesanan kamar dan tamu diterima sesuai dengan standar.",
+              "sequence": 1
+            },
+            {
+              "code_number": "3.2",
+              "statement": "Pencatatan perubahan pemesanan kamar diperbaharui sesuai dengan standar.",
+              "sequence": 2
+            },
+            {
+              "code_number": "3.3",
+              "statement": "Perubahan pemesanan kamar tamu dilakukan berdasarkan urutan tanggal kedatangan dan nama tamu yang dimaksud.",
+              "sequence": 3
+            },
+            {
+              "code_number": "3.4",
+              "statement": "Pembayaran dari tamu diproses sesuai dengan standar.",
+              "sequence": 4
+            },
+            {
+              "code_number": "3.5",
+              "statement": "Pembatalan dan penggantian reservasi dicatat sesuai dengan permintaan tamu dan standar perusahaan.",
+              "sequence": 5
+            }
+          ]
+        },
+        {
+          "title": "Memberi saran orang lain tentang rincian reservasi",
+          "sequence": 4,
+          "kuks": [
+            {
+              "code_number": "4.1",
+              "statement": "Permintaan tamu diinformasikan kepada departemen dan staf yang terkait.",
+              "sequence": 1
+            },
+            {
+              "code_number": "4.2",
+              "statement": "Saran tentang rincian reservasi diberikan kepada tamu dengan baik sesuai standar.",
+              "sequence": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.174.3",
+      "title": "Memberikan Petunjuk tentang Lokasi",
+      "standard_reference": "SKKNI Terkait",
+      "sequence": 29,
+      "elements": [
+        {
+          "title": "Menyimak pertanyaan tentang lokasi",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Pertanyaan tentang Lokasi disimak dan diidentifikasi secara tepat.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Pertanyaan didata sesuai prosedur.",
+              "sequence": 2
+            }
+          ]
+        },
+        {
+          "title": "Memastikan lokasi",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Petunjuk tentang lokasi dipilih dengan tepat sesuai kebutuhan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Petunjuk tentang lokasi dikonfirmasikan dengan benar.",
+              "sequence": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.008.3",
+      "title": "Menyediakan Jasa Penanganan Barang Tamu",
+      "standard_reference": "SKKNI Nomor 125 Tahun 2024",
+      "sequence": 30,
+      "elements": [
+        {
+          "title": "Menangani kedatangan dan keberangkatan tamu",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Daily expected arrival ditinjau dan tamu tertentu atau pergerakan tamu utama dicatat.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Tamu disambut dengan ramah dan sopan serta diarahkan pada area registrasi.",
+              "sequence": 2
+            },
+            {
+              "code_number": "1.3",
+              "statement": "Barang bawaan tamu dibantu sesuai dengan standar perusahaan.",
+              "sequence": 3
+            },
+            {
+              "code_number": "1.4",
+              "statement": "Tamu diantar menuju kamar yang tepat dan fasilitas kamar serta fasilitas lain diterangkan secara jelas dan sopan.",
+              "sequence": 4
+            },
+            {
+              "code_number": "1.5",
+              "statement": "Barang bawaan ditandai secara teliti dan disimpan untuk memudahkan pendistribusian pada saat kedatangan.",
+              "sequence": 5
+            }
+          ]
+        },
+        {
+          "title": "Menangani barang bawaan tamu",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Barang bawaan tamu diambil dan diangkut dengan aman ke tempat yang benar.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Sistem penyimpanan barang bawaan dioperasikan secara benar sesuai dengan standar perusahaan dan persyaratan keamanan.",
+              "sequence": 2
+            },
+            {
+              "code_number": "2.3",
+              "statement": "Barang bawaan ditempatkan secara benar dalam tempat penyimpanan.",
+              "sequence": 3
+            }
+          ]
+        },
+        {
+          "title": "Merespons permintaan atas layanan bell desk",
+          "sequence": 3,
+          "kuks": [
+            {
+              "code_number": "3.1",
+              "statement": "Layanan bell desk disediakan segera sesuai dengan persyaratan keselamatan dan keamanan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "3.2",
+              "statement": "Komunikasi yang baik dilakukan dengan kolega di departemen lain untuk memastikan respon yang efektif atas permintaan bell desk",
+              "sequence": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.022.3",
+      "title": "Menyediakan Fasilitas Kehilangan dan Penemuan Barang Tamu",
+      "standard_reference": "SKKNI Nomor 125 Tahun 2024",
+      "sequence": 31,
+      "elements": [
+        {
+          "title": "Mengikuti standar kehilangan dan penemuan",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Barang ditemukan atau yang hilang dicatat lokasi, tanggal, dan waktunya.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Catatan disimpan dan didokumentasikan.",
+              "sequence": 2
+            }
+          ]
+        },
+        {
+          "title": "Melengkapi dokumentasi kehilangan dan penemuan",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Keterangan barang dan rincian dicatat dalam buku atau daftar kehilangan dan penemuan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Barang yang ditemukan diberi label dan disimpan sesuai dengan susunan tanggal di lokasi yang tepat.",
+              "sequence": 2
+            }
+          ]
+        },
+        {
+          "title": "Mengikuti standar barang yang ditagih",
+          "sequence": 3,
+          "kuks": [
+            {
+              "code_number": "3.1",
+              "statement": "Barang yang diklaim ditandai dan diberi tanggal.",
+              "sequence": 1
+            },
+            {
+              "code_number": "3.2",
+              "statement": "Tamu yang mengklaim barang diperiksa identitasnya.",
+              "sequence": 2
+            },
+            {
+              "code_number": "3.3",
+              "statement": "Data penagihan barang dicatat.",
+              "sequence": 3
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "questions": [
+    {
+      "question_text": "Confirmation Letter di follow up bagi tamu yang melakukan pemesanan kamar melalui:",
+      "option_a": "Pilihan A",
+      "option_b": "Pilihan B",
+      "option_c": "Pilihan C",
+      "option_d": "Pilihan D",
+      "option_e": "Pilihan E",
+      "correct_answer": "A",
+      "is_active": true,
+      "unit_code": "I.55HDR00.148.3"
+    },
+    {
+      "question_text": "Pengertian Advance Deposit yang tepat dibawah ini, yaitu:",
+      "option_a": "Pilihan A",
+      "option_b": "Pilihan B",
+      "option_c": "Pilihan C",
+      "option_d": "Pilihan D",
+      "option_e": "Pilihan E",
+      "correct_answer": "A",
+      "is_active": true,
+      "unit_code": "I.55HDR00.148.3"
+    },
+    {
+      "question_text": "Yang tidak termasuk pihak ketiga dalam reservasi adalah:",
+      "option_a": "Pilihan A",
+      "option_b": "Pilihan B",
+      "option_c": "Pilihan C",
+      "option_d": "Pilihan D",
+      "option_e": "Pilihan E",
+      "correct_answer": "A",
+      "is_active": true,
+      "unit_code": "I.55HDR00.148.3"
+    },
+    {
+      "question_text": "Guaranteed Reservation seperti dibawah ini, kecuali:",
+      "option_a": "Pilihan A",
+      "option_b": "Pilihan B",
+      "option_c": "Pilihan C",
+      "option_d": "Pilihan D",
+      "option_e": "Pilihan E",
+      "correct_answer": "A",
+      "is_active": true,
+      "unit_code": "I.55HDR00.148.3"
+    },
+    {
+      "question_text": "Pengertian ‘Peak Season/High Season”adalah:",
+      "option_a": "Pilihan A",
+      "option_b": "Pilihan B",
+      "option_c": "Pilihan C",
+      "option_d": "Pilihan D",
+      "option_e": "Pilihan E",
+      "correct_answer": "A",
+      "is_active": true,
+      "unit_code": "I.55HDR00.148.3"
+    },
+    {
+      "question_text": "Pengisian Cross Reference pada Reservation Slip adalah:",
+      "option_a": "Pilihan A",
+      "option_b": "Pilihan B",
+      "option_c": "Pilihan C",
+      "option_d": "Pilihan D",
+      "option_e": "Pilihan E",
+      "correct_answer": "A",
+      "is_active": true,
+      "unit_code": "I.55HDR00.148.3"
+    },
+    {
+      "question_text": "Apabila pada saat Check out ternyata salah satu fasilitas di dalam kamar tersebut hilang. Form apakah yang diperlukan untuk melaporkan kehilangan tersebut:",
+      "option_a": "Pilihan A",
+      "option_b": "Pilihan B",
+      "option_c": "Pilihan C",
+      "option_d": "Pilihan D",
+      "option_e": "Pilihan E",
+      "correct_answer": "A",
+      "is_active": true,
+      "unit_code": "I.55HDR00.148.3"
+    },
+    {
+      "question_text": "Apabila sebuah kamar hotel memiliki living room dan juga pantry maka disebut kamar jenis apa:",
+      "option_a": "Pilihan A",
+      "option_b": "Pilihan B",
+      "option_c": "Pilihan C",
+      "option_d": "Pilihan D",
+      "option_e": "Pilihan E",
+      "correct_answer": "A",
+      "is_active": true,
+      "unit_code": "I.55HDR00.148.3"
+    },
+    {
+      "question_text": "Yang dimaksud dengan “No show” adalah:",
+      "option_a": "Pilihan A",
+      "option_b": "Pilihan B",
+      "option_c": "Pilihan C",
+      "option_d": "Pilihan D",
+      "option_e": "Pilihan E",
+      "correct_answer": "A",
+      "is_active": true,
+      "unit_code": "I.55HDR00.148.3"
+    },
+    {
+      "question_text": "Permintaan khusus / special remark yang biasa disampaikan oleh tamu hotel pada saat memesan kamar adalah, kecuali:",
+      "option_a": "Pilihan A",
+      "option_b": "Pilihan B",
+      "option_c": "Pilihan C",
+      "option_d": "Pilihan D",
+      "option_e": "Pilihan E",
+      "correct_answer": "A",
+      "is_active": true,
+      "unit_code": "I.55HDR00.148.3"
+    }
+  ]
+}

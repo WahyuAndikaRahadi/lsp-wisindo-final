@@ -127,7 +127,7 @@
                 File backup yang dihasilkan berformat <strong>SQL murni (ANSI/MySQL standard)</strong>. Jika terjadi kendala server atau migrasi data, file ini dapat direstore secara instan melalui <strong>phpMyAdmin</strong> (tab <em>Import</em>), panel hosting (<em>Restore Database</em>), atau melalui terminal MySQL CLI:
             </p>
             <code class="block font-mono text-[11px] bg-slate-900 text-amber-300 px-3 py-1.5 rounded-lg select-all">
-                mysql -u username -p {{ $stats['database'] }} &lt; lsp_proindo_backup_YYYY-MM-DD.sql
+                mysql -u username -p {{ $stats['database'] }} &lt; lsp_wisindo_backup_YYYY-MM-DD.sql
             </code>
         </div>
     </div>

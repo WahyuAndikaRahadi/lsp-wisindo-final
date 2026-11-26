@@ -71,7 +71,7 @@ class DatabaseBackupService
      */
     public function createBackup(?string $customPrefix = null): array
     {
-        $prefix = $customPrefix ? preg_replace('/[^a-zA-Z0-9_-]/', '', $customPrefix) : 'lsp_proindo_backup';
+        $prefix = $customPrefix ? preg_replace('/[^a-zA-Z0-9_-]/', '', $customPrefix) : 'lsp_wisindo_backup';
         $filename = sprintf('%s_%s.sql', $prefix, now()->format('Y-m-d_His'));
         $targetPath = $this->backupDir.DIRECTORY_SEPARATOR.$filename;
 
@@ -102,7 +102,7 @@ class DatabaseBackupService
      */
     public function streamLiveBackup(): StreamedResponse
     {
-        $filename = sprintf('lsp_proindo_backup_live_%s.sql', now()->format('Y-m-d_His'));
+        $filename = sprintf('lsp_wisindo_backup_live_%s.sql', now()->format('Y-m-d_His'));
 
         return response()->streamDownload(function () {
             $output = fopen('php://output', 'w');

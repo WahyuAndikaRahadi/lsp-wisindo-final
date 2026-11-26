@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Assessment;
 use App\Models\Schedule;
 use App\Models\Scheme;
+use App\Models\Tuk;
 use App\Models\User;
 use App\Services\AkWorkflowService;
 use App\Services\BnspReferenceService;
@@ -70,12 +71,16 @@ class JadwalController extends Controller
 
     public function create(): View
     {
-        $schemes = Scheme::active()->get();
+        $schemes = Scheme::active()->orderBy('name')->get();
         $assessors = User::where('role', 'ASESOR')->where('status', 'ACTIVE')->orderBy('full_name', 'asc')->get();
-        $provinces = BnspReferenceService::getProvinsiList();
-        $cities = BnspReferenceService::getAllCities();
+        $verifiedTuks = Tuk::where('verification_status', 'VERIFIED')
+            ->with(['schemes' => function ($q) {
+                $q->where('m_tuk_schemes.is_verified', true);
+            }])
+            ->orderBy('name')
+            ->get();
 
-        return view('admin.jadwal.create', compact('schemes', 'assessors', 'provinces', 'cities'));
+        return view('admin.jadwal.create', compact('schemes', 'assessors', 'verifiedTuks'));
     }
 
     public function store(Request $request): RedirectResponse
@@ -83,6 +88,7 @@ class JadwalController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'scheme_id' => 'required|exists:m_schemes,id',
+            'tuk_id' => 'nullable|exists:m_tuks,id',
             'tuk_name' => 'nullable|string|max:255',
             'tuk_address' => 'nullable|string|max:500',
             'kode_provinsi' => 'nullable|string|max:10',
@@ -90,6 +96,7 @@ class JadwalController extends Controller
             'kode_kota' => 'nullable|string|max:10',
             'nama_kota' => 'nullable|string|max:100',
             'tuk_city' => 'nullable|string|max:100',
+            'meeting_link' => 'nullable|string|max:500',
             'date' => 'required|date',
             'end_date' => 'nullable|date|after_or_equal:date',
             'pic_name' => 'nullable|string|max:255',
@@ -109,6 +116,20 @@ class JadwalController extends Controller
             'assessors' => 'nullable|array',
             'code' => 'nullable|string|max:50',
         ]);
+
+        if (! empty($validated['tuk_id'])) {
+            $tuk = Tuk::find($validated['tuk_id']);
+            if ($tuk) {
+                $validated['tuk_name'] = $tuk->name;
+                $validated['tuk_address'] = $tuk->address ?: ($validated['tuk_address'] ?? '-');
+                $validated['kode_provinsi'] = $tuk->kode_provinsi ?: ($validated['kode_provinsi'] ?? '32');
+                $validated['nama_provinsi'] = $tuk->nama_provinsi ?: ($validated['nama_provinsi'] ?? 'Jawa Barat');
+                $validated['kode_kota'] = $tuk->kode_kota ?: ($validated['kode_kota'] ?? null);
+                $validated['nama_kota'] = $tuk->nama_kota ?: ($validated['nama_kota'] ?? null);
+                $validated['pic_name'] = $tuk->pic_name ?: ($validated['pic_name'] ?? null);
+                $validated['pic_position'] = $tuk->pic_position ?: ($validated['pic_position'] ?? null);
+            }
+        }
 
         $code = $request->input('code') ?: strtoupper(Str::random(8));
 
@@ -130,6 +151,7 @@ class JadwalController extends Controller
         $schedule = Schedule::create([
             'name' => $validated['name'],
             'scheme_id' => $validated['scheme_id'],
+            'tuk_id' => $validated['tuk_id'] ?? null,
             'tuk_name' => $validated['tuk_name'] ?? null,
             'tuk_address' => ! empty($validated['tuk_address']) ? $validated['tuk_address'] : '-',
             'kode_provinsi' => $kodeProvinsi,
@@ -137,6 +159,7 @@ class JadwalController extends Controller
             'kode_kota' => $kodeKota,
             'nama_kota' => $namaKota,
             'tuk_city' => $tukCity,
+            'meeting_link' => $validated['meeting_link'] ?? null,
             'pic_name' => $validated['pic_name'] ?? null,
             'pic_position' => $position,
             'jabatan' => $position,
@@ -202,9 +225,9 @@ class JadwalController extends Controller
 
     public function edit(Schedule $jadwal): View
     {
-        $schemes = Scheme::active()->get();
+        $schemes = Scheme::active()->orderBy('name')->get();
         $assessors = User::where('role', 'ASESOR')->where('status', 'ACTIVE')->orderBy('full_name', 'asc')->get();
-        $jadwal->load('assessors');
+        $jadwal->load('assessors', 'tuk');
 
         if (empty($jadwal->kode_kota) && (! empty($jadwal->tuk_address) || ! empty($jadwal->tuk_city) || ! empty($jadwal->tuk_name))) {
             $resolved = BnspReferenceService::resolveCityAndProvince(
@@ -219,10 +242,14 @@ class JadwalController extends Controller
             $jadwal->nama_provinsi = $resolved['nama_provinsi'] ?? 'Jawa Barat';
         }
 
-        $provinces = BnspReferenceService::getProvinsiList();
-        $cities = BnspReferenceService::getAllCities();
+        $verifiedTuks = Tuk::where('verification_status', 'VERIFIED')
+            ->with(['schemes' => function ($q) {
+                $q->where('m_tuk_schemes.is_verified', true);
+            }])
+            ->orderBy('name')
+            ->get();
 
-        return view('admin.jadwal.edit', compact('jadwal', 'schemes', 'assessors', 'provinces', 'cities'));
+        return view('admin.jadwal.edit', compact('jadwal', 'schemes', 'assessors', 'verifiedTuks'));
     }
 
     public function update(Request $request, Schedule $jadwal): RedirectResponse
@@ -230,6 +257,7 @@ class JadwalController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'scheme_id' => 'required|exists:m_schemes,id',
+            'tuk_id' => 'nullable|exists:m_tuks,id',
             'tuk_name' => 'nullable|string|max:255',
             'tuk_address' => 'nullable|string|max:500',
             'kode_provinsi' => 'nullable|string|max:10',
@@ -237,6 +265,7 @@ class JadwalController extends Controller
             'kode_kota' => 'nullable|string|max:10',
             'nama_kota' => 'nullable|string|max:100',
             'tuk_city' => 'nullable|string|max:100',
+            'meeting_link' => 'nullable|string|max:500',
             'date' => 'required|date',
             'end_date' => 'nullable|date|after_or_equal:date',
             'pic_name' => 'nullable|string|max:255',
@@ -255,6 +284,20 @@ class JadwalController extends Controller
             'notes' => 'nullable|string',
             'assessor_ids' => 'nullable|array',
         ]);
+
+        if (! empty($validated['tuk_id'])) {
+            $tuk = Tuk::find($validated['tuk_id']);
+            if ($tuk) {
+                $validated['tuk_name'] = $tuk->name;
+                $validated['tuk_address'] = $tuk->address ?: ($validated['tuk_address'] ?? $jadwal->tuk_address);
+                $validated['kode_provinsi'] = $tuk->kode_provinsi ?: ($validated['kode_provinsi'] ?? $jadwal->kode_provinsi);
+                $validated['nama_provinsi'] = $tuk->nama_provinsi ?: ($validated['nama_provinsi'] ?? $jadwal->nama_provinsi);
+                $validated['kode_kota'] = $tuk->kode_kota ?: ($validated['kode_kota'] ?? $jadwal->kode_kota);
+                $validated['nama_kota'] = $tuk->nama_kota ?: ($validated['nama_kota'] ?? $jadwal->nama_kota);
+                $validated['pic_name'] = $tuk->pic_name ?: ($validated['pic_name'] ?? $jadwal->pic_name);
+                $validated['pic_position'] = $tuk->pic_position ?: ($validated['pic_position'] ?? $jadwal->pic_position);
+            }
+        }
 
         $instruments = $request->input('selected_instruments', $request->input('instruments', $jadwal->selected_instruments ?? ['AK01', 'IA01', 'IA01B', 'IA02', 'IA03', 'IA05']));
         $validated['selected_instruments'] = $instruments;

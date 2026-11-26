@@ -56,14 +56,14 @@
                         <form action="{{ route('admin.users.reset-password', $user->id) }}" method="POST" class="flex-1"
                               data-confirm="PERINGATAN RESET PASSWORD:
 
-Kata sandi akun {{ $user->full_name }} ({{ $user->email }}) akan direset kembali ke kata sandi default: 'proindo123'.
+Kata sandi akun {{ $user->full_name }} ({{ $user->email }}) akan direset kembali ke kata sandi default: 'wisindo123'.
 
 Apakah Anda yakin ingin melanjutkan?"
                               data-confirm-title="Konfirmasi Reset Kata Sandi"
                               data-confirm-ok="Ya, Reset Password"
                               data-confirm-danger="false">
                             @csrf
-                            <button type="submit" class="w-full px-3 py-2 text-xs font-bold text-amber-700 hover:text-amber-900 bg-amber-50 hover:bg-amber-100 border border-amber-200 rounded-lg text-center transition min-h-[38px]" title="Reset password ke default 'proindo123'">
+                            <button type="submit" class="w-full px-3 py-2 text-xs font-bold text-amber-700 hover:text-amber-900 bg-amber-50 hover:bg-amber-100 border border-amber-200 rounded-lg text-center transition min-h-[38px]" title="Reset password ke default 'wisindo123'">
                                 Reset Sandi
                             </button>
                         </form>
@@ -157,14 +157,14 @@ Apakah Anda yakin ingin melanjutkan?"
                                     <form action="{{ route('admin.users.reset-password', $user->id) }}" method="POST" class="inline"
                                           data-confirm="PERINGATAN RESET PASSWORD:
 
-Kata sandi akun {{ $user->full_name }} ({{ $user->email }}) akan direset kembali ke kata sandi default: 'proindo123'.
+Kata sandi akun {{ $user->full_name }} ({{ $user->email }}) akan direset kembali ke kata sandi default: 'wisindo123'.
 
 Apakah Anda yakin ingin melanjutkan?"
                                           data-confirm-title="Konfirmasi Reset Kata Sandi"
                                           data-confirm-ok="Ya, Reset Password"
                                           data-confirm-danger="false">
                                         @csrf
-                                        <button type="submit" class="px-2.5 py-1 text-xs font-semibold text-amber-700 hover:text-amber-900 bg-amber-50 hover:bg-amber-100 border border-amber-200 rounded transition" title="Reset password ke default 'proindo123'">
+                                        <button type="submit" class="px-2.5 py-1 text-xs font-semibold text-amber-700 hover:text-amber-900 bg-amber-50 hover:bg-amber-100 border border-amber-200 rounded transition" title="Reset password ke default 'wisindo123'">
                                             Reset Sandi
                                         </button>
                                     </form>

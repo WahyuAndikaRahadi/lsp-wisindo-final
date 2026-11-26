@@ -5,10 +5,10 @@
     <!-- Main Split-Card Container -->
     <div class="w-full bg-white shadow-xl flex flex-col md:flex-row overflow-hidden relative border border-slate-200 rounded-2xl">
         
-        <!-- Top Horizontal Dual Stripe (Spanning Entire Card: 65% Navy, 35% Red) -->
+        <!-- Top Horizontal Dual Stripe (Spanning Entire Card: Wisindo Indigo & Orange) -->
         <div class="absolute top-0 left-0 right-0 w-full flex h-1.5 z-10">
             <div class="w-3/5 md:w-[65%] bg-lsp-navy"></div>
-            <div class="w-2/5 md:w-[35%] bg-lsp-red"></div>
+            <div class="w-2/5 md:w-[35%] bg-lsp-orange"></div>
         </div>
 
         <!-- Left Panel: Info & Branding (40%) -->
@@ -16,21 +16,21 @@
             <div>
                 <!-- Official Logo -->
                 <div class="mb-4 md:mb-6">
-                    <img src="{{ asset('images/logo-lsp-wisindo.png') }}" 
-                         alt="LSP Praktisi Otomotif Indonesia" 
-                         class="h-14 sm:h-16 md:h-20 w-auto object-contain">
+                    <img src="{{ asset('images/logo-wisindo-alt-bawah.png') }}" 
+                         alt="LSP P3 Wisata Indonesia" 
+                         class="h-16 sm:h-20 md:h-24 w-auto object-contain">
                 </div>
 
                 <h1 class="font-sans text-2xl md:text-3xl font-extrabold text-lsp-title tracking-tight mb-2">
-                    LSP PrO Indo
+                    LSP Wisindo
                 </h1>
                 <p class="text-xs text-lsp-muted leading-relaxed">
-                    Pendaftaran mandiri peserta (asesi) sertifikasi profesi otomotif standar BNSP.
+                    Pendaftaran mandiri peserta (asesi) sertifikasi profesi pariwisata standar BNSP.
                 </p>
             </div>
 
             <div class="hidden md:block mt-8 pt-6 border-t border-slate-200">
-                <span class="text-[10px] font-extrabold text-lsp-red uppercase tracking-widest block mb-1">
+                <span class="text-[10px] font-extrabold text-lsp-orange uppercase tracking-widest block mb-1">
                     SERTIFIKASI PROFESI
                 </span>
                 <p class="text-[11px] text-lsp-muted leading-relaxed">
@@ -41,7 +41,7 @@
 
         <!-- Right Panel: Form (60%) -->
         <div class="w-full md:w-[60%] p-6 sm:p-8 md:p-10 bg-white flex flex-col justify-center">
-            <span class="text-[10px] font-extrabold text-lsp-red uppercase tracking-wider block mb-1">
+            <span class="text-[10px] font-extrabold text-lsp-orange uppercase tracking-wider block mb-1">
                 REGISTRASI PESERTA
             </span>
             <h2 class="font-sans text-2xl md:text-3xl font-extrabold text-lsp-title mb-1">
@@ -96,7 +96,7 @@
                     </label>
                     <input id="registration_token" type="text" name="registration_token" value="{{ old('registration_token') }}" required autocomplete="off"
                         class="w-full px-3.5 py-2.5 bg-lsp-input-bg border border-slate-300 focus:border-lsp-navy text-sm sm:text-xs font-mono tracking-wider rounded-lg text-slate-900 focus:outline-none focus:ring-1 focus:ring-lsp-navy transition @error('registration_token') border-lsp-red ring-1 ring-lsp-red @enderror"
-                        placeholder="Contoh: token1234" />
+                        placeholder="Contoh: wisindo1234" />
                     @error('registration_token')
                         <p class="mt-1 text-[11px] text-lsp-red font-medium">{{ $message }}</p>
                     @enderror

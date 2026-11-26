@@ -19,7 +19,7 @@ class RotateRegistrationTokenCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Rotate/randomize the weekly asesi registration token (proindo + 4 digits)';
+    protected $description = 'Rotate/randomize the weekly asesi registration token (wisindo + 4 digits)';
 
     /**
      * Execute the console command.

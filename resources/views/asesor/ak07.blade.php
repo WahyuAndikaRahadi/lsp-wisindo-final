@@ -118,7 +118,7 @@
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
             <h1 class="text-2xl font-black text-slate-900 tracking-tight">FR.AK.07. CEKLIS PENYESUAIAN YANG WAJAR DAN BERALASAN</h1>
-            <p class="text-xs text-slate-500 font-medium">Lembaga Sertifikasi Profesi Praktisi Otomotif (LSP-PrO Indo)</p>
+            <p class="text-xs text-slate-500 font-medium">Lembaga Sertifikasi Profesi P3 Wisata Indonesia (LSP Wisindo)</p>
         </div>
     </div>
 

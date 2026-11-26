@@ -106,28 +106,39 @@
                         Terdaftar: {{ $item->created_at ? $item->created_at->diffForHumans() : '-' }}
                     </span>
 
-                    @if($isRejected)
-                        <a href="{{ route('asesi.assessment.apl', $item->id) }}" class="w-full sm:w-auto px-4 py-2 text-xs font-bold bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-300 rounded-lg shadow-xs transition inline-flex items-center justify-center gap-1 text-center">
-                            <span>✕ Ditolak</span>
-                        </a>
-                    @elseif($sch->is_closed || $item->status === 'COMPLETED')
-                        <a href="{{ route('asesi.assessment.ruang-uji', $item->id) }}" class="w-full sm:w-auto px-4 py-2 text-xs font-bold bg-slate-800 hover:bg-slate-900 text-white rounded-lg transition inline-flex items-center justify-center gap-1.5 text-center">
-                            <svg class="w-3.5 h-3.5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                            <span>Ruang Uji &rarr;</span>
-                        </a>
-                    @elseif($isResume)
-                        <a href="{{ $actionUrl }}" class="w-full sm:w-auto px-4 py-2 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg shadow-sm transition text-center">
-                            Lanjut Uji &rarr;
-                        </a>
-                    @elseif($aplStatus === 'REVISION_REQUESTED')
-                        <a href="{{ route('asesi.assessment.apl', $item->id) }}" class="w-full sm:w-auto px-4 py-2 text-xs font-bold bg-amber-500 hover:bg-amber-600 text-white rounded-lg shadow-sm transition text-center">
-                            Revisi APL &rarr;
-                        </a>
-                    @else
-                        <a href="{{ route('asesi.assessment.apl', $item->id) }}" class="w-full sm:w-auto px-4 py-2 text-xs font-bold bg-brand-600 hover:bg-brand-700 text-white rounded-lg shadow-sm transition text-center">
-                            Isi APL &rarr;
-                        </a>
-                    @endif
+                    <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+                        @if(!empty($sch->meeting_link))
+                            <a href="{{ $sch->meeting_link }}" target="_blank" rel="noopener noreferrer"
+                               class="w-full sm:w-auto px-3 py-2 text-xs font-bold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg shadow-2xs transition inline-flex items-center justify-center gap-1.5 text-center"
+                               title="Masuk Ruang Video Meeting AJJ">
+                                <svg class="w-3.5 h-3.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                                <span>Zoom / Meet ↗</span>
+                            </a>
+                        @endif
+
+                        @if($isRejected)
+                            <a href="{{ route('asesi.assessment.apl', $item->id) }}" class="w-full sm:w-auto px-4 py-2 text-xs font-bold bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-300 rounded-lg shadow-xs transition inline-flex items-center justify-center gap-1 text-center">
+                                <span>✕ Ditolak</span>
+                            </a>
+                        @elseif($sch->is_closed || $item->status === 'COMPLETED')
+                            <a href="{{ route('asesi.assessment.ruang-uji', $item->id) }}" class="w-full sm:w-auto px-4 py-2 text-xs font-bold bg-slate-800 hover:bg-slate-900 text-white rounded-lg transition inline-flex items-center justify-center gap-1.5 text-center">
+                                <svg class="w-3.5 h-3.5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                <span>Ruang Uji &rarr;</span>
+                            </a>
+                        @elseif($isResume)
+                            <a href="{{ $actionUrl }}" class="w-full sm:w-auto px-4 py-2 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg shadow-sm transition text-center">
+                                Lanjut Uji &rarr;
+                            </a>
+                        @elseif($aplStatus === 'REVISION_REQUESTED')
+                            <a href="{{ route('asesi.assessment.apl', $item->id) }}" class="w-full sm:w-auto px-4 py-2 text-xs font-bold bg-amber-500 hover:bg-amber-600 text-white rounded-lg shadow-sm transition text-center">
+                                Revisi APL &rarr;
+                            </a>
+                        @else
+                            <a href="{{ route('asesi.assessment.apl', $item->id) }}" class="w-full sm:w-auto px-4 py-2 text-xs font-bold bg-brand-600 hover:bg-brand-700 text-white rounded-lg shadow-sm transition text-center">
+                                Isi APL &rarr;
+                            </a>
+                        @endif
+                    </div>
                 </div>
             </div>
         @endforeach

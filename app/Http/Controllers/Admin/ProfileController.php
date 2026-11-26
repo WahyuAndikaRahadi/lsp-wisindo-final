@@ -92,7 +92,7 @@ class ProfileController extends Controller
                 [
                     'nik' => $validated['nik'] ?? null,
                     'jabatan' => $validated['jabatan'] ?? 'Super Admin LSP',
-                    'nama_institusi_perusahaan' => $validated['nama_institusi_perusahaan'] ?? 'LSP Praktisi Otomotif Indonesia',
+                    'nama_institusi_perusahaan' => $validated['nama_institusi_perusahaan'] ?? 'LSP P3 Wisata Indonesia',
                     'signature_data' => $signatureData,
                 ]
             );
@@ -117,7 +117,7 @@ class ProfileController extends Controller
                 [
                     'nik' => $validated['nik'] ?? null,
                     'jabatan' => $validated['jabatan'] ?? 'Admin LSP',
-                    'nama_institusi_perusahaan' => $validated['nama_institusi_perusahaan'] ?? 'LSP Praktisi Otomotif Indonesia',
+                    'nama_institusi_perusahaan' => $validated['nama_institusi_perusahaan'] ?? 'LSP P3 Wisata Indonesia',
                     'signature_data' => $masterSignature,
                 ]
             );

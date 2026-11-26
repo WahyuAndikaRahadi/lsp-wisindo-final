@@ -1,14 +1,14 @@
 <div class="surat-tugas-wrapper" style="font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; color: #000; line-height: 1.45; font-size: 10pt; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important;">
     @php
-        $kopSuratPath = public_path('images/kop-surat-lsp-proindo.png');
+        $kopSuratPath = public_path('images/kop-surat-lsp-wisindo.png');
         $kopSuratBase64 = file_exists($kopSuratPath) 
             ? 'data:image/png;base64,' . base64_encode(file_get_contents($kopSuratPath)) 
-            : asset('images/kop-surat-lsp-proindo.png');
+            : null;
 
-        $logoPath = public_path('images/logo-lsp-proindo.png');
+        $logoPath = public_path('images/logo-lsp-wisindo.png');
         $logoBase64 = file_exists($logoPath)
             ? 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath))
-            : asset('images/logo-lsp-proindo.png');
+            : asset('images/logo-lsp-wisindo.png');
 
         $ttdDirekturPath = public_path('images/ttd-direktur-stempel-lsp.png');
         $ttdDirekturBase64 = file_exists($ttdDirekturPath)
@@ -19,38 +19,38 @@
     {{-- Kop Surat Banner (Presisi, Rapi & Berwarna Resmi Sesuai Dokumen Asli) --}}
     <div style="margin-bottom: 12px; text-align: center;">
         @if($kopSuratBase64)
-            <img src="{{ $kopSuratBase64 }}" alt="Kop Surat LSP PrO Indo" style="width: 100%; height: auto; display: block; margin: 0 auto;">
+            <img src="{{ $kopSuratBase64 }}" alt="Kop Surat LSP Wisindo" style="width: 100%; height: auto; display: block; margin: 0 auto;">
             {{-- Dual brand accent stripe under banner for crisp, vibrant framing --}}
             <div style="display: flex; width: 100%; height: 3.5px; margin-top: 3px; margin-bottom: 12px;">
-                <div style="width: 70%; background-color: #1E2B6E;"></div>
-                <div style="width: 30%; background-color: #CE181E;"></div>
+                <div style="width: 70%; background-color: #3B3D78;"></div>
+                <div style="width: 30%; background-color: #FF9832;"></div>
             </div>
         @else
             <table style="width: 100%; border-collapse: collapse; margin-bottom: 4px;">
                 <tr>
                     <td style="width: 85px; text-align: center; vertical-align: middle; padding-right: 12px;">
-                        <img src="{{ $logoBase64 }}" style="max-height: 65px; max-width: 85px; object-fit: contain;" alt="Logo LSP">
+                        <img src="{{ $logoBase64 }}" style="max-height: 65px; max-width: 85px; object-fit: contain;" alt="Logo LSP Wisindo">
                     </td>
                     <td style="text-align: center; vertical-align: middle; padding: 0;">
-                        <div style="font-size: 13pt; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; color: #1E2B6E; line-height: 1.2;">
+                        <div style="font-size: 13pt; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; color: #3B3D78; line-height: 1.2;">
                             LEMBAGA SERTIFIKASI PROFESI
                         </div>
-                        <div style="font-size: 11pt; font-weight: bold; color: #CE181E; letter-spacing: 0.5px; margin-top: 2px; text-transform: uppercase; line-height: 1.2;">
-                            PRAKTISI OTOMOTIF INDONESIA (LSP PrO INDO)
+                        <div style="font-size: 11pt; font-weight: bold; color: #FF9832; letter-spacing: 0.5px; margin-top: 2px; text-transform: uppercase; line-height: 1.2;">
+                            P3 WISATA INDONESIA (LSP WISINDO)
                         </div>
-                        <div style="font-size: 8pt; font-weight: bold; color: #1E2B6E; margin-top: 2px;">
-                            Lisensi BNSP: No. KEP.1444/BNSP/VIII/2021
+                        <div style="font-size: 8pt; font-weight: bold; color: #3B3D78; margin-top: 2px;">
+                            Lisensi BNSP Sektor Pariwisata
                         </div>
                         <div style="font-size: 7.5pt; color: #334155; margin-top: 2px; line-height: 1.35;">
-                            Ruko Blessing Center, Jl. Siput Raya No 38 Kayuringin Jaya, Kota Bekasi, Jawa Barat 17144<br>
-                            Telp: 0812-8557-7080 &nbsp;|&nbsp; Email: lsp.proindo@gmail.com &nbsp;|&nbsp; Website: lspproindo.id
+                            Sistem Asesmen Jarak Jauh (AJJ) &amp; Uji Kompetensi Pariwisata Berstandar BNSP<br>
+                            Email: info@lspwisindo.id &nbsp;|&nbsp; Website: lspwisindo.id
                         </div>
                     </td>
                 </tr>
             </table>
             <div style="display: flex; width: 100%; height: 3.5px; margin-top: 5px; margin-bottom: 12px;">
-                <div style="width: 70%; background-color: #1E2B6E;"></div>
-                <div style="width: 30%; background-color: #CE181E;"></div>
+                <div style="width: 70%; background-color: #3B3D78;"></div>
+                <div style="width: 30%; background-color: #FF9832;"></div>
             </div>
         @endif
     </div>
@@ -67,7 +67,7 @@
 
     {{-- Pembuka --}}
     <p style="text-align: justify; margin-bottom: 12px; margin-top: 0; line-height: 1.45;">
-        Dalam rangka pelaksanaan uji kompetensi di Lembaga Sertifikasi Profesi Pihak Ketiga Praktisi Otomotif Indonesia (LSP P3 PrO Indo) yang akan diselenggarakan:
+        Dalam rangka pelaksanaan uji kompetensi di Lembaga Sertifikasi Profesi Pihak Ketiga Wisata Indonesia (LSP P3 Wisindo) yang akan diselenggarakan:
     </p>
 
     {{-- Jadwal & Lokasi Pelaksanaan --}}
@@ -166,7 +166,7 @@
                     <tr>
                         <td style="width: 22px; vertical-align: top; padding: 1.5px 0;">b.</td>
                         <td style="vertical-align: top; padding: 1.5px 0; text-align: justify;">
-                            Melaporkan pelaksanaan tugas ini kepada Ketua Lembaga Sertifikasi Profesi Pihak Ketiga Praktisi Otomotif Indonesia (LSP P3 PrO Indo)
+                            Melaporkan pelaksanaan tugas ini kepada Ketua Lembaga Sertifikasi Profesi Pihak Ketiga Wisata Indonesia (LSP P3 Wisindo)
                         </td>
                     </tr>
                     <tr>

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\CheckAplApproved;
+use App\Http\Middleware\EnsureTukIsVerified;
 use App\Http\Middleware\RoleMiddleware;
 use App\Http\Middleware\SecurityHeadersMiddleware;
 use App\Http\Middleware\TrackLastStep;
@@ -21,6 +22,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => RoleMiddleware::class,
             'apl.approved' => CheckAplApproved::class,
             'track.step' => TrackLastStep::class,
+            'tuk.verified' => EnsureTukIsVerified::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

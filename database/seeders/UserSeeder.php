@@ -15,274 +15,220 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         $seedPassword = env('SEED_PASSWORD', '@Kompeten86') ?: '@Kompeten86';
-
         $password = Hash::make($seedPassword);
 
-        $users = [
-            // 1. Super Admin
+        // 1. Core System Administrators & Sample Accounts
+        $coreUsers = [
             [
-                'full_name' => 'Super Admin LSP',
-                'email' => 'lsp.proindo@gmail.com',
+                'full_name' => 'Super Admin LSP Wisindo',
+                'email' => 'superadmin@lsp-wisindo.id',
                 'phone' => '08111111111',
                 'role' => 'SUPER_ADMIN',
                 'status' => 'ACTIVE',
                 'password' => $password,
             ],
-            // 2. Admin LSP
             [
-                'full_name' => 'Admin LSP Pro Indo',
-                'email' => 'adminlsp@gmail.com',
+                'full_name' => 'Admin LSP Wisindo',
+                'email' => 'adminlsp@lsp-wisindo.id',
                 'phone' => '08222222222',
                 'role' => 'ADMIN_LSP',
                 'status' => 'ACTIVE',
                 'password' => $password,
             ],
-            // 3-23. 21 Asesors
             [
-                'full_name' => 'Randi Ardiansyah',
-                'email' => 'asesor.randi@gmail.com',
-                'phone' => '08100000001',
-                'assessor_registration_number' => 'MET.000.002498 2013',
-                'role' => 'ASESOR',
+                'full_name' => 'Admin TUK Wisata Nusantara',
+                'email' => 'tuk.wisindo@gmail.com',
+                'phone' => '081234567890',
+                'role' => 'TUK_ADMIN',
                 'status' => 'ACTIVE',
                 'password' => $password,
             ],
             [
-                'full_name' => 'Ari Susanto',
-                'email' => 'asesor.ari@gmail.com',
-                'phone' => '08100000002',
-                'assessor_registration_number' => 'MET.000.004916 2018',
-                'role' => 'ASESOR',
-                'status' => 'ACTIVE',
-                'password' => $password,
-            ],
-            [
-                'full_name' => 'Imam Muslim',
-                'email' => 'asesor.imam@gmail.com',
-                'phone' => '08100000003',
-                'assessor_registration_number' => 'MET.000.008273 2025',
-                'role' => 'ASESOR',
-                'status' => 'ACTIVE',
-                'password' => $password,
-            ],
-            [
-                'full_name' => 'Muhamad Rizik Abdillah',
-                'email' => 'asesor.rizik@gmail.com',
-                'phone' => '08100000004',
-                'assessor_registration_number' => 'MET.000.008259 2025',
-                'role' => 'ASESOR',
-                'status' => 'ACTIVE',
-                'password' => $password,
-            ],
-            [
-                'full_name' => 'Aris Exwanto',
-                'email' => 'asesor.aris@gmail.com',
-                'phone' => '08100000005',
-                'assessor_registration_number' => 'MET.000.001322 2019',
-                'role' => 'ASESOR',
-                'status' => 'ACTIVE',
-                'password' => $password,
-            ],
-            [
-                'full_name' => 'Ridwan',
-                'email' => 'asesor.ridwan@gmail.com',
-                'phone' => '08100000006',
-                'assessor_registration_number' => 'MET.000.008265 2025',
-                'role' => 'ASESOR',
-                'status' => 'ACTIVE',
-                'password' => $password,
-            ],
-            [
-                'full_name' => 'Karyanto',
-                'email' => 'asesor.karyanto@gmail.com',
-                'phone' => '08100000007',
-                'assessor_registration_number' => 'MET.000.008260 2025',
-                'role' => 'ASESOR',
-                'status' => 'ACTIVE',
-                'password' => $password,
-            ],
-            [
-                'full_name' => 'Ferry Susanto',
-                'email' => 'asesor.ferry@gmail.com',
-                'phone' => '08100000008',
-                'assessor_registration_number' => 'MET.000.004004 2024',
-                'role' => 'ASESOR',
-                'status' => 'ACTIVE',
-                'password' => $password,
-            ],
-            [
-                'full_name' => 'Rendi Agung Purnomo',
-                'email' => 'asesor.rendi@gmail.com',
-                'phone' => '08100000009',
-                'assessor_registration_number' => 'MET.000.011921 2019',
-                'role' => 'ASESOR',
-                'status' => 'ACTIVE',
-                'password' => $password,
-            ],
-            [
-                'full_name' => 'Suherman',
-                'email' => 'asesor.suherman@gmail.com',
-                'phone' => '08100000010',
-                'assessor_registration_number' => 'MET.000.010256 2016',
-                'role' => 'ASESOR',
-                'status' => 'ACTIVE',
-                'password' => $password,
-            ],
-            [
-                'full_name' => 'Gunadi',
-                'email' => 'asesor.gunadi@gmail.com',
-                'phone' => '08100000011',
-                'assessor_registration_number' => 'MET.000.000459 2007',
-                'role' => 'ASESOR',
-                'status' => 'ACTIVE',
-                'password' => $password,
-            ],
-            [
-                'full_name' => 'Sutarno',
-                'email' => 'asesor.sutarno@gmail.com',
-                'phone' => '08100000012',
-                'assessor_registration_number' => 'MET.000.007040 2018',
-                'role' => 'ASESOR',
-                'status' => 'ACTIVE',
-                'password' => $password,
-            ],
-            [
-                'full_name' => 'Saptono',
-                'email' => 'asesor.saptono@gmail.com',
-                'phone' => '08100000013',
-                'assessor_registration_number' => 'MET.000.003672 2016',
-                'role' => 'ASESOR',
-                'status' => 'ACTIVE',
-                'password' => $password,
-            ],
-            [
-                'full_name' => 'Alfian',
-                'email' => 'asesor.alfian@gmail.com',
-                'phone' => '08100000014',
-                'assessor_registration_number' => 'MET.000.008269 2025',
-                'role' => 'ASESOR',
-                'status' => 'ACTIVE',
-                'password' => $password,
-            ],
-            [
-                'full_name' => 'Edi Bambang Setiyoko',
-                'email' => 'asesor.edibambang@gmail.com',
-                'phone' => '08100000015',
-                'assessor_registration_number' => 'MET.000.010246 2016',
-                'role' => 'ASESOR',
-                'status' => 'ACTIVE',
-                'password' => $password,
-            ],
-            [
-                'full_name' => 'Sakri',
-                'email' => 'asesor.sakri@gmail.com',
-                'phone' => '08100000016',
-                'assessor_registration_number' => 'MET.000.008071 2025',
-                'role' => 'ASESOR',
-                'status' => 'ACTIVE',
-                'password' => $password,
-            ],
-            [
-                'full_name' => 'Tri Bambang',
-                'email' => 'asesor.tribambang@gmail.com',
-                'phone' => '08100000017',
-                'assessor_registration_number' => 'MET.000.006969 2026',
-                'role' => 'ASESOR',
-                'status' => 'ACTIVE',
-                'password' => $password,
-            ],
-            [
-                'full_name' => 'Bayu Saputro',
-                'email' => 'asesor.bayu@gmail.com',
-                'phone' => '08100000018',
-                'assessor_registration_number' => 'MET.000.006968 2026',
-                'role' => 'ASESOR',
-                'status' => 'ACTIVE',
-                'password' => $password,
-            ],
-            [
-                'full_name' => 'Roni Romansyah',
-                'email' => 'asesor.roni@gmail.com',
-                'phone' => '08100000019',
-                'assessor_registration_number' => 'MET.000.006962 2026',
-                'role' => 'ASESOR',
-                'status' => 'ACTIVE',
-                'password' => $password,
-            ],
-            [
-                'full_name' => 'Undang',
-                'email' => 'asesor.undang@gmail.com',
-                'phone' => '08100000020',
-                'assessor_registration_number' => null,
-                'role' => 'ASESOR',
-                'status' => 'ACTIVE',
-                'password' => $password,
-            ],
-            [
-                'full_name' => 'Ashari Sofirin',
-                'email' => 'asesor.ashari@gmail.com',
-                'phone' => '08100000021',
-                'assessor_registration_number' => 'MET.000.000689 2016',
-                'role' => 'ASESOR',
+                'full_name' => 'Asesi Uji Kompetensi',
+                'email' => 'asesi@gmail.com',
+                'phone' => '081987654321',
+                'role' => 'ASESI',
                 'status' => 'ACTIVE',
                 'password' => $password,
             ],
         ];
 
-        foreach ($users as $userData) {
-            User::firstOrCreate(
-                ['email' => $userData['email']],
-                $userData
+        foreach ($coreUsers as $uData) {
+            $user = User::updateOrCreate(
+                ['email' => $uData['email']],
+                $uData
+            );
+
+            UserProfile::updateOrCreate(
+                ['user_id' => $user->id],
+                [
+                    'signature_data' => 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+                    'tempat_lahir' => 'Jakarta',
+                    'tanggal_lahir' => '1990-01-01',
+                    'jenis_kelamin' => 'L',
+                    'alamat_rumah' => 'Jl. Wisata No. 1, Jakarta',
+                ]
             );
         }
 
-        // Test environment helper: seed a sample asesi for automated integration/feature tests
-        if (app()->environment('testing')) {
-            $testAsesi = User::updateOrCreate(
-                ['email' => 'asesi1@gmail.com'],
+        // 2. Daftar 18 Asesor Resmi LSP P3 Wisata Indonesia (LSP Wisindo)
+        // Sumber: Dokumen Asessor Penyusun dan validator-wisindo.xlsx
+        $assessors = [
+            [
+                'name' => 'Panca Nugraha',
+                'email' => 'asesor.panca@lspwisindo.id',
+                'met' => 'MET. 000.002973 2023',
+                'phone' => '081230000001',
+                'schemes' => ['SKM-CC-02', 'SKM-CDP-01'], // Commis Chef Hotel, Chef De Partie Hotel
+            ],
+            [
+                'name' => 'Lulut Budiyono',
+                'email' => 'asesor.lulut@lspwisindo.id',
+                'met' => 'MET. 000.002985 2023',
+                'phone' => '081230000002',
+                'schemes' => ['SKM-CC-02', 'SKM-CDP-01', 'SKM-FB-05'], // Commis Chef Hotel, Chef De Partie Hotel, Waiter Server
+            ],
+            [
+                'name' => 'Hendryan Afrianto',
+                'email' => 'asesor.hendryan@lspwisindo.id',
+                'met' => 'MET. 000.002975 2023',
+                'phone' => '081230000003',
+                'schemes' => ['SKM-CC-02', 'SKM-CDP-01'], // Commis Chef Hotel, Chef De Partie Hotel
+            ],
+            [
+                'name' => 'George Edwin A',
+                'email' => 'asesor.george@lspwisindo.id',
+                'met' => 'MET. 000.000683 2021',
+                'phone' => '081230000004',
+                'schemes' => ['SKM-CC-02', 'SKM-CDP-01'], // Commis Chef Hotel, Chef De Partie Hotel
+            ],
+            [
+                'name' => 'Efnu Nugroho',
+                'email' => 'asesor.efnu@lspwisindo.id',
+                'met' => 'MET. 000.000697 2021',
+                'phone' => '081230000005',
+                'schemes' => ['SKM-CC-02', 'SKM-CDP-01'], // Commis Chef Hotel, Chef De Partie Hotel
+            ],
+            [
+                'name' => 'Rita Irawati P',
+                'email' => 'asesor.rita@lspwisindo.id',
+                'met' => 'MET. 000.000699 2021',
+                'phone' => '081230000006',
+                'schemes' => ['SKM-HK-04', 'SKM-FO-03', 'SKM-FB-05'], // Room Attendant, Receptionist, Waiter Server
+            ],
+            [
+                'name' => 'Dwi Agung Jayan Nurcahyo',
+                'email' => 'asesor.dwiagung@lspwisindo.id',
+                'met' => 'MET. 000.002977 2023',
+                'phone' => '081230000007',
+                'schemes' => ['SKM-HK-04'], // Room Attendant
+            ],
+            [
+                'name' => 'Ahmad Rosyid Rafiudin',
+                'email' => 'asesor.ahmadrosyid@lspwisindo.id',
+                'met' => 'MET. 000.002980 2023',
+                'phone' => '081230000008',
+                'schemes' => ['SKM-HK-04'], // Room Attendant
+            ],
+            [
+                'name' => 'Agus Setyawan',
+                'email' => 'asesor.agussetyawan@lspwisindo.id',
+                'met' => 'MET. 000.002981 2023',
+                'phone' => '081230000009',
+                'schemes' => ['SKM-HK-04'], // Room Attendant
+            ],
+            [
+                'name' => 'Agus Budiyono',
+                'email' => 'asesor.agusbudiyono@lspwisindo.id',
+                'met' => 'MET. 000.002979 2023',
+                'phone' => '081230000010',
+                'schemes' => ['SKM-HK-04'], // Room Attendant
+            ],
+            [
+                'name' => 'Supriono',
+                'email' => 'asesor.supriono@lspwisindo.id',
+                'met' => 'MET. 000.002972 2023',
+                'phone' => '081230000011',
+                'schemes' => ['SKM-FO-03'], // Receptionist
+            ],
+            [
+                'name' => 'Silvia Herliana Pramono',
+                'email' => 'asesor.silvia@lspwisindo.id',
+                'met' => 'MET. 000.002970 2023',
+                'phone' => '081230000012',
+                'schemes' => ['SKM-FO-03'], // Receptionist
+            ],
+            [
+                'name' => 'Deni Dwi Ken Hamam Nurrosyid',
+                'email' => 'asesor.deni@lspwisindo.id',
+                'met' => 'MET. 000.002969 2023',
+                'phone' => '081230000013',
+                'schemes' => ['SKM-FO-03'], // Receptionist
+            ],
+            [
+                'name' => 'Rubi',
+                'email' => 'asesor.rubi@lspwisindo.id',
+                'met' => 'MET. 000.002971 2023',
+                'phone' => '081230000014',
+                'schemes' => ['SKM-FO-03'], // Receptionist
+            ],
+            [
+                'name' => 'Stephanus Arry Briantoro Santoso',
+                'email' => 'asesor.stephanus@lspwisindo.id',
+                'met' => 'MET. 000.000693 2021',
+                'phone' => '081230000015',
+                'schemes' => ['SKM-FB-05'], // Waiter Server
+            ],
+            [
+                'name' => 'Agil Ardiansyah',
+                'email' => 'asesor.agil@lspwisindo.id',
+                'met' => 'MET. 000.002986 2023',
+                'phone' => '081230000016',
+                'schemes' => ['SKM-FB-05'], // Waiter Server
+            ],
+            [
+                'name' => 'Novi Primadani',
+                'email' => 'asesor.novi@lspwisindo.id',
+                'met' => 'MET. 000.002964 2023',
+                'phone' => '081230000017',
+                'schemes' => ['SKM-FB-05'], // Waiter Server
+            ],
+            [
+                'name' => 'Suwartono',
+                'email' => 'asesor.suwartono@lspwisindo.id',
+                'met' => 'MET. 000.002976 2023',
+                'phone' => '081230000018',
+                'schemes' => ['SKM-FB-05'], // Waiter Server
+            ],
+        ];
+
+        foreach ($assessors as $item) {
+            $user = User::updateOrCreate(
+                ['email' => $item['email']],
                 [
-                    'full_name' => 'Asesi Test',
-                    'phone' => '08555555555',
-                    'role' => 'ASESI',
+                    'full_name' => $item['name'],
+                    'phone' => $item['phone'],
+                    'assessor_registration_number' => $item['met'],
+                    'role' => 'ASESOR',
                     'status' => 'ACTIVE',
                     'password' => $password,
                 ]
             );
 
-            UserProfile::firstOrCreate(
-                ['user_id' => $testAsesi->id],
+            // Buat Profil Asesor & TTD Digital siap pakai
+            UserProfile::updateOrCreate(
+                ['user_id' => $user->id],
                 [
-                    'nik' => '3216010000000001',
-                    'tempat_lahir' => 'Bekasi',
-                    'tanggal_lahir' => '2000-01-01',
-                    'jenis_kelamin' => 'L',
-                    'kebangsaan' => 'Indonesia',
-                    'alamat_rumah' => 'Jl. Industri No. 1, Cikarang',
-                    'kode_pos' => '17530',
-                    'no_telepon_rumah' => '08555555555',
-                    'pendidikan_terakhir' => 'SMK Otomotif',
-                    'nama_institusi_perusahaan' => 'SMK Negeri 1 Cikarang',
-                    'jabatan' => 'Siswa / Teknisi Junior',
                     'signature_data' => 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+                    'tempat_lahir' => 'Jakarta',
+                    'tanggal_lahir' => '1985-05-15',
+                    'jenis_kelamin' => 'L',
+                    'alamat_rumah' => 'Jl. Pariwisata Indonesia No. 10',
+                    'pendidikan_terakhir' => 'S1 Pariwisata',
+                    'nama_institusi_perusahaan' => 'LSP P3 Wisata Indonesia',
+                    'jabatan' => 'Asesor Kompetensi BNSP',
                 ]
             );
-
-            $testAssessor = User::where('role', 'ASESOR')->first();
-            if ($testAssessor) {
-                UserProfile::firstOrCreate(
-                    ['user_id' => $testAssessor->id],
-                    [
-                        'nik' => '3216010000000002',
-                        'tempat_lahir' => 'Jakarta',
-                        'tanggal_lahir' => '1985-05-05',
-                        'jenis_kelamin' => 'L',
-                        'kebangsaan' => 'Indonesia',
-                        'alamat_rumah' => 'Jl. Assessor No. 2, Jakarta',
-                        'kode_pos' => '10110',
-                        'signature_data' => 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
-                    ]
-                );
-            }
         }
     }
 }

@@ -20,7 +20,7 @@
                 </div>
 
                 <div class="flex items-center justify-between text-xs bg-slate-50 p-2.5 rounded-lg border border-slate-100">
-                    <span class="text-slate-600 font-medium">Bidang: <strong>{{ $scheme->category ?? 'Otomotif' }}</strong></span>
+                    <span class="text-slate-600 font-medium">Bidang: <strong>{{ $scheme->category ?? 'Pariwisata & Perhotelan' }}</strong></span>
                     <span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-white text-slate-700 border border-slate-200">
                         {{ $scheme->competency_units_count ?? $scheme->units_count ?? ($scheme->competencyUnits ? $scheme->competencyUnits->count() : 0) }} Unit
                     </span>
@@ -66,7 +66,7 @@
                             @endif
                         </td>
                         <td class="px-6 py-4 text-xs text-slate-600">
-                            {{ $scheme->category ?? 'Otomotif' }}
+                            {{ $scheme->category ?? 'Pariwisata & Perhotelan' }}
                         </td>
                         <td class="px-6 py-4 text-center">
                             <span class="px-2 py-0.5 rounded text-xs font-semibold bg-slate-100 text-slate-700">

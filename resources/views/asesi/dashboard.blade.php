@@ -3,20 +3,20 @@
 @section('content')
 <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-6">
     {{-- Header Banner --}}
-    <div class="bg-gradient-to-r from-lsp-navy to-lsp-navy-dark rounded-2xl p-5 sm:p-6 md:p-8 text-white shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 border-t-4 border-lsp-red">
+    <div class="bg-gradient-to-r from-lsp-navy to-lsp-navy-dark rounded-2xl p-5 sm:p-6 md:p-8 text-white shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 border-t-4 border-lsp-orange">
         <div>
-            <span class="inline-block px-2.5 py-0.5 rounded-full bg-white/10 text-lsp-red border border-lsp-red/30 text-[10px] font-extrabold tracking-wider uppercase mb-2">
+            <span class="inline-block px-2.5 py-0.5 rounded-full bg-white/10 text-lsp-orange border border-lsp-orange/30 text-[10px] font-extrabold tracking-wider uppercase mb-2">
                 Asesi
             </span>
             <h1 class="font-sans text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight">
                 Selamat Datang, {{ auth()->user()->full_name }}!
             </h1>
             <p class="text-blue-100/80 text-xs mt-1 max-w-xl">
-                Sistem sertifikasi profesi teknisi otomotif berstandar BNSP.
+                Sistem Sertifikasi Kompetensi Pariwisata &amp; Asesmen Jarak Jauh (AJJ) Berstandar BNSP.
             </p>
         </div>
         <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:space-x-3 shrink-0">
-            <a href="{{ route('asesi.jadwal.index') }}" class="px-4 py-2.5 bg-lsp-red hover:bg-lsp-red-dark text-white rounded-lg text-xs font-bold shadow-sm transition flex items-center justify-center space-x-2">
+            <a href="{{ route('asesi.jadwal.index') }}" class="px-4 py-2.5 bg-lsp-orange hover:bg-lsp-orange-dark text-white rounded-lg text-xs font-bold shadow-sm transition flex items-center justify-center space-x-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                 </svg>

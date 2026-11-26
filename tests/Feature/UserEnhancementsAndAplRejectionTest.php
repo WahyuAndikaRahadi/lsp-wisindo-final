@@ -115,7 +115,7 @@ class UserEnhancementsAndAplRejectionTest extends TestCase
         $searchResponse->assertDontSee('Zulfa Asesor');
     }
 
-    public function test_super_admin_can_reset_user_password_to_proindo123(): void
+    public function test_super_admin_can_reset_user_password_to_wisindo123(): void
     {
         $targetUser = User::factory()->create([
             'email' => 'target@example.com',
@@ -128,7 +128,7 @@ class UserEnhancementsAndAplRejectionTest extends TestCase
         $response->assertSessionHas('success');
 
         $targetUser->refresh();
-        $this->assertTrue(Hash::check('proindo123', $targetUser->password));
+        $this->assertTrue(Hash::check('wisindo123', $targetUser->password));
     }
 
     public function test_non_super_admin_cannot_reset_user_password(): void

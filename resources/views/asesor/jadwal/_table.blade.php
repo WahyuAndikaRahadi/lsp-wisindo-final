@@ -86,6 +86,16 @@
                 </div>
 
                 <div class="mt-5 pt-4 border-t border-slate-100 flex items-center gap-2">
+                    @if(!empty($jadwal->meeting_link))
+                        <a href="{{ $jadwal->meeting_link }}" target="_blank" rel="noopener noreferrer"
+                           class="inline-flex items-center justify-center px-3 py-2.5 min-h-[42px] text-xs font-bold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg shadow-2xs transition shrink-0 cursor-pointer" 
+                           title="Masuk Ruang Video Meeting AJJ">
+                            <svg class="w-4 h-4 mr-1 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                            </svg>
+                            <span>Meet AJJ ↗</span>
+                        </a>
+                    @endif
                     <button type="button" 
                             @click="$dispatch('open-surat-tugas', { scheduleId: {{ $jadwal->id }} })" 
                             class="inline-flex items-center justify-center px-3.5 py-2.5 min-h-[42px] text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 border border-slate-300 rounded-lg shadow-2xs transition shrink-0 cursor-pointer" 

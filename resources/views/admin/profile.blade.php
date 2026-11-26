@@ -80,7 +80,7 @@
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
                         Nama Institusi / Lembaga
                     </label>
-                    <input type="text" name="nama_institusi_perusahaan" value="{{ old('nama_institusi_perusahaan', $p->nama_institusi_perusahaan ?? 'LSP Praktisi Otomotif Indonesia') }}"
+                    <input type="text" name="nama_institusi_perusahaan" value="{{ old('nama_institusi_perusahaan', $p->nama_institusi_perusahaan ?? 'LSP P3 Wisata Indonesia') }}"
                         class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
                     @error('nama_institusi_perusahaan') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
                 </div>

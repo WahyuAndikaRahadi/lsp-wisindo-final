@@ -6,8 +6,8 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $title ?? 'LSP PrO Indo' }} - Sistem Sertifikasi BNSP</title>
 
-    <link rel="icon" type="image/png" href="{{ asset('images/logo-lsp-proindo.png') }}">
-    <link rel="apple-touch-icon" href="{{ asset('images/logo-lsp-proindo.png') }}">
+    <link rel="icon" type="image/png" href="{{ asset('images/favicon-wisindo.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('images/favicon-wisindo.png') }}">
 
     <!-- Google Fonts: Plus Jakarta Sans & Inter (Modern Sans-Serif) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -22,25 +22,31 @@
                 extend: {
                     colors: {
                         lsp: {
-                            navy: '#1E2B6E',
-                            'navy-dark': '#162052',
-                            'navy-light': '#2A3B94',
-                            red: '#CE181E',
-                            'red-dark': '#B01419',
+                            navy: '#3B3D78',
+                            'navy-dark': '#292A54',
+                            'navy-light': '#4F477F',
+                            purple: '#4F477F',
+                            'purple-light': '#7D7FBD',
+                            orange: '#FF9832',
+                            'orange-dark': '#E57E18',
+                            red: '#FF9832',
+                            'red-dark': '#E57E18',
                             canvas: '#F8FAFC',
                             'input-bg': '#F8FAFC',
                             title: '#0F172A',
                             muted: '#64748B',
                         },
                         brand: {
-                            50: '#EEF3FC',
-                            100: '#D9E4FA',
-                            200: '#B8CFF7',
-                            500: '#2A3B94',
-                            600: '#1E2B6E',
-                            700: '#162052',
-                            800: '#11183E',
-                            900: '#0B1028',
+                            50: '#F5F4FA',
+                            100: '#EBE9F5',
+                            200: '#D6D4EB',
+                            300: '#B0ACD8',
+                            400: '#7E7CBF',
+                            500: '#4F477F',
+                            600: '#3B3D78',
+                            700: '#2F3061',
+                            800: '#232449',
+                            900: '#171831',
                         }
                     },
                     fontFamily: {
@@ -105,9 +111,9 @@
         input:focus,
         select:focus,
         textarea:focus {
-            border-color: #1E2B6E !important;
+            border-color: #3B3D78 !important;
             outline: none !important;
-            box-shadow: 0 0 0 3px rgba(30, 43, 110, 0.12) !important;
+            box-shadow: 0 0 0 3px rgba(59, 61, 120, 0.15) !important;
         }
 
         /* Clean Modern Tables */
@@ -145,6 +151,49 @@
             border-radius: 1rem !important;
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.06), 0 8px 10px -6px rgba(0, 0, 0, 0.04) !important;
         }
+
+        /* Critical Sidebar & Logo styles to eliminate FOUC / glitch on page transitions */
+        aside {
+            width: 16rem !important;
+        }
+        @media (max-width: 767px) {
+            aside {
+                transform: translateX(-100%);
+            }
+        }
+        @media (min-width: 768px) {
+            aside {
+                transform: translateX(0) !important;
+            }
+        }
+        .sidebar-brand-box {
+            width: 44px !important;
+            height: 44px !important;
+            min-width: 44px !important;
+            min-height: 44px !important;
+            max-width: 44px !important;
+            max-height: 44px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            border-radius: 0.75rem !important;
+            background-color: #F8FAFC !important;
+            border: 1px solid #F1F5F9 !important;
+            overflow: hidden !important;
+            flex-shrink: 0 !important;
+        }
+        .sidebar-brand-img {
+            width: 36px !important;
+            height: 36px !important;
+            min-width: 36px !important;
+            min-height: 36px !important;
+            max-width: 36px !important;
+            max-height: 36px !important;
+            object-fit: contain !important;
+            display: block !important;
+            flex-shrink: 0 !important;
+            aspect-ratio: 1 / 1 !important;
+        }
     </style>
     @stack('styles')
 </head>
@@ -153,7 +202,7 @@
     <!-- Desktop Left Screen Vertical Dual Bar (Hidden on Mobile) -->
     <div class="hidden md:flex fixed left-0 top-0 bottom-0 w-1.5 z-50 pointer-events-none">
         <div class="w-0.75 bg-lsp-navy h-full"></div>
-        <div class="w-0.75 bg-lsp-red h-full"></div>
+        <div class="w-0.75 bg-lsp-orange h-full"></div>
     </div>
 
     @guest
@@ -172,29 +221,39 @@
                  class="fixed inset-0 z-40 bg-slate-900/50 backdrop-blur-xs md:hidden transition-opacity"></div>
 
             <!-- Sidebar Navigation -->
+            @php
+                $sidebarLogoBase64 = 'data:image/png;base64,' . base64_encode(file_get_contents(public_path('images/logo-icon-wisindo.png')));
+            @endphp
             <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
-                   class="fixed inset-y-0 left-0 md:left-1.5 z-50 md:z-30 w-72 md:w-64 bg-white border-r border-slate-200 shadow-xl md:shadow-none flex flex-col justify-between transition-transform duration-200 ease-in-out md:translate-x-0">
+                   class="fixed inset-y-0 left-0 md:left-1.5 z-50 md:z-30 w-72 md:w-64 bg-white border-r border-slate-200 shadow-xl md:shadow-none flex flex-col justify-between max-md:transition-transform max-md:duration-200 max-md:ease-in-out -translate-x-full md:translate-x-0 md:transition-none">
                 
                 <!-- Sidebar Top Section -->
                 <div class="flex-1 flex flex-col min-h-0 overflow-y-auto">
-                    <!-- Top Horizontal Dual Stripe -->
-                    <div class="w-full flex h-1 shrink-0">
+                    <!-- Top Horizontal Dual Stripe (Wisindo Indigo & Orange) -->
+                    <div class="w-full flex h-1.5 shrink-0">
                         <div class="w-2/3 bg-lsp-navy"></div>
-                        <div class="w-1/3 bg-lsp-red"></div>
+                        <div class="w-1/3 bg-lsp-orange"></div>
                     </div>
 
                     <!-- Brand / Logo with Mobile Close Button -->
                     <div class="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between shrink-0">
-                        <div class="flex items-center space-x-3">
-                            <img src="{{ asset('images/logo-lsp-wisindo.png') }}" 
-                                 alt="Logo LSP" 
-                                 class="h-10 sm:h-12 w-auto object-contain flex-shrink-0">
-                            <div class="flex flex-col">
-                                <span class="font-sans font-bold text-base leading-tight text-lsp-title tracking-tight">
-                                    LSP PrO Indo
+                        <div class="flex items-center space-x-3 min-w-0">
+                            <div class="sidebar-brand-box rounded-xl bg-slate-50 border border-slate-100">
+                                <img src="{{ $sidebarLogoBase64 }}" 
+                                     alt="Logo LSP Wisindo" 
+                                     width="36" 
+                                     height="36" 
+                                     loading="eager"
+                                     fetchpriority="high"
+                                     decoding="sync"
+                                     class="sidebar-brand-img">
+                            </div>
+                            <div class="flex flex-col min-w-0">
+                                <span class="font-sans font-bold text-base leading-tight text-lsp-title tracking-tight truncate">
+                                    LSP Wisindo
                                 </span>
-                                <span class="text-[9px] font-bold text-lsp-red uppercase tracking-wider mt-0.5">
-                                    PRAKTISI OTOMOTIF
+                                <span class="text-[9px] font-bold text-lsp-orange uppercase tracking-wider mt-0.5 truncate">
+                                    WISATA INDONESIA
                                 </span>
                                 <span class="text-[9px] text-slate-400 font-medium">
                                     Lisensi BNSP
@@ -268,6 +327,39 @@
                                 <span>Biodata & TTD Asesor</span>
                             </a>
 
+                        @elseif(auth()->user()->isRole('TUK_ADMIN'))
+                            <div class="px-3 pt-3 pb-1 text-[10px] font-extrabold text-lsp-muted uppercase tracking-wider">
+                                Menu Admin TUK
+                            </div>
+                            <a href="{{ route('tuk.dashboard') }}" 
+                               class="flex items-center space-x-3 px-3 py-2.5 rounded text-xs font-semibold transition {{ request()->routeIs('tuk.dashboard') ? 'bg-lsp-input-bg text-lsp-navy border-l-4 border-lsp-navy font-bold' : 'text-slate-600 hover:text-lsp-navy hover:bg-slate-50' }}">
+                                <svg class="w-4 h-4 text-lsp-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+                                </svg>
+                                <span>Dashboard TUK</span>
+                            </a>
+                            <a href="{{ route('tuk.data.edit') }}" 
+                               class="flex items-center space-x-3 px-3 py-2.5 rounded text-xs font-semibold transition {{ request()->routeIs('tuk.data.*') ? 'bg-lsp-input-bg text-lsp-navy border-l-4 border-lsp-navy font-bold' : 'text-slate-600 hover:text-lsp-navy hover:bg-slate-50' }}">
+                                <svg class="w-4 h-4 text-lsp-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                                </svg>
+                                <span>Data &amp; Verifikasi TUK</span>
+                            </a>
+                            @if(auth()->user()->tuk && auth()->user()->tuk->isVerified())
+                                <a href="{{ route('tuk.jadwal.index') }}" 
+                                   class="flex items-center space-x-3 px-3 py-2.5 rounded text-xs font-semibold transition {{ request()->routeIs('tuk.jadwal.*') ? 'bg-lsp-input-bg text-lsp-navy border-l-4 border-lsp-navy font-bold' : 'text-slate-600 hover:text-lsp-navy hover:bg-slate-50' }}">
+                                    <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                    </svg>
+                                    <span>Jadwal Asesmen TUK</span>
+                                </a>
+                            @else
+                                <div class="px-3 py-2 text-[11px] text-slate-400 flex items-center space-x-2 italic">
+                                    <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m0 0v2m0-2h2m-2 0H10m4-6a4 4 0 10-8 0 4 4 0 008 0z"/></svg>
+                                    <span>Jadwal TUK (Terkunci)</span>
+                                </div>
+                            @endif
+
                         @elseif(auth()->user()->isAdmin() || in_array(auth()->user()->role, ['KOMITE_TEKNIS']))
                             <div class="px-3 pt-3 pb-1 text-[10px] font-extrabold text-lsp-muted uppercase tracking-wider">
                                 Manajemen Asesmen
@@ -292,6 +384,23 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                                 </svg>
                                 <span>Kelola Jadwal Asesmen</span>
+                            </a>
+                            <a href="{{ route('admin.tuks.index') }}" 
+                               class="flex items-center justify-between px-3 py-2.5 rounded text-xs font-semibold transition {{ request()->routeIs('admin.tuks.*') ? 'bg-lsp-input-bg text-lsp-navy border-l-4 border-lsp-navy font-bold' : 'text-slate-600 hover:text-lsp-navy hover:bg-slate-50' }}">
+                                <div class="flex items-center space-x-3">
+                                    <svg class="w-4 h-4 text-lsp-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                                    </svg>
+                                    <span>Kelola TUK &amp; AJJ</span>
+                                </div>
+                                @php
+                                    $pendingTukCount = \App\Models\Tuk::where('verification_status', 'PENDING_VERIFICATION')->count();
+                                @endphp
+                                @if($pendingTukCount > 0)
+                                    <span class="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">
+                                        {{ $pendingTukCount }}
+                                    </span>
+                                @endif
                             </a>
                             <a href="{{ route('admin.certificates.index') }}" 
                                class="flex items-center space-x-3 px-3 py-2.5 rounded text-xs font-semibold transition {{ request()->routeIs('admin.certificates.*') ? 'bg-lsp-input-bg text-lsp-navy border-l-4 border-lsp-navy font-bold' : 'text-slate-600 hover:text-lsp-navy hover:bg-slate-50' }}">
@@ -448,10 +557,10 @@
                 
                 <!-- Top Horizontal Header Bar -->
                 <header class="bg-white/95 backdrop-blur-sm border-b border-slate-200 sticky top-0 z-30">
-                    <!-- Top dual stripe above the header bar -->
-                    <div class="w-full flex h-1">
+                    <!-- Top dual stripe above the header bar (Wisindo Indigo & Orange) -->
+                    <div class="w-full flex h-1.5">
                         <div class="w-2/3 bg-lsp-navy"></div>
-                        <div class="w-1/3 bg-lsp-red"></div>
+                        <div class="w-1/3 bg-lsp-orange"></div>
                     </div>
 
                     <div class="px-3.5 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-3">
@@ -547,7 +656,7 @@
                 <!-- Footer -->
                 <footer class="bg-white border-t border-slate-200 py-4 mt-auto">
                     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-[11px] text-slate-500">
-                        <p>&copy; {{ date('Y') }} <strong>LSP PrO Indo</strong> (Lembaga Sertifikasi Profesi Praktisi Otomotif Indonesia). Lisensi Resmi BNSP.</p>
+                        <p>&copy; {{ date('Y') }} <strong>LSP Wisindo</strong> (Lembaga Sertifikasi Profesi P3 Wisata Indonesia). Lisensi Resmi BNSP.</p>
                     </div>
                 </footer>
 
@@ -586,7 +695,7 @@
                 buttonsFontSize: '13px',
                 buttonsMaxLength: 40,
                 okButtonColor: '#ffffff',
-                okButtonBackground: '#1E2B6E',
+                okButtonBackground: '#3B3D78',
                 cancelButtonColor: '#475569',
                 cancelButtonBackground: '#F1F5F9',
             });
@@ -600,7 +709,7 @@
                 cssAnimationDuration: 300,
                 clickToClose: false,
                 svgSize: '85px',
-                svgColor: '#CE181E',
+                svgColor: '#FF9832',
                 messageFontSize: '15px',
                 messageMaxLength: 200,
                 messageColor: '#ffffff',
@@ -633,7 +742,7 @@
                     svgColor: '#10b981',
                     titleColor: '#0F172A',
                     messageColor: '#475569',
-                    buttonBackground: '#1E2B6E',
+                    buttonBackground: '#3B3D78',
                     buttonColor: '#ffffff',
                     backOverlayColor: 'rgba(15, 23, 42, 0.65)',
                 },
@@ -649,15 +758,15 @@
                     svgColor: '#f59e0b',
                     titleColor: '#0F172A',
                     messageColor: '#475569',
-                    buttonBackground: '#1E2B6E',
+                    buttonBackground: '#3B3D78',
                     buttonColor: '#ffffff',
                     backOverlayColor: 'rgba(15, 23, 42, 0.65)',
                 },
                 info: {
-                    svgColor: '#1E2B6E',
+                    svgColor: '#3B3D78',
                     titleColor: '#0F172A',
                     messageColor: '#475569',
-                    buttonBackground: '#1E2B6E',
+                    buttonBackground: '#3B3D78',
                     buttonColor: '#ffffff',
                     backOverlayColor: 'rgba(15, 23, 42, 0.65)',
                 },
@@ -699,7 +808,7 @@
                     notiflixIconColor: 'rgba(255,255,255,0.9)',
                 },
                 info: {
-                    background: '#1E2B6E',
+                    background: '#3B3D78',
                     textColor: '#ffffff',
                     notiflixIconColor: 'rgba(255,255,255,0.9)',
                 },
@@ -741,7 +850,7 @@
 
             var formatted = String(message || '').replace(/\n/g, '<br>');
             var isDanger = /hapus|delete|batal|permanen|nonaktifkan/i.test((message || '') + ' ' + (title || ''));
-            var defaultOpts = isDanger ? { okButtonBackground: '#CE181E' } : { okButtonBackground: '#1E2B6E' };
+            var defaultOpts = isDanger ? { okButtonBackground: '#CE181E' } : { okButtonBackground: '#3B3D78' };
             var opts = Object.assign({}, defaultOpts, customOptions || {});
 
             Notiflix.Confirm.show(
@@ -976,6 +1085,8 @@
     @endif
 
     <script src="{{ asset('js/ajax-tables.js') }}"></script>
+    <script src="{{ asset('js/wilayah-dropdown.js') }}"></script>
+    <script src="{{ asset('js/tuk-media-uploader.js') }}"></script>
     @stack('scripts')
 </body>
 </html>

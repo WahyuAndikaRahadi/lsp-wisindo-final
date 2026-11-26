@@ -118,7 +118,9 @@ class AuthController extends Controller
             'ASESOR' => redirect()->route('asesor.jadwal.index'),
             'ASESI' => redirect()->route('asesi.dashboard'),
             'KOMITE_TEKNIS' => redirect()->route('admin.dashboard'),
-            'TUK_ADMIN' => redirect()->route('admin.dashboard'),
+            'TUK_ADMIN' => $user->tuk && $user->tuk->isVerified()
+                ? redirect()->route('tuk.dashboard')
+                : redirect()->route('tuk.data.edit'),
             default => redirect()->route('login'),
         };
     }

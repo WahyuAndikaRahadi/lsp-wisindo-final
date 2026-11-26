@@ -6,6 +6,9 @@ use App\Http\Controllers\Asesor;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\PrintExampleController;
 use App\Http\Controllers\SecureFileController;
+use App\Http\Controllers\Tuk\DashboardController;
+use App\Http\Controllers\Tuk\DataTukController;
+use App\Http\Controllers\Tuk\JadwalController;
 use App\Http\Controllers\WilayahController;
 use App\Models\Assessment;
 use Illuminate\Http\Request;
@@ -407,6 +410,17 @@ Route::middleware(['auth', 'role:SUPER_ADMIN,ADMIN_LSP,KOMITE_TEKNIS,TUK_ADMIN']
         Route::match(['put', 'patch'], '/jadwal/{jadwal}', [Admin\JadwalController::class, 'update'])->name('jadwal.update');
         Route::delete('/jadwal/{jadwal}', [Admin\JadwalController::class, 'destroy'])->name('jadwal.destroy');
 
+        // TUK Management & AJJ Verification
+        Route::get('/tuks', [Admin\TukController::class, 'index'])->name('tuks.index');
+        Route::get('/tuks/create', [Admin\TukController::class, 'create'])->name('tuks.create');
+        Route::post('/tuks', [Admin\TukController::class, 'store'])->name('tuks.store');
+        Route::get('/tuks/{tuk}/edit', [Admin\TukController::class, 'edit'])->name('tuks.edit');
+        Route::match(['put', 'patch'], '/tuks/{tuk}', [Admin\TukController::class, 'update'])->name('tuks.update');
+        Route::delete('/tuks/{tuk}', [Admin\TukController::class, 'destroy'])->name('tuks.destroy');
+        Route::get('/tuks/{tuk}/review', [Admin\TukController::class, 'review'])->name('tuks.review');
+        Route::post('/tuks/{tuk}/verify', [Admin\TukController::class, 'verify'])->name('tuks.verify');
+        Route::post('/tuks/{tuk}/reject-revision', [Admin\TukController::class, 'rejectRevision'])->name('tuks.reject-revision');
+
         // Registration Token Manual Rotation
         Route::post('/registration-token/rotate', [Admin\DashboardController::class, 'rotateRegistrationToken'])->name('registration-token.rotate');
     });
@@ -458,6 +472,19 @@ Route::middleware(['auth', 'role:SUPER_ADMIN,ADMIN_LSP,KOMITE_TEKNIS,TUK_ADMIN']
         Route::get('/backups/export-live', [Admin\BackupController::class, 'exportLive'])->name('backups.export-live');
         Route::get('/backups/{filename}/download', [Admin\BackupController::class, 'download'])->name('backups.download');
         Route::delete('/backups/{filename}', [Admin\BackupController::class, 'destroy'])->name('backups.destroy');
+    });
+});
+
+// TUK Admin Portal
+Route::middleware(['auth', 'role:TUK_ADMIN'])->prefix('tuk')->name('tuk.')->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/data', [DataTukController::class, 'edit'])->name('data.edit');
+    Route::put('/data', [DataTukController::class, 'update'])->name('data.update');
+
+    // Gated by TUK verification approval
+    Route::middleware(['tuk.verified'])->group(function () {
+        Route::get('/jadwal', [JadwalController::class, 'index'])->name('jadwal.index');
+        Route::get('/jadwal/{schedule}', [JadwalController::class, 'show'])->name('jadwal.show');
     });
 });
 

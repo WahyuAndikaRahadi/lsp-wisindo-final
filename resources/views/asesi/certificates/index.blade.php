@@ -84,7 +84,7 @@
                 </div>
 
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between items-start gap-2 pt-2">
-                    <span class="text-[11px] text-slate-500">Sertifikat Resmi BNSP - LSP Praktisi Otomotif Indonesia</span>
+                    <span class="text-[11px] text-slate-500">Sertifikat Resmi BNSP - LSP P3 Wisata Indonesia</span>
                     <button type="button" @click="showPreviewModal = false" class="w-full sm:w-auto px-4 py-1.5 text-xs font-semibold bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-lg text-center">
                         Tutup
                     </button>

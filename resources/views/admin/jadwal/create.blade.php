@@ -3,16 +3,46 @@
 @section('content')
 <div class="space-y-6 max-w-4xl mx-auto">
     <div>
-        <a href="{{ route('admin.jadwal.index') }}" class="text-xs text-brand-600 hover:text-brand-700 font-semibold">&larr; Kembali ke Kelola Jadwal</a>
-        <h1 class="text-2xl font-black text-slate-900 tracking-tight mt-1">Buat Jadwal Asesmen Baru</h1>
-        <p class="text-sm text-slate-500">Lengkapi formulir untuk menyelenggarakan asesmen baru</p>
+        <a href="{{ route('admin.jadwal.index') }}" class="text-xs text-lsp-navy hover:underline font-semibold">&larr; Kembali ke Kelola Jadwal</a>
+        <h1 class="text-2xl font-black text-slate-900 tracking-tight mt-1">Buat Jadwal Asesmen Baru (AJJ)</h1>
+        <p class="text-sm text-slate-500">Pilih skema sertifikasi terlebih dahulu untuk menyaring Tempat Uji Kompetensi (TUK) yang terverifikasi.</p>
     </div>
 
     <form action="{{ route('admin.jadwal.store') }}" method="POST" class="space-y-6" x-data="{
         code: '{{ old('code', '') }}',
+        selectedSchemeId: '{{ old('scheme_id', '') }}',
+        selectedTukId: '{{ old('tuk_id', '') }}',
+        showManualTuk: false,
+        verifiedTuks: {{ Js::from($verifiedTuks ?? []) }},
+        selectedProvince: '{{ old('kode_provinsi', '32') }}',
+        selectedCity: '{{ old('kode_kota', '') }}',
+
+        get availableTuks() {
+            if (!this.selectedSchemeId) return [];
+            return this.verifiedTuks.filter(t => {
+                return t.schemes && t.schemes.some(s => String(s.id) === String(this.selectedSchemeId));
+            });
+        },
+        get currentTuk() {
+            return this.verifiedTuks.find(t => String(t.id) === String(this.selectedTukId));
+        },
+        get filteredCities() {
+            if (!this.selectedProvince) return [];
+            return this.allCities.filter(c => String(c.province_code) === String(this.selectedProvince));
+        },
+        onSchemeChange(schemeId) {
+            this.selectedSchemeId = schemeId;
+            // Jika TUK saat ini tidak mendukung skema yang baru dipilih, reset
+            if (this.selectedTukId && !this.availableTuks.some(t => String(t.id) === String(this.selectedTukId))) {
+                this.selectedTukId = '';
+            }
+        },
+        onTukChange(tukId) {
+            this.selectedTukId = tukId;
+        },
         generateCode() {
             const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-            let res = 'LSP-';
+            let res = 'WIS-';
             for (let i = 0; i < 6; i++) {
                 res += chars.charAt(Math.floor(Math.random() * chars.length));
             }
@@ -21,23 +51,33 @@
     }">
         @csrf
 
-        {{-- Basic Information --}}
-        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 space-y-4">
-            <h2 class="text-base font-bold text-slate-900">Informasi Dasar Jadwal</h2>
+        {{-- Basic Information & Scheme / TUK Link --}}
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 space-y-5">
+            <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                <h2 class="text-base font-bold text-slate-900">1. Skema &amp; TUK Asesmen Jarak Jauh (AJJ)</h2>
+                <span class="text-xs px-2.5 py-0.5 rounded-full font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                    SOP AJJ Wisindo
+                </span>
+            </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-1">Nama Jadwal <span class="text-rose-500">*</span></label>
-                    <input type="text" name="name" required value="{{ old('name') }}" placeholder="Contoh: Uji Kompetensi Pemeliharaan Kendaraan Ringan Angkatan 1" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                        Nama Jadwal Asesmen <span class="text-rose-500">*</span>
+                    </label>
+                    <input type="text" name="name" required value="{{ old('name') }}" placeholder="Contoh: Uji Kompetensi Front Office AJJ Batch 1" class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-xs sm:text-sm focus:ring-1 focus:ring-lsp-navy">
                     @error('name')
                         <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
                     @enderror
                 </div>
 
+                {{-- Skema Sertifikasi (Harus Dipilih Dahulu) --}}
                 <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-1">Skema Sertifikasi <span class="text-rose-500">*</span></label>
-                    <select name="scheme_id" required class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none bg-white">
-                        <option value="">-- Pilih Skema --</option>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                        Pilih Skema Sertifikasi <span class="text-rose-500">*</span>
+                    </label>
+                    <select name="scheme_id" required @change="onSchemeChange($event.target.value)" class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-xs sm:text-sm font-semibold focus:ring-1 focus:ring-lsp-navy bg-white">
+                        <option value="">-- Pilih Skema Terlebih Dahulu --</option>
                         @foreach($schemes ?? [] as $scheme)
                             <option value="{{ $scheme->id }}" {{ old('scheme_id') == $scheme->id ? 'selected' : '' }}>
                                 {{ $scheme->name }} ({{ $scheme->code }})
@@ -50,116 +90,103 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {{-- Dropdown Pemilihan TUK Terverifikasi Berdasarkan Skema --}}
+            <div class="p-4 bg-slate-50/80 rounded-xl border border-slate-200 space-y-3">
                 <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-1">Tempat Uji Kompetensi (Nama TUK) <span class="text-rose-500">*</span></label>
-                    <input type="text" name="tuk_name" required value="{{ old('tuk_name') }}" placeholder="Contoh: Gedung SMKS Inovasi Mandiri" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
-                    @error('tuk_name')
-                        <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-1">Alamat Lengkap TUK</label>
-                    <input type="text" name="tuk_address" value="{{ old('tuk_address') }}" placeholder="Contoh: Jl. Umar Wirahadikusumah KM. 25 Darmaraja" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
-                    @error('tuk_address')
-                        <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
-            </div>
-
-            {{-- Wilayah TUK: Provinsi & Kabupaten/Kota (Sesuai Master Kode BNSP / Profil Asesi) --}}
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4"
-                 x-data="{
-                    provinces: {{ Js::from($provinces ?? \App\Services\BnspReferenceService::getProvinsiList()) }},
-                    allCities: {{ Js::from($cities ?? \App\Services\BnspReferenceService::getAllCities()) }},
-                    selectedProvince: '{{ old('kode_provinsi', '32') }}',
-                    selectedCity: '{{ old('kode_kota', '') }}',
-                    get filteredCities() {
-                        if (!this.selectedProvince) return [];
-                        return this.allCities.filter(c => String(c.province_code) === String(this.selectedProvince));
-                    },
-                    init() {
-                        if (this.selectedProvince && !document.getElementById('tuk_nama_provinsi_input').value) {
-                            let prov = this.provinces.find(p => String(p.code) === String(this.selectedProvince));
-                            if (prov) document.getElementById('tuk_nama_provinsi_input').value = prov.name;
-                        }
-                        if (this.selectedCity && !document.getElementById('tuk_nama_kota_input').value) {
-                            let city = this.allCities.find(c => String(c.code) === String(this.selectedCity));
-                            if (city) document.getElementById('tuk_nama_kota_input').value = city.name;
-                        }
-                    },
-                    updateProvince(code) {
-                        this.selectedProvince = code;
-                        let prov = this.provinces.find(p => String(p.code) === String(code));
-                        document.getElementById('tuk_nama_provinsi_input').value = prov ? prov.name : '';
-                        this.selectedCity = '';
-                        document.getElementById('tuk_nama_kota_input').value = '';
-                    },
-                    updateCity(code) {
-                        this.selectedCity = code;
-                        let city = this.allCities.find(c => String(c.code) === String(code));
-                        document.getElementById('tuk_nama_kota_input').value = city ? city.name : '';
-                    }
-                 }">
-                <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-1">
-                        Provinsi TUK <span class="text-rose-500">*</span>
+                    <label class="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-1">
+                        Tempat Uji Kompetensi (TUK Terverifikasi AJJ) <span class="text-rose-500">*</span>
                     </label>
-                    <select name="kode_provinsi" @change="updateProvince($event.target.value)" required
-                        class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
-                        <option value="">-- Pilih Provinsi TUK --</option>
-                        <template x-for="prov in provinces" :key="prov.code">
-                            <option :value="prov.code" :selected="String(prov.code) === String(selectedProvince)" x-text="prov.name"></option>
+                    <select name="tuk_id" @change="onTukChange($event.target.value)" required :disabled="!selectedSchemeId"
+                            class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-xs sm:text-sm font-semibold focus:ring-1 focus:ring-lsp-navy bg-white disabled:bg-slate-100 disabled:text-slate-400">
+                        <template x-if="!selectedSchemeId">
+                            <option value="">-- Pilih Skema Sertifikasi terlebih dahulu di atas --</option>
+                        </template>
+                        <template x-if="selectedSchemeId && availableTuks.length === 0">
+                            <option value="">-- Belum ada TUK terverifikasi untuk skema ini --</option>
+                        </template>
+                        <template x-if="selectedSchemeId && availableTuks.length > 0">
+                            <option value="">-- Pilih TUK Terverifikasi (Tersedia: <span x-text="availableTuks.length"></span> TUK) --</option>
+                        </template>
+                        <template x-for="tuk in availableTuks" :key="tuk.id">
+                            <option :value="tuk.id" :selected="String(tuk.id) === String(selectedTukId)"
+                                    x-text="tuk.name + ' (' + tuk.type + ' - ' + (tuk.nama_kota || tuk.address) + ')'"></option>
                         </template>
                     </select>
-                    <input type="hidden" name="nama_provinsi" id="tuk_nama_provinsi_input" value="{{ old('nama_provinsi') }}">
-                    @error('kode_provinsi') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
+                    <p class="text-[11px] text-slate-500 mt-1" x-show="selectedSchemeId">
+                        Menampilkan TUK yang telah diverifikasi kelayakan fasilitas Asesmen Jarak Jauh (AJJ) untuk skema yang dipilih.
+                    </p>
                 </div>
 
-                <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-1">
-                        Kabupaten / Kota TUK (District) <span class="text-rose-500">*</span>
-                    </label>
-                    <select name="kode_kota" @change="updateCity($event.target.value)" required
-                        class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
-                        <option value="">-- Pilih Kota / Kabupaten TUK --</option>
-                        <template x-for="city in filteredCities" :key="city.code">
-                            <option :value="city.code" :selected="String(city.code) === String(selectedCity)" x-text="city.name"></option>
-                        </template>
-                    </select>
-                    <input type="hidden" name="nama_kota" id="tuk_nama_kota_input" value="{{ old('nama_kota') }}">
-                    @error('kode_kota') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
-                </div>
-            </div>
-
-            {{-- Penanggung Jawab TUK & Jabatan --}}
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-1">Nama Penanggung Jawab TUK <span class="text-xs font-normal text-slate-400">(Opsional)</span></label>
-                    <input type="text" name="pic_name" value="{{ old('pic_name') }}" placeholder="Contoh: Dr. H. Mulyadi, M.Pd." class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
-                    @error('pic_name')
-                        <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-1">Jabatan <span class="text-xs font-normal text-slate-400">(Opsional)</span></label>
-                    <input type="text" name="pic_position" value="{{ old('pic_position', old('jabatan')) }}" placeholder="Contoh: Kepala Sekolah / Kepala TUK" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
-                    @error('pic_position')
-                        <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
-                    @enderror
+                {{-- TUK Info Card when selected (Data automatically pulled from TUK profile) --}}
+                <div x-show="currentTuk" x-cloak class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2.5">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                TUK TERVERIFIKASI
+                            </span>
+                            <h4 class="text-xs sm:text-sm font-bold text-slate-900" x-text="currentTuk?.name"></h4>
+                            <span class="text-xs font-mono text-slate-500" x-text="'(' + currentTuk?.code + ')'"></span>
+                        </div>
+                        <span class="text-[11px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded font-semibold border border-emerald-200">
+                            Terhubung Otomatis
+                        </span>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-slate-600 pt-2 border-t border-slate-200">
+                        <div>
+                            <strong class="text-slate-700 block text-[11px] uppercase tracking-wider mb-0.5">Alamat Lengkap:</strong>
+                            <span x-text="currentTuk?.address || '-'" class="leading-relaxed"></span>
+                        </div>
+                        <div>
+                            <strong class="text-slate-700 block text-[11px] uppercase tracking-wider mb-0.5">Wilayah:</strong>
+                            <span x-text="(currentTuk?.nama_kota ? currentTuk?.nama_kota + ', ' : '') + (currentTuk?.nama_provinsi || '-')"></span>
+                        </div>
+                        <div>
+                            <strong class="text-slate-700 block text-[11px] uppercase tracking-wider mb-0.5">Penanggung Jawab (PIC):</strong>
+                            <span x-text="(currentTuk?.pic_name || '-') + ' (' + (currentTuk?.pic_position || 'Kepala TUK') + ')'"></span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
+            {{-- Input Link Video Meeting AJJ (Zoom / Google Meet) --}}
+            <div class="bg-indigo-50/50 p-4 rounded-xl border border-indigo-200/80 space-y-2">
+                <div class="flex items-center space-x-2">
+                    <span class="p-1.5 rounded-lg bg-indigo-600 text-white">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                    </span>
+                    <div>
+                        <label class="block text-xs font-bold text-indigo-950 uppercase tracking-wider">
+                            Link Meeting AJJ (Zoom / Google Meet)
+                        </label>
+                        <p class="text-[11px] text-indigo-700">Link pertemuan online video conference untuk pelaksanaan Asesmen Jarak Jauh.</p>
+                    </div>
+                </div>
+                <input type="url" name="meeting_link" value="{{ old('meeting_link') }}"
+                       placeholder="https://us02web.zoom.us/j/... atau https://meet.google.com/..."
+                       class="w-full px-3.5 py-2.5 rounded-lg border border-indigo-300 text-xs sm:text-sm focus:ring-1 focus:ring-lsp-navy font-mono bg-white">
+                <p class="text-[11px] text-slate-500">
+                    &bull; Link ini akan otomatis muncul sebagai tombol <strong>"Masuk Ruang Zoom / Meet AJJ"</strong> di akun Asesi, Asesor, dan Admin TUK.
+                </p>
+                @error('meeting_link')
+                    <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+
+            {{-- Asesor yang Ditugaskan --}}
             <div>
-                <label class="block text-sm font-semibold text-slate-700 mb-1">Asesor yang Ditugaskan (Multi-select) <span class="text-rose-500">*</span></label>
-                <div class="border border-slate-200 rounded-lg p-3 max-h-40 overflow-y-auto space-y-1.5">
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                    Asesor yang Ditugaskan (Multi-select) <span class="text-rose-500">*</span>
+                </label>
+                <div class="border border-slate-200 rounded-lg p-3 max-h-44 overflow-y-auto space-y-1.5 bg-slate-50">
                     @forelse($assessors ?? [] as $asesor)
-                        <label class="flex items-center space-x-2.5 text-sm text-slate-700 cursor-pointer hover:bg-slate-50 p-1 rounded">
-                            <input type="checkbox" name="assessor_ids[]" value="{{ $asesor->id }}" class="rounded border-slate-300 text-brand-600 focus:ring-brand-500" {{ in_array($asesor->id, old('assessor_ids', [])) ? 'checked' : '' }}>
-                            <span>{{ $asesor->full_name }}</span>
-                            <span class="text-xs text-slate-400">({{ $asesor->email }})</span>
+                        <label class="flex items-center justify-between text-xs text-slate-700 cursor-pointer hover:bg-white p-2 rounded-lg border border-transparent hover:border-slate-200 transition">
+                            <div class="flex items-center space-x-2.5 min-w-0">
+                                <input type="checkbox" name="assessor_ids[]" value="{{ $asesor->id }}" class="rounded border-slate-300 text-lsp-navy focus:ring-lsp-navy shrink-0" {{ in_array($asesor->id, old('assessor_ids', [])) ? 'checked' : '' }}>
+                                <div class="min-w-0">
+                                    <span class="font-semibold text-slate-800">{{ $asesor->full_name }}</span>
+                                    <span class="text-slate-400 font-mono text-[11px] block sm:inline sm:ml-1">{{ $asesor->assessor_registration_number ? "({$asesor->assessor_registration_number})" : "({$asesor->email})" }}</span>
+                                </div>
+                            </div>
                         </label>
                     @empty
                         <p class="text-xs text-slate-400">Tidak ada data asesor terdaftar.</p>
@@ -173,84 +200,70 @@
 
         {{-- Date and Time --}}
         <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 space-y-4">
-            <h2 class="text-base font-bold text-slate-900">Jadwal Pelaksanaan & Kuota Peserta</h2>
+            <h2 class="text-base font-bold text-slate-900 pb-2 border-b border-slate-100">2. Jadwal Pelaksanaan &amp; Kuota Peserta</h2>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1">Tanggal Mulai <span class="text-rose-500">*</span></label>
-                        <input type="date" name="date" required value="{{ old('date') }}" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
-                        @error('date')
-                            <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
-                        @enderror
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Tanggal Mulai <span class="text-rose-500">*</span></label>
+                        <input type="date" name="date" required value="{{ old('date') }}" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs sm:text-sm focus:ring-1 focus:ring-lsp-navy">
+                        @error('date') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
                     </div>
 
                     <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1">Tanggal Selesai</label>
-                        <input type="date" name="end_date" value="{{ old('end_date') }}" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
-                        @error('end_date')
-                            <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
-                        @enderror
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Tanggal Selesai</label>
+                        <input type="date" name="end_date" value="{{ old('end_date') }}" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs sm:text-sm focus:ring-1 focus:ring-lsp-navy">
+                        @error('end_date') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
                     </div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1">Jam Mulai <span class="text-rose-500">*</span></label>
-                        <input type="time" name="start_time" required value="{{ old('start_time', '08:00') }}" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
-                        @error('start_time')
-                            <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
-                        @enderror
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Jam Mulai <span class="text-rose-500">*</span></label>
+                        <input type="time" name="start_time" required value="{{ old('start_time', '08:00') }}" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs sm:text-sm focus:ring-1 focus:ring-lsp-navy">
+                        @error('start_time') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
                     </div>
 
                     <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1">Jam Selesai <span class="text-rose-500">*</span></label>
-                        <input type="time" name="end_time" required value="{{ old('end_time', '16:00') }}" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
-                        @error('end_time')
-                            <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
-                        @enderror
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Jam Selesai <span class="text-rose-500">*</span></label>
+                        <input type="time" name="end_time" required value="{{ old('end_time', '16:00') }}" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs sm:text-sm focus:ring-1 focus:ring-lsp-navy">
+                        @error('end_time') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-1">Perkiraan Jumlah Peserta (Siswa)</label>
-                    <input type="number" name="estimated_candidates" min="0" value="{{ old('estimated_candidates', 0) }}" placeholder="Contoh: 88" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
-                    @error('estimated_candidates')
-                        <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
-                    @enderror
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Perkiraan Kuota Peserta</label>
+                    <input type="number" name="estimated_candidates" min="0" value="{{ old('estimated_candidates', 0) }}" placeholder="Contoh: 20" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs sm:text-sm focus:ring-1 focus:ring-lsp-navy">
+                    @error('estimated_candidates') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
                 </div>
             </div>
         </div>
 
         {{-- Schedule Code & Notes --}}
         <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 space-y-4">
-            <h2 class="text-base font-bold text-slate-900">Kode Jadwal & Catatan</h2>
+            <h2 class="text-base font-bold text-slate-900 pb-2 border-b border-slate-100">3. Kode Masuk &amp; Catatan</h2>
 
             <div>
-                <label class="block text-sm font-semibold text-slate-700 mb-1">Kode Jadwal (Untuk Asesi Masuk) <span class="text-rose-500">*</span></label>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Kode Jadwal (Untuk Asesi Masuk) <span class="text-rose-500">*</span></label>
                 <div class="flex space-x-2">
-                    <input type="text" name="code" required x-model="code" placeholder="Contoh: LSP-XYZ123" class="flex-1 px-4 py-2.5 rounded-lg border border-slate-300 text-sm font-mono uppercase focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                    <input type="text" name="code" required x-model="code" placeholder="Contoh: WIS-XYZ123" class="flex-1 px-3.5 py-2.5 rounded-lg border border-slate-300 text-xs sm:text-sm font-mono uppercase focus:ring-1 focus:ring-lsp-navy">
                     <button type="button" @click="generateCode()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition">
                         Generate Kode Acak
                     </button>
                 </div>
-                @error('code')
-                    <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
-                @enderror
+                @error('code') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
             </div>
 
             <div>
-                <label class="block text-sm font-semibold text-slate-700 mb-1">Catatan Tambahan</label>
-                <textarea name="notes" rows="3" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="Catatan instruksi khusus untuk asesi atau asesor...">{{ old('notes') }}</textarea>
-                @error('notes')
-                    <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
-                @enderror
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Catatan Tambahan</label>
+                <textarea name="notes" rows="3" class="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-xs sm:text-sm focus:ring-1 focus:ring-lsp-navy" placeholder="Catatan instruksi khusus untuk asesi, asesor, atau TUK...">{{ old('notes') }}</textarea>
+                @error('notes') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
             </div>
         </div>
 
         <div class="flex items-center justify-end space-x-3">
-            <a href="{{ route('admin.jadwal.index') }}" class="px-5 py-2.5 text-sm font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition">Batal</a>
-            <button type="submit" class="px-6 py-2.5 text-sm font-bold bg-brand-600 hover:bg-brand-700 text-white rounded-lg shadow-sm transition">
+            <a href="{{ route('admin.jadwal.index') }}" class="px-5 py-2.5 text-xs sm:text-sm font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition">Batal</a>
+            <button type="submit" class="px-6 py-2.5 text-xs sm:text-sm font-bold bg-lsp-navy hover:bg-slate-900 text-white rounded-lg shadow-sm transition">
                 Simpan Jadwal Baru
             </button>
         </div>

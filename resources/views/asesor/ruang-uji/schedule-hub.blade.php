@@ -29,8 +29,16 @@
             <p class="text-sm text-slate-500">Pilih instrumen asesmen untuk memeriksa dan menilai seluruh peserta uji</p>
         </div>
         <div class="flex items-center space-x-2">
+            @if(!empty($schedule->meeting_link))
+                <a href="{{ $schedule->meeting_link }}" target="_blank" rel="noopener noreferrer"
+                   class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-lg shadow-sm transition flex items-center space-x-1.5 cursor-pointer"
+                   title="Buka Ruang Video Meeting AJJ">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                    <span>Masuk Ruang Zoom / Meet AJJ ↗</span>
+                </a>
+            @endif
             <span class="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200">
-                Kode Jadwal: {{ $schedule->code }}
+                Kode: {{ $schedule->code }}
             </span>
         </div>
     </div>

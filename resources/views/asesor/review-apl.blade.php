@@ -8,10 +8,10 @@
     $profile = $profile ?? $assessment->asesi->profile;
 
     $proofLabels = [
-        'IJAZAH_SMK' => 'Ijazah SMK Otomotif',
+        'IJAZAH_SMK' => 'Ijazah SMK Perhotelan / Pariwisata',
         'SURAT_SISWA_AKTIF' => 'Surat Keterangan Siswa Aktif SMK',
-        'IJAZAH_SMA_SERTIFIKAT' => 'Ijazah SMA + Sertifikat Pelatihan Otomotif',
-        'PENGALAMAN_KERJA' => 'Surat Pengalaman Kerja Bengkel Otomotif',
+        'IJAZAH_SMA_SERTIFIKAT' => 'Ijazah SMA/Sederajat + Sertifikat Pelatihan Terkait',
+        'PENGALAMAN_KERJA' => 'Surat Pengalaman Kerja Industri Perhotelan / Restoran',
         'KTP' => 'Fotokopi KTP / Identitas Diri',
         'PAS_FOTO' => 'Pas Foto 3x4 (Latar Belakang Merah)',
     ];
@@ -223,10 +223,10 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         @php
                             $basicProofOptions = [
-                                'IJAZAH_SMK' => 'A. Ijazah SMK Otomotif',
+                                'IJAZAH_SMK' => 'A. Ijazah SMK Perhotelan / Pariwisata',
                                 'SURAT_SISWA_AKTIF' => 'B. Surat Keterangan Siswa Aktif SMK',
-                                'IJAZAH_SMA_SERTIFIKAT' => 'C. Ijazah SMA + Sertifikat Pelatihan Otomotif',
-                                'PENGALAMAN_KERJA' => 'D. Surat Pengalaman Kerja Bengkel Otomotif',
+                                'IJAZAH_SMA_SERTIFIKAT' => 'C. Ijazah SMA/Sederajat + Sertifikat Pelatihan Terkait',
+                                'PENGALAMAN_KERJA' => 'D. Surat Pengalaman Kerja Industri Perhotelan / Restoran',
                             ];
                         @endphp
 

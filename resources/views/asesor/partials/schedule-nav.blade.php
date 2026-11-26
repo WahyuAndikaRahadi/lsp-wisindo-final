@@ -68,6 +68,15 @@
             <span class="hidden sm:inline">Jadwal</span>
         </a>
 
+        @if(!empty($schedule->meeting_link))
+            <a href="{{ $schedule->meeting_link }}" target="_blank" rel="noopener noreferrer"
+               class="inline-flex items-center px-3 py-2 rounded-lg text-xs font-black bg-blue-600 hover:bg-blue-700 text-white shadow-xs transition mr-1.5 shrink-0"
+               title="Masuk Ruang Pertemuan Video AJJ (Zoom / Google Meet)">
+                <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                <span>Ruang Meet AJJ ↗</span>
+            </a>
+        @endif
+
         @php
             $isClosedForMe = $schedule->isClosedForAssessor();
         @endphp

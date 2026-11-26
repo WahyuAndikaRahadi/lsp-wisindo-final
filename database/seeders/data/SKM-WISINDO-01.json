@@ -1,0 +1,3842 @@
+{
+  "scheme": {
+    "code": "SKM-CDP-01",
+    "name": "Skema Sertifikasi Okupasi Chef de Partie Hotel",
+    "scheme_type": "OKUPASI",
+    "version": "1.0",
+    "description": "Skema Sertifikasi Okupasi Chef de Partie Hotel (Nomor Skema: 459/PAR/2026)",
+    "passing_grade_theory": 75.0
+  },
+  "units": [
+    {
+      "code": "I.55HDR00.068.3",
+      "title": "Melaksanakan Prosedur Keamanan Makanan",
+      "standard_reference": "SKKNI No.125 Tahun 2024",
+      "sequence": 1,
+      "elements": [
+        {
+          "title": "Mengidentifikasi bahaya dan risiko keamanan makanan",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Bahaya dan risiko keamanan makanan yang ditimbulkan oleh zat biologi diidentifikasi dan didokumentasikan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Bahaya dan risiko keamanan makanan yang ditimbulkan oleh bahan fisika diidentifikasi dan didokumentasikan.",
+              "sequence": 2
+            },
+            {
+              "code_number": "1.3",
+              "statement": "Bahaya dan risiko keamanan makanan yang ditimbulkan oleh zat kimia diidentifikasi dan didokumentasikan.",
+              "sequence": 3
+            },
+            {
+              "code_number": "1.4",
+              "statement": "Keamanan makanan dilakukan sesuai standar perusahaan.",
+              "sequence": 4
+            }
+          ]
+        },
+        {
+          "title": "Mengidentifikasi titik kontrol penting dalam sistem produksi makanan dengan menggunakan metode HACCP",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Titik rawan makanan diidentifikasi dan diawasi dengan seksama sesuai metode HACCP.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Proses alur kerja produksi makanan diidentifikasi dan disiapkan sesuai metode HACCP.",
+              "sequence": 2
+            }
+          ]
+        },
+        {
+          "title": "Melaksanakan rencana HACCP perusahaan",
+          "sequence": 3,
+          "kuks": [
+            {
+              "code_number": "3.1",
+              "statement": "Produksi makanan yang sesuai dengan spesifikasi keamanan makanan berdasarkan metode HACCP ditentukan dan dilaksanakan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "3.2",
+              "statement": "Proses alur produksi makanan diikuti sesuai rencana HACCP.",
+              "sequence": 2
+            },
+            {
+              "code_number": "3.3",
+              "statement": "Ketepatan pencatatan data dimonitor dan dikoreksi sesuai standar perusahaan.",
+              "sequence": 3
+            },
+            {
+              "code_number": "3.4",
+              "statement": "Validasi audit internal dan eksternal metode HACCP perusahaan dilaksanakan sesuai dengan prosedur.",
+              "sequence": 4
+            }
+          ]
+        },
+        {
+          "title": "Mengevaluasi dan melaporkan hasil kegiatan",
+          "sequence": 4,
+          "kuks": [
+            {
+              "code_number": "4.1",
+              "statement": "Hasil pelaksanaan kegiatan keamanan makanan dievaluasi dan didokumentasikan untuk perbaikan pada kegiatan selanjutnya.",
+              "sequence": 1
+            },
+            {
+              "code_number": "4.2",
+              "statement": "Hasil evaluasi kegiatan keamanan makanan dilaporkan kepada manajemen atau pimpinan.",
+              "sequence": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.153.3",
+      "title": "Mengikuti Prosedur Kebersihan di Tempat Kerja",
+      "standard_reference": "SKKNI Nomor 125 Tahun 2024",
+      "sequence": 2,
+      "elements": [
+        {
+          "title": "Mengidentifikasi dan mencegah risiko kebersihan",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Risiko kebersihan diidentifikasi secepatnya.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Tindakan diambil untuk meminimalkan atau menghilangkan risiko kebersihan sesuai dengan standar perusahaan.",
+              "sequence": 2
+            }
+          ]
+        },
+        {
+          "title": "Mengikuti prosedur kebersihan",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Prosedur kebersihan tempat kerja diikuti secara baik sesuai dengan standar perusahaan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Penanganan dan penyimpanan seluruh barang dilengkapi sesuai dengan standar perusahaan.",
+              "sequence": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.160.3",
+      "title": "Menerapkan Proses Kesehatan dan Keselamatan Kerja",
+      "standard_reference": "SKKNI No.125 Tahun 2024",
+      "sequence": 3,
+      "elements": [
+        {
+          "title": "Menyediakan informasi tentang keselamatan dan kesehatan kerja",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Informasi yang berhubungan dikumpulkan secara jelas kepada staf.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Informasi perusahaan mengenai keselamatan dan Kesehatan diterangkan secara jelas kepada staf.",
+              "sequence": 2
+            }
+          ]
+        },
+        {
+          "title": "Melakukan koordinasi partisipasi staf dalam masalah keselamatan dan kesehatan kerja",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Staf diberikan kesempatan mendukung program manajemen keselamatan dan kesehatan di tempat kerja.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Masalah yang timbul ditindaklanjuti melalui konsultasi pada pihak yang tepat.",
+              "sequence": 2
+            },
+            {
+              "code_number": "2.3",
+              "statement": "Umpan balik tentang system manajemen dilaksanakan oleh orang yang ditunjuk.",
+              "sequence": 3
+            },
+            {
+              "code_number": "2.4",
+              "statement": "Bahaya dan risiko diidentifikasi.",
+              "sequence": 4
+            }
+          ]
+        },
+        {
+          "title": "Memonitor prosedur untuk mengontrol bahaya dan risiko",
+          "sequence": 3,
+          "kuks": [
+            {
+              "code_number": "3.1",
+              "statement": "Pengontrolan bahaya dan risiko dilaksanakan sesuai dengan prosedur.",
+              "sequence": 1
+            },
+            {
+              "code_number": "3.2",
+              "statement": "Kekurangan pengontrolan diidentifikasi dan dilaporkan kepada orang yang berkewenangan.",
+              "sequence": 2
+            }
+          ]
+        },
+        {
+          "title": "Menjaga catatan keselamatan dan kesehatan kerja",
+          "sequence": 4,
+          "kuks": [
+            {
+              "code_number": "4.1",
+              "statement": "Catatan dilengkapi secara akurat sesuai dengan prosedur.",
+              "sequence": 1
+            },
+            {
+              "code_number": "4.2",
+              "statement": "Catatan disimpan secara akurat sesuai prosedur.",
+              "sequence": 2
+            }
+          ]
+        },
+        {
+          "title": "Melaksanakan proses audit berbasis risiko",
+          "sequence": 5,
+          "kuks": [
+            {
+              "code_number": "5.1",
+              "statement": "Proses audit berbasis risiko dijalankan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "5.2",
+              "statement": "Proses surveillance dilaksanakan sesuai dengan peraturan pemerintah.",
+              "sequence": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.155.3",
+      "title": "Menyediakan Pertolongan Pertama",
+      "standard_reference": "SKKNI Nomor 125 Tahun 2024",
+      "sequence": 4,
+      "elements": [
+        {
+          "title": "Memilih dan menata peralatan",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Situasi darurat dikenali secara cepat dan benar.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Situasi dinilai secara cepat untuk tindakan yang dibutuhkan.",
+              "sequence": 2
+            },
+            {
+              "code_number": "1.3",
+              "statement": "Bantuan layanan darurat dari kolega dan tamu diorganisir.",
+              "sequence": 3
+            }
+          ]
+        },
+        {
+          "title": "Memberikan perawatan yang tepat",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Kondisi fisik pasien dinilai dari tanda-tanda vital yang dapat dilihat.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Pertolongan pertama diberikan untuk kondisi fisik dan mental kolega dan tamu sesuai dengan standar.",
+              "sequence": 2
+            }
+          ]
+        },
+        {
+          "title": "Memonitor situasi",
+          "sequence": 3,
+          "kuks": [
+            {
+              "code_number": "3.1",
+              "statement": "Peralatan dibersihkan setelah digunakan sesuai dengan standar.",
+              "sequence": 1
+            },
+            {
+              "code_number": "3.2",
+              "statement": "Informasi tentang kondisi kolega dan tamu disampaikan secara jelas pada pelayan kesehatan.",
+              "sequence": 2
+            }
+          ]
+        },
+        {
+          "title": "Menyiapkan laporan insiden",
+          "sequence": 4,
+          "kuks": [
+            {
+              "code_number": "4.1",
+              "statement": "Situasi darurat didokumentasikan sesuai dengan prosedur perusahaan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "4.2",
+              "statement": "Laporan dibuat secara jelas dan akurat.",
+              "sequence": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.167.3",
+      "title": "Membaca Instruksi dan Diagram dalam Konteks yang Berkaitan",
+      "standard_reference": "SKKNI Nomor 125 Tahun 2024",
+      "sequence": 5,
+      "elements": [
+        {
+          "title": "Mengidentifikasi tujuan teks",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Pemahaman tujuan teks didemonstrasikan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Pemahaman diagram didemonstrasikan.",
+              "sequence": 2
+            }
+          ]
+        },
+        {
+          "title": "Menginterpretasikan diagram, grafik, dan bagan",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Percakapan tidak resmi dibuka dan ditutup secara tepat.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Teknik klarifikasi dan timbal balik digunakan.",
+              "sequence": 2
+            },
+            {
+              "code_number": "2.3",
+              "statement": "Informasi yang tepat digunakan sesuai dengan konteks.",
+              "sequence": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.168.3",
+      "title": "Melakukan komunikasi Secara Lisan dalam Bahasa Inggris pada Tingkat Operasional Dasar",
+      "standard_reference": "SKKNI Nomor 125 Tahun 2024",
+      "sequence": 6,
+      "elements": [
+        {
+          "title": "Berpartisipasi dalam percakapan sederhana dengan rekan kerja",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Kalimat pembuka percakapan dalam Bahasa Inggris digunakan dan ditanggapi dengan tepat.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Topik pembicaraan umum dikomentari.",
+              "sequence": 2
+            },
+            {
+              "code_number": "1.3",
+              "statement": "Kegiatan operasional sebelumnya dibicarakan dengan rekan kerja.",
+              "sequence": 3
+            },
+            {
+              "code_number": "1.4",
+              "statement": "Kalimat penutup yang tepat digunakan untuk mengakhiri percakapan.",
+              "sequence": 4
+            }
+          ]
+        },
+        {
+          "title": "Menanggapi permintaan dan instruksi verbal",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Permintaan dan instruksi atasan dipahami dan dikonfirmasi.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Pengulangan dan klarifikasi terhadap permintaan dan instruksi diminta kepada yang memberi instruksi.",
+              "sequence": 2
+            }
+          ]
+        },
+        {
+          "title": "Membuat permintaan sederhana",
+          "sequence": 3,
+          "kuks": [
+            {
+              "code_number": "3.1",
+              "statement": "Kalimat permintaan yang sopan digunakan dengan benar.",
+              "sequence": 1
+            },
+            {
+              "code_number": "3.2",
+              "statement": "Ucapan terima kasih disampaikan dengan sopan dan benar.",
+              "sequence": 2
+            },
+            {
+              "code_number": "3.3",
+              "statement": "Permintaan yang tidak direspons diterima dan ditanggapi dengan baik.",
+              "sequence": 3
+            }
+          ]
+        },
+        {
+          "title": "Menjelaskan prosedur rutin",
+          "sequence": 4,
+          "kuks": [
+            {
+              "code_number": "4.1",
+              "statement": "Tahapan dalam pekerjaan rutin dijelaskan dengan tepat sesuai urutannya.",
+              "sequence": 1
+            },
+            {
+              "code_number": "4.2",
+              "statement": "Pengecualian dalam tahapan pekerjaan rutin dijelaskan dengan tepat.",
+              "sequence": 2
+            },
+            {
+              "code_number": "4.3",
+              "statement": "Saran untuk meningkatkan layanan prosedur rutin disampaikan.",
+              "sequence": 3
+            }
+          ]
+        },
+        {
+          "title": "Mengidentifikasi bentuk ekspresi dalam bahasa Inggris",
+          "sequence": 5,
+          "kuks": [
+            {
+              "code_number": "5.1",
+              "statement": "Kalimat formal dibuat digunakan sesuai dengan tata bahasa Inggris.",
+              "sequence": 1
+            },
+            {
+              "code_number": "5.2",
+              "statement": "Kalimat pertanyaan terbuka dan tertutup dibedakan dengan jelas.",
+              "sequence": 2
+            },
+            {
+              "code_number": "5.3",
+              "statement": "Bentuk ungkapan informal dalam bahasa Inggris diidentifikasi dengan tepat.",
+              "sequence": 3
+            }
+          ]
+        },
+        {
+          "title": "Mengungkapkan kesukaan",
+          "sequence": 6,
+          "kuks": [
+            {
+              "code_number": "6.1",
+              "statement": "Topik suka dan tidak suka dibicarakan dengan rekan kerja.",
+              "sequence": 1
+            },
+            {
+              "code_number": "6.2",
+              "statement": "Preferensi dan alasannya didiskusikan.",
+              "sequence": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.148.3",
+      "title": "Melakukan Kerja dalam Lingkungan Sosial yang Beragam",
+      "standard_reference": "SKKNI Nomor 125 Tahun 2024",
+      "sequence": 7,
+      "elements": [
+        {
+          "title": "Melakukan komunikasi dengan tamu dan kolega dari latar belakang yang beragam",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Tamu dan kolega dengan latar belakang budaya yang berbeda diperlakukan dengan hormat.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Keberagaman budaya dipertimbangkan dalam melakukan komunikasi lisan dan nonlisan.",
+              "sequence": 2
+            },
+            {
+              "code_number": "1.3",
+              "statement": "Penggunaan bahasa isyarat dan kata-kata sederhana digunakan dalam melakukan komunikasi dengan tamu dan kolega jika terjadi hambatan bahasa.",
+              "sequence": 3
+            },
+            {
+              "code_number": "1.4",
+              "statement": "Sumber-sumber informasi terkait budaya diperoleh dari kolega untuk tujuan komunikasi yang efektif.",
+              "sequence": 4
+            }
+          ]
+        },
+        {
+          "title": "Menangani kesalahpahaman antar budaya",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Kesalahpahaman terkait keberagaman budaya di tempat kerja diidentifikasi.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Kesulitan dan kesalahpahaman yang timbul karena keberagaman budaya disampaikan dan dicari bantuan pada pihak yang tepat.",
+              "sequence": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.169.3",
+      "title": "Melakukan Tugas Perlindungan Anak yang Relevan dengan Industri Pariwisata",
+      "standard_reference": "SKKNI Nomor 125 Tahun 2024",
+      "sequence": 8,
+      "elements": [
+        {
+          "title": "Mengidentifikasi masalah eksploitasi seksual anak",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Masalah eksploitasi anak diidentifikasi.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Dampak eksploitasi seksual anak dijelaskan.",
+              "sequence": 2
+            }
+          ]
+        },
+        {
+          "title": "Menjelaskan tindakan untuk mencegah eksploitasi seksual anak",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Aturan yang berkaitan dengan eksploitasi seksual anak diidentifikasi.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Aturan yang berkaitan dengan eksploitasi seksual anak dijelaskan.",
+              "sequence": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.215.3",
+      "title": "Membaca dan Menulis Bahasa Inggris pada Tingkat Lanjut",
+      "standard_reference": "SKKNI No.125 Tahun 2024",
+      "sequence": 9,
+      "elements": [
+        {
+          "title": "Mengenali tujuan dari berbagai jenis surat bisnis di tempat kerja",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Tujuan berbagai surat bisnis diidentifikasi.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Tujuan bisnis untuk surat pelanggan diidentifikasi.",
+              "sequence": 2
+            },
+            {
+              "code_number": "1.3",
+              "statement": "Tujuan surat untuk atasan diidentifikasi.",
+              "sequence": 3
+            }
+          ]
+        },
+        {
+          "title": "Memahami ketentuan menulis surat bisnis dalam bahasa Inggris",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Format yang sesuai untuk surat bisnis diidentifikasi.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Pentingnya nada saat menulis surat bisnis dalam bahasa Inggris dijelaskan.",
+              "sequence": 2
+            },
+            {
+              "code_number": "2.3",
+              "statement": "Pemilihan kata-kata bahasa Inggris untuk surat bisnis didiskusikan dengan kolega atau atasan.",
+              "sequence": 3
+            },
+            {
+              "code_number": "2.4",
+              "statement": "Tanggapan terhadap surat bisnis direncanakan.",
+              "sequence": 4
+            }
+          ]
+        },
+        {
+          "title": "Menerapkan ketentuan menulis surat bisnis dalam bahasa Inggris",
+          "sequence": 3,
+          "kuks": [
+            {
+              "code_number": "3.1",
+              "statement": "Format yang sesuai untuk surat bisnis dalam bahasa Inggris diterapkan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "3.2",
+              "statement": "Kata yang ramah dan tepat digunakan saat menulis bisnis surat dalam bahasa Inggris.",
+              "sequence": 2
+            },
+            {
+              "code_number": "3.3",
+              "statement": "Jenis bahasa yang tepat digunakan dalam surat bisnis sesuai tata bahasa.",
+              "sequence": 3
+            }
+          ]
+        },
+        {
+          "title": "Menulis risalah rapat dengan efektif",
+          "sequence": 4,
+          "kuks": [
+            {
+              "code_number": "4.1",
+              "statement": "Tujuan dan pembaca teks diidentifikasi.",
+              "sequence": 1
+            },
+            {
+              "code_number": "4.2",
+              "statement": "Format risalah yang tepat digunakan.",
+              "sequence": 2
+            },
+            {
+              "code_number": "4.3",
+              "statement": "Tanggal dan lokasi rapat dan daftar peserta rapat dimasukkan.",
+              "sequence": 3
+            },
+            {
+              "code_number": "4.4",
+              "statement": "Kontribusi peserta rapat dinyatakan.",
+              "sequence": 4
+            },
+            {
+              "code_number": "4.5",
+              "statement": "Rekomendasi inti rapat diidentifikasi dan dicatat.",
+              "sequence": 5
+            },
+            {
+              "code_number": "4.6",
+              "statement": "Kaidah ejaan tanda baca dan tata bahasa yang umum dalam bisnis diikuti.",
+              "sequence": 6
+            }
+          ]
+        },
+        {
+          "title": "Menyediakan terjemahan informal secara tertulis",
+          "sequence": 5,
+          "kuks": [
+            {
+              "code_number": "5.1",
+              "statement": "Makna dokumen ditafsirkan untuk menyampaikan ide dengan mempertimbangkan kepekaan budaya.",
+              "sequence": 1
+            },
+            {
+              "code_number": "5.2",
+              "statement": "Integritas terjemahan dipastikan dengan tidak menambah atau mengurangi maknanya.",
+              "sequence": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.213.3",
+      "title": "Melakukan Komunikasi secara Lisan dalam Bahasa Inggris pada Tingkat Operasional Menengah",
+      "standard_reference": "SKKNI No.125 Tahun 2024",
+      "sequence": 10,
+      "elements": [
+        {
+          "title": "Melakukan komunikasi dengan tamu dan kolega mengenai kegiatan rutin dan tidak rutin",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Keluhan tamu ditanggapi.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Konflik di lokasi kegiatan ditangani.",
+              "sequence": 2
+            },
+            {
+              "code_number": "1.3",
+              "statement": "Kejadian atau permintaan tiba-tiba ditanggapi.",
+              "sequence": 3
+            },
+            {
+              "code_number": "1.4",
+              "statement": "Informasi secara rinci dan saran diberikan.",
+              "sequence": 4
+            },
+            {
+              "code_number": "1.5",
+              "statement": "Bantuan yang merupakan tanggung jawabnya diberikan.",
+              "sequence": 5
+            },
+            {
+              "code_number": "1.6",
+              "statement": "Hal-hal yang merupakan tanggung jawabnya dinegosiasikan.",
+              "sequence": 6
+            },
+            {
+              "code_number": "1.7",
+              "statement": "Penjelasan mengenai kebutuhan kolega dan tamu diinformasikan.",
+              "sequence": 7
+            },
+            {
+              "code_number": "1.8",
+              "statement": "Informasi faktual disampaikan.",
+              "sequence": 8
+            },
+            {
+              "code_number": "1.9",
+              "statement": "Bantuan yang diperlukan dari sumber yang tepat dan atau orang lain diidentifikasi.",
+              "sequence": 9
+            },
+            {
+              "code_number": "1.10",
+              "statement": "Informasi yang jelas dan mudah diikuti dengan kecepatan yang tepat dan urutan yang benar disampaikan.",
+              "sequence": 10
+            },
+            {
+              "code_number": "1.11",
+              "statement": "Informasi tambahan yang sesuai dengan kebutuhan tamu dan kolega disampaikan.",
+              "sequence": 11
+            },
+            {
+              "code_number": "1.12",
+              "statement": "Instruksi secara rinci diinformasikan.",
+              "sequence": 12
+            }
+          ]
+        },
+        {
+          "title": "Melakukan diskusi dalam kelompok",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Pelaksanaan diskusi disesuaikan dengan topik yang dibuat.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Prosedur dan tata cara yang tepat diamati.",
+              "sequence": 2
+            },
+            {
+              "code_number": "2.3",
+              "statement": "Pendapat diberikan.",
+              "sequence": 3
+            },
+            {
+              "code_number": "2.4",
+              "statement": "Strategi mengkonfirmasi, menjelaskan pengertian, dan membuat tambahan konstruktif mengenai apa yang dikatakan disampaikan dalam diskusi.",
+              "sequence": 4
+            },
+            {
+              "code_number": "2.5",
+              "statement": "Umpan balik dan dukungan pada peserta lain diberikan.",
+              "sequence": 5
+            }
+          ]
+        },
+        {
+          "title": "Membuat presentasi lisan",
+          "sequence": 3,
+          "kuks": [
+            {
+              "code_number": "3.1",
+              "statement": "Presentasi dibuat sesuai dengan pertemuan atau diskusi.",
+              "sequence": 1
+            },
+            {
+              "code_number": "3.2",
+              "statement": "Presentasi disiapkan berdasarkan prinsip-prinsip pembelajaran orang dewasa.",
+              "sequence": 2
+            },
+            {
+              "code_number": "3.3",
+              "statement": "Presentasi disajikan.",
+              "sequence": 3
+            },
+            {
+              "code_number": "3.4",
+              "statement": "Umpan balik ditanggapi dan menjawab pertanyaan apabila diperlukan.",
+              "sequence": 4
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.214.3",
+      "title": "Membaca dan Menulis dalam Bahasa Inggris pada Tingkat Operasional Menengah",
+      "standard_reference": "SKKNI No.125 Tahun 2024",
+      "sequence": 11,
+      "elements": [
+        {
+          "title": "Membuat peraturan dan petunjuk",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Tujuan peraturan dan petunjuk diidentifikasi dan dikonfirmasikan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Format penulisan peraturan dan petunjuk ditentukan sesuai dengan ketentuan.",
+              "sequence": 2
+            },
+            {
+              "code_number": "1.3",
+              "statement": "Pilihan kata untuk petunjuk dan peraturan ditentukan sesuai dengan standar.",
+              "sequence": 3
+            },
+            {
+              "code_number": "1.4",
+              "statement": "Tipe petunjuk dan peraturan yang dibutuhkan dibuat.",
+              "sequence": 4
+            },
+            {
+              "code_number": "1.5",
+              "statement": "Proses interpretasi dan pencatatan peraturan dan petunjuk dibuat dan didokumentasikan.",
+              "sequence": 5
+            },
+            {
+              "code_number": "1.6",
+              "statement": "Peraturan dan petunjuk ditetapkan sesuai dengan kebutuhan.",
+              "sequence": 6
+            }
+          ]
+        },
+        {
+          "title": "Mengidentifikasi metode penilaian",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Kriteria untuk membuat penilaian didefinisikan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Format proses penilaian dan pencatatan hasil akhir dirancang.",
+              "sequence": 2
+            },
+            {
+              "code_number": "2.3",
+              "statement": "Konteks dan lokasi penilaian diterapkan dan ditetapkan.",
+              "sequence": 3
+            },
+            {
+              "code_number": "2.4",
+              "statement": "Pengembangan, pelaksanaan, dan peninjauan biaya penilaian diperkirakan.",
+              "sequence": 4
+            },
+            {
+              "code_number": "2.5",
+              "statement": "Fasilitas dan sumber–sumber fisik yang dibutuhkan untuk melaksanakan penilaian diidentifikasi dan didokumentasikan.",
+              "sequence": 5
+            },
+            {
+              "code_number": "2.6",
+              "statement": "Jumlah penilai dan dukungan yang dibutuhkan untuk melaksanakan proses penilaian ditentukan.",
+              "sequence": 6
+            },
+            {
+              "code_number": "2.7",
+              "statement": "Metode penilaian yang akan digunakan dipilih dan penyesuaian yang diperbolehkan diajukan sesuai dengan kebutuhan.",
+              "sequence": 7
+            },
+            {
+              "code_number": "2.8",
+              "statement": "Aturan untuk pembuktian kebenaran keputusan penilaian ditentukan.",
+              "sequence": 8
+            }
+          ]
+        },
+        {
+          "title": "Mengidentifikasi saran penilaian yang tersedia",
+          "sequence": 3,
+          "kuks": [
+            {
+              "code_number": "3.1",
+              "statement": "Saran penilaian yang tersedia diidentifikasi dan dievaluasi.",
+              "sequence": 1
+            },
+            {
+              "code_number": "3.2",
+              "statement": "Daftar spesialis dikumpulkan untuk mengkritik saran penilaian.",
+              "sequence": 2
+            },
+            {
+              "code_number": "3.3",
+              "statement": "Penyesuaian terhadap sarana dan metode dibuat sesuai dengan saran penilaian.",
+              "sequence": 3
+            }
+          ]
+        },
+        {
+          "title": "Melakukan evaluasi percobaan metode dan saran penilaian",
+          "sequence": 4,
+          "kuks": [
+            {
+              "code_number": "4.1",
+              "statement": "Saran dan metode penilaian diuji coba dengan sampel dari kelompok target.",
+              "sequence": 1
+            },
+            {
+              "code_number": "4.2",
+              "statement": "Penyesuaian yang dibolehkan terhadap metode dan saran penilaian direncanakan.",
+              "sequence": 2
+            },
+            {
+              "code_number": "4.3",
+              "statement": "Penilai diidentifikasi untuk mengatur sarana penilaian dalam cara yang konsisten.",
+              "sequence": 3
+            },
+            {
+              "code_number": "4.4",
+              "statement": "Saran dan metode penilaian diatur terhadap sampel target.",
+              "sequence": 4
+            },
+            {
+              "code_number": "4.5",
+              "statement": "Tanggapan dari sampel target dan penilai disusun dan dianalisis.",
+              "sequence": 5
+            },
+            {
+              "code_number": "4.6",
+              "statement": "Kepantasan metode penilaian dan kemudahan dalam penggunaan serta tingkat bahasa sarana penilaian ditentukan.",
+              "sequence": 6
+            },
+            {
+              "code_number": "4.7",
+              "statement": "Peningkatan dan perubahan terhadap metode saran dan penilaian dievaluasi.",
+              "sequence": 7
+            }
+          ]
+        },
+        {
+          "title": "Mendokumentasikan prosedur penilaian",
+          "sequence": 5,
+          "kuks": [
+            {
+              "code_number": "5.1",
+              "statement": "Prasangka yang dapat mempengaruhi keputusan penilaian diidentifikasi dan didokumentasikan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "5.2",
+              "statement": "Penyesuaian terhadap metode dan sarana penilaian untuk memenuhi karakteristik orang yang dinilai harus didokumentasikan.",
+              "sequence": 2
+            },
+            {
+              "code_number": "5.3",
+              "statement": "Kriteria untuk membuat keputusan tentang apakah sudah terampil atau belum ditinjau ulang dan disesuaikan.",
+              "sequence": 3
+            },
+            {
+              "code_number": "5.4",
+              "statement": "Prosedur penilaian dan instruksi didokumentasikan.",
+              "sequence": 4
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.177.3",
+      "title": "Mencari dan Mendapatkan Data Komputer",
+      "standard_reference": "SKKNI Nomor 125 Tahun 2024",
+      "sequence": 12,
+      "elements": [
+        {
+          "title": "Membuka berkas",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Komputer dihidupkan sesuai prosedur.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Aplikasi yang sesuai dipilih.",
+              "sequence": 2
+            },
+            {
+              "code_number": "1.3",
+              "statement": "Berkas dibuka sesuai kebutuhan.",
+              "sequence": 3
+            }
+          ]
+        },
+        {
+          "title": "Mengambil dan mengubah data",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Data yang diambil di tempatkan di dalam berkas.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Kebutuhan pengeditan diidentifikasi sesuai kebutuhan.",
+              "sequence": 2
+            },
+            {
+              "code_number": "2.3",
+              "statement": "Data disimpan sesuai prosedur.",
+              "sequence": 3
+            }
+          ]
+        },
+        {
+          "title": "Menutup dan mengeluarkan berkas",
+          "sequence": 3,
+          "kuks": [
+            {
+              "code_number": "3.1",
+              "statement": "Berkas ditutup sesuai dengan prosedur.",
+              "sequence": 1
+            },
+            {
+              "code_number": "3.2",
+              "statement": "Komputer dimatikan sesuai prosedur.",
+              "sequence": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.156.3",
+      "title": "Melaksanakan Prosedur Administrasi",
+      "standard_reference": "SKKNI Nomor 125 Tahun 2024",
+      "sequence": 13,
+      "elements": [
+        {
+          "title": "Memproses dokumen kantor",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Dokumen diproses sesuai dengan prosedur perusahaan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Peralatan dan perlengkapan digunakan secara benar.",
+              "sequence": 2
+            },
+            {
+              "code_number": "1.3",
+              "statement": "Kesalahan penggunaan peralatan  dan perlengkapan diperbaiki  sesuai dengan prosedur perusahaan.",
+              "sequence": 3
+            }
+          ]
+        },
+        {
+          "title": "Membuat dokumen korespondensi yang sederhana",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Topik korespondensi ditentukan sesuai kebutuhan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Teks ditulis dengan menggunakan bahasa yang tepat dan jelas.",
+              "sequence": 2
+            },
+            {
+              "code_number": "2.3",
+              "statement": "Dokumen korespondensi diperiksa kembali sebelum dikirim.",
+              "sequence": 3
+            }
+          ]
+        },
+        {
+          "title": "Menjaga sistem dokumen",
+          "sequence": 3,
+          "kuks": [
+            {
+              "code_number": "3.1",
+              "statement": "Peralatan yang digunakan digunakan dan dibersihkan sesuai dengan standar.",
+              "sequence": 1
+            },
+            {
+              "code_number": "3.2",
+              "statement": "Dokumen diarsipkan sesuai dengan prosedur.",
+              "sequence": 2
+            },
+            {
+              "code_number": "3.3",
+              "statement": "Referensi dan indeks dokumen disusun sesuai dengan prosedur perusahaan.",
+              "sequence": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.158.3",
+      "title": "Menerima dan Menyimpan Barang",
+      "standard_reference": "SKKNI Nomor 125 Tahun 2024",
+      "sequence": 14,
+      "elements": [
+        {
+          "title": "Mengambil kiriman persediaan",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Persediaan yang datang diperiksa sesuai pesanan secara seksama terhadap pesanan dan dokumentasi pengiriman sesuai dengan prosedur perusahaan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Persediaan diidentifikasi secara seksama, dicatat, dan dikomunikasikan pada orang yang tepat.",
+              "sequence": 2
+            },
+            {
+              "code_number": "1.3",
+              "statement": "Ketidaksesuaian ditindaklanjuti sesuai kebijakan perusahaan.",
+              "sequence": 3
+            }
+          ]
+        },
+        {
+          "title": "Menyimpan persediaan",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Persediaan disimpan ke tempat penyimpanan dengan aman.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.1",
+              "statement": "Jumlah persediaan dicatat secara akurat sesuai prosedur perusahaan.",
+              "sequence": 2
+            },
+            {
+              "code_number": "2.3",
+              "statement": "Persediaan diberi label sesuai dengan prosedur perusahaan.",
+              "sequence": 3
+            }
+          ]
+        },
+        {
+          "title": "Melakukan rotasi dan penjagaan persediaan",
+          "sequence": 3,
+          "kuks": [
+            {
+              "code_number": "3.1",
+              "statement": "Persediaan dirotasi sesuai dengan kebijakan perusahaan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "3.2",
+              "statement": "Persediaan dipindahkan sesuai dengan aturan keselamatan dan kesehatan.",
+              "sequence": 2
+            },
+            {
+              "code_number": "3.3",
+              "statement": "Kelebihan persediaan ditempatkan di gudang sesuai dengan kebijakan perusahaan.",
+              "sequence": 3
+            },
+            {
+              "code_number": "3.4",
+              "statement": "Tempat penyimpanan dijaga dengan aman sesuai dengan peraturan perusahaan.",
+              "sequence": 4
+            },
+            {
+              "code_number": "3.5",
+              "statement": "Masalah yang timbul segera diidentifikasi dan dilaporkan.",
+              "sequence": 5
+            },
+            {
+              "code_number": "3.6",
+              "statement": "Sistem pencatatan persediaan digunakan Sesuai dengan prinsip akuntansi dan ketentuan perusahaan.",
+              "sequence": 6
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.159.3",
+      "title": "Membuat Dokumen dan Tabulasi Data di dalam Komputer",
+      "standard_reference": "SKKNI No.125 Tahun 2024",
+      "sequence": 15,
+      "elements": [
+        {
+          "title": "Membuka berkas",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Komputer dioperasikan dan diakses secara benar.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Perangkat lunak yang memadai diaplikasikan sesuai kebutuhan.",
+              "sequence": 2
+            },
+            {
+              "code_number": "1.3",
+              "statement": "Berkas dikenali dan dibuka secara benar.",
+              "sequence": 3
+            }
+          ]
+        },
+        {
+          "title": "Membuat berkas komputer",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Komputer dihidupkan dan diakses secara benar.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Perangkat lunak yang tepat diaplikasikan sesuai kebutuhan.",
+              "sequence": 2
+            },
+            {
+              "code_number": "2.3",
+              "statement": "Berkas baru dibuat dan diberi nama sebagaimana dibutuhkan.",
+              "sequence": 3
+            },
+            {
+              "code_number": "2.4",
+              "statement": "Persyaratan didiskusikan dan diklarifikasikan dengan yang membutuhkan dokumen.",
+              "sequence": 4
+            }
+          ]
+        },
+        {
+          "title": "Membuat dokumen dari teks lisan atau tertulis",
+          "sequence": 3,
+          "kuks": [
+            {
+              "code_number": "3.1",
+              "statement": "Dokumen dibuat dalam bentuk dan format yang dibutuhkan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "3.2",
+              "statement": "Dokumen dibuat dalam jangka waktu yang telah ditentukan.",
+              "sequence": 2
+            },
+            {
+              "code_number": "3.3",
+              "statement": "Dokumen diperiksa kembali sebelum dicetak.",
+              "sequence": 3
+            },
+            {
+              "code_number": "3.4",
+              "statement": "Dokumen disimpan sesuai ketentuan.",
+              "sequence": 4
+            }
+          ]
+        },
+        {
+          "title": "Mengambil dan mengubah data",
+          "sequence": 4,
+          "kuks": [
+            {
+              "code_number": "4.1",
+              "statement": "Data ditempatkan di dalam berkas.",
+              "sequence": 1
+            },
+            {
+              "code_number": "4.2",
+              "statement": "Informasi pengeditan diidentifikasi secara benar data disimpan sesuai ketentuan.",
+              "sequence": 2
+            }
+          ]
+        },
+        {
+          "title": "Mencetak dan mengirimkan dokumen",
+          "sequence": 5,
+          "kuks": [
+            {
+              "code_number": "5.1",
+              "statement": "Print preview digunakan sesuai kebutuhan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "5.2",
+              "statement": "Peralatan yang sesuai disambungkan alat pencetak.",
+              "sequence": 2
+            },
+            {
+              "code_number": "5.3",
+              "statement": "Dokumen dicetak sesuai ketentuan.",
+              "sequence": 3
+            },
+            {
+              "code_number": "5.4",
+              "statement": "Dokumen dikirimkan dalam waktu yang telah ditentukan.",
+              "sequence": 4
+            }
+          ]
+        },
+        {
+          "title": "Menutup dan mengeluarkan berkas",
+          "sequence": 6,
+          "kuks": [
+            {
+              "code_number": "6.1",
+              "statement": "Berkas yang telah selesai dikerjakan disimpan dengan baik.",
+              "sequence": 1
+            },
+            {
+              "code_number": "6.2",
+              "statement": "Berkas ditutup dan program dikeluarkan sesuai dengan prosedur perangkat lunak.",
+              "sequence": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.172.3",
+      "title": "Melakukan Kerjasama Secara Kooperatif dalam Lingkungan Administrasi Umum",
+      "standard_reference": "SKKNI No.125 Tahun 2024",
+      "sequence": 16,
+      "elements": [
+        {
+          "title": "Melakukan komunikasi di tempat kerja",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Komunikasi dengan kolega dan tamu dilakukan secara profesional.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Komunikasi dua arah digunakan secara aktif.",
+              "sequence": 2
+            },
+            {
+              "code_number": "1.3",
+              "statement": "Potensi dan konflik yang ada diidentifikasi.",
+              "sequence": 3
+            }
+          ]
+        },
+        {
+          "title": "Menyediakan layanan kepada tamu",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Kebutuhan dan harapan tamu diidentifikasi secara benar.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Komunikasi dengan tamu dilakukan secara ramah dan sopan.",
+              "sequence": 2
+            },
+            {
+              "code_number": "2.3",
+              "statement": "Kebutuhan dan permintaan yang pantas dari tamu dipenuhi sesuai prosedur.",
+              "sequence": 3
+            },
+            {
+              "code_number": "2.4",
+              "statement": "Keluhan tamu diidentifikasi dan diambil tindakan solusinya sesuai prosedur perusahaan.",
+              "sequence": 4
+            }
+          ]
+        },
+        {
+          "title": "Melakukan kerja dalam tim",
+          "sequence": 3,
+          "kuks": [
+            {
+              "code_number": "3.1",
+              "statement": "Anggota tim dihormati dalam kegiatan harian.",
+              "sequence": 1
+            },
+            {
+              "code_number": "3.2",
+              "statement": "Tujuan kerja tim diidentifikasi secara bersama-sama.",
+              "sequence": 2
+            },
+            {
+              "code_number": "3.3",
+              "statement": "Tugas individu diidentifikasi dan dibagikan.",
+              "sequence": 3
+            },
+            {
+              "code_number": "3.4",
+              "statement": "Bantuan diberikan kepada anggota tim agar tujuan kerja tercapai.",
+              "sequence": 4
+            },
+            {
+              "code_number": "3.5",
+              "statement": "Umpan balik atas kinerja tim diterima.",
+              "sequence": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.190.3",
+      "title": "Menyiapkan Dokumen Bisnis",
+      "standard_reference": "SKKNI No.125 Tahun 2024",
+      "sequence": 17,
+      "elements": [
+        {
+          "title": "Menentukan persyaratan dokumen",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Persyaratan dan tujuan pembuatan dokumen didefinisikan secara jelas sesuai dengan standar.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Bantuan para ahli diperoleh sesuai kebutuhan.",
+              "sequence": 2
+            }
+          ]
+        },
+        {
+          "title": "Melaksanakan riset",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Riset dilaksanakan sesuai denganruang lingkup proyek.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Metode pengumpulan data digunakan dengan tepat.",
+              "sequence": 2
+            },
+            {
+              "code_number": "2.3",
+              "statement": "Data dianalisis dan dinilai relevansinya sebelum penggabungan dalam bentuk dokumen.",
+              "sequence": 3
+            }
+          ]
+        },
+        {
+          "title": "Menyusun dokumen",
+          "sequence": 3,
+          "kuks": [
+            {
+              "code_number": "3.1",
+              "statement": "Struktur dan isi dokumen dikembangkan sesuai dengan tujuan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "3.2",
+              "statement": "Presentasi tertulis dan teknis grafis digunakan untuk penyajian dokumen secara efektif dan menarik.",
+              "sequence": 2
+            },
+            {
+              "code_number": "3.3",
+              "statement": "Isu-isu utama diidentifikasi dan dianalisis sesuai dengan kebutuhan.",
+              "sequence": 3
+            },
+            {
+              "code_number": "3.4",
+              "statement": "Rekomendasi untuk Tindakan dicantumkan sesuai kebutuhan.",
+              "sequence": 4
+            },
+            {
+              "code_number": "3.5",
+              "statement": "Kualitas informasi diperiksa sesuai dengan standar.",
+              "sequence": 5
+            },
+            {
+              "code_number": "3.6",
+              "statement": "Akurasi teks diperiksa sesuai dengan standar.",
+              "sequence": 6
+            },
+            {
+              "code_number": "3.7",
+              "statement": "Presentasi dokumen disusun sesuai dengan standar dan kebutuhan.",
+              "sequence": 7
+            }
+          ]
+        },
+        {
+          "title": "Menindaklanjuti dokumen",
+          "sequence": 4,
+          "kuks": [
+            {
+              "code_number": "4.1",
+              "statement": "Dokumen disajikan dan/atau diedarkan sesuai kebutuhan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "4.2",
+              "statement": "Presentasi atau sirkulasi ditindaklanjuti sesuai kebutuhan.",
+              "sequence": 2
+            },
+            {
+              "code_number": "4.3",
+              "statement": "Rekomendasi ditinjau kembali dan ditindaklanjuti sesuai dengan prioritas yang disepakati.",
+              "sequence": 3
+            },
+            {
+              "code_number": "4.4",
+              "statement": "Tindakan rekomendasi yang disetujui dikonsultasikan sepenuhnya dengan kolega.",
+              "sequence": 4
+            },
+            {
+              "code_number": "4.5",
+              "statement": "Implementasi rekomendasi dibuat dan diserahkan kepada manajemen perusahaan.",
+              "sequence": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.150.3",
+      "title": "Mengembangkan Pengetahuan tentang Industri Perhotelan",
+      "standard_reference": "SKKNI No.125 Tahun 2024",
+      "sequence": 18,
+      "elements": [
+        {
+          "title": "Mencari informasi tentang industri perhotelan",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Sumber informasi diakses dan ditingkatkan secara benar.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Informasi tentang industri digunakan dengan benar pada aktivitas kerja harian.",
+              "sequence": 2
+            }
+          ]
+        },
+        {
+          "title": "Meningkatkan pengetahuan bidang industri perhotelan",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Informasi industry perhotelan diperbaharui melalui riset secara formal atau nonformal.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Informasi terbaru aktivitas kerja harian disampaikan kepada kolega terkait.",
+              "sequence": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.209.3",
+      "title": "Menggunakan Bahasa Lisan untuk Negosiasi Pertukaran Informasi dalam Konteks Hotel dan Restoran",
+      "standard_reference": "SKKNI No.125 Tahun 2024",
+      "sequence": 19,
+      "elements": [
+        {
+          "title": "Memahami tujuan pertukaran",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Strategi pembukaan dan penutupan digunakan secara jelas untuk mengidentifikasi tujuan pertukaran.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Klarifikasi dan teknik umpan balik digunakan untuk memastikan pemahaman.",
+              "sequence": 2
+            },
+            {
+              "code_number": "1.3",
+              "statement": "Kosakata dan kalimat yang tepat digunakan.",
+              "sequence": 3
+            },
+            {
+              "code_number": "1.4",
+              "statement": "Pemahaman dengan mengulangi kalimat permintaan didemonstrasikan.",
+              "sequence": 4
+            },
+            {
+              "code_number": "1.5",
+              "statement": "Kata-kata utama didengarkan untuk memastikan pemaknaan.",
+              "sequence": 5
+            }
+          ]
+        },
+        {
+          "title": "Memberikan informasi yang tepat",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Tujuan pertukaran dicapai dengan memberikan informasi tentang topik yang diminta.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Konstruksi gramatikal yang kompleks digunakan.",
+              "sequence": 2
+            },
+            {
+              "code_number": "2.3",
+              "statement": "Situasi dan sifat pertukaran diterangkan sesuai dengan kebutuhan.",
+              "sequence": 3
+            },
+            {
+              "code_number": "2.4",
+              "statement": "Solusi diajukan untuk penyelesaian.",
+              "sequence": 4
+            },
+            {
+              "code_number": "2.5",
+              "statement": "Tingkat formalitas atau informalitas yang tepat digunakan berdasarkan pada konteks pertukaran.",
+              "sequence": 5
+            }
+          ]
+        },
+        {
+          "title": "Meminta informasi",
+          "sequence": 3,
+          "kuks": [
+            {
+              "code_number": "3.1",
+              "statement": "Permintaan informasi yang tepat dibuat.",
+              "sequence": 1
+            },
+            {
+              "code_number": "3.2",
+              "statement": "Pertanyaan yang tepat dibentuk secara gramatikal.",
+              "sequence": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.166.3",
+      "title": "Memulai Percakapan dan Mengembangkan Hubungan Baik dengan Tamu",
+      "standard_reference": "SKKNI No.125 Tahun 2024",
+      "sequence": 20,
+      "elements": [
+        {
+          "title": "Menyediakan dan meminta informasi tentang topik yang sudah familiar",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Teknik percakapan ditangani untuk memeriksa pemahaman.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Tata Bahasa yang tepat digunakan untuk menyampaikan maksud dengan jelas.",
+              "sequence": 2
+            },
+            {
+              "code_number": "1.3",
+              "statement": "Informasi lisan dengan dialog singkat diberikan dalam menanggapi permintaan tamu.",
+              "sequence": 3
+            }
+          ]
+        },
+        {
+          "title": "Menunjukkan pemahaman atas struktur percakapan tidak resmi",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Percakapan tidak resmi dibuka dan ditutup secara tepat.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Teknik klarifikasi dan timbal balik digunakan.",
+              "sequence": 2
+            }
+          ]
+        },
+        {
+          "title": "Menanggapi keluhan secara tepat",
+          "sequence": 3,
+          "kuks": [
+            {
+              "code_number": "3.1",
+              "statement": "Pemahaman didemonstrasikan dengan mengulangi kalimat keluhan tersebut.",
+              "sequence": 1
+            },
+            {
+              "code_number": "3.2",
+              "statement": "Tindakan yang tepat ditawarkan untuk memecahkan masalah keluhan.",
+              "sequence": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.185.3",
+      "title": "Membuat dan Menyampaikan Presentasi",
+      "standard_reference": "SKKNI No.125 Tahun 2024",
+      "sequence": 21,
+      "elements": [
+        {
+          "title": "Mencari dan mengembangkan presentasi lisan",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Topik presentasi dicari secara tepat sesuai kebutuhan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Topik presentasi dikembangkan dan ditentukan secara efektif.",
+              "sequence": 2
+            }
+          ]
+        },
+        {
+          "title": "Membuat presentasi",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Materi presentasi disiapkan sesuai dengan topik yang ditentukan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Presentasi dibuat menggunakan bahasa yang baik dan benar.",
+              "sequence": 2
+            },
+            {
+              "code_number": "2.3",
+              "statement": "Presentasi lisan disampaikan secara efektif sesuai dengan standar.",
+              "sequence": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.040.3",
+      "title": "Membersihkan Area dan Peralatan Dapur",
+      "standard_reference": "SKKNI No.125 Tahun 2024",
+      "sequence": 22,
+      "elements": [
+        {
+          "title": "Membersihkan dan menyanitasi peralatan dapur",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Bahan kimia yang digunakan untuk pembersihan dan sanitasi peralatan dapur ditentukan dengan benar sesuai kebutuhan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Peralatan dibersihkan dan disanitasi sesuai dengan prosedur tanpa menyebabkan kerusakan.",
+              "sequence": 2
+            },
+            {
+              "code_number": "1.3",
+              "statement": "Peralatan disusun dan dibongkar dengan cara yang aman sesuai prosedur.",
+              "sequence": 3
+            },
+            {
+              "code_number": "1.4",
+              "statement": "Peralatan disimpan pada posisi dan area yang tepat secara benar dan aman.",
+              "sequence": 4
+            }
+          ]
+        },
+        {
+          "title": "Membersihkan dan menyanitasi area dapur",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Jadwal pembersihan dan sanitasi ditentukan dan diikuti.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Bahan kimia dan perlengkapannya digunakan untuk membersihkan dan menyanitasi dinding, lantai, rak dan permukaan lain secara benar dan aman.",
+              "sequence": 2
+            },
+            {
+              "code_number": "2.3",
+              "statement": "Dinding, lantai, rak, dan permukaan kerja dibersihkan dan disanitasi tanpa menimbulkan kerusakan sesuai dengan peraturan kesehatan perusahaan.",
+              "sequence": 3
+            },
+            {
+              "code_number": "2.4",
+              "statement": "Prosedur pertolongan pertama digunakan dan diikuti saat terjadi peristiwa kecelakaan yang disebabkan oleh zat kimia.",
+              "sequence": 4
+            }
+          ]
+        },
+        {
+          "title": "Menangani limbah dan linen",
+          "sequence": 3,
+          "kuks": [
+            {
+              "code_number": "3.1",
+              "statement": "Limbah disortir dan dibuang sesuai dengan peraturan kesehatan dan praktik perusahaan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "3.2",
+              "statement": "Linen disortir dan dipindahkan secara aman sesuai dengan peraturan perusahaan.",
+              "sequence": 2
+            }
+          ]
+        },
+        {
+          "title": "Mengadakan pelatihan",
+          "sequence": 4,
+          "kuks": [
+            {
+              "code_number": "4.1",
+              "statement": "Program dan jadwal pelatihan diadakan dan diikuti untuk meningkatkan pengetahuan dan keterampilan terkait kesehatan dan keselamatan kerja di dapur.",
+              "sequence": 1
+            },
+            {
+              "code_number": "4.2",
+              "statement": "Hasil evaluasi pelaksanaan pelatihan dilaporkan kepada manajemen atau pimpinan.",
+              "sequence": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.009.3",
+      "title": "Melakukan Komunikasi Melalui Telepon dan Email",
+      "standard_reference": "SKKNI No.125 Tahun 2024",
+      "sequence": 23,
+      "elements": [
+        {
+          "title": "Menjawab panggilan telepon masuk",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Telepon dijawab secara cepat, jelas, dan sesuai dengan standar perusahaan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Bantuan yang sopan ditawarkan kepada penelepon dan tujuan menelepon ditentukan secara jelas.",
+              "sequence": 2
+            },
+            {
+              "code_number": "1.3",
+              "statement": "Keterangan rinci diulang pada penelepon untuk konfirmasi.",
+              "sequence": 3
+            },
+            {
+              "code_number": "1.4",
+              "statement": "Pertanyaan penelepon dijawab serta diteruskan orang yang tepat.",
+              "sequence": 4
+            },
+            {
+              "code_number": "1.5",
+              "statement": "Permintaan dicatat secara akurat dan disampaikan pada departemen atau orang yang tepat untuk tindaklanjuti.",
+              "sequence": 5
+            },
+            {
+              "code_number": "1.6",
+              "statement": "Produk dan layanan perusahaan dipromosikan.",
+              "sequence": 6
+            },
+            {
+              "code_number": "1.7",
+              "statement": "Pesan disampaikan secara akurat kepada orang yang dimaksud dalam waktu yang sudah ditetapkan.",
+              "sequence": 7
+            },
+            {
+              "code_number": "1.8",
+              "statement": "Panggilan telepon yang bersifat mengancam dan mencurigakan dilaporkan kepada orang yang   tepat sesuai dengan standar perusahaan.",
+              "sequence": 8
+            }
+          ]
+        },
+        {
+          "title": "Membuat panggilan telepon",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Nomor telepon diperoleh secara akurat.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Tujuan pemanggilan dibuat secara jelas sebelum telepon.",
+              "sequence": 2
+            },
+            {
+              "code_number": "2.3",
+              "statement": "Perlengkapan digunakan secara baik untuk melakukan hubungan komunikasi secara jelas dengan tamu.",
+              "sequence": 3
+            },
+            {
+              "code_number": "2.4",
+              "statement": "Pada saat menelepon dilakukan dengan sikap yang baik.",
+              "sequence": 4
+            }
+          ]
+        },
+        {
+          "title": "Melakukan komunikasi melalui email",
+          "sequence": 3,
+          "kuks": [
+            {
+              "code_number": "3.1",
+              "statement": "Koneksi internet disambungkan dengan baik.",
+              "sequence": 1
+            },
+            {
+              "code_number": "3.2",
+              "statement": "Email dibuka dengan alamat dan kode akses yang benar.",
+              "sequence": 2
+            },
+            {
+              "code_number": "3.3",
+              "statement": "Semua email masuk diperiksa dan dibaca dengan teliti.",
+              "sequence": 3
+            },
+            {
+              "code_number": "3.3",
+              "statement": "Email masuk dijawab dengan baik dan benar sesuai standar perusahaan.",
+              "sequence": 4
+            },
+            {
+              "code_number": "3.4",
+              "statement": "Permintaan dalam email dilaksanakan dan disampaikan kepada bagian terkait.",
+              "sequence": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.152.3",
+      "title": "Menangani Situasi Konflik",
+      "standard_reference": "SKKNI No.125 Tahun 2024",
+      "sequence": 24,
+      "elements": [
+        {
+          "title": "Mengidentifikasi situasi konflik",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Potensi konflik diidentifikasi dan diambil tindakan penyelesaian sesuai standar perusahaan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Keselamatan tamu diidentifikasi secara cepat sesuai prosedur.",
+              "sequence": 2
+            }
+          ]
+        },
+        {
+          "title": "Memecahkan situasi konflik",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Solusi konflik diambil dalam ruang lingkup tanggung jawab individu.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Komunikasi efektif digunakan untuk membantu dalam penanganan konflik.",
+              "sequence": 2
+            },
+            {
+              "code_number": "2.3",
+              "statement": "Teknik pemecahan konflik dilaksanakan sesuai prosedur.",
+              "sequence": 3
+            }
+          ]
+        },
+        {
+          "title": "Memberi tanggapan terhadap keluhan tamu yang berpotensi menjadi konflik",
+          "sequence": 3,
+          "kuks": [
+            {
+              "code_number": "3.1",
+              "statement": "Keluhan tamu ditangani secara profesional sesuai prosedur.",
+              "sequence": 1
+            },
+            {
+              "code_number": "3.2",
+              "statement": "Tanggung jawab diambil untuk memecahkan masalah keluhan.",
+              "sequence": 2
+            },
+            {
+              "code_number": "3.3",
+              "statement": "Keluhan dikonfirmasi kepada tamu.",
+              "sequence": 3
+            },
+            {
+              "code_number": "3.4",
+              "statement": "Dokumen keluhan yang dilengkapi secara akurat.",
+              "sequence": 4
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.039.3",
+      "title": "Mengorganisasikan dan Menyiapkan Makanan",
+      "standard_reference": "SKKNI No.125 Tahun 2024",
+      "sequence": 25,
+      "elements": [
+        {
+          "title": "Menyiapkan perlengkapan sesuai kebutuhan",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Perlengkapan dipastikan dalam keadaan bersih.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Perlengkapan dipersiapkan sesuai kebutuhan.",
+              "sequence": 2
+            }
+          ]
+        },
+        {
+          "title": "Mengumpulkan dan menyiapkan bahan untuk jenis-jenis makanan dalam menu",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Bahan-bahan diidentifikasi dengan benar sesuai dengan standar resep.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Jumlah, jenis dan mutu bahan-bahan dikumpulkan dan disiapkan dalam bentuk jangka waktu yang sesuai.",
+              "sequence": 2
+            }
+          ]
+        },
+        {
+          "title": "Menyiapkan produk yang terbuat dari susu, hidangan kering, buah-buahan dan sayur-sayuran",
+          "sequence": 3,
+          "kuks": [
+            {
+              "code_number": "3.1",
+              "statement": "Makanan disiapkan sesuai dengan standar resep yang berlaku.",
+              "sequence": 1
+            },
+            {
+              "code_number": "3.2",
+              "statement": "Makanan yang disiapkan divariasikan tidak terbatas pada sandwiches dan penghias hidangan.",
+              "sequence": 2
+            }
+          ]
+        },
+        {
+          "title": "Menyiapkan daging, seafood, dan unggas",
+          "sequence": 4,
+          "kuks": [
+            {
+              "code_number": "4.1",
+              "statement": "Makanan disiapkan sesuai standar resep.",
+              "sequence": 1
+            },
+            {
+              "code_number": "4.2",
+              "statement": "Makanan ditempatkan terpisah untuk mencegah kontaminasi makanan.",
+              "sequence": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.210.3",
+      "title": "Menangani Keluhan",
+      "standard_reference": "SKKNI No.125 Tahun 2024",
+      "sequence": 26,
+      "elements": [
+        {
+          "title": "Membangun sifat dan rincian keluhan",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Sambutan secara formal, pernyataan yang sopan, dan bahasa tubuh yang tepat digunakan sesuai dengan standar.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Teknik klarifikasi dan umpan balik digunakan bila tamu menerangkan sifat komplainnya.",
+              "sequence": 2
+            },
+            {
+              "code_number": "1.3",
+              "statement": "Situasi konflik yang potensial diidentifikasi secara cepat dan tepat.",
+              "sequence": 3
+            },
+            {
+              "code_number": "1.4",
+              "statement": "Tamu yang menyampaikan keluhan ditenangkan.",
+              "sequence": 4
+            },
+            {
+              "code_number": "1.5",
+              "statement": "Pilihan kosakata dan kalimat digunakan dengan tepat sesuai kebutuhan.",
+              "sequence": 5
+            },
+            {
+              "code_number": "1.6",
+              "statement": "Susunan tata bahasa digunakan dengan baik dan benar.",
+              "sequence": 6
+            }
+          ]
+        },
+        {
+          "title": "Menawarkan tindakan yang tepat untuk memecahkan masalah keluhan",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Situasi yang menimbulkan keluhan diterangkan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Solusi terbaik ditawarkan untuk penyelesaian keluhan.",
+              "sequence": 2
+            }
+          ]
+        },
+        {
+          "title": "Melakukan tindaklanjut",
+          "sequence": 3,
+          "kuks": [
+            {
+              "code_number": "3.1",
+              "statement": "Tindakan yang sudah diambil diperiksa sesuai dengan prosedur.",
+              "sequence": 1
+            },
+            {
+              "code_number": "3.2",
+              "statement": "Penyelidikan lebih lanjut dilakukan sesuai dengan kebijakan dan prosedur.",
+              "sequence": 2
+            },
+            {
+              "code_number": "3.3",
+              "statement": "Tindakan yang sudah diambil diperiksa sesuai dengan prosedur.",
+              "sequence": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.147.3",
+      "title": "Melakukan Kerjasama dengan Kolega dan Tamu",
+      "standard_reference": "SKKNI No.125 Tahun 2024",
+      "sequence": 27,
+      "elements": [
+        {
+          "title": "Melakukan komunikasi di tempat kerja",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Komunikasi dengan kolega dan tamu menggunakan intonasi dan bahasa tubuh yang sopan dilaksanakan secara profesional.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Komunikasi dua arah dilaksanakan secara aktif dan efektif.",
+              "sequence": 2
+            },
+            {
+              "code_number": "1.3",
+              "statement": "Konflik dan potensi konflik diidentifikasi dengan bantuan dari kolega untuk penyelesaiannya.",
+              "sequence": 3
+            }
+          ]
+        },
+        {
+          "title": "Memberikan bantuan untuk tamu internal dan eksternal",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Kebutuhan dan harapan tamu, termasuk kebutuhan tertentu diidentifikasi sesuai dengan standar perusahaan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Kebutuhan dan permintaan tamu dipenuhi dalam jangka waktu yang cepat sesuai prosedur perusahaan.",
+              "sequence": 2
+            },
+            {
+              "code_number": "2.3",
+              "statement": "Keluhan tamu diidentifikasi dan ditangani secara profesional untuk penyelesaiannya sesuai prosedur perusahaan.",
+              "sequence": 3
+            }
+          ]
+        },
+        {
+          "title": "Menjaga standar kinerja presentasi persona",
+          "sequence": 3,
+          "kuks": [
+            {
+              "code_number": "3.1",
+              "statement": "Standar kerja digunakan dalam melakukan pekerjaan yang berhubungan dengan tamu dan kolega.",
+              "sequence": 1
+            },
+            {
+              "code_number": "3.2",
+              "statement": "Standar kebersihan, kesehatan dan kelestarian lingkungan diterapkan dalam meningkatkan kinerja sesuai prosedur.",
+              "sequence": 2
+            },
+            {
+              "code_number": "3.3",
+              "statement": "Pakaian yang sopan digunakan dalam menunjang kinerja sesuai dengan  standar perusahaan.",
+              "sequence": 3
+            }
+          ]
+        },
+        {
+          "title": "Melakukan kerja dalam tim",
+          "sequence": 4,
+          "kuks": [
+            {
+              "code_number": "4.1",
+              "statement": "Kepercayaan, dukungan dan toleransi dilaksanakan dalam aktivitas sehari-hari untuk mencapai tujuan kerja tim.",
+              "sequence": 1
+            },
+            {
+              "code_number": "4.2",
+              "statement": "Tujuan kerja tim secara bersama diidentifikasi.",
+              "sequence": 2
+            },
+            {
+              "code_number": "4.3",
+              "statement": "Tanggung jawab serta tugas individu diidentifikasi dan diselesaikan sesuai prioritas dalam waktu yang ditentukan.",
+              "sequence": 3
+            },
+            {
+              "code_number": "4.4",
+              "statement": "Bantuan diminta dan ditawarkan dari dan kepada anggota tim untuk memenuhi tujuan kerja.",
+              "sequence": 4
+            },
+            {
+              "code_number": "4.5",
+              "statement": "Umpan balik dan informasi dari anggota tim lain diterima.",
+              "sequence": 5
+            },
+            {
+              "code_number": "4.6",
+              "statement": "Perubahan tanggung jawab dari anggota tim didiskusikan untuk memenuhi tujuan kerja.",
+              "sequence": 6
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.041.3",
+      "title": "Menggunakan Metode Dasar Memasak",
+      "standard_reference": "SKKNI No.125 Tahun 2024",
+      "sequence": 28,
+      "elements": [
+        {
+          "title": "Memilih dan menggunakan perlengkapan memasak",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Perlengkapan yang tepat ditentukan secara benar untuk metode memasak tertentu.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Perlengkapan masak dipilih dan digunakan sesuai keperluan masakan tertentu.",
+              "sequence": 2
+            }
+          ]
+        },
+        {
+          "title": "Menerapkan metode dasar memasak",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Istilah dasar dalam memasak diperbarui dan dikembangkan sesuai dengan kebutuhan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Metode dasar memasak disiapkan dan dipilih sesuai standar resep perusahaan.",
+              "sequence": 2
+            },
+            {
+              "code_number": "2.3",
+              "statement": "Metode dasar memasak yang telah dipilih didemonstrasikan dan digunakan sesuai standar resep perusahaan.",
+              "sequence": 3
+            }
+          ]
+        },
+        {
+          "title": "Mengevaluasi dan melaporkan hasil pelaksanaan kegiatan",
+          "sequence": 3,
+          "kuks": [
+            {
+              "code_number": "3.1",
+              "statement": "Hasil pelaksanaan kegiatan dasar memasak dievaluasi.",
+              "sequence": 1
+            },
+            {
+              "code_number": "3.2",
+              "statement": "Hasil evaluasi kegiatan dasar memasak dilaporkan kepada manajemen atau pimpinan.",
+              "sequence": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.086.3",
+      "title": "Mengangkut dan Menyimpan Makanan dengan Cara yang Aman",
+      "standard_reference": "SKKNI No.125 Tahun 2024",
+      "sequence": 29,
+      "elements": [
+        {
+          "title": "Mendeskripsikan pengangkutan makanan yang tepat",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Kendaraan pengangkut diidentifikasi sesuai persyaratan kesehatan dan peraturan pemerintah.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Kendaraan pengangkut dipilih sesuai dengan jenis dan karateristik makanan.",
+              "sequence": 2
+            }
+          ]
+        },
+        {
+          "title": "Mengangkut makanan secara aman dan bersih",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Makanan yang telah dikemas disusun ke dalam kendaraan pengangkut.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Prosedur keamanan dan kebersihan makanan dijalankan sesuai aturan perusahaan.",
+              "sequence": 2
+            },
+            {
+              "code_number": "2.3",
+              "statement": "Catatan pengangkutan didokumentasikan sesuai dengan standar perusahaan.",
+              "sequence": 3
+            }
+          ]
+        },
+        {
+          "title": "Menyimpan makanan secara aman dan bersih",
+          "sequence": 3,
+          "kuks": [
+            {
+              "code_number": "3.1",
+              "statement": "Tempat penyimpanan makanan dipilih sesuai dengan jenis makanan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "3.2",
+              "statement": "Kondisi lingkungan yang tepat dijaga sesuai dengan jenis makanan.",
+              "sequence": 2
+            },
+            {
+              "code_number": "3.4",
+              "statement": "Makanan yang diangkut dijaga kualitas dan kuantitasnya.",
+              "sequence": 3
+            },
+            {
+              "code_number": "3.5",
+              "statement": "Area penyimpanan dijaga bebas dari kontaminasi.",
+              "sequence": 4
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.042.3",
+      "title": "Menyajikan Makanan",
+      "standard_reference": "SKKNI No.125 Tahun 2024",
+      "sequence": 30,
+      "elements": [
+        {
+          "title": "Menerima permintaan reservasi",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Menu makanan diidentifikasi dan disiapkan sesuai kebutuhan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Saus dan penghias makanan disusun sesuai dengan standar.",
+              "sequence": 2
+            }
+          ]
+        },
+        {
+          "title": "Menghitung porsi dan menyajikan makanan",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Porsi makanan yang akan disajikan ditentukan sesuai dengan standar resep.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Penampilan sajian makanan diperiksa dari kebersihan, kerusakan dan kesesuaian temperatur serta warna.",
+              "sequence": 2
+            },
+            {
+              "code_number": "2.3",
+              "statement": "Makanan dihidangkan dengan rapi dan menarik tanpa tetesan dan tumpahan sesuai dengan standar perusahaan.",
+              "sequence": 3
+            }
+          ]
+        },
+        {
+          "title": "Melakukan kerjasama dalam sebuah tim",
+          "sequence": 3,
+          "kuks": [
+            {
+              "code_number": "3.1",
+              "statement": "Tugas dan tanggung jawab anggota tim dalam penyajian makanan ditentukan sesuai prosedur.",
+              "sequence": 1
+            },
+            {
+              "code_number": "3.2",
+              "statement": "Tugas dan tanggung jawab setiap anggota tim dilaksanakan sesuai dengan ketentuan.",
+              "sequence": 2
+            },
+            {
+              "code_number": "3.3",
+              "statement": "Kerja tim antara seluruh staf pelayanan didemonstrasikan",
+              "sequence": 3
+            },
+            {
+              "code_number": "3.4",
+              "statement": "Kerja rutin dapur untuk layanan makanan didemonstrasikan untuk  memaksimalkan mutu makanan dan meminimalkan penundaan.",
+              "sequence": 4
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.206.3",
+      "title": "Mengelola Persediaan Barang Operasional",
+      "standard_reference": "SKKNI No.125 Tahun 2024",
+      "sequence": 31,
+      "elements": [
+        {
+          "title": "Membangun dan melaksanakan proses persediaan dan pembelian",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Jumlah persediaan disesuaikan dengan tingkat hunian hotel.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Proses dikembangkan dengan mencakup pengawasan mutu.",
+              "sequence": 2
+            },
+            {
+              "code_number": "1.3",
+              "statement": "Pembelian barang persediaan dibuat dalam purchase order sesuai dengan permintaan dari pihak terkait.",
+              "sequence": 3
+            },
+            {
+              "code_number": "1.4",
+              "statement": "Purchase order diberikan kepada pemasok sesuai dengan standar perusahaan.",
+              "sequence": 4
+            },
+            {
+              "code_number": "1.5",
+              "statement": "Proses persediaan dan pembelian dibuat dan dilaksanakan di tempat kerja.",
+              "sequence": 5
+            }
+          ]
+        },
+        {
+          "title": "Mengawasi sistem persediaan",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Sistem pengawasan dikembangkan dan dikomunikasikan kepada pihak yang terkait.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Sistem pengawasan diterapkan sesuai dengan prosedur perusahaan.",
+              "sequence": 2
+            },
+            {
+              "code_number": "2.3",
+              "statement": "Sistem pengawasan khusus dilaksanakan pada barang-barang yang berpotensi usang.",
+              "sequence": 3
+            },
+            {
+              "code_number": "2.4",
+              "statement": "Data persediaan dihitung sesuai dengan standar perusahaan.",
+              "sequence": 4
+            },
+            {
+              "code_number": "2.5",
+              "statement": "Data hasil perhitungan dikomunikasikan kepada karyawan terkait.",
+              "sequence": 5
+            },
+            {
+              "code_number": "2.6",
+              "statement": "Sistem distribusi persediaan dimonitor di tempat kerja sesuai standar.",
+              "sequence": 6
+            }
+          ]
+        },
+        {
+          "title": "Mengembangkan pengaturan persediaan secara maksimum",
+          "sequence": 3,
+          "kuks": [
+            {
+              "code_number": "3.1",
+              "statement": "Pemasok ditinjau ulang secara berkala mengikuti persyaratan perusahaan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "3.2",
+              "statement": "Spesifikasi pembelian dikembangkan sesuai kebutuhan.",
+              "sequence": 2
+            },
+            {
+              "code_number": "3.3",
+              "statement": "Sumber pasokan disesuaikan pada penilaian sesuai standar Perusahaan",
+              "sequence": 3
+            },
+            {
+              "code_number": "3.4",
+              "statement": "Kualitas pasokan dievaluasi berdasarkan masukan dari rekanan dan tamu.",
+              "sequence": 4
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.060.3",
+      "title": "Membina dan Menjaga Kendali Mutu",
+      "standard_reference": "SKKNI No.125 Tahun 2024",
+      "sequence": 32,
+      "elements": [
+        {
+          "title": "Membina dan melaksanakan prosedur untuk kendali mutu",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Bahan mentah dipilih dan disiapkan sesuai kebutuhan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Proses memasak dikontrol secara berkala sesuai prosedur.",
+              "sequence": 2
+            },
+            {
+              "code_number": "1.3",
+              "statement": "Kontrol porsi dipastikan sesuai dengan standar resep.",
+              "sequence": 3
+            },
+            {
+              "code_number": "1.4",
+              "statement": "Penyajian diarahkan sesuai dengan standar resep.",
+              "sequence": 4
+            },
+            {
+              "code_number": "1.5",
+              "statement": "Produk dan layanan diawasi agar konsisten dan memenuhi persyaratan perusahaan.",
+              "sequence": 5
+            },
+            {
+              "code_number": "1.6",
+              "statement": "Jenis makanan disesuaikan dengan keterangan menu.",
+              "sequence": 6
+            }
+          ]
+        },
+        {
+          "title": "Memonitor mutu",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Pengamatan terhadap menu dilaksanakan secara berkala.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Pengujian terhadap menu dilakukan sesuai prosedur.",
+              "sequence": 2
+            },
+            {
+              "code_number": "2.3",
+              "statement": "Pencarian umpan balik dari tamu terhadap menu dilaksanakan.",
+              "sequence": 3
+            }
+          ]
+        },
+        {
+          "title": "Memecahkan masalah yang berkaitan dengan mutu",
+          "sequence": 3,
+          "kuks": [
+            {
+              "code_number": "3.1",
+              "statement": "Masalah yang berkaitan dengan kendali mutu diidentifikasi sesuai dengan prosedur.",
+              "sequence": 1
+            },
+            {
+              "code_number": "3.2",
+              "statement": "Masalah yang diidentifikasi dipecahkan secara tepat sesuai dengan prosedur.",
+              "sequence": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.218.3",
+      "title": "Mengelola Persediaan Barang",
+      "standard_reference": "SKKNI No.125 Tahun 2024",
+      "sequence": 33,
+      "elements": [
+        {
+          "title": "Menerima persediaan makanan",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Persediaan yang masuk diperiksa secara cermat atas pemesanan dan dokumen pengiriman sesuai prosedur.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Variasi dipahami dan dicatat untuk disampaikan kepada atasan.",
+              "sequence": 2
+            },
+            {
+              "code_number": "1.3",
+              "statement": "Barang-barang diperiksa  dan dicatat  atas kerusakan dan ketidaksesuaian sesuai dengan kebijakan perusahaan.",
+              "sequence": 3
+            }
+          ]
+        },
+        {
+          "title": "Menyimpan barang persediaan",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Kondisi Gudang penyimpanan dipersiapkan sesuai standar perusahaan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Seluruh persediaan dipindahkan dengan aman ke tempat penyimpanan yang layak tanpa kerusakan.",
+              "sequence": 2
+            },
+            {
+              "code_number": "2.3",
+              "statement": "Persediaan disimpan di lokasi yang aman sesuai dengan prosedur perusahaan.",
+              "sequence": 3
+            },
+            {
+              "code_number": "2.4",
+              "statement": "Tingkat persediaan dicatat secara tepat sesuai dengan prosedur perusahaan.",
+              "sequence": 4
+            },
+            {
+              "code_number": "2.5",
+              "statement": "Persediaan diberi label sesuai dengan prosedur perusahaan.",
+              "sequence": 5
+            }
+          ]
+        },
+        {
+          "title": "Merotasi dan menjaga persediaan",
+          "sequence": 3,
+          "kuks": [
+            {
+              "code_number": "3.1",
+              "statement": "Persediaan dirotasi sesuai dengan kebijakan perusahaan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "3.2",
+              "statement": "Persediaan dipindahkan sesuai dengan peraturan keselamatan dan kesehatan.",
+              "sequence": 2
+            },
+            {
+              "code_number": "3.3",
+              "statement": "Kualitas persediaan diperiksa dan dilaporkan sesuai aturan perusahaan.",
+              "sequence": 3
+            },
+            {
+              "code_number": "3.4",
+              "statement": "Kelebihan persediaan disimpan di gudang sesuai dengan peraturan perusahaan.",
+              "sequence": 4
+            },
+            {
+              "code_number": "3.5",
+              "statement": "Sistem pencatatan persediaan digunakan sesuai dengan persyaratan ketepatan dan kecepatan.",
+              "sequence": 5
+            }
+          ]
+        },
+        {
+          "title": "Mengevaluasi dan melaporkan hasil pelaksanaan kegiatan",
+          "sequence": 4,
+          "kuks": [
+            {
+              "code_number": "4.1",
+              "statement": "Hasil pelaksanaan kegiatan penerimaan dan penyimpanan dievaluasi sesuai kebijakan perusahaan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "4.2",
+              "statement": "Hasil evaluasi pelaksanaan kegiatan penerimaan dan penyimpanan dilaporkan kepada atasan.",
+              "sequence": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.062.3",
+      "title": "Mengoperasikan Outlet Makanan Cepat Saji",
+      "standard_reference": "SKKNI No.125 Tahun 2024",
+      "sequence": 34,
+      "elements": [
+        {
+          "title": "Menyiapkan pelayanan",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Produk dan bahan makanan diperiksa dan disimpan kembali (restock) bila diperlukan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Persiapan dilakukan untuk memastikan kecukupan bahan makanan yang sesuai untuk memulai layanan.",
+              "sequence": 2
+            },
+            {
+              "code_number": "1.3",
+              "statement": "Persiapan dipastikan selesai sebelum pelayanan dimulai.",
+              "sequence": 3
+            },
+            {
+              "code_number": "1.4",
+              "statement": "Kebutuhan untuk jenis makanan tambahan dipenuhi pada waktu yang tepat.",
+              "sequence": 4
+            },
+            {
+              "code_number": "1.5",
+              "statement": "Area pelayanan dan jenis makanan ditampilkan sesuai dengan standar.",
+              "sequence": 5
+            }
+          ]
+        },
+        {
+          "title": "Melayani tamu",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Kebutuhan tamu ditentukan dan dipenuhi sesuai dengan standar.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Keterampilan menjalin hubungan dengan tamu digunakan untuk memberikan layanan yang sopan, efisien, dan efektif.",
+              "sequence": 2
+            },
+            {
+              "code_number": "2.3",
+              "statement": "Bantuan diberikan kepada tamu dalam memilih jenis makanan sesuai dengan permintaan.",
+              "sequence": 3
+            },
+            {
+              "code_number": "2.4",
+              "statement": "24. Keterampilan menjual digunakan secara tepat sesuai dengan prosedur.",
+              "sequence": 4
+            },
+            {
+              "code_number": "2.4",
+              "statement": "Pengetahuan menyeluruh tentang produk dan layanan diperbarui dan dikembangkan sesuai kebutuhan.",
+              "sequence": 5
+            }
+          ]
+        },
+        {
+          "title": "Memasak dan menyiapkan makanan",
+          "sequence": 3,
+          "kuks": [
+            {
+              "code_number": "3.1",
+              "statement": "Perlengkapan yang tepat dipilih dan digunakan secara benar untuk metode memasak khusus.",
+              "sequence": 1
+            },
+            {
+              "code_number": "3.2",
+              "statement": "Bahan yang tepat dipilih dan diolah sesuai dengan standar.",
+              "sequence": 2
+            },
+            {
+              "code_number": "3.3",
+              "statement": "Metode memasak yang tepat digunakan sesuai dengan standar resep perusahaan.",
+              "sequence": 3
+            },
+            {
+              "code_number": "3.4",
+              "statement": "Hidangan yang membutuhkan pemanasan ulang dipanaskan dengan cara yang benar sesuai prosedur.",
+              "sequence": 4
+            },
+            {
+              "code_number": "3.5",
+              "statement": "Pekerjaan diatur dengan rekan kerja yang lain untuk memastikan bahwa makanan disiapkan dan dimasak tepat waktu sehingga layanan dapat terus berlangsung.",
+              "sequence": 5
+            },
+            {
+              "code_number": "3.6",
+              "statement": "Kontrol porsi diterapkan untuk mengurangi limbah makanan.",
+              "sequence": 6
+            }
+          ]
+        },
+        {
+          "title": "Menyajikan makanan",
+          "sequence": 4,
+          "kuks": [
+            {
+              "code_number": "4.1",
+              "statement": "Makanan ditampilkan secara menarik tanpa tetesan dan tumpahan sesuai dengan standar perusahaan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "4.2",
+              "statement": "Porsi makanan ditetapkan sesuai dengan standar perusahaan.",
+              "sequence": 2
+            },
+            {
+              "code_number": "4.3",
+              "statement": "Makanan panas atau dingin disajikan dengan peralatan saji yang tepat.",
+              "sequence": 3
+            }
+          ]
+        },
+        {
+          "title": "Menyimpan makanan",
+          "sequence": 5,
+          "kuks": [
+            {
+              "code_number": "5.1",
+              "statement": "Makanan disimpan dengan cara yang benar sesuai dengan standar kesehatan dan keamanan makanan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "5.2",
+              "statement": "Persediaan dimonitor, dihitung dan dipesan kembali bila dibutuhkan.",
+              "sequence": 2
+            }
+          ]
+        },
+        {
+          "title": "Membersihkan dan merawat",
+          "sequence": 6,
+          "kuks": [
+            {
+              "code_number": "6.1",
+              "statement": "Perlengkapan dirawat sesuai dengan instruksi pabrik.",
+              "sequence": 1
+            },
+            {
+              "code_number": "6.2",
+              "statement": "Perlengkapan dibersihkan bila diperlukan sebelum, sesudah dan selesai pelayanan.",
+              "sequence": 2
+            }
+          ]
+        },
+        {
+          "title": "Melaksanakan aturan kesehatan dan keselamatan kerja",
+          "sequence": 7,
+          "kuks": [
+            {
+              "code_number": "7.1",
+              "statement": "Praktik kerja yang sehat dan aman digunakan sesuai dengan peraturan yang berlaku.",
+              "sequence": 1
+            },
+            {
+              "code_number": "7.2",
+              "statement": "Persiapan dan pemasakan dilaksanakan dengan memperhatikan praktik kerja yang aman.",
+              "sequence": 2
+            },
+            {
+              "code_number": "7.3",
+              "statement": "Perlengkapan digunakan dengan cara yang aman sesuai dengan instruksi pabrik dan prinsip-prinsip kesehatan dan keamanan kerja.",
+              "sequence": 3
+            }
+          ]
+        },
+        {
+          "title": "Mengawasi prinsip-prinsip dan praktik kesehatan",
+          "sequence": 8,
+          "kuks": [
+            {
+              "code_number": "8.1",
+              "statement": "Kesehatan pribadi selalu dijaga setiap saat.",
+              "sequence": 1
+            },
+            {
+              "code_number": "8.2",
+              "statement": "Kesehatan makanan dijaga sesuai dengan prinsip dan praktik keamanan makanan.",
+              "sequence": 2
+            }
+          ]
+        },
+        {
+          "title": "Menangani pembayaran tunai dan nontunai",
+          "sequence": 9,
+          "kuks": [
+            {
+              "code_number": "9.1",
+              "statement": "Pembayaran tunai diterima dan diperiksa secara akurat dengan menggunakan dokumentasi yang benar.",
+              "sequence": 1
+            },
+            {
+              "code_number": "9.2",
+              "statement": "Mesin kasir (cash register) dioperasikan sesuai dengan instruksi pabrik dan prosedur perusahaan.",
+              "sequence": 2
+            },
+            {
+              "code_number": "9.3",
+              "statement": "Transaksi tunai dilaksanakan dengan segera, tepat, dan akurat sesuai dengan prosedur perusahaan.",
+              "sequence": 3
+            },
+            {
+              "code_number": "9.4",
+              "statement": "Transaksi nontunai dilaksanakan dengan benar sesuai dengan prosedur perusahaan.",
+              "sequence": 4
+            },
+            {
+              "code_number": "9.5",
+              "statement": "Keamanan uang tunai dijaga sesuai dengan prosedur perusahaan.",
+              "sequence": 5
+            },
+            {
+              "code_number": "9.6",
+              "statement": "Pencocokan data transaksi keuangan dilaksanakan secara akurat dengan menggunakan dokumentasi khusus.",
+              "sequence": 6
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.058.3",
+      "title": "Menyiapkan dan Menghidangkan Jenis Makanan Khusus",
+      "standard_reference": "SKKNI No.125 Tahun 2024",
+      "sequence": 35,
+      "elements": [
+        {
+          "title": "Memilih pemasok dan membeli barang",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Pemasok terbaik dipilih dengan memperhatikan mutu dan harga yang berkaitan dengan peraturan perusahaan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Bahan makanan dibeli dari pemasok yang telah dipilih sesuai kebutuhan.",
+              "sequence": 2
+            },
+            {
+              "code_number": "1.3",
+              "statement": "Pemborosan dalam proses pembelian bahan diminimalkan.",
+              "sequence": 3
+            }
+          ]
+        },
+        {
+          "title": "Merencanakan menu dan strategi pemasaran",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Jenis menu ditentukan harganya untuk mendapat keuntungan yang memuaskan dan disusun seimbang berkaitan dengan permintaan tamu.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Perencanaan menu dan strategi pemasaran dikembangkan berdasarkan laporan ketersediaan bahan musiman.",
+              "sequence": 2
+            },
+            {
+              "code_number": "2.3",
+              "statement": "Karakteristik utama dari ragam jenis makanan yang berbeda digunakan untuk menciptakan jenis menu baru.",
+              "sequence": 3
+            }
+          ]
+        },
+        {
+          "title": "Menyiapkan dan menyajikan jenis hidangan",
+          "sequence": 3,
+          "kuks": [
+            {
+              "code_number": "3.1",
+              "statement": "Jenis-jenis makanan disiapkan sesuai standar resep.",
+              "sequence": 1
+            },
+            {
+              "code_number": "3.2",
+              "statement": "Jenis makanan dimasak dalam ragam sesuai standar resep perusahaan.",
+              "sequence": 2
+            }
+          ]
+        },
+        {
+          "title": "Mendemonstrasikan persiapan awal dan teknik memasak",
+          "sequence": 4,
+          "kuks": [
+            {
+              "code_number": "4.1",
+              "statement": "Teknik memasak didemonstrasikan secara efektif dan diajarkan pada staf lain.",
+              "sequence": 1
+            },
+            {
+              "code_number": "4.2",
+              "statement": "Teknik memasak didemonstrasikan dengan mengacu kepada standar.",
+              "sequence": 2
+            }
+          ]
+        },
+        {
+          "title": "Melaksanakan praktik kesehatan dan keselamatan",
+          "sequence": 5,
+          "kuks": [
+            {
+              "code_number": "5.1",
+              "statement": "Masalah potensial diidentifikasi dan tindakan pencegahan diambil untuk menghilangkan risiko tentang masalah Kesehatan dan keselamatan yang berhubungan dengan pekerjaan di tempat kerja.",
+              "sequence": 1
+            },
+            {
+              "code_number": "5.2",
+              "statement": "Perlengkapan yang digunakan dioperasikan sesuai dengan praktik perusahaan.",
+              "sequence": 2
+            },
+            {
+              "code_number": "5.3",
+              "statement": "Jenis makanan disimpan secara bersih dan benar.",
+              "sequence": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.050.3",
+      "title": "Menyiapkan dan Memasak Unggas",
+      "standard_reference": "SKKNI No.125 Tahun 2024",
+      "sequence": 36,
+      "elements": [
+        {
+          "title": "Memilih dan membeli daging unggas",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Berbagai jenis daging ungags diidentifikasi secara benar.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Daging unggas dipilih dan dibeli sesuai dengan penilaian mutu yang benar dan kontrol porsi.",
+              "sequence": 2
+            }
+          ]
+        },
+        {
+          "title": "Mengolah daging unggas",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Teknik persiapan daging unggas didemonstrasikan dan digunakan secara benar.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Peralatan yang tepat untuk mengolah daging unggas dipilih dan digunakan.",
+              "sequence": 2
+            },
+            {
+              "code_number": "2.3",
+              "statement": "Daging unggas disiapkan dan dimasak sesuai dengan standar resep perusahaan.",
+              "sequence": 3
+            },
+            {
+              "code_number": "2.4",
+              "statement": "Daging unggas disajikan sesuai dengan standar perusahaan.",
+              "sequence": 4
+            }
+          ]
+        },
+        {
+          "title": "Menangani dan menyimpan daging unggas",
+          "sequence": 3,
+          "kuks": [
+            {
+              "code_number": "3.1",
+              "statement": "Kondisi penyimpanan dan temperatur untuk daging unggas dimonitor.",
+              "sequence": 1
+            },
+            {
+              "code_number": "3.2",
+              "statement": "Daging unggas ditangani secara benar sesuai dengan prosedur keamanan makanan untuk meminimalkan risiko pembusukan dan kontaminasi silang.",
+              "sequence": 2
+            },
+            {
+              "code_number": "3.3",
+              "statement": "Daging unggas beku dilumerkan secara benar sesuai standar Hazard Analysis and Critical Control Points (HACCP).",
+              "sequence": 3
+            }
+          ]
+        },
+        {
+          "title": "Mengevaluasi dan melaporkan hasil pelaksanaan kegiatan",
+          "sequence": 4,
+          "kuks": [
+            {
+              "code_number": "4.1",
+              "statement": "Hasil kegiatan menyiapkan dan memasak ungags dievaluasi sesuai kebijakan perusahaan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "4.2",
+              "statement": "Hasil evaluasi menyiapkan dan memasak unggas dilaporkan kepada manajemen.",
+              "sequence": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.071.3",
+      "title": "Menyiapkan dan Mengolah Makanan untuk Buffet",
+      "standard_reference": "SKKNI No.125 Tahun 2024",
+      "sequence": 37,
+      "elements": [
+        {
+          "title": "Merencanakan tata letak buffet",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Prasmanan dirancang sesuai dengan standar dan permintaan tamu.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Biaya prasmanan dihitung sesuai dengan peraturan pelaporan perusahaan.",
+              "sequence": 2
+            },
+            {
+              "code_number": "1.3",
+              "statement": "Ragam bagian inti prasmanan dan dekorasi diorganisasikan secara praktis sesuai standar.",
+              "sequence": 3
+            },
+            {
+              "code_number": "1.4",
+              "statement": "Peralatan untuk prasmanan dipilih dengan pertimbangan ukuran, warna, dan bentuk yang menarik.",
+              "sequence": 4
+            }
+          ]
+        },
+        {
+          "title": "Menyiapkan dan membuat makanan untuk buffet",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Metode memasak buffet yang tepat digunakan untuk menyiapkan daging, unggas, hidangan laut, dan makanan lainnya.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Salad dan cold cuts platter disiapkan menurut standar resep.",
+              "sequence": 2
+            },
+            {
+              "code_number": "2.3",
+              "statement": "Makanan buffet dilapisi dengan gelatin atau agar-agar sesuai dengan standar dan kebutuhan.",
+              "sequence": 3
+            },
+            {
+              "code_number": "2.4",
+              "statement": "Saus dan penghias hidangan dibuat sesuai dengan jenis makanannya.",
+              "sequence": 4
+            },
+            {
+              "code_number": "2.5",
+              "statement": "Kontrol porsi diterapkan untuk mengurangi pemborosan dan meningkatkan keuntungan.",
+              "sequence": 5
+            },
+            {
+              "code_number": "2.6",
+              "statement": "Makanan dihias untuk mendapatkan kepuasan dari tamu.",
+              "sequence": 6
+            },
+            {
+              "code_number": "2.7",
+              "statement": "Makanan manis yang cocok untuk penyajian buffet disiapkan dan dibuat sesuai dengan standar resep.",
+              "sequence": 7
+            }
+          ]
+        },
+        {
+          "title": "Menampilkan makanan buffet",
+          "sequence": 3,
+          "kuks": [
+            {
+              "code_number": "3.1",
+              "statement": "Makanan buffet ditampilkan artistik untuk menciptakan ketertarikan tamu.",
+              "sequence": 1
+            },
+            {
+              "code_number": "3.2",
+              "statement": "Meja dan makanan buffet diatur serasi untuk tampilan yang menarik sesuai standar.",
+              "sequence": 2
+            }
+          ]
+        },
+        {
+          "title": "Menyajikan buffet dengan cara yang sehat dan aman",
+          "sequence": 4,
+          "kuks": [
+            {
+              "code_number": "4.1",
+              "statement": "Buffet ditampilkan secara sehat dan benar pada temperatur yang aman sebelum dan sesudah waktu layanan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "4.2",
+              "statement": "Kelebihan makanan dimanfaatkan kembali dengan cara higienis untuk meminimalkan pembuangan makanan.",
+              "sequence": 2
+            },
+            {
+              "code_number": "4.3",
+              "statement": "Prosedur kebersihan dan keamanan makanan diterapkan pada semua pekerjaan.",
+              "sequence": 3
+            }
+          ]
+        },
+        {
+          "title": "Mengevaluasi dan melaporkan hasil pelaksanaan kegiatan",
+          "sequence": 5,
+          "kuks": [
+            {
+              "code_number": "5.1",
+              "statement": "Hasil pelaksanaan kegiatan merencanakan dan menyiapkan makanan untuk buffet dievaluasi sesuai kebijakan perusahaan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "5.2",
+              "statement": "Hasil evaluasi dilaporkan dan didokumentasikan untuk perbaikan pada kegiatan selanjutnya.",
+              "sequence": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.053.3",
+      "title": "Merencanakandan Mengontrol Menu Berdasarkan Katering",
+      "standard_reference": "SKKNI No.125 Tahun 2024",
+      "sequence": 38,
+      "elements": [
+        {
+          "title": "Merencanakan dan menyiapkan menu",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Beragam jenis menu disiapkan sesuai kebutuhan dan ketentuan perusahaan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Biaya menu dihitung dan ditetapkan  sesuai kebutuhan jenis menu dan anggaran yang sudah ditentukan.",
+              "sequence": 2
+            },
+            {
+              "code_number": "1.3",
+              "statement": "Menu disiapkan dan disusun secara berurutan dan menarik sesuai dengan kebutuhan.",
+              "sequence": 3
+            }
+          ]
+        },
+        {
+          "title": "Mengontrol menu berdasarkan katering",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Jadwal produksi dirancang dengan mempertimbangkan jenis menu, perlengkapan, tenaga kerja, dan waktu yang tersedia.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Biaya tenaga kerja dikendalikan dengan pertimbangan berdasarkan pada jumlah, jadwal kerja, dan ketentuan upah.",
+              "sequence": 2
+            },
+            {
+              "code_number": "2.3",
+              "statement": "Pemanfaatan produk dan mutu dioptimalkan melalui penerapan kontrol porsi dan uji hasil yang efektif.",
+              "sequence": 3
+            },
+            {
+              "code_number": "2.4",
+              "statement": "Kontrol persediaan barang diterapkan dengan mengikuti prosedur penerimaan dan penyimpanan barang yang benar.",
+              "sequence": 4
+            }
+          ]
+        },
+        {
+          "title": "Menjaga keamanan dan kebersihan",
+          "sequence": 3,
+          "kuks": [
+            {
+              "code_number": "3.1",
+              "statement": "Keamanan dijaga dalam produksi makanan dan area penyimpanan untuk meminimalkan Risiko pencurian, kerusakan, dan kehilangan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "3.3",
+              "statement": "Kebersihan dijaga dalam   produksi makanan dan area penyimpanan sesuai dengan standar.",
+              "sequence": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.128.3",
+      "title": "Merancang, Merencanakan dan Menulis Menu Hidangan Indonesia",
+      "standard_reference": "SKKNI No.125 Tahun 2024",
+      "sequence": 39,
+      "elements": [
+        {
+          "title": "Mendeskripsikan karakteristik utama menu Indonesia",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Karakteristik utama menu Indonesia diidentifikasi sesuai dengan resep standar perusahaan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Karakteristik utama menu Indonesia diidentifikasi dan disesuaikan dengan berbagai ragam kegiatan lainnya.",
+              "sequence": 2
+            }
+          ]
+        },
+        {
+          "title": "Merancang menu",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Struktur dan rangkaian menu Indonesia direncanakan dan dirancang sesuai dengan standar dan keinginan pelanggan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Menu direncanakan, dirancang, dan dicetak secara jelas dan menarik untuk mengikuti kebiasaan tradisional dan aturan-aturan yang sesuai dengan tema, waktu, dan dekorasi usaha.",
+              "sequence": 2
+            },
+            {
+              "code_number": "2.3",
+              "statement": "Menu direncanakan dan dirancang untuk memberikan keseimbangan ragam kesegaran, cita rasa, warna, tekstur, dan kelezatan sesuai dengan resep standar perusahaan.",
+              "sequence": 3
+            },
+            {
+              "code_number": "2.4",
+              "statement": "Menu direncanakan dalam kaitannya dengan perlengkapan dapur dan tingkat keterampilan staf sesuai dengan usaha.",
+              "sequence": 4
+            },
+            {
+              "code_number": "2.5",
+              "statement": "Hasil analisis penjualan digabungkan ke dalam perencanaan menu.",
+              "sequence": 5
+            },
+            {
+              "code_number": "2.6",
+              "statement": "Jumlah hidangan ditawarkan berdasarkan pada kapasitas dapur.",
+              "sequence": 6
+            }
+          ]
+        },
+        {
+          "title": "Menentukan biaya menu",
+          "sequence": 3,
+          "kuks": [
+            {
+              "code_number": "3.1",
+              "statement": "Hidangan ditentukan harganya sesuai dengan pengaruh musim.",
+              "sequence": 1
+            },
+            {
+              "code_number": "3.2",
+              "statement": "Biaya makanan dikontrol dengan yang dilakukan untuk menentukan persentase dan mengurangi pemborosan.",
+              "sequence": 2
+            },
+            {
+              "code_number": "3.3",
+              "statement": "Biaya tenaga kerja dikontrol dengan pertimbangan diberikan pada penjadwalan, daftar, dan kondisi pemberian penghargaan.",
+              "sequence": 3
+            },
+            {
+              "code_number": "3.4",
+              "statement": "Penggunaan produk dan mutu dioptimalkan melalui pembuatan kembali, kontrol porsi, dan uji hasil.",
+              "sequence": 4
+            }
+          ]
+        },
+        {
+          "title": "Mengontrol menu berdasarkan produksi",
+          "sequence": 4,
+          "kuks": [
+            {
+              "code_number": "4.1",
+              "statement": "Pengontrolan menu dilakukan termasuk pesanan dalam jumlah sedikit.",
+              "sequence": 1
+            },
+            {
+              "code_number": "4.2",
+              "statement": "Pengontrolan menu dilakukan mulai tahap permintaan barang, penerimaan barang, dan penyimpanan barang sebelum digunakan.",
+              "sequence": 2
+            },
+            {
+              "code_number": "4.3",
+              "statement": "Pengontrolan dilakukan dengan mengontrol persediaan secara komputerisasi.",
+              "sequence": 3
+            },
+            {
+              "code_number": "4.4",
+              "statement": "Pengontrolan dilakukan terhadap temperatur penyimpanan.",
+              "sequence": 4
+            }
+          ]
+        },
+        {
+          "title": "Menjaga Keamanan",
+          "sequence": 5,
+          "kuks": [
+            {
+              "code_number": "5.1",
+              "statement": "Keamanan makanan dijaga dalam proses persiapan produksi makanan terhadap pengaruh fisik, kimiawi, dan biologis.",
+              "sequence": 1
+            },
+            {
+              "code_number": "5.2",
+              "statement": "Keamanan makanan dijaga selama proses produksi makanan.",
+              "sequence": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "I.55HDR00.129.3",
+      "title": "Merancang dan Mengoperasikan Dapur Restoran Indonesia",
+      "standard_reference": "SKKNI No.125 Tahun 2024",
+      "sequence": 40,
+      "elements": [
+        {
+          "title": "Merencanakan dapur Restoran Indonesia",
+          "sequence": 1,
+          "kuks": [
+            {
+              "code_number": "1.1",
+              "statement": "Dapur Restoran Indonesia direncanakan sesuai dengan fasilitas, perlengkapan dan ruang yang tersedia, dan sesuai dengan peraturan usaha dan keagamaan.",
+              "sequence": 1
+            },
+            {
+              "code_number": "1.2",
+              "statement": "Serangkaian jenis menu direncanakan dan dirancang sesuai dengan peraturan usaha.",
+              "sequence": 2
+            },
+            {
+              "code_number": "1.3",
+              "statement": "Rencana pelayanan dirancang dan disiapkan dan perlengkapan yang dibutuhkan diidentifikasi dengan benar serta jadwal alur kerja disiapkan.",
+              "sequence": 3
+            },
+            {
+              "code_number": "1.4",
+              "statement": "Staf dan perlengkapan dipertimbangkan.",
+              "sequence": 4
+            }
+          ]
+        },
+        {
+          "title": "Menyiapkan dan mengoperasikan Restoran Indonesia",
+          "sequence": 2,
+          "kuks": [
+            {
+              "code_number": "2.1",
+              "statement": "Serangkaian bahan dipilih dan disiapkan sesuai dengan spesifikasi resep dan standar usaha.",
+              "sequence": 1
+            },
+            {
+              "code_number": "2.2",
+              "statement": "Saus disiapkan sesuai dengan spesifikasi resep.",
+              "sequence": 2
+            },
+            {
+              "code_number": "2.3",
+              "statement": "Tempat kuali, steamer, oven, dan perlengkapan disiapkan sesuai dengan peraturan usaha.",
+              "sequence": 3
+            },
+            {
+              "code_number": "2.4",
+              "statement": "Jenis makanan dalam menu dimasak, didinginkan, dan dikemas sesuai dengan peraturan dan persyaratan kesehatan.",
+              "sequence": 4
+            },
+            {
+              "code_number": "2.5",
+              "statement": "Produk ditentukan porsinya dengan tepat sesuai dengan spesifikasi usaha.",
+              "sequence": 5
+            },
+            {
+              "code_number": "2.6",
+              "statement": "Peraturan dan persyaratan dasar kebersihan, Keselamatan dan Kesehatan Kerja (K3) dipatuhi dan diterapkan untuk seluruh tugas, khususnya yang berkaitan dengan persiapan dan penyimpanan produk.",
+              "sequence": 6
+            }
+          ]
+        },
+        {
+          "title": "Membuat jenis menu",
+          "sequence": 3,
+          "kuks": [
+            {
+              "code_number": "3.1",
+              "statement": "Resep standar untuk jenis menu diikuti secara akurat sesuai dengan praktik dan spesifikasi usaha.",
+              "sequence": 1
+            },
+            {
+              "code_number": "3.2",
+              "statement": "Steamer untuk pengukusan ikan ditangani secara benar sesuai dengan peraturan keselamatan.",
+              "sequence": 2
+            },
+            {
+              "code_number": "3.3",
+              "statement": "Langkah yang tepat diterapkan untuk seluruh metode memasak dan sesuai dengan spesifikasi resep.",
+              "sequence": 3
+            },
+            {
+              "code_number": "3.4",
+              "statement": "Produk yang sudah dimasak seperti kari dan sambal dikemas dan disimpan pada kondisi yang tepat untuk menjaga mutu, daya tahan, dan sesuai dengan peraturan keselamatan dan kesehatan.",
+              "sequence": 4
+            },
+            {
+              "code_number": "3.5",
+              "statement": "Peraturan dan persyaratan dasar kebersihan, Keselamatan dan Kesehatan Kerja (K3) dipatuhi dan diterapkan untuk  seluruh tugas.",
+              "sequence": 5
+            }
+          ]
+        },
+        {
+          "title": "Menyajikan jenis menu",
+          "sequence": 4,
+          "kuks": [
+            {
+              "code_number": "4.1",
+              "statement": "Ukuran, warna, dan bentuk peralatan dan perlengkapan makan dipilih sesuai dengan porsi dan peraturan usaha.",
+              "sequence": 1
+            },
+            {
+              "code_number": "4.2",
+              "statement": "Produk yang sudah dimasak disajikan secara tepat dan menarik untuk memenuhi keinginan pelanggan.",
+              "sequence": 2
+            },
+            {
+              "code_number": "4.3",
+              "statement": "Makanan pelengkap dan ukuran porsi sesuai dengan gaya tradisional daerah.",
+              "sequence": 3
+            }
+          ]
+        },
+        {
+          "title": "Menentukan biaya jenis menu",
+          "sequence": 5,
+          "kuks": [
+            {
+              "code_number": "5.1",
+              "statement": "Biaya bahan-bahan dan produksi dihitung sesuai dengan spesifikasi resep dan peraturan usaha.",
+              "sequence": 1
+            },
+            {
+              "code_number": "5.2",
+              "statement": "Keuntungan, kerugian, dan pembagian dipertimbangkan ketika menghitung biaya jenis menu.",
+              "sequence": 2
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "questions": [
+    {
+      "question_text": "Dalam penyajian hidangan fine dining, seorang juru saji menata menu main course dengan daging sapi panggang, kentang gratin, dan sayuran tumis. Namun, plating terlihat monoton karena kurang kontras warna dan tekstur. Prinsip apa yang paling tepat digunakan untuk memperbaiki tampilan hidangan tersebut?",
+      "option_a": "Menambahkan hiasan edible flowers tanpa mempertimbangkan rasa",
+      "option_b": "Menggunakan piring putih polos agar fokus pada makanan",
+      "option_c": "Memberikan garnish berbentuk rumit walaupun tidak dapat dimakan",
+      "option_d": "Meminimalisir komponen agar tampilan terlihat sederhana",
+      "option_e": "Menambahkan elemen warna kontras seperti saus hijau atau sayuran rebus",
+      "correct_answer": "A",
+      "is_active": true,
+      "unit_code": "I.55HDR00.068.3"
+    },
+    {
+      "question_text": "Dalam dapur produksi berskala besar, terdapat risiko tinggi kecelakaan kerja seperti luka bakar, teriris pisau, atau terpeleset. Manajer dapur ingin meningkatkan keamanan kerja dengan menerapkan SOP baru. Langkah mana yang paling tepat untuk meminimalisir kecelakaan?",
+      "option_a": "Memastikan semua staf memakai seragam rapi tanpa harus menggunakan APD",
+      "option_b": "Memberikan pelatihan K3, penggunaan APD, serta inspeksi peralatan secara rutin",
+      "option_c": "Mengurangi jumlah staf agar ruang dapur tidak terlalu penuh",
+      "option_d": "Memberikan penghargaan bagi staf yang jarang melakukan kesalahan",
+      "option_e": "Mengatur shift kerja lebih panjang agar produksi lebih efisien",
+      "correct_answer": "A",
+      "is_active": true,
+      "unit_code": "I.55HDR00.068.3"
+    },
+    {
+      "question_text": "Seorang koki diminta menyiapkan menu internasional dengan konsep fusion cuisine, yaitu memadukan teknik Asia dan Eropa. Ia berencana membuat sushi dengan isian smoked salmon dan saus keju. Apa keunggulan utama dari penerapan fusion cuisine pada menu ini?",
+      "option_a": "Mengurangi biaya produksi dengan memanfaatkan bahan lokal sepenuhnya",
+      "option_b": "Menyajikan hidangan yang tetap mempertahankan resep tradisional secara murni",
+      "option_c": "Memberikan inovasi rasa dan pengalaman kuliner baru bagi konsumen",
+      "option_d": "Memastikan konsumen asing merasa familiar dengan cita rasa hidangan",
+      "option_e": "Membatasi variasi menu agar fokus pada kualitas satu hidangan",
+      "correct_answer": "A",
+      "is_active": true,
+      "unit_code": "I.55HDR00.068.3"
+    },
+    {
+      "question_text": "Dalam penyajian menu banquet hotel, seorang chef menyiapkan 500 porsi sup krim jagung. Untuk menjaga kualitas sup, staf dapur harus menyimpannya dalam suhu yang sesuai standar. Jika sup disimpan di suhu 30–40°C, bakteri patogen berkembang biak dengan cepat. Suhu ideal untuk menjaga keamanan pangan sebelum sup disajikan adalah…",
+      "option_a": "30–40°C agar tidak cepat basi",
+      "option_b": "60–65°C untuk mencegah pertumbuhan bakteri",
+      "option_c": "10–15°C agar tetap segar lebih lama",
+      "option_d": "25–30°C sehingga lebih aman untuk plating cepat",
+      "option_e": "0–5°C agar tidak terjadi kontaminasi silang",
+      "correct_answer": "A",
+      "is_active": true,
+      "unit_code": "I.55HDR00.068.3"
+    },
+    {
+      "question_text": "Seorang staf kitchen ditugaskan membersihkan area kerja setelah selesai memasak. Ia menggunakan kain lap kotor yang sudah dipakai berulang kali dan tidak mencuci peralatan dengan benar. Jika kebiasaan ini dibiarkan, dampak apa yang paling berbahaya bagi konsumen?",
+      "option_a": "Meningkatkan efisiensi kerja karena tidak membuang waktu mencuci ulang",
+      "option_b": "Menyebabkan peralatan menjadi lebih awet karena jarang terkena deterjen",
+      "option_c": "Terjadinya kontaminasi silang yang berpotensi menyebabkan foodborne disease",
+      "option_d": "Mengurangi biaya operasional dapur karena penggunaan bahan pembersih sedikit",
+      "option_e": "Membuat dapur terlihat lebih rapi walau sebenarnya kurang higienis",
+      "correct_answer": "A",
+      "is_active": true,
+      "unit_code": "I.55HDR00.068.3"
+    },
+    {
+      "question_text": "Seorang chef diminta menyajikan hidangan nasional Indonesia untuk acara kenegaraan. Ia memilih menu tumpeng lengkap dengan lauk pauk tradisional. Selain kelezatan, alasan utama pemilihan tumpeng sebagai simbol pada acara resmi tersebut adalah…",
+      "option_a": "Tumpeng mencerminkan filosofi budaya Indonesia sebagai wujud syukur dan kebersamaan",
+      "option_b": "Tumpeng lebih mudah dibuat dibandingkan hidangan internasional",
+      "option_c": "Tumpeng memiliki cita rasa netral sehingga semua tamu dapat menikmatinya",
+      "option_d": "Tumpeng sudah diadaptasi menjadi menu internasional sehingga lebih modern",
+      "option_e": "Tumpeng hanya membutuhkan sedikit biaya produksi dibanding menu lainnya",
+      "correct_answer": "A",
+      "is_active": true,
+      "unit_code": "I.55HDR00.068.3"
+    },
+    {
+      "question_text": "Dalam perencanaan menu harian di sebuah restoran sehat, chef harus memperhatikan keseimbangan gizi. Seorang pelanggan meminta menu rendah kalori tetapi tetap mengandung protein tinggi. Dari pilihan berikut, kombinasi mana yang paling tepat dimasukkan dalam menu?",
+      "option_a": "Ikan kukus dengan sayuran rebus dan nasi merah",
+      "option_b": "Ayam goreng tepung dengan kentang goreng",
+      "option_c": "Rendang daging sapi dengan santan kental",
+      "option_d": "Burger sapi dengan roti putih dan keju",
+      "option_e": "Pizza dengan topping sosis dan keju mozarella",
+      "correct_answer": "A",
+      "is_active": true,
+      "unit_code": "I.55HDR00.068.3"
+    },
+    {
+      "question_text": "Dalam dapur hotel berbintang, terjadi keluhan bahwa alur kerja kitchen lambat karena staf sering menunggu instruksi berulang. Untuk memperbaiki masalah ini, langkah manajemen dapur yang paling tepat adalah…",
+      "option_a": "Mengurangi jumlah staf agar dapur lebih leluasa",
+      "option_b": "Menerapkan sistem kerja brigade kitchen dengan pembagian tugas jelas",
+      "option_c": "Menambahkan lebih banyak supervisor di tiap area dapur",
+      "option_d": "Membatasi jumlah menu agar pekerjaan lebih sederhana",
+      "option_e": "Membiarkan staf berimprovisasi sesuai kebiasaan masing-masing",
+      "correct_answer": "A",
+      "is_active": true,
+      "unit_code": "I.55HDR00.068.3"
+    },
+    {
+      "question_text": "Seorang chef sedang mengolah masakan internasional bertema oriental. Ia memutuskan untuk menggunakan teknik stir-fry dengan api besar dalam waktu singkat. Kelebihan utama teknik ini dibandingkan metode lain adalah…",
+      "option_a": "Menghasilkan cita rasa smoky khas yang disebut wok hei",
+      "option_b": "Membuat makanan benar-benar matang sempurna meski waktu lama",
+      "option_c": "Mempertahankan warna, tekstur renyah, dan kandungan gizi bahan makanan",
+      "option_d": "Memudahkan pengendalian food cost karena porsi kecil",
+      "option_e": "Menyamakan hasil rasa meski bahan baku bervariasi",
+      "correct_answer": "A",
+      "is_active": true,
+      "unit_code": "I.55HDR00.068.3"
+    },
+    {
+      "question_text": "Dalam perencanaan menu banquet untuk 200 orang, seorang chef harus mempertimbangkan keseimbangan antara makanan pembuka, utama, dan penutup. Pada situasi tertentu, ketersediaan bahan protein hewani seperti daging dan ikan sangat terbatas karena kendala distribusi. Jika chef ingin tetap menjaga kualitas gizi dan tampilan menu agar memuaskan tamu, strategi paling tepat yang bisa dilakukan adalah?",
+      "option_a": "Mengurangi porsi utama dan menambahkan nasi atau roti sebagai pengganti protein",
+      "option_b": "Menghilangkan menu pembuka dan menambah variasi menu utama berbahan karbohidrat",
+      "option_c": "Menggunakan bahan olahan instan agar persiapan lebih cepat dan hemat biaya",
+      "option_d": "Menggantikan menu utama berbahan protein hewani dengan menu dessert yang lebih beragam",
+      "option_e": "Memadukan protein nabati seperti kacang-kacangan dan tahu tempe untuk melengkapi kebutuhan gizi",
+      "correct_answer": "A",
+      "is_active": true,
+      "unit_code": "I.55HDR00.068.3"
+    }
+  ]
+}

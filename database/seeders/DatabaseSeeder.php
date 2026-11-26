@@ -13,13 +13,9 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
+            SchemeSeeder::class,
             UserSeeder::class,
             TukSeeder::class,
-            SchemeSeeder::class,
-            CorrectedQuestionBankAnswerKeySeeder::class,
-            CompleteMissingAk03FeedbackSeeder::class,
-            SetAllCbtScoresToPerfectSeeder::class,
-            InterviewQuestionSeeder::class,
         ]);
 
         Setting::firstOrCreate(
