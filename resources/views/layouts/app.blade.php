@@ -364,41 +364,10 @@
                             @endif
                         @endif
 
-                        <!-- Logout / Switch Back Button (dipaling bawah setelah sidebar) -->
-                        @if(session('admin_impersonator_id'))
-                            <div class="pt-3 mt-3 border-t border-slate-100">
-                                <form action="{{ route('proxy.switch-back') }}" method="POST" class="w-full">
-                                    @csrf
-                                    <button type="submit" 
-                                            title="Kembali ke Sesi Admin" 
-                                            class="w-full flex items-center space-x-3 px-3 py-2.5 rounded text-xs font-bold transition text-white bg-amber-600 hover:bg-amber-700 active:bg-amber-800 shadow-xs focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-1 cursor-pointer">
-                                        <svg class="w-4 h-4 text-white shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
-                                        </svg>
-                                        <span>Kembali ke Admin</span>
-                                    </button>
-                                </form>
-                            </div>
-                        @else
-                            <div class="pt-3 mt-3 border-t border-slate-100">
-                                <form action="{{ route('logout') }}" method="POST" class="w-full">
-                                    @csrf
-                                    <button type="submit" 
-                                            title="Keluar dari Sistem" 
-                                            class="w-full flex items-center space-x-3 px-3 py-2.5 rounded text-xs font-bold transition text-white bg-red-600 hover:bg-red-700 active:bg-red-800 shadow-xs hover:shadow focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 cursor-pointer">
-                                        <svg class="w-4 h-4 text-white shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
-                                        </svg>
-                                        <span>Log Out</span>
-                                    </button>
-                                </form>
-                            </div>
-                        @endif
-
                     </nav>
                 </div>
 
-                <!-- Sidebar Bottom: User Profile -->
+                <!-- Sidebar Bottom: User Profile & Quick Actions -->
                 <div class="p-3 border-t border-slate-200 bg-slate-50/50 shrink-0">
                     <div class="flex items-center justify-between p-1">
                         @php
@@ -439,6 +408,37 @@
                             </div>
                         @endif
                     </div>
+
+                    <!-- Tombol Logout / Kembali ke Admin Langsung di Bawah Profil (Selalu Terlihat di Mobile & Desktop) -->
+                    @if(session('admin_impersonator_id'))
+                        <div class="mt-2.5 pt-2 border-t border-slate-200">
+                            <form action="{{ route('proxy.switch-back') }}" method="POST" class="w-full">
+                                @csrf
+                                <button type="submit" 
+                                        title="Kembali ke Sesi Admin" 
+                                        class="w-full flex items-center justify-center space-x-2 px-3 py-2 rounded text-xs font-bold transition text-white bg-amber-600 hover:bg-amber-700 active:bg-amber-800 shadow-xs focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-1 cursor-pointer">
+                                    <svg class="w-4 h-4 text-white shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
+                                    </svg>
+                                    <span>Kembali ke Admin</span>
+                                </button>
+                            </form>
+                        </div>
+                    @else
+                        <div class="mt-2.5 pt-2 border-t border-slate-200">
+                            <form action="{{ route('logout') }}" method="POST" class="w-full">
+                                @csrf
+                                <button type="submit" 
+                                        title="Keluar dari Sistem" 
+                                        class="w-full flex items-center justify-center space-x-2 px-3 py-2 rounded text-xs font-bold transition text-white bg-red-600 hover:bg-red-700 active:bg-red-800 shadow-xs hover:shadow focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 cursor-pointer">
+                                    <svg class="w-4 h-4 text-white shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                                    </svg>
+                                    <span>Log Out</span>
+                                </button>
+                            </form>
+                        </div>
+                    @endif
                 </div>
 
             </aside>

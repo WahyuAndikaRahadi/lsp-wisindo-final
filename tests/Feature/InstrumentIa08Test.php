@@ -313,6 +313,7 @@ class InstrumentIa08Test extends TestCase
         $exportResp = $this->actingAs($admin)->get(route('admin.dokumen-muk.export-asesi', [
             'assessment' => $this->assessment->id,
             'type' => 'ia08',
+            'format' => 'html',
         ]));
         $exportResp->assertOk();
         $exportResp->assertSee('CVP - CEKLIS VERIFIKASI PORTOFOLIO');

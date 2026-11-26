@@ -1,12 +1,15 @@
 @php
     $isCompleted = (bool) ($response?->assessor_signed_at || ! empty($response?->assessor_signature));
     $isScheduleClosed = (bool) ($assessment->schedule?->isClosedForAssessor());
+    $savedData = $savedData ?? (is_array($response?->data_json) ? $response->data_json : (json_decode($response?->data_json ?? '[]', true) ?: []));
+    $recommendation = $savedRecommendation ?? $savedData['recommendation'] ?? 'K';
 @endphp
 @extends('layouts.app', ['title' => 'FR.IA.03 - Pertanyaan Mendukung Observasi'])
 
 @section('content')
 <div class="space-y-6" x-data="{
     isEditing: {{ ($isCompleted || $isScheduleClosed) ? 'false' : 'true' }},
+    recommendation: '{{ old('recommendation', $recommendation) }}',
     setAllQuestions(val) {
         if (!this.isEditing) return;
         const target = val.toLowerCase();
@@ -14,6 +17,11 @@
             el.checked = true;
             el.dispatchEvent(new Event('change', { bubbles: true }));
         });
+        if (target === 'm') {
+            this.recommendation = 'K';
+        } else if (target === 'tm') {
+            this.recommendation = 'BK';
+        }
     }
 }">
     @if($isScheduleClosed)
@@ -140,6 +148,30 @@
                         @endforelse
                     </tbody>
                 </table>
+            </div>
+        </div>
+
+        {{-- Section: Rekomendasi Hasil Pertanyaan Mendukung Observasi --}}
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 space-y-4">
+            <h2 class="text-base font-bold text-slate-900">Rekomendasi Hasil Pertanyaan Mendukung Observasi</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <label class="flex items-start space-x-3 p-3.5 rounded-xl border-2 cursor-pointer transition"
+                    :class="recommendation === 'K' ? 'border-emerald-500 bg-emerald-50/50' : 'border-slate-200 hover:border-slate-300'">
+                    <input type="radio" name="recommendation" value="K" x-model="recommendation" :disabled="!isEditing" class="text-emerald-600 focus:ring-emerald-500 mt-0.5">
+                    <div class="text-xs">
+                        <div class="font-bold text-emerald-950">KOMPETEN (K)</div>
+                        <p class="text-slate-600 mt-0.5">Asesi mampu menjawab pertanyaan lisan pendukung observasi dengan memuaskan dan memenuhi standar.</p>
+                    </div>
+                </label>
+
+                <label class="flex items-start space-x-3 p-3.5 rounded-xl border-2 cursor-pointer transition"
+                    :class="recommendation === 'BK' ? 'border-rose-500 bg-rose-50/50' : 'border-slate-200 hover:border-slate-300'">
+                    <input type="radio" name="recommendation" value="BK" x-model="recommendation" :disabled="!isEditing" class="text-rose-600 focus:ring-rose-500 mt-0.5">
+                    <div class="text-xs">
+                        <div class="font-bold text-rose-950">BELUM KOMPETEN (BK)</div>
+                        <p class="text-slate-600 mt-0.5">Tanggapan asesi belum memenuhi standar unjuk kerja yang dipersyaratkan.</p>
+                    </div>
+                </label>
             </div>
         </div>
 

@@ -62,6 +62,62 @@
         </div>
     @endif
 
+    @if($isSubmitted)
+        @php
+            $correctCount = 0;
+            foreach ($questions as $qItem) {
+                $qItemAns = $draftAnswers[(string) $qItem->id] ?? null;
+                $isItemCorrect = isset($breakdown[$qItem->id])
+                    ? ($breakdown[$qItem->id]['is_correct'] ?? false)
+                    : ($qItemAns !== null && strtoupper((string) $qItemAns) === strtoupper((string) $qItem->correct_answer));
+                if ($isItemCorrect) {
+                    $correctCount++;
+                }
+            }
+        @endphp
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="px-6 py-4 bg-slate-900 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800">
+                <div>
+                    <span class="text-xs font-mono font-bold text-purple-400 uppercase tracking-wider block">Hasil Evaluasi CBT Online</span>
+                    <h2 class="text-base sm:text-lg font-bold text-white">Ringkasan Nilai &amp; Rekomendasi Ujian Teori</h2>
+                </div>
+                <span class="inline-flex items-center px-4 py-1.5 rounded-full text-xs font-black shadow-xs {{ $isPassed ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-rose-100 text-rose-800 border border-rose-300' }}">
+                    {{ $isPassed ? '✓ KOMPETEN (K)' : '✕ BELUM KOMPETEN (BK)' }}
+                </span>
+            </div>
+            <div class="p-4 sm:p-6 grid grid-cols-2 sm:grid-cols-4 gap-4 bg-slate-50/50">
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs">
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Nilai Akhir CBT</span>
+                    <div class="mt-1 text-2xl font-black font-mono {{ $isPassed ? 'text-emerald-700' : 'text-rose-700' }}">
+                        {{ number_format($score, 1) }} <span class="text-xs font-normal text-slate-500">/ 100</span>
+                    </div>
+                    <span class="text-[10px] text-slate-400 font-medium">Berdasarkan koreksi otomatis</span>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs">
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Standar Minimal (KKM)</span>
+                    <div class="mt-1 text-2xl font-black font-mono text-slate-800">
+                        {{ number_format($passingGrade, 1) }}
+                    </div>
+                    <span class="text-[10px] text-slate-400 font-medium">Batas kelulusan teori</span>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs">
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Jawaban Benar</span>
+                    <div class="mt-1 text-2xl font-black font-mono text-emerald-600">
+                        {{ $correctCount }} <span class="text-xs font-normal text-slate-500">/ {{ $questions->count() }}</span>
+                    </div>
+                    <span class="text-[10px] text-slate-400 font-medium">{{ round(($correctCount / max(1, $questions->count())) * 100) }}% ketepatan</span>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs">
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Status Kelulusan</span>
+                    <div class="mt-1 text-base font-black {{ $isPassed ? 'text-emerald-700' : 'text-rose-700' }}">
+                        {{ $isPassed ? 'Memenuhi Standar' : 'Di Bawah Standar' }}
+                    </div>
+                    <span class="text-[10px] text-slate-500 font-semibold">{{ $isPassed ? 'Rekomendasi K' : 'Rekomendasi BK' }}</span>
+                </div>
+            </div>
+        </div>
+    @endif
+
     @if($questions->isEmpty())
         <div class="bg-amber-50 border border-amber-200 rounded-xl p-8 text-center text-amber-900 text-sm">
             Belum ada bank soal yang diaktifkan untuk jadwal dan skema ini. Silakan hubungi asesor atau admin LSP.
@@ -78,6 +134,17 @@
                             $qId = (string) $q->id;
                             $savedVal = $draftAnswers[$qId] ?? null;
                             $isDoubtful = in_array($qId, $draftDoubtful ?? [], true);
+
+                            $isCorrect = null;
+                            if ($isSubmitted) {
+                                if (isset($breakdown[$q->id])) {
+                                    $isCorrect = (bool) ($breakdown[$q->id]['is_correct'] ?? false);
+                                } elseif ($savedVal !== null && $savedVal !== '') {
+                                    $isCorrect = (strtoupper((string) $savedVal) === strtoupper((string) $q->correct_answer));
+                                } else {
+                                    $isCorrect = false;
+                                }
+                            }
                         @endphp
                         <div class="cbt-question-panel bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm space-y-5 {{ $index === 0 ? '' : 'hidden' }}"
                              id="question-panel-{{ $index }}"
@@ -90,6 +157,21 @@
                                     <span class="px-3 py-1 bg-brand-50 text-brand-700 text-xs font-bold rounded-lg border border-brand-200 font-mono">
                                         Soal No. {{ $index + 1 }} dari {{ $questions->count() }}
                                     </span>
+                                    @if($isSubmitted)
+                                        @if($savedVal === null || $savedVal === '')
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 border border-slate-300">
+                                                <span>⚪</span> Tidak Dijawab (0)
+                                            </span>
+                                        @elseif($isCorrect)
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                                                <span>✓</span> Jawaban Benar (+1)
+                                            </span>
+                                        @else
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-rose-100 text-rose-800 border border-rose-300">
+                                                <span>✕</span> Jawaban Salah (0)
+                                            </span>
+                                        @endif
+                                    @endif
                                 </div>
 
                                 <div class="flex flex-wrap items-center gap-2">
@@ -135,22 +217,43 @@
                                 @foreach(['A' => $q->option_a, 'B' => $q->option_b, 'C' => $q->option_c, 'D' => $q->option_d] as $optKey => $optText)
                                     @php
                                         $optImg = $q->getOptionImageUrl($optKey);
+                                        $isSelected = ($savedVal === $optKey);
+
+                                        $labelClass = 'border-slate-200 bg-white hover:border-brand-500 hover:bg-brand-50/30';
+                                        if ($isSubmitted) {
+                                            if ($isSelected) {
+                                                if ($isCorrect) {
+                                                    $labelClass = 'bg-emerald-50/80 border-emerald-500 ring-2 ring-emerald-500 text-emerald-950 font-bold';
+                                                } else {
+                                                    $labelClass = 'bg-rose-50/80 border-rose-500 ring-2 ring-rose-500 text-rose-950 font-bold';
+                                                }
+                                            } else {
+                                                $labelClass = 'bg-slate-50/40 border-slate-200 opacity-70';
+                                            }
+                                        } elseif ($isSelected) {
+                                            $labelClass = 'bg-brand-50/60 border-brand-500 ring-1 ring-brand-500';
+                                        }
                                     @endphp
                                     @if($optText || $optImg)
-                                        <label class="cbt-option-label flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 hover:border-brand-500 hover:bg-brand-50/30 cursor-pointer transition {{ $savedVal === $optKey ? 'bg-brand-50/60 border-brand-500 ring-1 ring-brand-500' : 'bg-white' }}">
+                                        <label class="cbt-option-label flex items-start gap-3 p-3.5 rounded-xl border cursor-pointer transition {{ $labelClass }}">
                                             <input type="radio"
                                                    name="answers[{{ $q->id }}]"
                                                    value="{{ $optKey }}"
                                                    data-index="{{ $index }}"
                                                    data-qid="{{ $qId }}"
-                                                   class="cbt-radio mt-0.5 text-brand-600 focus:ring-brand-500 w-4 h-4 cursor-pointer shrink-0"
-                                                   @checked($savedVal === $optKey)
+                                                   class="cbt-radio mt-0.5 {{ $isSubmitted ? ($isCorrect ? 'text-emerald-600 focus:ring-emerald-500' : 'text-rose-600 focus:ring-rose-500') : 'text-brand-600 focus:ring-brand-500' }} w-4 h-4 cursor-pointer shrink-0"
+                                                   @checked($isSelected)
                                                    @disabled($isSubmitted)>
                                             <div class="flex-1 min-w-0 text-xs sm:text-sm text-slate-800 space-y-2">
                                                 <div class="flex items-start gap-1.5">
                                                     <span class="font-bold text-slate-900">{{ $optKey }}.</span>
                                                     @if($optText)
                                                         <span class="break-words">{{ $optText }}</span>
+                                                    @endif
+                                                    @if($isSubmitted && $isSelected)
+                                                        <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-[10px] font-black {{ $isCorrect ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800' }}">
+                                                            {{ $isCorrect ? 'Jawaban Anda (Benar)' : 'Jawaban Anda (Salah)' }}
+                                                        </span>
                                                     @endif
                                                 </div>
                                                 @if($optImg)
@@ -207,26 +310,49 @@
                             <h2 class="text-sm font-black text-slate-900 uppercase tracking-wider">
                                 Nomor Soal
                             </h2>
-                            <span class="text-xs font-bold text-brand-700 bg-brand-50 px-2.5 py-1 rounded-full border border-brand-200 font-mono" id="palette-progress">
-                                0 / {{ $questions->count() }}
-                            </span>
+                            @if($isSubmitted)
+                                <span class="text-xs font-bold {{ $isPassed ? 'text-emerald-700 bg-emerald-50 border-emerald-200' : 'text-rose-700 bg-rose-50 border-rose-200' }} px-2.5 py-1 rounded-full border font-mono">
+                                    Nilai: {{ number_format($score, 1) }}
+                                </span>
+                            @else
+                                <span class="text-xs font-bold text-brand-700 bg-brand-50 px-2.5 py-1 rounded-full border border-brand-200 font-mono" id="palette-progress">
+                                    0 / {{ $questions->count() }}
+                                </span>
+                            @endif
                         </div>
 
                         {{-- Legend --}}
-                        <div class="grid grid-cols-3 gap-2 text-[11px] py-2.5 px-3 bg-slate-50/80 rounded-xl border border-slate-200/80">
-                            <div class="flex items-center gap-1.5 text-slate-700 font-medium">
-                                <span class="w-3.5 h-3.5 rounded-md bg-blue-600 border border-blue-700 shrink-0"></span>
-                                <span>Dijawab</span>
+                        @if($isSubmitted)
+                            <div class="grid grid-cols-3 gap-2 text-[11px] py-2.5 px-3 bg-slate-50/80 rounded-xl border border-slate-200/80">
+                                <div class="flex items-center gap-1.5 text-slate-700 font-medium">
+                                    <span class="w-3.5 h-3.5 rounded-md bg-emerald-600 border border-emerald-700 shrink-0"></span>
+                                    <span>Benar</span>
+                                </div>
+                                <div class="flex items-center gap-1.5 text-slate-700 font-medium">
+                                    <span class="w-3.5 h-3.5 rounded-md bg-rose-600 border border-rose-700 shrink-0"></span>
+                                    <span>Salah</span>
+                                </div>
+                                <div class="flex items-center gap-1.5 text-slate-700 font-medium">
+                                    <span class="w-3.5 h-3.5 rounded-md bg-slate-200 border-2 border-slate-300 shrink-0"></span>
+                                    <span>Kosong</span>
+                                </div>
                             </div>
-                            <div class="flex items-center gap-1.5 text-slate-700 font-medium">
-                                <span class="w-3.5 h-3.5 rounded-md bg-amber-400 border border-amber-500 shrink-0"></span>
-                                <span>Ragu-ragu</span>
+                        @else
+                            <div class="grid grid-cols-3 gap-2 text-[11px] py-2.5 px-3 bg-slate-50/80 rounded-xl border border-slate-200/80">
+                                <div class="flex items-center gap-1.5 text-slate-700 font-medium">
+                                    <span class="w-3.5 h-3.5 rounded-md bg-blue-600 border border-blue-700 shrink-0"></span>
+                                    <span>Dijawab</span>
+                                </div>
+                                <div class="flex items-center gap-1.5 text-slate-700 font-medium">
+                                    <span class="w-3.5 h-3.5 rounded-md bg-amber-400 border border-amber-500 shrink-0"></span>
+                                    <span>Ragu-ragu</span>
+                                </div>
+                                <div class="flex items-center gap-1.5 text-slate-700 font-medium">
+                                    <span class="w-3.5 h-3.5 rounded-md bg-white border-2 border-slate-300 shrink-0"></span>
+                                    <span>Belum</span>
+                                </div>
                             </div>
-                            <div class="flex items-center gap-1.5 text-slate-700 font-medium">
-                                <span class="w-3.5 h-3.5 rounded-md bg-white border-2 border-slate-300 shrink-0"></span>
-                                <span>Belum</span>
-                            </div>
-                        </div>
+                        @endif
 
                         {{-- Grid of Number Buttons with Distinct Margin & Clean Borders --}}
                         <div class="p-2 sm:p-2.5 bg-slate-50/60 rounded-xl border border-slate-200/80 my-2">
@@ -237,11 +363,28 @@
                                         $hasAnswer = isset($draftAnswers[$qId]) && $draftAnswers[$qId] !== null && $draftAnswers[$qId] !== '';
                                         $isDoubtful = in_array($qId, $draftDoubtful ?? [], true);
                                         
-                                        $btnClass = 'bg-white text-slate-700 border-2 border-slate-300 hover:border-slate-400 hover:bg-slate-100 shadow-2xs font-bold';
-                                        if ($isDoubtful) {
-                                            $btnClass = 'bg-amber-400 text-slate-900 border-2 border-amber-500 font-black shadow-xs hover:bg-amber-500';
-                                        } elseif ($hasAnswer) {
-                                            $btnClass = 'bg-blue-600 text-white border-2 border-blue-700 font-bold shadow-xs hover:bg-blue-700';
+                                        if ($isSubmitted) {
+                                            $btnCorrect = false;
+                                            if (isset($breakdown[$q->id])) {
+                                                $btnCorrect = (bool) ($breakdown[$q->id]['is_correct'] ?? false);
+                                            } elseif ($hasAnswer) {
+                                                $btnCorrect = (strtoupper((string)$draftAnswers[$qId]) === strtoupper((string)$q->correct_answer));
+                                            }
+
+                                            if (! $hasAnswer) {
+                                                $btnClass = 'bg-slate-200 text-slate-600 border-2 border-slate-300 hover:bg-slate-300 font-bold';
+                                            } elseif ($btnCorrect) {
+                                                $btnClass = 'bg-emerald-600 text-white border-2 border-emerald-700 font-bold shadow-xs hover:bg-emerald-700';
+                                            } else {
+                                                $btnClass = 'bg-rose-600 text-white border-2 border-rose-700 font-bold shadow-xs hover:bg-rose-700';
+                                            }
+                                        } else {
+                                            $btnClass = 'bg-white text-slate-700 border-2 border-slate-300 hover:border-slate-400 hover:bg-slate-100 shadow-2xs font-bold';
+                                            if ($isDoubtful) {
+                                                $btnClass = 'bg-amber-400 text-slate-900 border-2 border-amber-500 font-black shadow-xs hover:bg-amber-500';
+                                            } elseif ($hasAnswer) {
+                                                $btnClass = 'bg-blue-600 text-white border-2 border-blue-700 font-bold shadow-xs hover:bg-blue-700';
+                                            }
                                         }
                                     @endphp
                                     <button type="button"
@@ -257,20 +400,45 @@
                         </div>
 
                         {{-- Stats Summary --}}
-                        <div class="bg-slate-50 rounded-lg p-3 text-xs space-y-1.5 border border-slate-200 text-slate-600">
-                            <div class="flex justify-between">
-                                <span>Sudah Terjawab:</span>
-                                <strong class="text-blue-700" id="stat-answered">0</strong>
+                        @if($isSubmitted)
+                            <div class="bg-slate-50 rounded-lg p-3 text-xs space-y-1.5 border border-slate-200 text-slate-600">
+                                <div class="flex justify-between">
+                                    <span>Jawaban Benar:</span>
+                                    <strong class="text-emerald-700">{{ $correctCount }} / {{ $questions->count() }}</strong>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Jawaban Salah / Kosong:</span>
+                                    <strong class="text-rose-700">{{ $questions->count() - $correctCount }}</strong>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Nilai Total:</span>
+                                    <strong class="{{ $isPassed ? 'text-emerald-700 font-mono' : 'text-rose-700 font-mono' }}">{{ number_format($score, 1) }} / 100</strong>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Standar KKM:</span>
+                                    <strong class="text-slate-800 font-mono">{{ number_format($passingGrade, 1) }}</strong>
+                                </div>
+                                <div class="flex justify-between pt-1 border-t border-slate-200">
+                                    <span>Rekomendasi Teori:</span>
+                                    <strong class="{{ $isPassed ? 'text-emerald-700' : 'text-rose-700' }}">{{ $isPassed ? 'KOMPETEN (K)' : 'BELUM KOMPETEN (BK)' }}</strong>
+                                </div>
                             </div>
-                            <div class="flex justify-between">
-                                <span>Ragu-ragu:</span>
-                                <strong class="text-amber-700" id="stat-doubtful">0</strong>
+                        @else
+                            <div class="bg-slate-50 rounded-lg p-3 text-xs space-y-1.5 border border-slate-200 text-slate-600">
+                                <div class="flex justify-between">
+                                    <span>Sudah Terjawab:</span>
+                                    <strong class="text-blue-700" id="stat-answered">0</strong>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Ragu-ragu:</span>
+                                    <strong class="text-amber-700" id="stat-doubtful">0</strong>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Belum Dijawab:</span>
+                                    <strong class="text-slate-700" id="stat-unanswered">{{ $questions->count() }}</strong>
+                                </div>
                             </div>
-                            <div class="flex justify-between">
-                                <span>Belum Dijawab:</span>
-                                <strong class="text-slate-700" id="stat-unanswered">{{ $questions->count() }}</strong>
-                            </div>
-                        </div>
+                        @endif
 
                         {{-- Final Submit Section --}}
                         @if(! $isSubmitted)
@@ -386,6 +554,8 @@
     }
 
     function updateQuestionUI(index, qid) {
+        if (isSubmitted) return;
+
         const hasAnswer = answers[qid] !== undefined && answers[qid] !== null && answers[qid] !== '';
         const isDoubtful = doubtfulList.includes(String(qid));
 

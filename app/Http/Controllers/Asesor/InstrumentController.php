@@ -617,6 +617,14 @@ class InstrumentController extends Controller
             $data = is_array($data) ? $data : [];
             $data['questions'] = $request->input('questions', []);
             $data['recommendation'] = $request->input('recommendation', 'K');
+        } elseif ($code === 'IA03') {
+            $data = is_array($data) ? $data : [];
+            $data['questions'] = $request->input('questions', []);
+            $data['recommendation'] = $request->input('recommendation', 'K');
+        } elseif ($code === 'IA01') {
+            $data = is_array($data) ? $data : [];
+            $data['kuks'] = $request->input('kuks', []);
+            $data['recommendation'] = $request->input('recommendation', 'K');
         }
 
         if (isset($existingData['evidence_image_path'])) {

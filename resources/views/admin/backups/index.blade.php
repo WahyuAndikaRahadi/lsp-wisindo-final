@@ -106,10 +106,10 @@
                 </span>
             </div>
             <div class="mt-2 text-xs font-black text-slate-900 truncate">
-                {{ $stats['last_backup_at'] ? $stats['last_backup_at']->isoFormat('D MMMM Y') : 'Belum Ada' }}
+                {{ $stats['last_backup_at'] ? $stats['last_backup_at']->setTimezone(config('app.timezone', 'Asia/Jakarta'))->isoFormat('D MMMM Y') : 'Belum Ada' }}
             </div>
             <div class="text-[11px] text-slate-500 mt-0.5 font-mono">
-                {{ $stats['last_backup_at'] ? $stats['last_backup_at']->isoFormat('HH:mm:ss [WIB]') : 'Klik Buat Backup Baru' }}
+                {{ $stats['last_backup_at'] ? $stats['last_backup_at']->setTimezone(config('app.timezone', 'Asia/Jakarta'))->isoFormat('HH:mm:ss [WIB]') : 'Klik Buat Backup Baru' }}
             </div>
         </div>
     </div>
@@ -185,8 +185,8 @@
                                     {{ $b['size_formatted'] }}
                                 </td>
                                 <td class="py-3 px-4 text-slate-600">
-                                    <div>{{ $b['created_at']->isoFormat('dddd, D MMMM Y') }}</div>
-                                    <div class="text-[11px] text-slate-400 font-mono">{{ $b['created_at']->isoFormat('HH:mm:ss [WIB]') }} ({{ $b['created_at']->diffForHumans() }})</div>
+                                    <div>{{ $b['created_at']->setTimezone(config('app.timezone', 'Asia/Jakarta'))->isoFormat('dddd, D MMMM Y') }}</div>
+                                    <div class="text-[11px] text-slate-400 font-mono">{{ $b['created_at']->setTimezone(config('app.timezone', 'Asia/Jakarta'))->isoFormat('HH:mm:ss [WIB]') }} ({{ $b['created_at']->diffForHumans() }})</div>
                                 </td>
                                 <td class="py-3 px-4 text-right pr-6">
                                     <div class="inline-flex items-center gap-1.5">
@@ -230,7 +230,7 @@
                             <div class="min-w-0 flex-1">
                                 <span class="font-mono text-xs font-bold text-slate-900 break-all block">{{ $b['filename'] }}</span>
                                 <div class="text-[11px] text-slate-500 mt-0.5">
-                                    {{ $b['created_at']->isoFormat('D MMM Y, HH:mm') }} &bull; <strong class="text-slate-800 font-mono">{{ $b['size_formatted'] }}</strong>
+                                    {{ $b['created_at']->setTimezone(config('app.timezone', 'Asia/Jakarta'))->isoFormat('D MMM Y, HH:mm [WIB]') }} &bull; <strong class="text-slate-800 font-mono">{{ $b['size_formatted'] }}</strong>
                                 </div>
                             </div>
                         </div>

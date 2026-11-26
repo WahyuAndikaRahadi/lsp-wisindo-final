@@ -49,10 +49,11 @@
                 @elseif(strtoupper($code) === 'IA08')
                     @php
                         $hasPortfoliosHeader = ! empty($response?->data_json['portfolios']);
+                        $recIa08Header = $response?->data_json['recommendation'] ?? 'K';
                     @endphp
                     @if($hasEvaluatedHeader)
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
-                            ✓ Diverifikasi Asesor
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold {{ $recIa08Header === 'K' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-rose-100 text-rose-800 border border-rose-200' }}">
+                            {{ $recIa08Header === 'K' ? '✓ Kompeten (K)' : 'Belum Kompeten (BK)' }}
                         </span>
                     @elseif($hasPortfoliosHeader)
                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-100 text-blue-800 border border-blue-200">
@@ -64,13 +65,44 @@
                         </span>
                     @endif
                 @elseif(strtoupper($code) === 'IA09')
+                    @php
+                        $recIa09Header = $response?->data_json['recommendation'] ?? 'K';
+                    @endphp
                     @if($hasEvaluatedHeader)
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
-                            ✓ Selesai Wawancara
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold {{ $recIa09Header === 'K' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-rose-100 text-rose-800 border border-rose-200' }}">
+                            {{ $recIa09Header === 'K' ? '✓ Kompeten (K)' : 'Belum Kompeten (BK)' }}
                         </span>
                     @else
                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-violet-100 text-violet-800 border border-violet-200">
                             Menunggu Sesi Wawancara
+                        </span>
+                    @endif
+                @elseif(strtoupper($code) === 'IA01')
+                    @php
+                        $kuksHeader = $response?->data_json['kuks'] ?? [];
+                        $isAllKHeader = ! empty($kuksHeader) && collect($kuksHeader)->every(fn($item) => ($item['result'] ?? '') === 'K');
+                        $recIa01Header = $response?->data_json['recommendation'] ?? ($isAllKHeader ? 'K' : 'BK');
+                    @endphp
+                    @if($hasEvaluatedHeader)
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold {{ $recIa01Header === 'K' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-rose-100 text-rose-800 border border-rose-200' }}">
+                            {{ $recIa01Header === 'K' ? '✓ Kompeten (K)' : 'Belum Kompeten (BK)' }}
+                        </span>
+                    @else
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-100 text-blue-800 border border-blue-200">
+                            Menunggu Observasi Asesor
+                        </span>
+                    @endif
+                @elseif(strtoupper($code) === 'IA03')
+                    @php
+                        $recIa03Header = $response?->data_json['recommendation'] ?? 'K';
+                    @endphp
+                    @if($hasEvaluatedHeader)
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold {{ $recIa03Header === 'K' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-rose-100 text-rose-800 border border-rose-200' }}">
+                            {{ $recIa03Header === 'K' ? '✓ Kompeten (K)' : 'Belum Kompeten (BK)' }}
+                        </span>
+                    @else
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200">
+                            Menunggu Sesi Lisan
                         </span>
                     @endif
                 @else
@@ -118,6 +150,118 @@
                 <div class="font-bold text-sm">Jadwal Asesmen Telah Resmi Ditutup &amp; Dikunci</div>
                 <p class="text-xs text-emerald-800 mt-0.5 leading-relaxed">Seluruh rangkaian uji telah selesai. Ruang uji ini sekarang dalam mode lihat (read-only).</p>
             </div>
+        </div>
+    @endif
+
+    {{-- Tinjauan Khusus FR.IA.01 (Ceklis Observasi Praktik) --}}
+    @if(strtoupper($code) === 'IA01')
+        @php
+            $isAssessedIa01 = ! empty($response?->assessor_signed_at);
+            $savedKuks = $response?->data_json['kuks'] ?? [];
+            $isAllK = ! empty($savedKuks) && collect($savedKuks)->every(fn($item) => ($item['result'] ?? '') === 'K');
+            $recommendationIa01 = $response?->data_json['recommendation'] ?? ($isAllK ? 'K' : 'BK');
+        @endphp
+
+        <div class="space-y-6">
+            {{-- Status Rekomendasi Hasil Observasi --}}
+            @if($isAssessedIa01)
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="px-6 py-4 bg-slate-900 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800">
+                        <div>
+                            <span class="text-xs font-mono font-bold text-blue-400 uppercase tracking-wider block">Transparansi Penilaian FR.IA.01</span>
+                            <h3 class="text-sm sm:text-base font-bold text-white">Rekomendasi Hasil Observasi Praktik</h3>
+                        </div>
+                        <span class="inline-flex items-center px-3.5 py-1.5 rounded-full text-xs font-black shadow-xs {{ $recommendationIa01 === 'K' ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-rose-100 text-rose-800 border border-rose-300' }}">
+                            {{ $recommendationIa01 === 'K' ? '✓ KOMPETEN (K)' : '✕ BELUM KOMPETEN (BK)' }}
+                        </span>
+                    </div>
+
+                    <div class="p-4 sm:p-6 bg-slate-50/50 border-b border-slate-100">
+                        <div class="p-4 rounded-xl {{ $recommendationIa01 === 'K' ? 'bg-emerald-50 border border-emerald-200 text-emerald-950' : 'bg-rose-50 border border-rose-200 text-rose-950' }} text-xs space-y-1">
+                            <span class="font-bold text-sm block">
+                                {{ $recommendationIa01 === 'K' ? 'Pencapaian: Seluruh Kriteria Unjuk Kerja Terpenuhi' : 'Pencapaian: Terdapat Kriteria Unjuk Kerja yang Belum Terpenuhi' }}
+                            </span>
+                            <p class="leading-relaxed">
+                                {{ $recommendationIa01 === 'K' 
+                                    ? 'Berdasarkan observasi langsung terhadap aktivitas unjuk kerja di tempat uji kompetensi (TUK), Anda direkomendasikan KOMPETEN (K) pada instrumen FR.IA.01.' 
+                                    : 'Berdasarkan observasi langsung terhadap aktivitas unjuk kerja, Anda direkomendasikan BELUM KOMPETEN (BK) pada instrumen FR.IA.01. Silakan perhatikan kriteria yang ditandai BK pada tabel di bawah.' }}
+                            </p>
+                        </div>
+                    </div>
+
+                    {{-- Tabel Detail Observasi Tiap Unit & KUK --}}
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-xs">
+                            <thead class="bg-slate-50 text-slate-700 uppercase tracking-wider font-bold border-b border-slate-200">
+                                <tr>
+                                    <th class="px-4 py-3 text-center w-12 border-r border-slate-200">No</th>
+                                    <th class="px-4 py-3 text-left border-r border-slate-200">Kriteria Unjuk Kerja (KUK)</th>
+                                    <th class="px-4 py-3 text-center w-24 border-r border-slate-200">Pencapaian</th>
+                                    <th class="px-4 py-3 text-left w-64">Catatan Observasi</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                @php $kukCounter = 1; @endphp
+                                @foreach($units as $unit)
+                                    <tr class="bg-slate-100/80 font-bold text-slate-800">
+                                        <td colspan="4" class="px-4 py-2.5">
+                                            <div class="flex items-center gap-2">
+                                                <span class="font-mono text-brand-700 bg-brand-50 px-2 py-0.5 rounded border border-brand-200">{{ $unit->code }}</span>
+                                                <span>{{ $unit->title ?? $unit->name }}</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    @foreach($unit->elements as $elem)
+                                        <tr class="bg-slate-50 text-slate-700 font-semibold text-[11px]">
+                                            <td colspan="4" class="px-4 py-1.5 pl-8 italic">
+                                                Elemen: {{ $elem->title ?? $elem->name }}
+                                            </td>
+                                        </tr>
+                                        @foreach($elem->kuks as $kuk)
+                                            @php
+                                                $kukData = $savedKuks[$kuk->id] ?? [];
+                                                $result = $kukData['result'] ?? ($isAssessedIa01 ? 'K' : '-');
+                                                $kukNote = $kukData['note'] ?? '-';
+                                                $isK = strtoupper((string)$result) === 'K';
+                                            @endphp
+                                            <tr class="hover:bg-slate-50/50 transition">
+                                                <td class="px-4 py-2.5 text-center font-bold text-slate-400 font-mono border-r border-slate-200 align-top">
+                                                    {{ $kukCounter++ }}
+                                                </td>
+                                                <td class="px-4 py-2.5 border-r border-slate-200 align-top">
+                                                    <span class="font-mono text-[10px] text-slate-500 font-bold block">{{ $kuk->code_number ?? $kuk->code ?? '' }}</span>
+                                                    <span class="text-slate-900 leading-relaxed">{{ $kuk->statement ?? $kuk->criteria }}</span>
+                                                </td>
+                                                <td class="px-4 py-2.5 text-center align-middle border-r border-slate-200">
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded font-black text-xs {{ $isK ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-rose-100 text-rose-800 border border-rose-300' }}">
+                                                        {{ $isK ? 'K' : 'BK' }}
+                                                    </span>
+                                                </td>
+                                                <td class="px-4 py-2.5 text-slate-600 align-top italic text-[11px]">
+                                                    {{ $kukNote ?: '-' }}
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    @endforeach
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            @else
+                <div class="bg-blue-50 border-2 border-blue-200 rounded-2xl p-5 text-blue-950 space-y-2 shadow-xs">
+                    <div class="flex items-center gap-3">
+                        <span class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-lg shrink-0">📋</span>
+                        <div>
+                            <h3 class="text-sm sm:text-base font-bold text-blue-950">Observasi Aktivitas Unjuk Kerja di Tempat Kerja / TUK</h3>
+                            <p class="text-xs text-blue-800 mt-0.5">Asesor mengobservasi demonstrasi praktik Anda berdasarkan kriteria unjuk kerja pada skema sertifikasi.</p>
+                        </div>
+                    </div>
+                    <p class="text-xs text-slate-600 leading-relaxed pl-13">
+                        Setelah Asesor selesai melaksanakan observasi dan menandatangani hasil asesmen, seluruh pencapaian unit kompetensi dan rekomendasi Kompeten (K) / Belum Kompeten (BK) Anda akan ditampilkan di sini.
+                    </p>
+                </div>
+            @endif
         </div>
     @endif
 
@@ -301,6 +445,90 @@
             <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
                 Instrumen ini memuat skenario dan instruksi pelaksanaan tugas praktik demonstrasi di Tempat Uji Kompetensi (TUK). Pelaksanaan instruksi unjuk kerja diobservasi langsung oleh Asesor. Dokumen ini disahkan bersama oleh Asesor dan Asesi.
             </p>
+        </div>
+    @endif
+
+    {{-- Tinjauan Khusus FR.IA.03 (Pertanyaan Mendukung Observasi - PMO) --}}
+    @if(strtoupper($code) === 'IA03')
+        @php
+            $isAssessedIa03 = ! empty($response?->assessor_signed_at);
+            $savedQuestionsDataIa03 = $response?->data_json['questions'] ?? [];
+            $recommendationIa03 = $response?->data_json['recommendation'] ?? 'K';
+        @endphp
+
+        <div class="space-y-6">
+            @if($isAssessedIa03)
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="px-6 py-4 bg-slate-900 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800">
+                        <div>
+                            <span class="text-xs font-mono font-bold text-amber-400 uppercase tracking-wider block">Transparansi Penilaian FR.IA.03</span>
+                            <h3 class="text-sm sm:text-base font-bold text-white">Rekomendasi Hasil Pertanyaan Mendukung Observasi</h3>
+                        </div>
+                        <span class="inline-flex items-center px-3.5 py-1.5 rounded-full text-xs font-black shadow-xs {{ $recommendationIa03 === 'K' ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-rose-100 text-rose-800 border border-rose-300' }}">
+                            {{ $recommendationIa03 === 'K' ? '✓ KOMPETEN (K)' : '✕ BELUM KOMPETEN (BK)' }}
+                        </span>
+                    </div>
+
+                    @if(empty($pmoQuestions) || count($pmoQuestions) === 0)
+                        <div class="p-8 text-center text-slate-500 text-xs">
+                            Data pertanyaan lisan pendukung observasi tidak ditemukan.
+                        </div>
+                    @else
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-xs">
+                                <thead class="bg-slate-50 text-slate-700 uppercase tracking-wider font-bold border-b border-slate-200">
+                                    <tr>
+                                        <th class="px-4 py-3 text-center w-12 border-r border-slate-200">No</th>
+                                        <th class="px-4 py-3 text-left border-r border-slate-200">Daftar Pertanyaan Lisan</th>
+                                        <th class="px-4 py-3 text-center w-36 border-r border-slate-200">Pencapaian</th>
+                                        <th class="px-4 py-3 text-left w-64">Tanggapan / Catatan</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100">
+                                    @foreach($pmoQuestions as $idx => $q)
+                                        @php
+                                            $qId = $q['id'] ?? $idx;
+                                            $qData = $savedQuestionsDataIa03[$qId] ?? ($savedQuestionsDataIa03[$idx] ?? []);
+                                            $pencapaian = $qData['pencapaian'] ?? ($qData['result'] ?? 'M');
+                                            $isMemuaskan = in_array(strtoupper((string)$pencapaian), ['M', 'YA', '1', 'KOMPETEN']);
+                                            $qNote = $qData['notes'] ?? ($qData['note'] ?? '-');
+                                        @endphp
+                                        <tr class="hover:bg-slate-50/50 transition">
+                                            <td class="px-4 py-3 text-center font-bold text-slate-400 font-mono border-r border-slate-200 align-top">
+                                                {{ $idx + 1 }}
+                                            </td>
+                                            <td class="px-4 py-3 border-r border-slate-200 align-top space-y-1">
+                                                <div class="font-medium text-slate-900 leading-relaxed">{{ $q['question'] ?? ($q['text'] ?? '-') }}</div>
+                                            </td>
+                                            <td class="px-4 py-3 text-center align-middle border-r border-slate-200">
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded font-black text-xs {{ $isMemuaskan ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-rose-100 text-rose-800 border border-rose-300' }}">
+                                                    {{ $isMemuaskan ? '✓ Memuaskan (M)' : '✕ Tidak Memuaskan (TM)' }}
+                                                </span>
+                                            </td>
+                                            <td class="px-4 py-3 text-slate-600 align-top italic text-[11px]">
+                                                {{ $qNote ?: '-' }}
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @endif
+                </div>
+            @else
+                <div class="bg-amber-50 border-2 border-amber-200 rounded-2xl p-5 text-amber-950 space-y-2 shadow-xs">
+                    <div class="flex items-center gap-3">
+                        <span class="w-10 h-10 rounded-full bg-amber-600 text-white flex items-center justify-center font-bold text-lg shrink-0">💬</span>
+                        <div>
+                            <h3 class="text-sm sm:text-base font-bold text-amber-950">Pertanyaan Mendukung Observasi (Lisan / PMO)</h3>
+                            <p class="text-xs text-amber-800 mt-0.5">Pertanyaan lisan diajukan langsung oleh Asesor untuk mengonfirmasi aspek pengetahuan unjuk kerja.</p>
+                        </div>
+                    </div>
+                    <p class="text-xs text-slate-600 leading-relaxed pl-13">
+                        Setelah Asesor menyelesaikan sesi tanya jawab dan menginputkan rekomendasi Kompeten (K) / Belum Kompeten (BK), seluruh pencapaian Anda akan ditampilkan di sini.
+                    </p>
+                </div>
+            @endif
         </div>
     @endif
 
@@ -510,7 +738,7 @@
         @php
             $isAssessedIa09 = ! empty($response?->assessor_signed_at);
             $savedQuestionsData = $response?->data_json['questions'] ?? [];
-            $recommendationIa09 = $response?->data_json['recommendation'] ?? null;
+            $recommendationIa09 = $response?->data_json['recommendation'] ?? 'K';
         @endphp
 
         <div class="space-y-6">
@@ -537,8 +765,8 @@
                             <span class="text-xs font-mono font-bold text-violet-400 uppercase tracking-wider block">Transparansi Penilaian FR.IA.09</span>
                             <h3 class="text-sm sm:text-base font-bold text-white">Hasil Tanya Jawab Wawancara Terstruktur</h3>
                         </div>
-                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-black {{ $recommendationIa09 === 'K' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800' }}">
-                            {{ $recommendationIa09 === 'K' ? 'KOMPETEN (K)' : 'BELUM KOMPETEN (BK)' }}
+                        <span class="inline-flex items-center px-3.5 py-1.5 rounded-full text-xs font-black shadow-xs {{ $recommendationIa09 === 'K' ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-rose-100 text-rose-800 border border-rose-300' }}">
+                            {{ $recommendationIa09 === 'K' ? '✓ KOMPETEN (K)' : '✕ BELUM KOMPETEN (BK)' }}
                         </span>
                     </div>
 

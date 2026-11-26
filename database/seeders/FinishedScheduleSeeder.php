@@ -427,7 +427,10 @@ class FinishedScheduleSeeder extends Seeder
             AssessmentIaResponse::updateOrCreate(
                 ['assessment_id' => $assessment->id, 'instrument_code' => 'IA01'],
                 [
-                    'data_json' => ['kuks' => $kukEvaluations],
+                    'data_json' => [
+                        'kuks' => $kukEvaluations,
+                        'recommendation' => $isKompeten ? 'K' : 'BK',
+                    ],
                     'score' => $isKompeten ? 95.00 : 65.00,
                     'assessor_notes' => $isKompeten
                         ? 'Seluruh kriteria unjuk kerja terpenuhi dengan baik dan memuaskan.'
@@ -481,6 +484,7 @@ class FinishedScheduleSeeder extends Seeder
                 ['assessment_id' => $assessment->id, 'instrument_code' => 'IA03'],
                 [
                     'data_json' => [
+                        'recommendation' => $isKompeten ? 'K' : 'BK',
                         'notes' => 'Pertanyaan lisan telah dijawab dengan baik sesuai standar unjuk kerja.',
                     ],
                     'score' => $isKompeten ? 90.00 : 60.00,

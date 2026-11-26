@@ -209,11 +209,22 @@ class RuangUjiController extends Controller
 
             if ($codeUpper === 'IA05') {
                 $isDone = (bool) ($resp && ($resp->score !== null || $resp->asesi_signed_at !== null));
-                $meta['status_label'] = ($isDone || $schedule->is_closed) ? '✓ Selesai CBT' : 'Ujian Teori CBT';
-                $meta['status_badge_class'] = ($isDone || $schedule->is_closed) ? 'text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200' : 'text-purple-700 bg-purple-50 px-2 py-0.5 rounded border border-purple-200';
+                $passingGrade = (float) ($assessment->schedule?->scheme?->passing_grade_theory ?? 70.0);
+                $score = (float) ($resp?->score ?? 0);
+                $isPassed = $score >= $passingGrade;
+
+                if ($isDone) {
+                    $meta['status_label'] = ($isPassed ? '✓ Kompeten (K)' : 'Belum Kompeten (BK)')." • {$score}/100";
+                    $meta['status_badge_class'] = $isPassed
+                        ? 'text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200'
+                        : 'text-rose-700 bg-rose-50 px-2 py-0.5 rounded border border-rose-200';
+                } else {
+                    $meta['status_label'] = 'Ujian Teori CBT';
+                    $meta['status_badge_class'] = 'text-purple-700 bg-purple-50 px-2 py-0.5 rounded border border-purple-200';
+                }
                 $meta['progress_percent'] = ($isDone || $schedule->is_closed) ? 100 : 0;
-                $meta['progress_bar_color'] = ($isDone || $schedule->is_closed) ? 'bg-emerald-600' : 'bg-purple-600';
-                $meta['progress_text'] = ($isDone || $schedule->is_closed) ? '1 / 1 Selesai' : '0 / 1 Belum Ujian';
+                $meta['progress_bar_color'] = ($isDone || $schedule->is_closed) ? ($isPassed ? 'bg-emerald-600' : 'bg-rose-500') : 'bg-purple-600';
+                $meta['progress_text'] = ($isDone || $schedule->is_closed) ? ($isPassed ? 'Lulus KKM (≥ '.$passingGrade.')' : 'Di Bawah KKM (< '.$passingGrade.')') : '0 / 1 Belum Ujian';
                 $meta['action_label'] = ($isDone || $schedule->is_closed) ? 'Lihat Hasil CBT' : 'Mulai Kerjakan CBT';
                 $meta['action_button_class'] = ($isDone || $schedule->is_closed) ? 'bg-slate-800 hover:bg-slate-900 text-white' : 'bg-brand-600 hover:bg-brand-700 text-white';
             } elseif ($codeUpper === 'IA02') {
@@ -227,10 +238,21 @@ class RuangUjiController extends Controller
                 $meta['action_button_class'] = $schedule->is_closed ? 'bg-slate-800 hover:bg-slate-900 text-white' : 'bg-brand-600 hover:bg-brand-700 text-white';
             } elseif ($codeUpper === 'IA01') {
                 $hasEvaluated = (bool) $resp?->assessor_signed_at || ! empty($resp?->assessor_notes);
-                $meta['status_label'] = ($hasEvaluated || $schedule->is_closed) ? '✓ Telah Dievaluasi Asesor' : 'Observasi Praktik';
-                $meta['status_badge_class'] = ($hasEvaluated || $schedule->is_closed) ? 'text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200' : 'text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200';
+                $kuks = $resp?->data_json['kuks'] ?? [];
+                $isAllK = ! empty($kuks) && collect($kuks)->every(fn ($item) => ($item['result'] ?? '') === 'K');
+                $recIa01 = $resp?->data_json['recommendation'] ?? ($isAllK ? 'K' : 'BK');
+
+                if ($hasEvaluated) {
+                    $meta['status_label'] = $recIa01 === 'K' ? '✓ Kompeten (K)' : 'Belum Kompeten (BK)';
+                    $meta['status_badge_class'] = $recIa01 === 'K'
+                        ? 'text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200'
+                        : 'text-rose-700 bg-rose-50 px-2 py-0.5 rounded border border-rose-200';
+                } else {
+                    $meta['status_label'] = $schedule->is_closed ? 'Observasi Praktik Selesai' : 'Observasi Praktik';
+                    $meta['status_badge_class'] = 'text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200';
+                }
                 $meta['progress_percent'] = ($hasEvaluated || $schedule->is_closed) ? 100 : 0;
-                $meta['progress_bar_color'] = ($hasEvaluated || $schedule->is_closed) ? 'bg-emerald-600' : 'bg-slate-400';
+                $meta['progress_bar_color'] = ($hasEvaluated || $schedule->is_closed) ? ($recIa01 === 'K' ? 'bg-emerald-600' : 'bg-rose-500') : 'bg-slate-400';
                 $meta['progress_text'] = ($hasEvaluated || $schedule->is_closed) ? '1 / 1 Telah Dievaluasi' : '0 / 1 Evaluasi Asesor';
                 $meta['action_label'] = 'Lihat Evaluasi Asesor';
                 $meta['action_button_class'] = ($hasEvaluated || $schedule->is_closed) ? 'bg-slate-800 hover:bg-slate-900 text-white' : 'bg-slate-700 hover:bg-slate-800 text-white';
@@ -267,10 +289,19 @@ class RuangUjiController extends Controller
                 }
             } elseif ($codeUpper === 'IA03') {
                 $hasEvaluated = (bool) $resp?->assessor_signed_at || ! empty($resp?->assessor_notes);
-                $meta['status_label'] = ($hasEvaluated || $schedule->is_closed) ? '✓ Telah Dievaluasi Asesor' : 'Tanya Jawab (PMO)';
-                $meta['status_badge_class'] = ($hasEvaluated || $schedule->is_closed) ? 'text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200' : 'text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200';
+                $recIa03 = $resp?->data_json['recommendation'] ?? 'K';
+
+                if ($hasEvaluated) {
+                    $meta['status_label'] = $recIa03 === 'K' ? '✓ Kompeten (K)' : 'Belum Kompeten (BK)';
+                    $meta['status_badge_class'] = $recIa03 === 'K'
+                        ? 'text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200'
+                        : 'text-rose-700 bg-rose-50 px-2 py-0.5 rounded border border-rose-200';
+                } else {
+                    $meta['status_label'] = 'Tanya Jawab (PMO)';
+                    $meta['status_badge_class'] = 'text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200';
+                }
                 $meta['progress_percent'] = ($hasEvaluated || $schedule->is_closed) ? 100 : 0;
-                $meta['progress_bar_color'] = ($hasEvaluated || $schedule->is_closed) ? 'bg-emerald-600' : 'bg-slate-400';
+                $meta['progress_bar_color'] = ($hasEvaluated || $schedule->is_closed) ? ($recIa03 === 'K' ? 'bg-emerald-600' : 'bg-rose-500') : 'bg-slate-400';
                 $meta['progress_text'] = ($hasEvaluated || $schedule->is_closed) ? '1 / 1 Telah Dievaluasi' : '0 / 1 Evaluasi Asesor';
                 $meta['action_label'] = 'Lihat Evaluasi Asesor';
                 $meta['action_button_class'] = ($hasEvaluated || $schedule->is_closed) ? 'bg-slate-800 hover:bg-slate-900 text-white' : 'bg-slate-700 hover:bg-slate-800 text-white';
@@ -278,12 +309,15 @@ class RuangUjiController extends Controller
                 $portfolios = $resp?->data_json['portfolios'] ?? [];
                 $hasPortfolios = ! empty($portfolios);
                 $isSignedByAssessor = ! empty($resp?->assessor_signed_at);
+                $recIa08 = $resp?->data_json['recommendation'] ?? 'K';
 
                 if ($isSignedByAssessor) {
-                    $meta['status_label'] = '✓ Telah Diverifikasi Asesor';
-                    $meta['status_badge_class'] = 'text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200';
+                    $meta['status_label'] = $recIa08 === 'K' ? '✓ Kompeten (K)' : 'Belum Kompeten (BK)';
+                    $meta['status_badge_class'] = $recIa08 === 'K'
+                        ? 'text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200'
+                        : 'text-rose-700 bg-rose-50 px-2 py-0.5 rounded border border-rose-200';
                     $meta['progress_percent'] = 100;
-                    $meta['progress_bar_color'] = 'bg-emerald-600';
+                    $meta['progress_bar_color'] = $recIa08 === 'K' ? 'bg-emerald-600' : 'bg-rose-500';
                     $meta['progress_text'] = count($portfolios).' Berkas Diverifikasi';
                     $meta['action_label'] = 'Lihat Hasil Verifikasi';
                     $meta['action_button_class'] = 'bg-slate-800 hover:bg-slate-900 text-white';
@@ -306,10 +340,19 @@ class RuangUjiController extends Controller
                 }
             } elseif ($codeUpper === 'IA09') {
                 $hasEvaluated = (bool) $resp?->assessor_signed_at;
-                $meta['status_label'] = ($hasEvaluated || $schedule->is_closed) ? '✓ Selesai Wawancara' : 'Sesi Wawancara';
-                $meta['status_badge_class'] = ($hasEvaluated || $schedule->is_closed) ? 'text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200' : 'text-violet-700 bg-violet-50 px-2 py-0.5 rounded border border-violet-200';
+                $recIa09 = $resp?->data_json['recommendation'] ?? 'K';
+
+                if ($hasEvaluated) {
+                    $meta['status_label'] = $recIa09 === 'K' ? '✓ Kompeten (K)' : 'Belum Kompeten (BK)';
+                    $meta['status_badge_class'] = $recIa09 === 'K'
+                        ? 'text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200'
+                        : 'text-rose-700 bg-rose-50 px-2 py-0.5 rounded border border-rose-200';
+                } else {
+                    $meta['status_label'] = 'Sesi Wawancara';
+                    $meta['status_badge_class'] = 'text-violet-700 bg-violet-50 px-2 py-0.5 rounded border border-violet-200';
+                }
                 $meta['progress_percent'] = ($hasEvaluated || $schedule->is_closed) ? 100 : 0;
-                $meta['progress_bar_color'] = ($hasEvaluated || $schedule->is_closed) ? 'bg-emerald-600' : 'bg-slate-400';
+                $meta['progress_bar_color'] = ($hasEvaluated || $schedule->is_closed) ? ($recIa09 === 'K' ? 'bg-emerald-600' : 'bg-rose-500') : 'bg-slate-400';
                 $meta['progress_text'] = ($hasEvaluated || $schedule->is_closed) ? '1 / 1 Telah Selesai' : '0 / 1 Tatap Muka Asesor';
                 $meta['action_label'] = ($hasEvaluated || $schedule->is_closed) ? 'Lihat Hasil Wawancara' : 'Persiapan Wawancara';
                 $meta['action_button_class'] = ($hasEvaluated || $schedule->is_closed) ? 'bg-slate-800 hover:bg-slate-900 text-white' : 'bg-slate-700 hover:bg-slate-800 text-white';
@@ -444,6 +487,7 @@ class RuangUjiController extends Controller
 
         $draftAnswers = [];
         $draftDoubtful = [];
+        $breakdown = [];
         if ($existingResp && ! empty($existingResp->data_json)) {
             $data = is_array($existingResp->data_json)
                 ? $existingResp->data_json
@@ -455,9 +499,14 @@ class RuangUjiController extends Controller
             } else {
                 $draftAnswers = $data;
             }
+            $breakdown = $data['breakdown'] ?? [];
         }
 
-        return view('asesi.ruang-uji.ia05', compact('assessment', 'questions', 'existingResp', 'isSubmitted', 'draftAnswers', 'draftDoubtful'));
+        $passingGrade = (float) ($assessment->schedule?->scheme?->passing_grade_theory ?? 70.0);
+        $score = (float) ($existingResp?->score ?? 0);
+        $isPassed = $score >= $passingGrade;
+
+        return view('asesi.ruang-uji.ia05', compact('assessment', 'questions', 'existingResp', 'isSubmitted', 'draftAnswers', 'draftDoubtful', 'passingGrade', 'score', 'isPassed', 'breakdown'));
     }
 
     public function autosaveIa05(Assessment $assessment, Request $request): JsonResponse
