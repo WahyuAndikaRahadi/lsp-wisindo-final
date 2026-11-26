@@ -238,13 +238,20 @@ class AsesiCbtAndIaTransparencyTest extends TestCase
 
         // 2. Q1 correct check
         $response->assertSee('Jawaban Benar (+1)');
-        $response->assertSee('Jawaban Anda (Benar)');
+        $response->assertSee('(Benar)');
+        $response->assertDontSee('Jawaban Anda (Benar)');
 
         // 3. Q2 wrong check
         $response->assertSee('Jawaban Salah (0)');
-        $response->assertSee('Jawaban Anda (Salah)');
+        $response->assertSee('(Salah)');
+        $response->assertDontSee('Jawaban Anda (Salah)');
 
-        // 4. CRITICAL: The correct answer 'C' for Q2 must NOT have "Kunci Jawaban" or reveal it is correct
+        // 4. Header clean check (no bulky badges on submitted view)
+        $response->assertSee('Kembali ke Ruang Uji');
+        $response->assertDontSee('Dokumen FR.IA.05.C');
+        $response->assertDontSee('Jawaban CBT Telah Terkirim');
+
+        // 5. CRITICAL: The correct answer 'C' for Q2 must NOT have "Kunci Jawaban" or reveal it is correct
         $response->assertDontSee('Kunci Jawaban: C');
         $response->assertDontSee('Kunci Jawaban: Jakarta');
         $response->assertDontSee('Jawaban yang Benar: C');
@@ -322,6 +329,9 @@ class AsesiCbtAndIaTransparencyTest extends TestCase
         $resIa03->assertStatus(200);
         $resIa03->assertSee('BELUM KOMPETEN (BK)');
         $resIa03->assertSee('Rekomendasi Hasil Pertanyaan Mendukung Observasi');
+        // Questions should NOT be leaked to asesi
+        $resIa03->assertDontSee('Daftar Pertanyaan Lisan');
+        $resIa03->assertDontSee('Catatan Tanggapan:');
         // Per-question pencapaian should NOT be shown to asesi
         $resIa03->assertDontSee('Memuaskan (M)');
         $resIa03->assertDontSee('Tidak Memuaskan (TM)');
@@ -356,8 +366,11 @@ class AsesiCbtAndIaTransparencyTest extends TestCase
         $resIa09 = $this->actingAs($this->asesi)->get(route('asesi.assessment.instrument.view', ['assessment' => $this->assessment, 'code' => 'IA09']));
         $resIa09->assertStatus(200);
         $resIa09->assertSee('KOMPETEN (K)');
-        $resIa09->assertSee('Bagaimana prosedur penanganan darurat?');
-        $resIa09->assertSee('Menjawab dengan runtut dan sesuai SOP');
+        $resIa09->assertSee('Transparansi Penilaian FR.IA.09');
+        // Oral question text and answers should NOT be leaked to asesi
+        $resIa09->assertDontSee('Bagaimana prosedur penanganan darurat?');
+        $resIa09->assertDontSee('Menjawab dengan runtut dan sesuai SOP');
+        $resIa09->assertDontSee('Pertanyaan Wawancara & Tanggapan');
         // Per-question pencapaian Ya/Tidak badge should NOT be shown
         $resIa09->assertDontSee('✓ Ya');
         $resIa09->assertDontSee('✕ Tidak');

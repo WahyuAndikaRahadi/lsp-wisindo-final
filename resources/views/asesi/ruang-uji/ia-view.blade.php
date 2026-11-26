@@ -400,7 +400,6 @@
     @if(strtoupper($code) === 'IA03')
         @php
             $isAssessedIa03 = ! empty($response?->assessor_signed_at);
-            $savedQuestionsDataIa03 = $response?->data_json['questions'] ?? [];
             $recommendationIa03 = $response?->data_json['recommendation'] ?? 'K';
         @endphp
 
@@ -417,41 +416,25 @@
                         </span>
                     </div>
 
-                    @if(empty($pmoQuestions) || count($pmoQuestions) === 0)
-                        <div class="p-6 text-center text-slate-500 text-xs">
-                            Data pertanyaan lisan pendukung observasi tidak ditemukan.
+                    <div class="p-4 sm:p-6 space-y-4">
+                        <div class="p-4 rounded-xl {{ $recommendationIa03 === 'K' ? 'bg-emerald-50 border border-emerald-200 text-emerald-950' : 'bg-rose-50 border border-rose-200 text-rose-950' }} text-xs sm:text-sm leading-relaxed space-y-1">
+                            <span class="font-bold block text-sm sm:text-base">
+                                {{ $recommendationIa03 === 'K' ? 'Rekomendasi: Kompeten (K)' : 'Rekomendasi: Belum Kompeten (BK)' }}
+                            </span>
+                            <p class="text-xs sm:text-sm text-slate-700">
+                                {{ $recommendationIa03 === 'K' 
+                                    ? 'Berdasarkan sesi pertanyaan pendukung observasi di TUK, Anda direkomendasikan KOMPETEN (K) pada instrumen FR.IA.03.' 
+                                    : 'Berdasarkan sesi pertanyaan pendukung observasi di TUK, Anda direkomendasikan BELUM KOMPETEN (BK) pada instrumen FR.IA.03.' }}
+                            </p>
                         </div>
-                    @else
-                        <div class="p-4 sm:p-6 space-y-3">
-                            <div class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                                Daftar Pertanyaan Lisan
+
+                        @if(! empty($response?->assessor_notes))
+                            <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs">
+                                <span class="font-bold text-slate-700 block mb-1">Catatan Asesor:</span>
+                                <p class="text-slate-800 whitespace-pre-line">{{ $response->assessor_notes }}</p>
                             </div>
-                            <div class="space-y-3">
-                                @foreach($pmoQuestions as $idx => $q)
-                                    @php
-                                        $qId = $q['id'] ?? $idx;
-                                        $qData = $savedQuestionsDataIa03[$qId] ?? ($savedQuestionsDataIa03[$idx] ?? []);
-                                        $qNote = $qData['notes'] ?? ($qData['note'] ?? null);
-                                    @endphp
-                                    <div class="p-3.5 sm:p-4 rounded-xl border border-slate-200 bg-slate-50/50 space-y-2">
-                                        <div class="flex items-start gap-2.5">
-                                            <span class="px-2 py-0.5 rounded text-[11px] font-bold font-mono bg-amber-100 text-amber-900 border border-amber-200 shrink-0">
-                                                #{{ $idx + 1 }}
-                                            </span>
-                                            <p class="text-xs sm:text-sm font-medium text-slate-900 leading-relaxed flex-1">
-                                                {{ $q['question'] ?? ($q['text'] ?? '-') }}
-                                            </p>
-                                        </div>
-                                        @if(! empty($qNote) && $qNote !== '-')
-                                            <div class="sm:ml-8 text-xs text-slate-600 bg-white p-2.5 rounded-lg border border-slate-200/80">
-                                                <span class="font-semibold text-slate-700">Catatan Tanggapan:</span> {{ $qNote }}
-                                            </div>
-                                        @endif
-                                    </div>
-                                @endforeach
-                            </div>
-                        </div>
-                    @endif
+                        @endif
+                    </div>
                 </div>
             @else
                 <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 sm:p-5 text-amber-950 space-y-2">
@@ -729,7 +712,6 @@
     @if(strtoupper($code) === 'IA09')
         @php
             $isAssessedIa09 = ! empty($response?->assessor_signed_at);
-            $savedQuestionsData = $response?->data_json['questions'] ?? [];
             $recommendationIa09 = $response?->data_json['recommendation'] ?? 'K';
         @endphp
 
@@ -745,7 +727,7 @@
                         </div>
                     </div>
                     <p class="text-xs text-slate-600 leading-relaxed sm:pl-11">
-                        Rekomendasi akhir Kompeten (K) atau Belum Kompeten (BK) beserta rangkuman wawancara akan tampil di sini setelah sesi selesai disahkan oleh asesor.
+                        Rekomendasi akhir Kompeten (K) atau Belum Kompeten (BK) akan tampil di sini setelah sesi wawancara disahkan oleh asesor.
                     </p>
                 </div>
             @else
@@ -754,58 +736,32 @@
                     <div class="px-4 sm:px-6 py-3.5 sm:py-4 bg-slate-900 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 border-b border-slate-800">
                         <div>
                             <span class="text-xs font-mono font-bold text-violet-400 uppercase tracking-wider block">Transparansi Penilaian FR.IA.09</span>
-                            <h3 class="text-sm sm:text-base font-bold text-white">Hasil Tanya Jawab Wawancara Terstruktur</h3>
+                            <h3 class="text-sm sm:text-base font-bold text-white">Rekomendasi Hasil Pertanyaan Wawancara</h3>
                         </div>
                         <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold shadow-xs {{ $recommendationIa09 === 'K' ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-rose-100 text-rose-800 border border-rose-300' }}">
                             {{ $recommendationIa09 === 'K' ? '✓ KOMPETEN (K)' : '✕ BELUM KOMPETEN (BK)' }}
                         </span>
                     </div>
 
-                    @if($interviewQuestions->isEmpty())
-                        <div class="p-6 text-center text-slate-500 text-xs">
-                            Data pertanyaan wawancara tidak ditemukan.
+                    <div class="p-4 sm:p-6 space-y-4">
+                        <div class="p-4 rounded-xl {{ $recommendationIa09 === 'K' ? 'bg-emerald-50 border border-emerald-200 text-emerald-950' : 'bg-rose-50 border border-rose-200 text-rose-950' }} text-xs sm:text-sm leading-relaxed space-y-1">
+                            <span class="font-bold block text-sm sm:text-base">
+                                {{ $recommendationIa09 === 'K' ? 'Rekomendasi: Kompeten (K)' : 'Rekomendasi: Belum Kompeten (BK)' }}
+                            </span>
+                            <p class="text-xs sm:text-sm text-slate-700">
+                                {{ $recommendationIa09 === 'K' 
+                                    ? 'Berdasarkan sesi wawancara tatap muka di TUK, Anda direkomendasikan KOMPETEN (K) pada instrumen FR.IA.09.' 
+                                    : 'Berdasarkan sesi wawancara tatap muka di TUK, Anda direkomendasikan BELUM KOMPETEN (BK) pada instrumen FR.IA.09.' }}
+                            </p>
                         </div>
-                    @else
-                        <div class="p-4 sm:p-6 space-y-3">
-                            <div class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                                Pertanyaan Wawancara &amp; Tanggapan
+
+                        @if(! empty($response?->assessor_notes))
+                            <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs">
+                                <span class="font-bold text-slate-700 block mb-1">Catatan Asesor:</span>
+                                <p class="text-slate-800 whitespace-pre-line">{{ $response->assessor_notes }}</p>
                             </div>
-                            <div class="space-y-3">
-                                @foreach($interviewQuestions as $idx => $q)
-                                    @php
-                                        $savedQ = $savedQuestionsData[$q->id] ?? [];
-                                        $ansSummary = $savedQ['candidate_answer_summary'] ?? null;
-                                    @endphp
-                                    <div class="p-3.5 sm:p-4 rounded-xl border border-slate-200 bg-slate-50/50 space-y-2">
-                                        <div class="flex flex-wrap items-center gap-2">
-                                            <span class="px-2 py-0.5 rounded text-[11px] font-bold font-mono bg-violet-100 text-violet-900 border border-violet-200">
-                                                #{{ $q->order ?? ($idx + 1) }}
-                                            </span>
-                                            @if($q->evidence_context)
-                                                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-200 text-slate-800">
-                                                    {{ $q->evidence_context }}
-                                                </span>
-                                            @endif
-                                            @if($q->competencyUnit)
-                                                <span class="font-mono text-[10px] font-bold text-slate-600">
-                                                    {{ $q->competencyUnit->code }}
-                                                </span>
-                                            @endif
-                                        </div>
-                                        <p class="text-xs sm:text-sm font-medium text-slate-900 leading-relaxed">
-                                            {{ $q->question_text }}
-                                        </p>
-                                        @if(! empty($ansSummary) && $ansSummary !== '-')
-                                            <div class="text-xs text-slate-700 bg-white p-2.5 rounded-lg border border-slate-200/80 leading-relaxed">
-                                                <span class="font-semibold text-slate-600 block text-[11px] mb-0.5">Kesimpulan Tanggapan:</span>
-                                                "{{ $ansSummary }}"
-                                            </div>
-                                        @endif
-                                    </div>
-                                @endforeach
-                            </div>
-                        </div>
-                    @endif
+                        @endif
+                    </div>
                 </div>
             @endif
         </div>

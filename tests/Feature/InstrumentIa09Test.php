@@ -234,8 +234,8 @@ class InstrumentIa09Test extends TestCase
 
         $response->assertOk();
         $response->assertSee('Transparansi Penilaian FR.IA.09');
-        $response->assertSee('Ceritakan kecelakaan kerja akibat tidak menggunakan APD saat bekerja');
-        $response->assertSee('Asesi memaparkan pengalaman kerja dengan sangat baik.');
+        $response->assertDontSee('Ceritakan kecelakaan kerja akibat tidak menggunakan APD saat bekerja');
+        $response->assertDontSee('Asesi memaparkan pengalaman kerja dengan sangat baik.');
         $response->assertSee('KOMPETEN (K)');
 
         // Verify HTML print export returns 200 OK
