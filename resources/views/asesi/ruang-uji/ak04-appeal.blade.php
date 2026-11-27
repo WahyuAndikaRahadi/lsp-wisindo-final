@@ -72,7 +72,7 @@
             </span>
         </div>
         <p class="text-[11px] {{ $isWithinDeadline ? 'text-amber-800' : 'text-rose-800' }} leading-relaxed">
-            * Catatan Regulasi: Batas {{ $appealWindowDays }} hari kerja dihitung hari kerja resmi (Senin-Jumat, mengabaikan Sabtu dan Minggu). Batas 3 hari kerja diambil dari praktik umum BNSP, belum dikonfirmasi dengan SOP LSP PrO Indo.
+            * Catatan Regulasi: Batas {{ $appealWindowDays }} hari kerja dihitung hari kerja resmi (Senin-Jumat, mengabaikan Sabtu dan Minggu). Batas 3 hari kerja diambil dari praktik umum BNSP, belum dikonfirmasi dengan SOP LSP Wisindo
         </p>
     </div>
 

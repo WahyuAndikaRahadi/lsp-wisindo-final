@@ -199,18 +199,35 @@ def header(c, dy):
     c.setLineWidth(0.7); c.setStrokeColor(black)
     c.rect(X(126), Y(bot), X(762 - 126), (bot - top) * S)
     vline(c, 254, top, bot)
-    logo_file = os.path.join(ASSETS, "logo.png")
+    logo_file = os.path.join(PROJECT_ROOT, "public", "images", "logo-wisindo-alt-bawah.png")
+    if not os.path.exists(logo_file):
+        logo_file = os.path.join(ASSETS, "logo.png")
     if os.path.exists(logo_file):
-        c.drawImage(logo_file, X(148.5), Y(20 + dy + 85.6), X(96.7), X(85.6), mask="auto")
+        try:
+            with Image.open(logo_file) as im:
+                iw, ih = im.size
+            aspect = (iw / ih) if ih else 1.0
+        except Exception:
+            aspect = 1.0
+        max_w, max_h = 108.0, 80.0
+        draw_h = max_h
+        draw_w = draw_h * aspect
+        if draw_w > max_w:
+            draw_w = max_w
+            draw_h = draw_w / aspect
+        logo_x = 126.0 + (128.0 - draw_w) / 2.0
+        logo_bot_y = top + (90.0 + draw_h) / 2.0
+        c.drawImage(logo_file, X(logo_x), Y(logo_bot_y), X(draw_w), X(draw_h), mask="auto")
     segs = [("L", 1), ("embaga ", 0), ("S", 1), ("ertifikasi ", 0), ("P", 1), ("rofesi ", 0),
-            ("P", 1), ("raktisi ", 0), ("O", 1), ("tomotif  ", 0), ("LSP-PrO Indo", 1)]
+            ("W", 1), ("isata ", 0), ("I", 1), ("ndonesia", 0)]
     f = lambda b: "DJC-B" if b else "DJC"
     w10 = sum(sw(s, f(b), 10) for s, b in segs)
-    size = 10 * (417 * S) / w10
-    xp = X(293)
+    size = min(16.0, 10 * (417 * S) / w10)
+    total_w = sum(sw(s, f(b), size) for s, b in segs)
+    xp = X(254) + (X(762 - 254) - total_w) / 2.0
     for s, b in segs:
         c.setFont(f(b), size); c.setFillColor(black)
-        c.drawString(xp, Y(70 + dy) - size * 0.32, s); xp += sw(s, f(b), size)
+        c.drawString(xp, Y(63 + dy) - size * 0.32, s); xp += sw(s, f(b), size)
 
 def watermark(c):
     # Dihapus sesuai permintaan user: tidak menggunakan watermark LSP
@@ -442,13 +459,13 @@ def page2(c, d, pnum=2):
             judul = ""
 
         ln = wrap_plain(judul, "Lib", UNIT, maxw)
-        h = 20.6 if len(ln) <= 1 else 37.5
+        h = max(21.0, len(ln) * 16.5 + 6.0)
         yc = y + h / 2
         hline(c, L, 640, y + h, 0.7)
         ctext(c, f"{i}.", 152, yc)
         ctext(c, kode, 245, yc, "Lib", UNIT)
         for k, l in enumerate(ln):
-            text(c, l, 318, yc + (k - (len(ln) - 1) / 2) * 17, "Lib", UNIT)
+            text(c, l, 318, yc + (k - (len(ln) - 1) / 2) * 16.5, "Lib", UNIT)
         y += h
 
     hline(c, L, R, y, THICK)
@@ -617,6 +634,32 @@ def page3(c, d, pnum=3):
     pageno(c, pnum)
 
 # ================= HALAMAN 2 & 3 UNTUK SKEMA BESAR (> 9 UNIT) =================
+def draw_unit_table_header(c, top, L=128, R=771, THICK=1.5):
+    hline(c, L, R, top, THICK)
+    hline(c, L, R, top + 52)
+    ctext(c, "No.", 152, top + 26, "Cal-B")
+    ctext(c, "Kode Unit", 245, top + 26, "Cal-B")
+    ctext(c, "Judul Unit", 477, top + 26, "Cal-B")
+    ctext(c, "Standar", 706, top + 10, "Cal-B")
+    ctext(c, "Kompetensi Kerja", 706, top + 28, "Cal-B")
+    return top + 52
+
+def close_unit_table(c, table_top, body_top, y, standar, L=128, R=771, THICK=1.5):
+    hline(c, L, R, y, THICK)
+    vline(c, L, table_top, y, THICK)
+    vline(c, R, table_top, y, THICK)
+    for x in (176, 313, 640):
+        vline(c, x, table_top, y)
+    mid = (body_top + y) / 2
+    s0 = str(standar[0]) if len(standar) > 0 else ""
+    s1 = str(standar[1]) if len(standar) > 1 else ""
+    std_lines = []
+    for part in (s0, s1):
+        if part:
+            std_lines.extend(wrap_plain(part, "Cal", BODY, X(118)))
+    for idx, sl in enumerate(std_lines):
+        ctext(c, sl, 705, mid + (idx - (len(std_lines) - 1) / 2) * 17)
+
 def page2_large(c, d, pnum=2):
     watermark(c); header(c, 21)
     heading(c, "Bagian  2 :  Data Sertifikasi", 128, 160, 181)
@@ -644,14 +687,16 @@ def page2_large(c, d, pnum=2):
                              ("lainnya", "Lainnya", 426, 411)):
         checkbox(c, bool(t.get(key, False)), bx, yc, 14); text(c, lbl, 446, yc + 1)
 
-    # --- tabel unit ---
+    # --- tabel unit (dengan paginasi otomatis agar tidak terpotong) ---
     heading(c, "Daftar Unit Kompetensi sesuai kemasan:", 128, 453, 254)
     L, R = 128, 771
-    hline(c, L, R, 471, THICK); hline(c, L, R, 523)
-    ctext(c, "No.", 152, 497, "Cal-B"); ctext(c, "Kode Unit", 245, 497, "Cal-B"); ctext(c, "Judul Unit", 477, 497, "Cal-B")
-    ctext(c, "Standar", 706, 481, "Cal-B"); ctext(c, "Kompetensi Kerja", 706, 499, "Cal-B")
-    y = 523
+    table_top = 471
+    body_top = draw_unit_table_header(c, table_top, L, R, THICK)
+    y = body_top
     maxw = X(316)
+    standar = d.get("standar") or ["SKKNI Nomor 97", "Tahun 2018"]
+    Y_PAGE_LIMIT = 1045
+
     for i, unit_entry in enumerate(d.get("units", []), 1):
         if isinstance(unit_entry, (list, tuple)):
             kode = str(unit_entry[0])
@@ -664,28 +709,34 @@ def page2_large(c, d, pnum=2):
             judul = ""
 
         ln = wrap_plain(judul, "Lib", UNIT, maxw)
-        h = 20.6 if len(ln) <= 1 else 37.5
+        h = max(21.0, len(ln) * 16.5 + 6.0)
+
+        if y + h > Y_PAGE_LIMIT and y > body_top:
+            close_unit_table(c, table_top, body_top, y, standar, L, R, THICK)
+            pageno(c, pnum)
+            c.showPage()
+            pnum += 1
+            watermark(c); header(c, 21)
+            heading(c, "Daftar Unit Kompetensi sesuai kemasan (Lanjutan):", 128, 142, 320)
+            table_top = 162
+            body_top = draw_unit_table_header(c, table_top, L, R, THICK)
+            y = body_top
+
         yc = y + h / 2
         hline(c, L, 640, y + h, 0.7)
         ctext(c, f"{i}.", 152, yc)
         ctext(c, kode, 245, yc, "Lib", UNIT)
         for k, l in enumerate(ln):
-            text(c, l, 318, yc + (k - (len(ln) - 1) / 2) * 17, "Lib", UNIT)
+            text(c, l, 318, yc + (k - (len(ln) - 1) / 2) * 16.5, "Lib", UNIT)
         y += h
 
-    hline(c, L, R, y, THICK)
-    vline(c, L, 471, y, THICK); vline(c, R, 471, y, THICK)
-    for x in (176, 313, 640): vline(c, x, 471, y)
-    mid = (523 + y) / 2
-    standar = d.get("standar") or ["SKKNI Nomor 97", "Tahun 2018"]
-    s0 = standar[0] if len(standar) > 0 else ""
-    s1 = standar[1] if len(standar) > 1 else ""
-    ctext(c, str(s0), 705, mid - 9); ctext(c, str(s1), 705, mid + 9)
+    close_unit_table(c, table_top, body_top, y, standar, L, R, THICK)
 
-    # Bottom heading only
-    if y + 35 < 1050:
+    # Bottom heading only if enough room
+    if y + 40 < Y_PAGE_LIMIT:
         heading(c, "Bagian  3 :  Bukti Kelengkapan Pemohon", 128, y + 25, 279)
     pageno(c, pnum)
+    return pnum
 
 def page3_large(c, d, pnum=3):
     watermark(c); header(c, 21)
@@ -832,9 +883,9 @@ def build(d=DATA, out=OUT):
     
     units = d.get("units", [])
     if len(units) > 9:
-        page2_large(c, d, pnum=2)
+        last_pnum = page2_large(c, d, pnum=2)
         c.showPage()
-        page3_large(c, d, pnum=3)
+        page3_large(c, d, pnum=last_pnum + 1)
         c.showPage()
     else:
         page2(c, d, pnum=2)

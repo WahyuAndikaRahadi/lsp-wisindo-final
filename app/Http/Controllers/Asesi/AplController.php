@@ -236,6 +236,14 @@ class AplController extends Controller
 
         $kukInputs = $request->input('kuks', $request->input('apl02', []));
 
+        if (empty($kukInputs) && $request->filled('kuks_json')) {
+            $decodedKuks = json_decode((string) $request->input('kuks_json'), true);
+
+            if (is_array($decodedKuks)) {
+                $kukInputs = $decodedKuks;
+            }
+        }
+
         $isAlreadyApproved = ($assessment->apl_status === 'APPROVED');
 
         DB::transaction(function () use ($assessment, $kukInputs, $request, $signature, $profile, $isAlreadyApproved) {

@@ -29,7 +29,7 @@
                 Sertifikat Saya
             </h1>
             <p class="text-xs sm:text-sm text-slate-500 mt-1 leading-relaxed max-w-2xl">
-                Daftar sertifikat kompetensi BNSP yang telah Anda raih di LSP PrO Indo.
+                Daftar sertifikat kompetensi BNSP yang telah Anda raih di LSP Wisindo
             </p>
         </div>
     </div>

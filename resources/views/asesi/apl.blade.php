@@ -112,6 +112,7 @@
 
     <form action="{{ route('asesi.assessment.apl.store', $assessment) }}" method="POST" enctype="multipart/form-data" data-loading-text="Mengunggah berkas portofolio & menyimpan data APL 01..." class="space-y-8" id="aplForm">
         @csrf
+        <input type="hidden" name="kuks_json" id="kuksJsonInput" value="">
 
         {{-- BAGIAN 1: FR.APL.01 DATA PEMOHON --}}
         <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
@@ -842,7 +843,7 @@
                             <label class="flex items-start gap-2.5 cursor-pointer">
                                 <input type="checkbox" name="statement_integrity" value="1" required class="mt-0.5 rounded border-indigo-300 text-brand-600 focus:ring-brand-500 w-4 h-4 shrink-0">
                                 <span class="text-xs text-indigo-950 leading-relaxed">
-                                    <strong>Pernyataan Asesi:</strong> Saya menyatakan mematuhi tata tertib dan menjaga kerahasiaan materi uji LSP PrO Indo.
+                                    <strong>Pernyataan Asesi:</strong> Saya menyatakan mematuhi tata tertib dan menjaga kerahasiaan materi uji LSP Wisindo
                                 </span>
                             </label>
                         </div>
@@ -951,6 +952,44 @@ function deleteUploadedProof(proofId, proofType, filename, deleteUrl) {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
+    const aplForm = document.getElementById('aplForm');
+    const kuksJsonInput = document.getElementById('kuksJsonInput');
+    if (aplForm && kuksJsonInput) {
+        aplForm.addEventListener('submit', function () {
+            const kukPayload = {};
+            aplForm.querySelectorAll('input[type="radio"][name^="kuks["]:checked').forEach(function (radio) {
+                const match = radio.name.match(/^kuks\[(\d+)\]\[value\]$/);
+                if (match) {
+                    const kukId = match[1];
+                    kukPayload[kukId] = kukPayload[kukId] || {};
+                    kukPayload[kukId].value = radio.value;
+                }
+            });
+            aplForm.querySelectorAll('select[name^="kuks["]').forEach(function (select) {
+                const match = select.name.match(/^kuks\[(\d+)\]\[proof_type\]$/);
+                if (match) {
+                    const kukId = match[1];
+                    kukPayload[kukId] = kukPayload[kukId] || {};
+                    kukPayload[kukId].proof_type = select.value;
+                }
+            });
+            kuksJsonInput.value = JSON.stringify(kukPayload);
+
+            // Prevent exceeding PHP max_input_vars on schemes with many KUKs
+            aplForm.querySelectorAll('input[name^="kuks["], select[name^="kuks["]').forEach(function (el) {
+                el.disabled = true;
+            });
+        });
+
+        window.addEventListener('pageshow', function (event) {
+            if (event.persisted) {
+                aplForm.querySelectorAll('input[name^="kuks["], select[name^="kuks["]').forEach(function (el) {
+                    el.disabled = false;
+                });
+            }
+        });
+    }
+
     document.querySelectorAll('input[type="file"][name^="proofs["]').forEach(function (input) {
         input.addEventListener('change', function () {
             let clearBtn = input.parentElement.querySelector('.btn-clear-selection');
