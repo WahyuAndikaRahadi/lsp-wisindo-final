@@ -23,7 +23,7 @@ class MapaController extends Controller
                 ->with('warning', 'Harap selesaikan peninjauan seluruh berkas APL asesi terlebih dahulu sebelum mengisi FR.MAPA.01.');
         }
 
-        $schedule->load(['scheme.competencyUnits', 'assessments.asesi.profile', 'assessors']);
+        $schedule->load(['scheme.competencyUnits', 'scheme.jobGroups.competencyUnits', 'assessments.asesi.profile', 'assessors']);
         $assessments = $schedule->assessorAssessments();
         $selectedAssessmentId = $request->query('assessment');
         $selectedAssessment = $selectedAssessmentId ? $assessments->firstWhere('id', (int) $selectedAssessmentId) : null;

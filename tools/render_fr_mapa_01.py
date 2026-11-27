@@ -21,7 +21,10 @@ from PIL import Image
 try:
     import pymupdf as fitz
 except ImportError:
-    import fitz
+    try:
+        import fitz
+    except ImportError:
+        fitz = None
 
 try:
     from font_helper import find_font
@@ -1275,72 +1278,22 @@ def render_mapa_dynamic(data, dest_path):
     c.drawString(L + 8.0, Y(cur_y + 13.5), "2.    Mempersiapkan Rencana Asesmen")
     cur_y += 28.0
 
-    # 2a. Daftar Unit Kompetensi (Kelompok Pekerjaan)
+    # 2a & 2b. Daftar Unit Kompetensi (Kelompok Pekerjaan) & Rencana Asesmen
     units = data.get("units") or []
-    if units:
-        u_c1, u_c2, u_c3 = L + 90.0, L + 125.0, L + 220.0
+    job_groups = data.get("job_groups") or []
+    if job_groups:
+        groups_to_render = job_groups
+    elif units:
+        groups_to_render = [{
+            "sequence": 1,
+            "name": "",
+            "label": "Kelompok Pekerjaan 1",
+            "units": units,
+        }]
+    else:
+        groups_to_render = []
 
-        def draw_units_list_header(top_y):
-            hb = top_y + 24.0
-            c.setLineWidth(0.65)
-            c.rect(L, Y(hb), R - L, 24.0)
-            for ux in (u_c1, u_c2, u_c3):
-                c.line(ux, Y(top_y), ux, Y(hb))
-            c.setFont("Lib-B", 8.8)
-            c.drawCentredString((L + u_c1) / 2.0, Y(top_y + 15.0), "Kelompok")
-            c.drawCentredString((u_c1 + u_c2) / 2.0, Y(top_y + 15.0), "No.")
-            c.drawCentredString((u_c2 + u_c3) / 2.0, Y(top_y + 15.0), "Kode Unit")
-            c.drawCentredString((u_c3 + R) / 2.0, Y(top_y + 15.0), "Judul Unit")
-            return hb
-
-        def close_units_list_box(box_top, body_top, bot_y):
-            c.setLineWidth(0.65)
-            c.rect(L, Y(bot_y), R - L, bot_y - box_top)
-            for ux in (u_c1, u_c2, u_c3):
-                c.line(ux, Y(box_top), ux, Y(bot_y))
-            mid = (body_top + bot_y) / 2.0
-            c.setFont("Lib-B", 8.5)
-            c.drawCentredString((L + u_c1) / 2.0, Y(mid - 3.0), "Kelompok")
-            c.drawCentredString((L + u_c1) / 2.0, Y(mid + 8.0), "Pekerjaan 1")
-
-        box_top = cur_y
-        body_top = draw_units_list_header(box_top)
-        cur_y = body_top
-        has_u_rows = False
-
-        for idx, u in enumerate(units, 1):
-            code = str(u.get("code", "") if isinstance(u, dict) else (u[0] if isinstance(u, (list, tuple)) else u))
-            title = str(u.get("title", "") if isinstance(u, dict) else (u[1] if isinstance(u, (list, tuple)) and len(u) > 1 else ""))
-            t_lines = wrap_w(title, "Lib", 8.5, (R - 6.0) - (u_c3 + 6.0)) or [title]
-            rh = max(18.0, 7.0 + len(t_lines) * 10.5)
-
-            if cur_y + rh > Y_MAX and has_u_rows:
-                close_units_list_box(box_top, body_top, cur_y)
-                new_page()
-                box_top = cur_y
-                body_top = draw_units_list_header(box_top)
-                cur_y = body_top
-                has_u_rows = False
-
-            if has_u_rows:
-                c.setLineWidth(0.45)
-                c.line(u_c1, Y(cur_y), R, Y(cur_y))
-
-            ym = cur_y + rh / 2.0
-            c.setFont("Lib", 8.5)
-            c.drawCentredString((u_c1 + u_c2) / 2.0, Y(ym + 3.0), f"{idx}.")
-            c.drawCentredString((u_c2 + u_c3) / 2.0, Y(ym + 3.0), code)
-            for k, tl in enumerate(t_lines):
-                c.drawString(u_c3 + 6.0, Y(ym + 3.0 + (k - (len(t_lines) - 1) / 2.0) * 10.5), tl)
-            cur_y += rh
-            has_u_rows = True
-
-        close_units_list_box(box_top, body_top, cur_y)
-        cur_y += 14.0
-
-    # 2b. Rencana Asesmen Berdasarkan Unit Kompetensi (Terhubung langsung ke AK.01)
-    # Column boundaries: Unit(50.4..148), Bukti(148..244), L(244..260), TL(260..276), T(276..292),
-    # CL(292..338), DIT(338..374), TJ(374..420), CVP(420..464), CRP(464..502), VPK(502..544.8)
+    u_c1, u_c2, u_c3 = L + 90.0, L + 125.0, L + 220.0
     cols = [L, 148.0, 244.0, 260.0, 276.0, 292.0, 338.0, 374.0, 420.0, 464.0, 502.0, R]
     raw_types = data.get("evidence_types", ["L", "T"])
     ev_types = [str(x).strip().upper() for x in (raw_types if isinstance(raw_types, list) else str(raw_types).split(","))]
@@ -1348,6 +1301,42 @@ def render_mapa_dynamic(data, dest_path):
     met_codes = [("CVP" if str(x).strip().upper() == "VP" else str(x).strip().upper()) for x in (raw_met if isinstance(raw_met, list) else [])]
     ev_lines = data.get("evidence_lines") or ["Hasil observasi", "langsung dan tanya", "jawab tentang"]
     ev_prefix = " ".join(str(x).strip() for x in ev_lines if str(x).strip())
+
+    def draw_units_list_header(top_y):
+        hb = top_y + 24.0
+        c.setLineWidth(0.65)
+        c.rect(L, Y(hb), R - L, 24.0)
+        for ux in (u_c1, u_c2, u_c3):
+            c.line(ux, Y(top_y), ux, Y(hb))
+        c.setFont("Lib-B", 8.8)
+        c.drawCentredString((L + u_c1) / 2.0, Y(top_y + 15.0), "Kelompok")
+        c.drawCentredString((u_c1 + u_c2) / 2.0, Y(top_y + 15.0), "No.")
+        c.drawCentredString((u_c2 + u_c3) / 2.0, Y(top_y + 15.0), "Kode Unit")
+        c.drawCentredString((u_c3 + R) / 2.0, Y(top_y + 15.0), "Judul Unit")
+        return hb
+
+    def close_units_list_box(box_top, body_top, bot_y, grp_seq=1, grp_name=""):
+        c.setLineWidth(0.65)
+        c.rect(L, Y(bot_y), R - L, bot_y - box_top)
+        for ux in (u_c1, u_c2, u_c3):
+            c.line(ux, Y(box_top), ux, Y(bot_y))
+        mid = (body_top + bot_y) / 2.0
+        max_w = (u_c1 - L) - 8.0
+        name_lines = wrap_w(grp_name, "Lib", 7.4, max_w) if grp_name else []
+        # Fit nicely inside box height
+        avail_h = max(10.0, (bot_y - body_top) - 6.0)
+        if 22.0 + len(name_lines) * 9.0 > avail_h:
+            max_name_lines = max(0, int((avail_h - 20.0) // 9.0))
+            name_lines = name_lines[:max_name_lines]
+        total_lbl_h = 18.0 + (len(name_lines) * 9.0 + 3.0 if name_lines else 0.0)
+        start_y = mid - total_lbl_h / 2.0 + 8.0
+        c.setFont("Lib-B", 8.4)
+        c.drawCentredString((L + u_c1) / 2.0, Y(start_y), "Kelompok")
+        c.drawCentredString((L + u_c1) / 2.0, Y(start_y + 10.0), f"Pekerjaan {grp_seq}")
+        if name_lines:
+            c.setFont("Lib", 7.4)
+            for nl_idx, nl in enumerate(name_lines):
+                c.drawCentredString((L + u_c1) / 2.0, Y(start_y + 21.0 + nl_idx * 9.0), nl)
 
     def draw_plan_table_header(top_y):
         hdr_h = 216.0
@@ -1459,70 +1448,116 @@ def render_mapa_dynamic(data, dest_path):
         for cx in (cols[3], cols[4], cols[6], cols[7], cols[8], cols[9], cols[10]):
             c.line(cx, Y(sub_y), cx, Y(bot_y))
 
-    if cur_y + 265.0 > Y_MAX:
-        new_page()
+    for grp in groups_to_render:
+        grp_seq = int(grp.get("sequence", 1))
+        grp_name = str(grp.get("name", "") or "").strip()
+        grp_units = grp.get("units") or []
+        if not grp_units:
+            continue
 
-    plan_box_top = cur_y
-    cur_y = draw_plan_table_header(plan_box_top)
-    has_p_rows = False
-
-    for idx, u in enumerate(units, 1):
-        title = str(u.get("title", "") if isinstance(u, dict) else (u[1] if isinstance(u, (list, tuple)) and len(u) > 1 else u))
-        u_lines = wrap_w(f"{idx}. {title}", "Lib", 8.2, (cols[1] - cols[0]) - 8.0) or [f"{idx}. {title}"]
-        b_lines = wrap_w(f"{ev_prefix} {title}", "Lib", 8.0, (cols[2] - cols[1]) - 8.0) or [ev_prefix]
-        rh = max(26.0, 10.0 + max(len(u_lines), len(b_lines)) * 10.2)
-
-        if cur_y + rh > Y_MAX and has_p_rows:
-            close_plan_table(plan_box_top, cur_y)
+        # Ensure header + at least first unit fit
+        if cur_y + 52.0 > Y_MAX:
             new_page()
-            plan_box_top = cur_y
-            cur_y = draw_plan_table_header(plan_box_top)
-            has_p_rows = False
 
-        if has_p_rows:
-            c.setLineWidth(0.45)
-            c.line(L, Y(cur_y), R, Y(cur_y))
+        box_top = cur_y
+        body_top = draw_units_list_header(box_top)
+        cur_y = body_top
+        has_u_rows = False
 
-        ym = cur_y + rh / 2.0
-        c.setFont("Lib", 8.2)
-        for k, ul in enumerate(u_lines):
-            c.drawString(cols[0] + 4.0, Y(cur_y + 11.0 + k * 10.2), ul)
-        c.setFont("Lib", 8.0)
-        for k, bl in enumerate(b_lines):
-            c.drawString(cols[1] + 4.0, Y(cur_y + 11.0 + k * 10.2), bl)
+        for idx, u in enumerate(grp_units, 1):
+            code = str(u.get("code", "") if isinstance(u, dict) else (u[0] if isinstance(u, (list, tuple)) else u))
+            title = str(u.get("title", "") if isinstance(u, dict) else (u[1] if isinstance(u, (list, tuple)) and len(u) > 1 else ""))
+            t_lines = wrap_w(title, "Lib", 8.5, (R - 6.0) - (u_c3 + 6.0)) or [title]
+            rh = max(18.0, 7.0 + len(t_lines) * 10.5)
 
-        # Jenis Bukti (L, TL, T)
-        c.setFont("Lib-B", 8.5)
-        if "L" in ev_types:
-            c.drawCentredString((cols[2] + cols[3]) / 2.0, Y(ym + 3.0), "L")
-        if "TL" in ev_types:
-            c.drawCentredString((cols[3] + cols[4]) / 2.0, Y(ym + 3.0), "TL")
-        if "T" in ev_types:
-            c.drawCentredString((cols[4] + cols[5]) / 2.0, Y(ym + 3.0), "T")
+            if cur_y + rh > Y_MAX and has_u_rows:
+                close_units_list_box(box_top, body_top, cur_y, grp_seq, grp_name)
+                new_page()
+                box_top = cur_y
+                body_top = draw_units_list_header(box_top)
+                cur_y = body_top
+                has_u_rows = False
 
-        # Metode & Perangkat
-        if "CL" in met_codes:
-            c.drawCentredString((cols[5] + cols[6]) / 2.0, Y(ym + 3.0), "CL")
-        if "DIT" in met_codes:
-            c.drawCentredString((cols[6] + cols[7]) / 2.0, Y(ym + 3.0), "DIT")
-        tj_items = [x for x in ["DPT", "DPL", "PW"] if x in met_codes]
-        if tj_items:
-            tj_str = ", ".join(tj_items)
-            c.setFont("Lib-B", 7.0 if len(tj_items) >= 3 else (7.8 if len(tj_items) == 2 else 8.5))
-            c.drawCentredString((cols[7] + cols[8]) / 2.0, Y(ym + 3.0), tj_str)
+            if has_u_rows:
+                c.setLineWidth(0.45)
+                c.line(u_c1, Y(cur_y), R, Y(cur_y))
+
+            ym = cur_y + rh / 2.0
+            c.setFont("Lib", 8.5)
+            c.drawCentredString((u_c1 + u_c2) / 2.0, Y(ym + 3.0), f"{idx}.")
+            c.drawCentredString((u_c2 + u_c3) / 2.0, Y(ym + 3.0), code)
+            for k, tl in enumerate(t_lines):
+                c.drawString(u_c3 + 6.0, Y(ym + 3.0 + (k - (len(t_lines) - 1) / 2.0) * 10.5), tl)
+            cur_y += rh
+            has_u_rows = True
+
+        close_units_list_box(box_top, body_top, cur_y, grp_seq, grp_name)
+        cur_y += 12.0
+
+        if cur_y + 255.0 > Y_MAX:
+            new_page()
+
+        plan_box_top = cur_y
+        cur_y = draw_plan_table_header(plan_box_top)
+        has_p_rows = False
+
+        for idx, u in enumerate(grp_units, 1):
+            title = str(u.get("title", "") if isinstance(u, dict) else (u[1] if isinstance(u, (list, tuple)) and len(u) > 1 else u))
+            u_lines = wrap_w(f"{idx}. {title}", "Lib", 8.2, (cols[1] - cols[0]) - 8.0) or [f"{idx}. {title}"]
+            b_lines = wrap_w(f"{ev_prefix} {title}", "Lib", 8.0, (cols[2] - cols[1]) - 8.0) or [ev_prefix]
+            rh = max(26.0, 10.0 + max(len(u_lines), len(b_lines)) * 10.2)
+
+            if cur_y + rh > Y_MAX and has_p_rows:
+                close_plan_table(plan_box_top, cur_y)
+                new_page()
+                plan_box_top = cur_y
+                cur_y = draw_plan_table_header(plan_box_top)
+                has_p_rows = False
+
+            if has_p_rows:
+                c.setLineWidth(0.45)
+                c.line(L, Y(cur_y), R, Y(cur_y))
+
+            ym = cur_y + rh / 2.0
+            c.setFont("Lib", 8.2)
+            for k, ul in enumerate(u_lines):
+                c.drawString(cols[0] + 4.0, Y(cur_y + 11.0 + k * 10.2), ul)
+            c.setFont("Lib", 8.0)
+            for k, bl in enumerate(b_lines):
+                c.drawString(cols[1] + 4.0, Y(cur_y + 11.0 + k * 10.2), bl)
+
+            # Jenis Bukti (L, TL, T)
             c.setFont("Lib-B", 8.5)
-        if "CVP" in met_codes:
-            c.drawCentredString((cols[8] + cols[9]) / 2.0, Y(ym + 3.0), "CVP")
-        if "CRP" in met_codes:
-            c.drawCentredString((cols[9] + cols[10]) / 2.0, Y(ym + 3.0), "CRP")
-        if "VPK" in met_codes:
-            c.drawCentredString((cols[10] + cols[11]) / 2.0, Y(ym + 3.0), "VPK")
+            if "L" in ev_types:
+                c.drawCentredString((cols[2] + cols[3]) / 2.0, Y(ym + 3.0), "L")
+            if "TL" in ev_types:
+                c.drawCentredString((cols[3] + cols[4]) / 2.0, Y(ym + 3.0), "TL")
+            if "T" in ev_types:
+                c.drawCentredString((cols[4] + cols[5]) / 2.0, Y(ym + 3.0), "T")
 
-        cur_y += rh
-        has_p_rows = True
+            # Metode & Perangkat
+            if "CL" in met_codes:
+                c.drawCentredString((cols[5] + cols[6]) / 2.0, Y(ym + 3.0), "CL")
+            if "DIT" in met_codes:
+                c.drawCentredString((cols[6] + cols[7]) / 2.0, Y(ym + 3.0), "DIT")
+            tj_items = [x for x in ["DPT", "DPL", "PW"] if x in met_codes]
+            if tj_items:
+                tj_str = ", ".join(tj_items)
+                c.setFont("Lib-B", 7.0 if len(tj_items) >= 3 else (7.8 if len(tj_items) == 2 else 8.5))
+                c.drawCentredString((cols[7] + cols[8]) / 2.0, Y(ym + 3.0), tj_str)
+                c.setFont("Lib-B", 8.5)
+            if "CVP" in met_codes:
+                c.drawCentredString((cols[8] + cols[9]) / 2.0, Y(ym + 3.0), "CVP")
+            if "CRP" in met_codes:
+                c.drawCentredString((cols[9] + cols[10]) / 2.0, Y(ym + 3.0), "CRP")
+            if "VPK" in met_codes:
+                c.drawCentredString((cols[10] + cols[11]) / 2.0, Y(ym + 3.0), "VPK")
 
-    close_plan_table(plan_box_top, cur_y)
-    cur_y += 14.0
+            cur_y += rh
+            has_p_rows = True
+
+        close_plan_table(plan_box_top, cur_y)
+        cur_y += 14.0
 
     # ================= SECTION 3: Modifikasi & Kontekstualisasi =================
     mod_items = [

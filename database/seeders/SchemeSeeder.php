@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\CompetencyUnit;
+use App\Models\JobGroup;
 use App\Models\Kuk;
 use App\Models\QuestionBank;
 use App\Models\Scheme;
@@ -40,18 +41,50 @@ class SchemeSeeder extends Seeder
                 ]
             );
 
+            // Job Groups (Kelompok Pekerjaan)
+            $jobGroupsBySequence = [];
+            $seededGroupSequences = [];
+            foreach ($content['job_groups'] ?? [] as $jgData) {
+                $jgSeq = (int) ($jgData['sequence'] ?? 1);
+                $jobGroup = JobGroup::updateOrCreate(
+                    [
+                        'scheme_id' => $scheme->id,
+                        'sequence' => $jgSeq,
+                    ],
+                    [
+                        'name' => $jgData['name'],
+                    ]
+                );
+                $jobGroupsBySequence[$jgSeq] = $jobGroup;
+                $seededGroupSequences[] = $jgSeq;
+            }
+
+            if (! empty($seededGroupSequences)) {
+                JobGroup::withoutGlobalScopes()
+                    ->where('scheme_id', $scheme->id)
+                    ->whereNotIn('sequence', $seededGroupSequences)
+                    ->delete();
+            }
+
             // Units
             $unitModels = [];
             foreach ($content['units'] ?? [] as $uData) {
-                $unit = CompetencyUnit::updateOrCreate(
+                $jgSeq = isset($uData['job_group_sequence']) ? (int) $uData['job_group_sequence'] : null;
+                $jobGroupId = $jgSeq !== null && isset($jobGroupsBySequence[$jgSeq])
+                    ? $jobGroupsBySequence[$jgSeq]->id
+                    : null;
+
+                $unit = CompetencyUnit::withoutGlobalScopes()->updateOrCreate(
                     [
                         'scheme_id' => $scheme->id,
                         'code' => $uData['code'],
                     ],
                     [
+                        'job_group_id' => $jobGroupId,
                         'title' => $uData['title'],
                         'standard_reference' => $uData['standard_reference'] ?? 'SKKNI Terkait',
                         'sequence' => $uData['sequence'] ?? 1,
+                        'job_group_sequence' => $uData['job_group_unit_sequence'] ?? null,
                     ]
                 );
                 $unitModels[$uData['code']] = $unit;

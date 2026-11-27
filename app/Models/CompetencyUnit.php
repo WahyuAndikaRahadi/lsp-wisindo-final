@@ -16,20 +16,35 @@ class CompetencyUnit extends Model
 
     protected $fillable = [
         'scheme_id',
+        'job_group_id',
         'code',
         'title',
         'standard_reference',
         'sequence',
+        'job_group_sequence',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'sequence' => 'integer',
+            'job_group_sequence' => 'integer',
+        ];
+    }
 
     protected static function booted(): void
     {
-        static::addGlobalScope('ordered', fn ($q) => $q->orderBy('sequence'));
+        static::addGlobalScope('ordered', fn ($q) => $q->orderBy('sequence')->orderBy('id'));
     }
 
     public function scheme(): BelongsTo
     {
         return $this->belongsTo(Scheme::class);
+    }
+
+    public function jobGroup(): BelongsTo
+    {
+        return $this->belongsTo(JobGroup::class);
     }
 
     public function elements(): HasMany

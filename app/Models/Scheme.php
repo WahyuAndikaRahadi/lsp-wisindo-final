@@ -49,6 +49,11 @@ class Scheme extends Model
         return $this->competencyUnits();
     }
 
+    public function jobGroups(): HasMany
+    {
+        return $this->hasMany(JobGroup::class)->orderBy('sequence')->orderBy('id');
+    }
+
     public function questionBanks(): HasMany
     {
         return $this->hasMany(QuestionBank::class);

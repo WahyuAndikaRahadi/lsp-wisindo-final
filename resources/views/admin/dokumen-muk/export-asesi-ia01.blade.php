@@ -8,16 +8,22 @@
     $ia01Response = $iaResponses->firstWhere('instrument_code', 'IA01');
     $savedKuks = $ia01Response?->data_json['kuks'] ?? [];
     $allUnits = $scheme->competencyUnits->sortBy('sequence');
+    $dbJobGroups = $scheme->jobGroups()->with(['competencyUnits.elements.kuks'])->get();
 
-    // Group units according to BNSP standard clusters if 9 units exist
-    if ($allUnits->count() >= 9) {
-        $kelompok1Units = $allUnits->filter(fn($u) => $u->sequence <= 5);
-        $kelompok2Units = $allUnits->filter(fn($u) => $u->sequence == 6);
-        $kelompok3Units = $allUnits->filter(fn($u) => $u->sequence >= 7);
+    if ($dbJobGroups->isNotEmpty()) {
+        $kelompokGroups = $dbJobGroups->map(fn ($jg) => [
+            'sequence' => $jg->sequence,
+            'name' => $jg->name,
+            'units' => $jg->competencyUnits,
+        ])->filter(fn ($g) => $g['units']->isNotEmpty())->values();
     } else {
-        $kelompok1Units = $allUnits;
-        $kelompok2Units = collect();
-        $kelompok3Units = collect();
+        $kelompokGroups = collect([
+            [
+                'sequence' => 1,
+                'name' => '',
+                'units' => $allUnits,
+            ],
+        ])->filter(fn ($g) => $g['units']->isNotEmpty())->values();
     }
 
     $isKompeten = true;
@@ -111,56 +117,29 @@
         </tr>
     </table>
 
-    {{-- KELOMPOK PEKERJAAN 1: GENERAL SERVICE --}}
-    @if($kelompok1Units->isNotEmpty())
+    {{-- KELOMPOK PEKERJAAN DINAMIS --}}
+    @foreach($kelompokGroups as $grp)
+        @if(!$loop->first)
+            <div style="page-break-before: always;"></div>
+        @endif
         <table style="width: 100%; border: 1px solid #000; border-collapse: collapse; margin-top: 10px; margin-bottom: 8px; font-size: 8pt; page-break-inside: avoid;">
             <thead>
                 <tr style="background-color: #f1f5f9; text-align: center; font-weight: bold;">
-                    <th style="border: 1px solid #000; padding: 4px; width: 25%;">Kelompok Pekerjaan 1</th>
-                    <th style="border: 1px solid #000; padding: 4px; width: 6%;">No</th>
-                    <th style="border: 1px solid #000; padding: 4px; width: 25%;">Kode Unit</th>
-                    <th style="border: 1px solid #000; padding: 4px;">Judul Unit</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($kelompok1Units as $idx => $u)
-                <tr>
-                    @if($loop->first)
-                    <td style="border: 1px solid #000; padding: 4px 6px; text-align: center; font-weight: bold; vertical-align: middle;" rowspan="{{ $kelompok1Units->count() }}">
-                        Kelompok Pekerjaan 1<br><span style="font-weight: normal; font-size: 7.5pt;">General Service</span>
-                    </td>
-                    @endif
-                    <td style="border: 1px solid #000; padding: 3px 4px; text-align: center;">{{ $idx + 1 }}.</td>
-                    <td style="border: 1px solid #000; padding: 3px 6px; font-family: monospace;">{{ $u->code }}</td>
-                    <td style="border: 1px solid #000; padding: 3px 6px;">{{ $u->title }}</td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
-
-        @foreach($kelompok1Units as $idx => $unit)
-            @include('admin.dokumen-muk.partials.ia01-unit', ['unit' => $unit, 'unitNumber' => $idx + 1, 'savedKuks' => $savedKuks])
-        @endforeach
-    @endif
-
-    {{-- KELOMPOK PEKERJAAN 2: ENGINE --}}
-    @if($kelompok2Units->isNotEmpty())
-        <div style="page-break-before: always;"></div>
-        <table style="width: 100%; border: 1px solid #000; border-collapse: collapse; margin-top: 10px; margin-bottom: 8px; font-size: 8pt; page-break-inside: avoid;">
-            <thead>
-                <tr style="background-color: #f1f5f9; text-align: center; font-weight: bold;">
-                    <th style="border: 1px solid #000; padding: 4px; width: 25%;">Kelompok Pekerjaan 2</th>
+                    <th style="border: 1px solid #000; padding: 4px; width: 25%;">Kelompok Pekerjaan {{ $grp['sequence'] }}</th>
                     <th style="border: 1px solid #000; padding: 4px; width: 6%;">No.</th>
                     <th style="border: 1px solid #000; padding: 4px; width: 25%;">Kode Unit</th>
                     <th style="border: 1px solid #000; padding: 4px;">Judul Unit</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach($kelompok2Units as $idx => $u)
+                @foreach($grp['units'] as $idx => $u)
                 <tr>
                     @if($loop->first)
-                    <td style="border: 1px solid #000; padding: 4px 6px; text-align: center; font-weight: bold; vertical-align: middle;" rowspan="{{ $kelompok2Units->count() }}">
-                        Kelompok Pekerjaan 2<br><span style="font-weight: normal; font-size: 7.5pt;">Engine</span>
+                    <td style="border: 1px solid #000; padding: 4px 6px; text-align: center; font-weight: bold; vertical-align: middle;" rowspan="{{ $grp['units']->count() }}">
+                        Kelompok Pekerjaan {{ $grp['sequence'] }}
+                        @if(!empty($grp['name']))
+                            <br><span style="font-weight: normal; font-size: 7.5pt;">{{ $grp['name'] }}</span>
+                        @endif
                     </td>
                     @endif
                     <td style="border: 1px solid #000; padding: 3px 4px; text-align: center;">{{ $idx + 1 }}.</td>
@@ -171,43 +150,10 @@
             </tbody>
         </table>
 
-        @foreach($kelompok2Units as $idx => $unit)
+        @foreach($grp['units'] as $idx => $unit)
             @include('admin.dokumen-muk.partials.ia01-unit', ['unit' => $unit, 'unitNumber' => $idx + 1, 'savedKuks' => $savedKuks])
         @endforeach
-    @endif
-
-    {{-- KELOMPOK PEKERJAAN 3: KELISTRIKAN & ENGINE MANAGEMENT --}}
-    @if($kelompok3Units->isNotEmpty())
-        <div style="page-break-before: always;"></div>
-        <table style="width: 100%; border: 1px solid #000; border-collapse: collapse; margin-top: 10px; margin-bottom: 8px; font-size: 8pt; page-break-inside: avoid;">
-            <thead>
-                <tr style="background-color: #f1f5f9; text-align: center; font-weight: bold;">
-                    <th style="border: 1px solid #000; padding: 4px; width: 25%;">Kelompok Pekerjaan 3</th>
-                    <th style="border: 1px solid #000; padding: 4px; width: 6%;">No.</th>
-                    <th style="border: 1px solid #000; padding: 4px; width: 25%;">Kode Unit</th>
-                    <th style="border: 1px solid #000; padding: 4px;">Judul Unit</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($kelompok3Units as $idx => $u)
-                <tr>
-                    @if($loop->first)
-                    <td style="border: 1px solid #000; padding: 4px 6px; text-align: center; font-weight: bold; vertical-align: middle;" rowspan="{{ $kelompok3Units->count() }}">
-                        Kelompok Pekerjaan 3
-                    </td>
-                    @endif
-                    <td style="border: 1px solid #000; padding: 3px 4px; text-align: center;">{{ $idx + 1 }}.</td>
-                    <td style="border: 1px solid #000; padding: 3px 6px; font-family: monospace;">{{ $u->code }}</td>
-                    <td style="border: 1px solid #000; padding: 3px 6px;">{{ $u->title }}</td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
-
-        @foreach($kelompok3Units as $idx => $unit)
-            @include('admin.dokumen-muk.partials.ia01-unit', ['unit' => $unit, 'unitNumber' => $idx + 1, 'savedKuks' => $savedKuks])
-        @endforeach
-    @endif
+    @endforeach
 
     {{-- Umpan Balik untuk Asesi Box --}}
     <table style="width: 100%; border: 1px solid #000; border-collapse: collapse; margin-top: 15px; margin-bottom: 10px; font-size: 8.5pt; page-break-inside: avoid;">

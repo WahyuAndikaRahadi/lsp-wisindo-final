@@ -141,30 +141,67 @@
 
     {{-- 2. Rencana Asesmen --}}
     <div style="background: #f1f5f9; border: 1px solid #000; border-bottom: none; padding: 4px 6px; font-weight: bold; font-size: 9pt; margin-top: 10px;" class="avoid-break">
-        2. Rencana Asesmen Berdasarkan Unit Kompetensi
+        2. Rencana Asesmen Berdasarkan Kelompok Pekerjaan &amp; Unit Kompetensi
     </div>
-    <table class="bnsp-table" style="margin-top: 0; font-size: 7.5pt;">
-        <thead>
-            <tr>
-                <th style="width: 5%;">No</th>
-                <th style="width: 25%;">Kode Unit</th>
-                <th style="width: 45%;">Judul Unit Kompetensi</th>
-                <th style="width: 25%;">Bukti &amp; Metode yang Digunakan</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($scheme->competencyUnits as $idx => $u)
+    @php
+        $mapaJobGroups = $scheme->jobGroups()->with('competencyUnits')->get();
+    @endphp
+    @if($mapaJobGroups->isNotEmpty())
+        @foreach($mapaJobGroups as $jg)
+            <table class="bnsp-table" style="margin-top: 0; margin-bottom: 6px; font-size: 7.5pt;">
+                <thead>
+                    <tr>
+                        <th style="width: 22%;">Kelompok</th>
+                        <th style="width: 5%;">No</th>
+                        <th style="width: 20%;">Kode Unit</th>
+                        <th style="width: 33%;">Judul Unit Kompetensi</th>
+                        <th style="width: 20%;">Bukti &amp; Metode yang Digunakan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($jg->competencyUnits as $idx => $u)
+                        <tr>
+                            @if($loop->first)
+                                <td rowspan="{{ $jg->competencyUnits->count() }}" style="text-align: center; font-weight: bold; vertical-align: middle; background: #fafafa;">
+                                    Kelompok Pekerjaan {{ $jg->sequence }}<br>
+                                    <span style="font-weight: normal; font-size: 7pt;">{{ $jg->name }}</span>
+                                </td>
+                            @endif
+                            <td style="text-align: center;">{{ $idx + 1 }}.</td>
+                            <td style="font-family: monospace; font-weight: bold;">{{ $u->code }}</td>
+                            <td>{{ $u->title }}</td>
+                            <td style="font-size: 7pt; color: #334155; font-weight: 600;">
+                                {{ $metodeSummary }}
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        @endforeach
+    @else
+        <table class="bnsp-table" style="margin-top: 0; font-size: 7.5pt;">
+            <thead>
                 <tr>
-                    <td style="text-align: center;">{{ $idx + 1 }}</td>
-                    <td style="font-family: monospace; font-weight: bold;">{{ $u->code }}</td>
-                    <td>{{ $u->title }}</td>
-                    <td style="font-size: 7pt; color: #334155; font-weight: 600;">
-                        {{ $metodeSummary }}
-                    </td>
+                    <th style="width: 5%;">No</th>
+                    <th style="width: 25%;">Kode Unit</th>
+                    <th style="width: 45%;">Judul Unit Kompetensi</th>
+                    <th style="width: 25%;">Bukti &amp; Metode yang Digunakan</th>
                 </tr>
-            @endforeach
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach($scheme->competencyUnits as $idx => $u)
+                    <tr>
+                        <td style="text-align: center;">{{ $idx + 1 }}</td>
+                        <td style="font-family: monospace; font-weight: bold;">{{ $u->code }}</td>
+                        <td>{{ $u->title }}</td>
+                        <td style="font-size: 7pt; color: #334155; font-weight: 600;">
+                            {{ $metodeSummary }}
+                        </td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    @endif
 
     {{-- Signatures --}}
     <div class="sig-container avoid-break" style="margin-top: 15px;">

@@ -445,7 +445,11 @@ Route::middleware(['auth', 'role:SUPER_ADMIN,ADMIN_LSP,KOMITE_TEKNIS,TUK_ADMIN']
         Route::resource('question-banks', Admin\QuestionBankController::class);
         Route::resource('interview-questions', Admin\InterviewQuestionController::class)->except(['create', 'show', 'edit']);
 
-        // Scheme Competency Units, Elements & KUK Management
+        // Scheme Job Groups (Kelompok Pekerjaan), Competency Units, Elements & KUK Management
+        Route::post('/schemes/{scheme}/job-groups', [Admin\SchemeController::class, 'storeJobGroup'])->name('schemes.job-groups.store');
+        Route::put('/job-groups/{jobGroup}', [Admin\SchemeController::class, 'updateJobGroup'])->name('schemes.job-groups.update');
+        Route::delete('/job-groups/{jobGroup}', [Admin\SchemeController::class, 'destroyJobGroup'])->name('schemes.job-groups.destroy');
+
         Route::post('/schemes/{scheme}/units', [Admin\SchemeController::class, 'storeUnit'])->name('schemes.units.store');
         Route::put('/units/{unit}', [Admin\SchemeController::class, 'updateUnit'])->name('schemes.units.update');
         Route::delete('/units/{unit}', [Admin\SchemeController::class, 'destroyUnit'])->name('schemes.units.destroy');

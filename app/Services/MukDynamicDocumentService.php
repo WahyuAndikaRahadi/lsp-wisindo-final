@@ -1029,6 +1029,47 @@ class MukDynamicDocumentService
     }
 
     /**
+     * Build ordered Kelompok Pekerjaan (job groups) payload for a scheme.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    protected function buildJobGroupsPayload(?Scheme $scheme): array
+    {
+        if (! $scheme) {
+            return [];
+        }
+
+        $scheme->loadMissing(['jobGroups.competencyUnits']);
+        $jobGroupsPayload = [];
+
+        foreach ($scheme->jobGroups as $jg) {
+            $jgUnits = [];
+            foreach ($jg->competencyUnits as $uIdx => $u) {
+                $jgUnits[] = [
+                    'id' => $u->id,
+                    'no' => $uIdx + 1,
+                    'code' => $u->code,
+                    'title' => $u->title,
+                    'sequence' => $u->sequence,
+                    'job_group_sequence' => $u->job_group_sequence ?? ($uIdx + 1),
+                ];
+            }
+
+            if (! empty($jgUnits)) {
+                $jobGroupsPayload[] = [
+                    'id' => $jg->id,
+                    'sequence' => $jg->sequence,
+                    'name' => $jg->name,
+                    'label' => "Kelompok Pekerjaan {$jg->sequence}",
+                    'units' => $jgUnits,
+                ];
+            }
+        }
+
+        return $jobGroupsPayload;
+    }
+
+    /**
      * Build specific payload for FR.MAPA.01 (Merencanakan Aktivitas dan Proses Asesmen).
      * Sourced from assessor's input (mapa01_data).
      */
@@ -1037,7 +1078,7 @@ class MukDynamicDocumentService
         $mapaData = $assessment?->mapa01_data ?? $schedule->mapa01_data ?? [];
         $ak01Data = $assessment?->ak01_data ?? $schedule->ak01_data ?? [];
         $scheme = $assessment?->scheme ?? $schedule->scheme;
-        $scheme?->loadMissing(['competencyUnits', 'penyusun', 'validators']);
+        $scheme?->loadMissing(['competencyUnits', 'jobGroups.competencyUnits', 'penyusun', 'validators']);
         $assessor = $assessment?->assessor ?? $schedule->assessors->first();
         $assessorProfile = $assessor?->profile;
 
@@ -1185,6 +1226,7 @@ class MukDynamicDocumentService
             'tuk_nama' => $schedule->tuk_name ?? '',
             'tuk_type' => $tukType,
             'units' => $unitsPayload,
+            'job_groups' => $this->buildJobGroupsPayload($scheme),
             'penyusun_list' => $scheme?->penyusun_list ?? [],
             'validators_list' => $scheme?->validator_list ?? [],
             'pendekatan_asesi' => $mapaData['pendekatan_asesi'] ?? 'Hasil pelatihan dan / atau pendidikan, dimana Kurikulum dan fasilitas praktek mampu telusur terhadap standar kompetensi',
@@ -1499,6 +1541,7 @@ class MukDynamicDocumentService
             'signature_asesi' => $asesiSignature,
             'signature_asesor' => $assessorSignature,
             'units' => $unitsData,
+            'job_groups' => $this->buildJobGroupsPayload($scheme),
             'kuk_results_by_id' => $kukResultsById,
             'kuk_results_seq' => $kukResultsSeq,
             'unfulfilled_items' => $unfulfilledItems,

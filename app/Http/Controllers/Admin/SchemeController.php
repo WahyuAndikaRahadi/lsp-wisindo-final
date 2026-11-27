@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\CompetencyUnit;
+use App\Models\JobGroup;
 use App\Models\Kuk;
 use App\Models\Scheme;
 use App\Models\SchemeCommittee;
@@ -40,7 +41,13 @@ class SchemeController extends Controller
 
     public function show(Scheme $scheme): View
     {
-        $scheme->load(['competencyUnits.elements.kuks', 'penyusun', 'validators']);
+        $scheme->load([
+            'competencyUnits.jobGroup',
+            'competencyUnits.elements.kuks',
+            'jobGroups.competencyUnits',
+            'penyusun',
+            'validators',
+        ]);
 
         return view('admin.schemes.show', compact('scheme'));
     }
@@ -186,6 +193,69 @@ class SchemeController extends Controller
     }
 
     /**
+     * Store a new job group (Kelompok Pekerjaan) under a scheme.
+     */
+    public function storeJobGroup(Request $request, Scheme $scheme): RedirectResponse
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'sequence' => 'nullable|integer|min:1',
+        ]);
+
+        $maxSeq = $scheme->jobGroups()->max('sequence') ?? 0;
+        $sequence = (int) ($validated['sequence'] ?? ($maxSeq + 1));
+
+        JobGroup::create([
+            'scheme_id' => $scheme->id,
+            'sequence' => $sequence,
+            'name' => trim($validated['name']),
+        ]);
+
+        return redirect()->route('admin.schemes.show', $scheme->id)
+            ->with('success', 'Kelompok pekerjaan baru berhasil ditambahkan.');
+    }
+
+    /**
+     * Update an existing job group (Kelompok Pekerjaan).
+     */
+    public function updateJobGroup(Request $request, JobGroup $jobGroup): RedirectResponse
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'sequence' => [
+                'required',
+                'integer',
+                'min:1',
+                Rule::unique('m_job_groups', 'sequence')
+                    ->where('scheme_id', $jobGroup->scheme_id)
+                    ->ignore($jobGroup->id),
+            ],
+        ]);
+
+        $jobGroup->update([
+            'name' => trim($validated['name']),
+            'sequence' => (int) $validated['sequence'],
+        ]);
+
+        return redirect()->route('admin.schemes.show', $jobGroup->scheme_id)
+            ->with('success', "Kelompok Pekerjaan {$jobGroup->sequence} berhasil diperbarui.");
+    }
+
+    /**
+     * Delete a job group (units remain, unlinked).
+     */
+    public function destroyJobGroup(JobGroup $jobGroup): RedirectResponse
+    {
+        $schemeId = $jobGroup->scheme_id;
+        $name = $jobGroup->name;
+
+        $jobGroup->delete();
+
+        return redirect()->route('admin.schemes.show', $schemeId)
+            ->with('success', "Kelompok pekerjaan \"{$name}\" berhasil dihapus.");
+    }
+
+    /**
      * Store a new competency unit under a scheme.
      */
     public function storeUnit(Request $request, Scheme $scheme): RedirectResponse
@@ -194,14 +264,29 @@ class SchemeController extends Controller
             'code' => 'required|string|max:50',
             'title' => 'required|string|max:255',
             'standard_reference' => 'nullable|string|max:100',
+            'sequence' => 'nullable|integer|min:1',
+            'job_group_id' => [
+                'nullable',
+                'integer',
+                Rule::exists('m_job_groups', 'id')->where('scheme_id', $scheme->id),
+            ],
+            'job_group_sequence' => 'nullable|integer|min:1',
         ]);
 
         $maxSeq = $scheme->competencyUnits()->max('sequence') ?? 0;
+        $jobGroupId = ! empty($validated['job_group_id']) ? (int) $validated['job_group_id'] : null;
+        $jobGroupSeq = $validated['job_group_sequence'] ?? null;
+        if ($jobGroupId !== null && $jobGroupSeq === null) {
+            $jobGroupSeq = ((int) CompetencyUnit::withoutGlobalScopes()->where('job_group_id', $jobGroupId)->max('job_group_sequence')) + 1;
+        }
+
         $scheme->competencyUnits()->create([
+            'job_group_id' => $jobGroupId,
             'code' => strtoupper(trim($validated['code'])),
             'title' => trim($validated['title']),
             'standard_reference' => $validated['standard_reference'] ?? 'SKKNI',
-            'sequence' => $maxSeq + 1,
+            'sequence' => (int) ($validated['sequence'] ?? ($maxSeq + 1)),
+            'job_group_sequence' => $jobGroupId !== null ? (int) $jobGroupSeq : null,
         ]);
 
         return redirect()->route('admin.schemes.show', $scheme->id)
@@ -217,12 +302,28 @@ class SchemeController extends Controller
             'code' => 'required|string|max:50',
             'title' => 'required|string|max:255',
             'standard_reference' => 'nullable|string|max:100',
+            'sequence' => 'nullable|integer|min:1',
+            'job_group_id' => [
+                'nullable',
+                'integer',
+                Rule::exists('m_job_groups', 'id')->where('scheme_id', $unit->scheme_id),
+            ],
+            'job_group_sequence' => 'nullable|integer|min:1',
         ]);
 
+        $jobGroupId = ! empty($validated['job_group_id']) ? (int) $validated['job_group_id'] : null;
+        $jobGroupSeq = $validated['job_group_sequence'] ?? null;
+        if ($jobGroupId !== null && $jobGroupSeq === null) {
+            $jobGroupSeq = ((int) CompetencyUnit::withoutGlobalScopes()->where('job_group_id', $jobGroupId)->max('job_group_sequence')) + 1;
+        }
+
         $unit->update([
+            'job_group_id' => $jobGroupId,
             'code' => strtoupper(trim($validated['code'])),
             'title' => trim($validated['title']),
             'standard_reference' => $validated['standard_reference'] ?? $unit->standard_reference,
+            'sequence' => (int) ($validated['sequence'] ?? $unit->sequence),
+            'job_group_sequence' => $jobGroupId !== null ? (int) $jobGroupSeq : null,
         ]);
 
         return redirect()->route('admin.schemes.show', $unit->scheme_id)
