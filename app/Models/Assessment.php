@@ -176,7 +176,7 @@ class Assessment extends Model
             }
         }
 
-        return ['IA01', 'IA01B', 'IA02', 'IA03', 'IA05'];
+        return ['IA01', 'IA02', 'IA03', 'IA05'];
     }
 
     /**
@@ -277,23 +277,7 @@ class Assessment extends Model
             }
         }
 
-        // 2. If Report Sheet (IA01B) is assigned, asesi must have uploaded the work sheet evidence
-        if (in_array('IA01B', $assigned, true)) {
-            $hasAsesiTask = true;
-            $respIa01b = $responses->get('IA01B');
-            $hasEvidence = false;
-            if ($respIa01b) {
-                $dataJson = is_array($respIa01b->data_json)
-                    ? $respIa01b->data_json
-                    : (json_decode($respIa01b->data_json ?? '[]', true) ?: []);
-                $hasEvidence = ! empty($dataJson['evidence_image_path']) || ! empty($respIa01b->assessor_signed_at);
-            }
-            if (! $hasEvidence) {
-                return false;
-            }
-        }
-
-        // 3. If Portfolio (IA08) is assigned, asesi must have uploaded portfolio files
+        // 2. If Portfolio (IA08) is assigned, asesi must have uploaded portfolio files
         if (in_array('IA08', $assigned, true)) {
             $hasAsesiTask = true;
             $respIa08 = $responses->get('IA08');
@@ -309,7 +293,7 @@ class Assessment extends Model
             }
         }
 
-        // 4. If there were asesi online tasks (like IA05, IA01B, or IA08) and they are all done, AK03 unlocks!
+        // 3. If there were asesi online tasks (like IA05 or IA08) and they are all done, AK03 unlocks!
         if ($hasAsesiTask) {
             return true;
         }

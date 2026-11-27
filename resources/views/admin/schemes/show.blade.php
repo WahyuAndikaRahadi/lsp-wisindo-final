@@ -17,6 +17,14 @@
     showEditKukModal: false,
     editKukData: { id: null, code_number: '', statement: '' },
 
+    previewSigModal: false,
+    previewSigData: { name: '', no_met: '', signature: '', role: '' },
+
+    openPreviewSig(data, role) {
+        this.previewSigData = { name: data.name, no_met: data.no_met, signature: data.signature, role: role };
+        this.previewSigModal = true;
+    },
+
     openEditUnit(unit) {
         this.editUnitData = { ...unit };
         this.showEditUnitModal = true;
@@ -69,6 +77,118 @@
             {{ $scheme->description }}
         </div>
     @endif
+
+    {{-- Tim Penyusun & Validator Dokumen MUK --}}
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="px-4 sm:px-6 py-3.5 sm:py-4 bg-slate-50 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center sm:justify-between items-start gap-2">
+            <div>
+                <h2 class="text-sm font-bold text-slate-900">
+                    Tim Penyusun & Validator Dokumen MUK
+                </h2>
+                <p class="text-xs text-slate-500 mt-0.5">Asesor yang bertanggung jawab menyusun dan memvalidasi materi uji kompetensi (MAPA, AK, IA).</p>
+            </div>
+            <a href="{{ route('admin.schemes.edit', $scheme->id) }}" class="text-xs text-brand-600 hover:text-brand-800 font-bold flex items-center space-x-1">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                <span>Kelola Tim MUK</span>
+            </a>
+        </div>
+
+        <div class="p-5 sm:p-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {{-- Column 1: Tim Penyusun --}}
+            <div class="space-y-3">
+                <div class="flex items-center justify-between pb-2 border-b border-slate-200">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-brand-600"></span>
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700">Tim Penyusun MUK</h3>
+                    </div>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-brand-50 text-brand-700 border border-brand-200">
+                        {{ $scheme->penyusun->count() }} Orang
+                    </span>
+                </div>
+
+                <div class="space-y-2.5">
+                    @forelse($scheme->penyusun as $idx => $person)
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-white hover:border-slate-300 transition">
+                            <div class="flex items-center space-x-3 min-w-0">
+                                <div class="w-8 h-8 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center font-bold text-xs shrink-0">
+                                    {{ $idx + 1 }}
+                                </div>
+                                <div class="min-w-0">
+                                    <h4 class="text-xs font-bold text-slate-900 truncate">{{ $person->name }}</h4>
+                                    <p class="text-[11px] font-mono text-slate-500 truncate mt-0.5">
+                                        {{ $person->no_met ? $person->no_met : 'Belum ada No. MET' }}
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="shrink-0 self-end sm:self-center">
+                                @if($person->signature)
+                                    <div @click="openPreviewSig({ name: '{{ addslashes($person->name) }}', no_met: '{{ addslashes($person->no_met ?? '') }}', signature: '{{ $person->signature }}' }, 'Penyusun')"
+                                         title="Klik untuk melihat pratinjau penuh"
+                                         class="h-20 w-48 sm:h-24 sm:w-56 bg-white border border-slate-200 hover:border-brand-400 rounded-xl p-2 flex items-center justify-center shadow-2xs hover:shadow-md transition cursor-zoom-in group relative">
+                                        <img src="{{ $person->signature }}" alt="TTD {{ $person->name }}" class="h-full w-full object-contain filter contrast-125">
+                                        <span class="absolute bottom-1 right-1 opacity-0 group-hover:opacity-100 transition text-[9px] font-bold text-brand-600 bg-brand-50 px-1 py-0.5 rounded border border-brand-200">Perbesar</span>
+                                    </div>
+                                @else
+                                    <span class="text-[10px] text-slate-400 italic">Tanpa TTD</span>
+                                @endif
+                            </div>
+                        </div>
+                    @empty
+                        <div class="p-4 text-center border border-dashed border-slate-200 rounded-lg text-slate-400 text-xs italic">
+                            Belum ada Tim Penyusun yang ditambahkan.
+                        </div>
+                    @endforelse
+                </div>
+            </div>
+
+            {{-- Column 2: Tim Validator --}}
+            <div class="space-y-3">
+                <div class="flex items-center justify-between pb-2 border-b border-slate-200">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700">Tim Validator MUK</h3>
+                    </div>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                        {{ $scheme->validators->count() }} Orang
+                    </span>
+                </div>
+
+                <div class="space-y-2.5">
+                    @forelse($scheme->validators as $idx => $person)
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-white hover:border-slate-300 transition">
+                            <div class="flex items-center space-x-3 min-w-0">
+                                <div class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-xs shrink-0">
+                                    {{ $idx + 1 }}
+                                </div>
+                                <div class="min-w-0">
+                                    <h4 class="text-xs font-bold text-slate-900 truncate">{{ $person->name }}</h4>
+                                    <p class="text-[11px] font-mono text-slate-500 truncate mt-0.5">
+                                        {{ $person->no_met ? $person->no_met : 'Belum ada No. MET' }}
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="shrink-0 self-end sm:self-center">
+                                @if($person->signature)
+                                    <div @click="openPreviewSig({ name: '{{ addslashes($person->name) }}', no_met: '{{ addslashes($person->no_met ?? '') }}', signature: '{{ $person->signature }}' }, 'Validator')"
+                                         title="Klik untuk melihat pratinjau penuh"
+                                         class="h-20 w-48 sm:h-24 sm:w-56 bg-white border border-slate-200 hover:border-emerald-400 rounded-xl p-2 flex items-center justify-center shadow-2xs hover:shadow-md transition cursor-zoom-in group relative">
+                                        <img src="{{ $person->signature }}" alt="TTD {{ $person->name }}" class="h-full w-full object-contain filter contrast-125">
+                                        <span class="absolute bottom-1 right-1 opacity-0 group-hover:opacity-100 transition text-[9px] font-bold text-emerald-700 bg-emerald-50 px-1 py-0.5 rounded border border-emerald-200">Perbesar</span>
+                                    </div>
+                                @else
+                                    <span class="text-[10px] text-slate-400 italic">Tanpa TTD</span>
+                                @endif
+                            </div>
+                        </div>
+                    @empty
+                        <div class="p-4 text-center border border-dashed border-slate-200 rounded-lg text-slate-400 text-xs italic">
+                            Belum ada Tim Validator yang ditambahkan.
+                        </div>
+                    @endforelse
+                </div>
+            </div>
+        </div>
+    </div>
 
     {{-- Competency Units & Elements List --}}
     <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
@@ -363,6 +483,30 @@
                         <button type="submit" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-lg">Simpan</button>
                     </div>
                 </form>
+            </div>
+        </div>
+    </div>
+
+    {{-- MODAL PREVIEW TTD DIGITAL BESAR --}}
+    <div x-show="previewSigModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto" style="background-color: rgba(15, 23, 42, 0.65);">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4" @click.away="previewSigModal = false">
+                <div class="flex items-center justify-between border-b pb-3">
+                    <div>
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-brand-600" x-text="'Tanda Tangan Digital Tim ' + previewSigData.role"></span>
+                        <h3 class="text-base font-bold text-slate-900" x-text="previewSigData.name"></h3>
+                        <p class="text-xs font-mono text-slate-500" x-text="previewSigData.no_met || 'Belum ada No. MET'"></p>
+                    </div>
+                    <button type="button" @click="previewSigModal = false" class="text-slate-400 hover:text-slate-600 text-2xl font-bold leading-none">&times;</button>
+                </div>
+                <div class="bg-slate-50 border border-slate-200 rounded-xl p-6 flex items-center justify-center min-h-[220px]">
+                    <img :src="previewSigData.signature" :alt="'TTD ' + previewSigData.name" class="max-h-60 max-w-full object-contain filter contrast-125">
+                </div>
+                <div class="flex justify-end pt-2">
+                    <button type="button" @click="previewSigModal = false" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-lg shadow-sm">
+                        Tutup
+                    </button>
+                </div>
             </div>
         </div>
     </div>

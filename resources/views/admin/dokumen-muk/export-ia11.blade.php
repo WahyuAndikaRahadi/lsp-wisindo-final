@@ -85,14 +85,14 @@
     <div class="grid grid-cols-2 gap-8 text-xs">
         <div>
             <p class="font-bold text-slate-800 mb-1">Ketua Komite Skema / Lead Assessor:</p>
-            <p class="text-[11px] text-slate-600 mb-12">LSP Praktisi Otomotif Indonesia</p>
+            <p class="text-[11px] text-slate-600 mb-12">LSP P3 Wisata Indonesia</p>
             <div class="border-b border-black w-48 mb-1"></div>
             <p class="font-bold">{{ $leadAssessor->full_name ?? 'RIDWAN' }}</p>
             <p class="text-[10px] text-slate-500">Tanggal: {{ \Carbon\Carbon::parse($schedule->date)->translatedFormat('d F Y') }}</p>
         </div>
         <div>
             <p class="font-bold text-slate-800 mb-1">Peninjau Instrumen / Master Asesor:</p>
-            <p class="text-[11px] text-slate-600 mb-12">Tim Penjaminan Mutu LSP PrO Indo</p>
+            <p class="text-[11px] text-slate-600 mb-12">Tim Penjaminan Mutu LSP Wisindo</p>
             <div class="border-b border-black w-48 mb-1"></div>
             <p class="font-bold">{{ $assessors->first()?->full_name ?? 'Dr. Ir. Bambang Supriyadi, M.T.' }}</p>
             <p class="text-[10px] text-slate-500">No. MET: {{ $assessors->first()?->profile?->no_reg_asesor ?? 'MET.000.001234 2021' }}</p>

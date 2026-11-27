@@ -102,7 +102,7 @@ def run_diff(ref_pdf, gen_pdf):
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:
-        ref = "all-document-lsp-ProIndo/MUK SKEMA 2 Klaster Maintenance Gasoline Engine Injection/2. FR.APL.01. Permohonan Sertifikasi Kompetensi.pdf"
+        ref = "all-document-lsp-Wisindo/Skema Sertifikasi Okupasi Waiter Server atau Wait Person Hotel/2. FR.APL 01. Permohonan Sertifikasi Kompetensi.docx"
         gen = "tests/Fixtures/muk/FR_APL_01_generated.pdf"
     else:
         ref, gen = sys.argv[1], sys.argv[2]

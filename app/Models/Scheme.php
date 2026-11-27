@@ -64,6 +64,43 @@ class Scheme extends Model
         return $this->hasMany(Schedule::class);
     }
 
+    public function committees(): HasMany
+    {
+        return $this->hasMany(SchemeCommittee::class)->orderBy('sequence')->orderBy('id');
+    }
+
+    public function penyusun(): HasMany
+    {
+        return $this->hasMany(SchemeCommittee::class)->where('role', 'PENYUSUN')->orderBy('sequence')->orderBy('id');
+    }
+
+    public function validators(): HasMany
+    {
+        return $this->hasMany(SchemeCommittee::class)->where('role', 'VALIDATOR')->orderBy('sequence')->orderBy('id');
+    }
+
+    public function getPenyusunListAttribute(): array
+    {
+        return $this->penyusun->map(fn (SchemeCommittee $item) => [
+            'id' => $item->id,
+            'name' => $item->name,
+            'no_met' => $item->no_met,
+            'signature' => $item->signature,
+            'sequence' => $item->sequence,
+        ])->values()->all();
+    }
+
+    public function getValidatorListAttribute(): array
+    {
+        return $this->validators->map(fn (SchemeCommittee $item) => [
+            'id' => $item->id,
+            'name' => $item->name,
+            'no_met' => $item->no_met,
+            'signature' => $item->signature,
+            'sequence' => $item->sequence,
+        ])->values()->all();
+    }
+
     public function scopeActive($query)
     {
         return $query->where('is_active', true);

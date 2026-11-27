@@ -59,7 +59,7 @@ class AssessmentWorkflowOverhaulTest extends TestCase
             'date' => now()->toDateString(),
             'start_time' => '08:00',
             'end_time' => '16:00',
-            'selected_instruments' => ['AK01', 'IA01', 'IA01B', 'IA02', 'IA03', 'IA05'],
+            'selected_instruments' => ['AK01', 'IA01', 'IA02', 'IA03', 'IA05'],
             'status' => 'ACTIVE',
             'created_by' => $this->admin->id,
         ]);
@@ -783,7 +783,7 @@ class AssessmentWorkflowOverhaulTest extends TestCase
             'date' => now()->toDateString(),
             'start_time' => '08:00',
             'end_time' => '17:00',
-            'selected_instruments' => ['AK01', 'IA01', 'IA01B', 'IA02', 'IA03', 'IA05'],
+            'selected_instruments' => ['AK01', 'IA01', 'IA02', 'IA03', 'IA05'],
             'created_by' => $this->admin->id,
             'is_active' => true,
             'is_closed' => true,
@@ -827,11 +827,6 @@ class AssessmentWorkflowOverhaulTest extends TestCase
         $resAsesiHub = $this->actingAs($asesiUser)->get(route('asesi.assessment.ruang-uji', $asm));
         $resAsesiHub->assertOk();
         $resAsesiHub->assertSee('Jadwal Asesmen Telah Resmi Ditutup &amp; Dikunci', false);
-
-        $resAsesiIa01b = $this->actingAs($asesiUser)->get(route('asesi.assessment.instrument.view', [$asm, 'IA01B']));
-        $resAsesiIa01b->assertOk();
-        $resAsesiIa01b->assertSee('Pengunggahan berkas fisik tidak lagi tersedia (mode lihat)');
-        $resAsesiIa01b->assertDontSee('action="'.route('asesi.assessment.instrument.upload-evidence', [$asm, 'IA01B']).'"', false);
 
         $resAsesiIa05 = $this->actingAs($asesiUser)->get(route('asesi.assessment.instrument.ia05', $asm));
         $resAsesiIa05->assertOk();
@@ -879,8 +874,8 @@ class AssessmentWorkflowOverhaulTest extends TestCase
         $resSubmitAppeal->assertRedirect(route('asesi.dashboard'));
         $resSubmitAppeal->assertSessionHas('success');
 
-        // 3. POST attempts on core testing instruments (IA01B upload & IA05 CBT) on closed schedule must be rejected
-        $resUpload = $this->actingAs($asesiUser)->post(route('asesi.assessment.instrument.upload-evidence', [$asm, 'IA01B']), [
+        // 3. POST attempts on core testing instruments (IA02 upload & IA05 CBT) on closed schedule must be rejected
+        $resUpload = $this->actingAs($asesiUser)->post(route('asesi.assessment.instrument.upload-evidence', [$asm, 'IA02']), [
             'evidence_image' => UploadedFile::fake()->image('report.jpg'),
         ]);
         $resUpload->assertSessionHas('error');

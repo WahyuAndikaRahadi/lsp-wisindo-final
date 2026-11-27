@@ -35,7 +35,7 @@ class AkWorkflowService
         $iaResponses = $assessment->iaResponses->keyBy('instrument_code');
         $hasProofs = $assessment->proofs()->count() > 0;
 
-        $hasDemonstration = $iaResponses->has('IA01') || $iaResponses->has('IA01B') || $iaResponses->has('IA02');
+        $hasDemonstration = $iaResponses->has('IA01') || $iaResponses->has('IA02');
         $hasOral = $iaResponses->has('IA03');
         $hasWritten = $iaResponses->has('IA05') && $iaResponses['IA05']->score !== null;
 

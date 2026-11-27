@@ -24,6 +24,24 @@ class Ak07Controller extends Controller
         $myAssessments = $schedule->assessorAssessments();
 
         if (! $schedule->isStepUnlocked('ak07')) {
+            if (! $schedule->isStepUnlocked('mapa')) {
+                return redirect()->route('asesor.schedule.instrument', ['schedule' => $schedule->id, 'code' => 'apl'])
+                    ->with('warning', 'Harap selesaikan peninjauan seluruh berkas APL asesi terlebih dahulu.');
+            }
+
+            if (! $schedule->isStepUnlocked('ak04')) {
+                return redirect()->route('asesor.schedule.mapa', $schedule->id)
+                    ->with('warning', 'Harap lengkapi dan simpan dokumen FR.MAPA.01 terlebih dahulu.');
+            }
+
+            $hasBriefed = ! empty($schedule->ak04_briefed_at)
+                || $schedule->assessorAssessmentsQuery()->whereNotNull('ak04_briefed_at')->exists();
+
+            if (! $hasBriefed) {
+                return redirect()->route('asesor.schedule.ak04', $schedule->id)
+                    ->with('warning', 'Harap lakukan briefing pengenalan banding FR.AK.04 terlebih dahulu.');
+            }
+
             return redirect()->route('asesor.schedule.ak01', $schedule->id)
                 ->with('warning', 'Lengkapi dan simpan persetujuan FR.AK.01 terlebih dahulu sebelum melanjutkan ke FR.AK.07.');
         }

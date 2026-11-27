@@ -91,11 +91,11 @@
 @php
     $scheme = $schedule->scheme ?? $assessment->schedule?->scheme;
     $skemaJudul = $scheme->name ?? 'Maintenance Gasoline Engine Injection System';
-    $skemaNomor = $scheme->code ?? '02/LSP PrO Indo/I/2026';
+    $skemaNomor = $scheme->code ?? 'SKM/LSP-WISINDO/2026';
     $ak01Data = $assessment->ak01_data ?? $schedule->ak01_data ?? [];
     $tukTipe = ($ak01Data['tuk_type'] ?? ($schedule->tuk_type ?? 'Sewaktu')) . '*';
-    $tukNama = $schedule->tuk_name ?? 'TUK Otomotif Mandiri';
-    $asesorNama = $assessor?->full_name ?? $assessor?->name ?? 'Drs. Budi Santoso, M.T.';
+    $tukNama = $schedule->tuk_name ?? 'TUK Mandiri';
+    $asesorNama = $assessor?->full_name ?? $assessor?->name ?? 'Drs. Budi Santoso, M.Par.';
     $asesiNama = $asesi->full_name ?? $asesi->name ?? 'Nama Asesi';
 
     $date = !empty($schedule?->date) ? \Carbon\Carbon::parse($schedule->date) : now();
@@ -141,7 +141,7 @@
                 <img src="{{ asset('storage/assets/logo.png') }}" onerror="this.onerror=null; this.src='{{ asset('images/logo.png') }}';" class="header-logo-img" alt="Logo LSP">
             </td>
             <td class="header-title-cell">
-                Lembaga Sertifikasi Profesi Praktisi Otomotif LSP-PrO Indo
+                Lembaga Sertifikasi Profesi P3 Wisata Indonesia (LSP Wisindo)
             </td>
         </tr>
     </table>

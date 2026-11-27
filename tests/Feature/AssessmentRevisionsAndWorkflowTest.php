@@ -77,7 +77,7 @@ class AssessmentRevisionsAndWorkflowTest extends TestCase
             'date' => now()->toDateString(),
             'start_time' => '08:00:00',
             'end_time' => '17:00:00',
-            'selected_instruments' => ['AK01', 'IA01', 'IA01B', 'IA02', 'IA03', 'IA05'],
+            'selected_instruments' => ['AK01', 'IA01', 'IA02', 'IA03', 'IA05'],
             'status' => 'ACTIVE',
             'created_by' => $admin->id,
         ]);

@@ -129,16 +129,6 @@ class RuangUjiController extends Controller
                 'download_url' => null,
                 'action_url' => route('asesi.assessment.instrument.view', [$assessment, 'IA01']),
             ],
-            'IA01B' => [
-                'code' => 'FR.IA.01B',
-                'title' => 'Lembar Pemeriksaan Teknis (Report Sheet)',
-                'desc' => 'Pencatatan dan verifikasi hasil pengukuran parameter fisik komponen serta lembar kerja asesi.',
-                'badge' => 'Report Sheet',
-                'badge_color' => 'bg-cyan-50 text-cyan-700 border-cyan-200',
-                'has_download' => false,
-                'download_url' => null,
-                'action_url' => route('asesi.assessment.instrument.view', [$assessment, 'IA01B']),
-            ],
             'IA02' => [
                 'code' => 'FR.IA.02',
                 'title' => 'Tugas Praktik Demonstrasi (TPD)',
@@ -256,37 +246,7 @@ class RuangUjiController extends Controller
                 $meta['progress_text'] = ($hasEvaluated || $schedule->is_closed) ? 'Telah Dievaluasi' : 'Menunggu Asesor';
                 $meta['action_label'] = 'Lihat Observasi';
                 $meta['action_button_class'] = ($hasEvaluated || $schedule->is_closed) ? 'bg-slate-800 hover:bg-slate-900 text-white' : 'bg-slate-700 hover:bg-slate-800 text-white';
-            } elseif ($codeUpper === 'IA01B') {
-                $hasEvidence = ! empty($resp?->data_json['evidence_image_path']);
-                $isRevisionRequested = ! empty($resp?->data_json['revision_requested']) || ($resp?->data_json['revision_status'] ?? '') === 'REVISION_REQUESTED';
-                $isSignedByAssessor = ! empty($resp?->assessor_signed_at);
-                $isResubmitted = ($resp?->data_json['revision_status'] ?? '') === 'RESUBMITTED';
 
-                if ($isRevisionRequested && ! $schedule->is_closed) {
-                    $meta['status_label'] = '⚠️ Perlu Revisi Berkas';
-                    $meta['status_badge_class'] = 'text-rose-700 bg-rose-50 px-2 py-0.5 rounded border border-rose-200';
-                    $meta['progress_percent'] = 50;
-                    $meta['progress_bar_color'] = 'bg-rose-500';
-                    $meta['progress_text'] = 'Perlu Unggah Ulang';
-                    $meta['action_label'] = 'Unggah Berkas Revisi';
-                    $meta['action_button_class'] = 'bg-rose-600 hover:bg-rose-700 text-white';
-                } elseif ($isResubmitted && ! $isSignedByAssessor) {
-                    $meta['status_label'] = 'Revisi Menunggu Asesor';
-                    $meta['status_badge_class'] = 'text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200';
-                    $meta['progress_percent'] = 75;
-                    $meta['progress_bar_color'] = 'bg-blue-600';
-                    $meta['progress_text'] = 'Menunggu Evaluasi';
-                    $meta['action_label'] = 'Lihat Report Sheet';
-                    $meta['action_button_class'] = 'bg-brand-600 hover:bg-brand-700 text-white';
-                } else {
-                    $meta['status_label'] = ($hasEvidence || $schedule->is_closed) ? '✓ Terunggah' : 'Wajib Unggah';
-                    $meta['status_badge_class'] = ($hasEvidence || $schedule->is_closed) ? 'text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200' : 'text-cyan-700 bg-cyan-50 px-2 py-0.5 rounded border border-cyan-200';
-                    $meta['progress_percent'] = ($hasEvidence || $schedule->is_closed) ? 100 : 0;
-                    $meta['progress_bar_color'] = ($hasEvidence || $schedule->is_closed) ? 'bg-emerald-600' : 'bg-blue-500';
-                    $meta['progress_text'] = ($hasEvidence || $schedule->is_closed) ? '1 Berkas Terunggah' : 'Belum Diunggah';
-                    $meta['action_label'] = ($hasEvidence || $schedule->is_closed) ? 'Lihat Report Sheet' : 'Unggah Report Sheet';
-                    $meta['action_button_class'] = ($hasEvidence || $schedule->is_closed) ? 'bg-slate-800 hover:bg-slate-900 text-white' : 'bg-brand-600 hover:bg-brand-700 text-white';
-                }
             } elseif ($codeUpper === 'IA03') {
                 $hasEvaluated = (bool) $resp?->assessor_signed_at || ! empty($resp?->assessor_notes);
                 $recIa03 = $resp?->data_json['recommendation'] ?? 'K';
@@ -777,7 +737,7 @@ class RuangUjiController extends Controller
             $request->validate([
                 'evidence_image' => 'required|file|mimes:jpeg,jpg,png,webp,pdf|max:10240',
             ]);
-            $folder = strtolower($code) === 'ia01b' ? 'ia01b_evidence' : 'ia02_evidence';
+            $folder = 'ia_evidence';
             $path = $request->file('evidence_image')->store($folder, 'local');
 
             $isRevision = ! empty($dataJson['revision_requested']) || ($dataJson['revision_status'] ?? '') === 'REVISION_REQUESTED';
@@ -858,7 +818,7 @@ class RuangUjiController extends Controller
         ]);
 
         $codeUpper = strtoupper($code);
-        $folder = strtolower($code) === 'ia01b' ? 'ia01b_evidence' : 'ia02_evidence';
+        $folder = 'ia_evidence';
         $path = $request->file('evidence_image')->store($folder, 'local');
 
         $response = AssessmentIaResponse::firstOrNew([

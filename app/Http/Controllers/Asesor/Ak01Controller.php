@@ -106,7 +106,7 @@ class Ak01Controller extends Controller
         $selectedInstruments = (array) $request->input('selected_instruments', []);
         $selectedIa = array_values(array_filter($selectedInstruments, fn ($c) => str_starts_with(strtoupper($c), 'IA')));
         if (empty($selectedIa)) {
-            $selectedIa = ['IA01', 'IA01B', 'IA02', 'IA03', 'IA05'];
+            $selectedIa = ['IA01', 'IA02', 'IA03', 'IA05'];
         }
 
         DB::transaction(function () use ($schedule, $targetAssessments, $ak01Data, $assessorSignature, $selectedIa) {

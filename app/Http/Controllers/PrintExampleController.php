@@ -157,15 +157,6 @@ class PrintExampleController extends Controller
         );
     }
 
-    public function ia01b(Request $request)
-    {
-        return $this->serveDynamic(
-            $request,
-            'ia01b',
-            base_path('lsp-document-dynamic/MUK SKEMA 2 Klaster Maintenance Gasoline Engine Injection/9B. FR.IA.01B Report Sheet_.pdf')
-        );
-    }
-
     public function ia03(Request $request)
     {
         return $this->serveDynamic(

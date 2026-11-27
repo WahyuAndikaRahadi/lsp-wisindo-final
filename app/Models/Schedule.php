@@ -242,7 +242,7 @@ class Schedule extends Model
             return $instruments;
         }
 
-        return ['AK01', 'IA01', 'IA01B', 'IA02', 'IA03', 'IA05'];
+        return ['AK01', 'IA01', 'IA02', 'IA03', 'IA05'];
     }
 
     /**
@@ -424,6 +424,50 @@ class Schedule extends Model
             'reports' => $this->isReportsUnlocked($assessor),
             default => true,
         };
+    }
+
+    /**
+     * Get the current active workflow route URL for the assessor.
+     */
+    public function getAssessorActiveStepRoute(?User $assessor = null): string
+    {
+        if ($this->is_closed || $this->isClosedForAssessor($assessor)) {
+            return route('asesor.schedule.ruang-uji', $this->id);
+        }
+
+        if (! $this->isStepUnlocked('mapa', $assessor)) {
+            return route('asesor.schedule.instrument', ['schedule' => $this->id, 'code' => 'apl']);
+        }
+
+        if (! $this->isStepUnlocked('ak07', $assessor)) {
+            if (! $this->isStepUnlocked('ak04', $assessor)) {
+                return route('asesor.schedule.mapa', $this->id);
+            }
+
+            $query = $this->assessorAssessmentsQuery($assessor);
+            $hasBriefed = ! empty($this->ak04_briefed_at)
+                || (clone $query)->whereNotNull('ak04_briefed_at')->exists();
+
+            if (! $hasBriefed) {
+                return route('asesor.schedule.ak04', $this->id);
+            }
+
+            return route('asesor.schedule.ak01', $this->id);
+        }
+
+        if (! $this->isStepUnlocked('ruang-uji', $assessor)) {
+            return route('asesor.schedule.ak07', $this->id);
+        }
+
+        if (! $this->isStepUnlocked('ak02', $assessor)) {
+            return route('asesor.schedule.ruang-uji', $this->id);
+        }
+
+        if (! $this->isStepUnlocked('reports', $assessor)) {
+            return route('asesor.schedule.ak02', $this->id);
+        }
+
+        return route('asesor.schedule.reports', $this->id);
     }
 
     public function isMapaUnlocked(?User $assessor = null): bool

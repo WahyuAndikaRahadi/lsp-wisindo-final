@@ -64,7 +64,7 @@ class MapaController extends Controller
         ];
 
         $pelaksanaOptions = [
-            'Lembaga Sertifikasi LSP Praktisi Otomotif Indonesia',
+            'Lembaga Sertifikasi LSP Pariwisata dan Perhotelan Wisindo (LSP Wisindo)',
             'Organisasi Pelatihan',
             'Asesor Perusahaan',
         ];
@@ -76,14 +76,8 @@ class MapaController extends Controller
             'Manajer atau supervisor ditempat kerja',
         ];
 
-        // Default integrated tasks if none saved
-        $defaultIntegratedTasks = [
-            'Melaksanakan Komunikasi di Tempat Kerja',
-            'Melaksanakan Pemeliharaan Komponen',
-            'Membaca Gambar Teknik',
-            'Menggunakan Alat Ukur',
-            'Menggunakan Peralatan dan Perlengkapan Tempat Kerja',
-        ];
+        // Default integrated tasks if none saved (kosongan untuk Wisindo)
+        $defaultIntegratedTasks = [];
 
         return view('asesor.mapa', compact(
             'schedule',

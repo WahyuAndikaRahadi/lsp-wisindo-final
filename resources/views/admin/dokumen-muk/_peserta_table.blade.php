@@ -35,11 +35,9 @@
                         <tbody class="divide-y divide-slate-100">
                             @foreach($assessments as $idx => $assessment)
                                 @php
-                                    $ia01bResp = $assessment->iaResponses?->first(fn($r) => strtoupper((string)$r->instrument_code) === 'IA01B');
-                                    $ia01bData = is_array($ia01bResp?->data_json) ? $ia01bResp->data_json : (json_decode($ia01bResp?->data_json ?? '[]', true) ?: []);
-                                    $hasIa01b = !empty($ia01bData['evidence_image_path'] ?? $ia01bData['file_path'] ?? $ia01bData['uploaded_file'] ?? null);
                                     $openUp = $assessments->count() > 3 && ($loop->last || $loop->iteration >= $assessments->count() - 1);
                                 @endphp
+
                                 <tr class="flex flex-col md:table-row p-4 md:p-0 hover:bg-slate-50/70 transition space-y-2.5 md:space-y-0">
                                     <td class="hidden md:table-cell px-4 py-3 text-slate-500 font-mono whitespace-nowrap">
                                         {{ $assessments->firstItem() ? $assessments->firstItem() + $idx : $idx + 1 }}
@@ -233,19 +231,6 @@
                                                                     </a>
                                                                 @endif
 
-                                                                @if(in_array('IA01B', $assignedIas, true))
-                                                                    <a href="{{ route('admin.dokumen-muk.asesi-dynamic', ['assessment' => $assessment->id, 'type' => 'ia01b']) }}" target="_blank"
-                                                                       class="flex items-center justify-between px-2.5 py-1.5 rounded-lg hover:bg-brand-50 text-slate-700 hover:text-brand-700 transition group text-xs">
-                                                                        <div class="flex items-center gap-2 overflow-hidden">
-                                                                            <span class="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 group-hover:bg-brand-100 group-hover:text-brand-700 text-slate-600 shrink-0">FR.IA.01B</span>
-                                                                            <span class="truncate">Report Sheet</span>
-                                                                            @if($hasIa01b)
-                                                                                <span class="px-1.5 py-0.2 rounded text-[9px] font-semibold bg-emerald-100 text-emerald-700">Bukti Ada</span>
-                                                                            @endif
-                                                                        </div>
-                                                                        <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-brand-600 shrink-0 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-                                                                    </a>
-                                                                @endif
 
                                                                 @if(in_array('IA02', $assignedIas, true))
                                                                     <a href="{{ route('admin.dokumen-muk.asesi-dynamic', ['assessment' => $assessment->id, 'type' => 'ia02']) }}" target="_blank"

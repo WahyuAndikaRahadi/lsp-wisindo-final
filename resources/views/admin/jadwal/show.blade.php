@@ -25,7 +25,7 @@
         <div class="flex items-center flex-wrap gap-2">
             @if(!empty($jadwal->meeting_link))
                 <a href="{{ $jadwal->meeting_link }}" target="_blank" rel="noopener noreferrer"
-                   class="px-3.5 py-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-2xs transition flex items-center gap-1.5 cursor-pointer" 
+                   class="w-full sm:w-auto px-3.5 py-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-2xs transition inline-flex items-center justify-center gap-1.5 cursor-pointer" 
                    title="Masuk Ruang Pertemuan Video AJJ (Zoom / Google Meet)">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
                     <span>Masuk Zoom / Meet AJJ ↗</span>

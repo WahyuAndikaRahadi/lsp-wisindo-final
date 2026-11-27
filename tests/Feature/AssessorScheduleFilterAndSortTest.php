@@ -90,15 +90,15 @@ class AssessorScheduleFilterAndSortTest extends TestCase
         ]);
     }
 
-    public function test_assessor_can_view_all_schedules_with_quick_chips(): void
+    public function test_assessor_can_view_all_schedules_without_quick_chips(): void
     {
         $response = $this->actingAs($this->assessor)
             ->get(route('asesor.jadwal.index'));
 
         $response->assertOk();
-        $response->assertSee('Semua Jadwal (3)');
-        $response->assertSee('Jadwal Aktif (2)');
-        $response->assertSee('Jadwal Selesai (1)');
+        $response->assertDontSee('Semua Jadwal (');
+        $response->assertDontSee('Jadwal Aktif (');
+        $response->assertDontSee('Jadwal Selesai (');
         $response->assertSee('SCH-ACTIVE-OLD');
         $response->assertSee('SCH-ACTIVE-NEW');
         $response->assertSee('SCH-COMPLETED');
@@ -126,7 +126,18 @@ class AssessorScheduleFilterAndSortTest extends TestCase
         $response->assertDontSee('SCH-ACTIVE-NEW');
     }
 
-    public function test_filter_by_date_range(): void
+    public function test_filter_by_single_date(): void
+    {
+        $response = $this->actingAs($this->assessor)
+            ->get(route('asesor.jadwal.index', ['date' => '2026-05-10']));
+
+        $response->assertOk();
+        $response->assertSee('SCH-ACTIVE-OLD');
+        $response->assertDontSee('SCH-ACTIVE-NEW');
+        $response->assertDontSee('SCH-COMPLETED');
+    }
+
+    public function test_filter_by_date_range_fallback(): void
     {
         // Only schedule in May 2026
         $response = $this->actingAs($this->assessor)
@@ -141,49 +152,20 @@ class AssessorScheduleFilterAndSortTest extends TestCase
         $response->assertDontSee('SCH-COMPLETED');
     }
 
-    public function test_sorting_by_date_descending_and_ascending(): void
+    public function test_default_sorting_always_orders_latest_date_first(): void
     {
-        // Date Descending (Newest first): Semeru (June) -> Bromo (May) -> Anjasmoro (April)
-        $responseDesc = $this->actingAs($this->assessor)
-            ->get(route('asesor.jadwal.index', ['sort' => 'date_desc']));
+        // Default (without sort param): Semeru (June) -> Bromo (May) -> Anjasmoro (April)
+        $response = $this->actingAs($this->assessor)
+            ->get(route('asesor.jadwal.index'));
 
-        $responseDesc->assertOk();
-        $contentDesc = $responseDesc->getContent();
-        $posSemeru = strpos($contentDesc, 'Semeru Schedule');
-        $posBromo = strpos($contentDesc, 'Bromo Schedule');
-        $posAnjasmoro = strpos($contentDesc, 'Anjasmoro Schedule');
+        $response->assertOk();
+        $content = $response->getContent();
+        $posSemeru = strpos($content, 'Semeru Schedule');
+        $posBromo = strpos($content, 'Bromo Schedule');
+        $posAnjasmoro = strpos($content, 'Anjasmoro Schedule');
 
         $this->assertTrue($posSemeru < $posBromo);
         $this->assertTrue($posBromo < $posAnjasmoro);
-
-        // Date Ascending (Oldest first): Anjasmoro (April) -> Bromo (May) -> Semeru (June)
-        $responseAsc = $this->actingAs($this->assessor)
-            ->get(route('asesor.jadwal.index', ['sort' => 'date_asc']));
-
-        $responseAsc->assertOk();
-        $contentAsc = $responseAsc->getContent();
-        $posSemeruAsc = strpos($contentAsc, 'Semeru Schedule');
-        $posBromoAsc = strpos($contentAsc, 'Bromo Schedule');
-        $posAnjasmoroAsc = strpos($contentAsc, 'Anjasmoro Schedule');
-
-        $this->assertTrue($posAnjasmoroAsc < $posBromoAsc);
-        $this->assertTrue($posBromoAsc < $posSemeruAsc);
-    }
-
-    public function test_sorting_by_name_alphabetical(): void
-    {
-        // Name Asc: Anjasmoro -> Bromo -> Semeru
-        $responseAsc = $this->actingAs($this->assessor)
-            ->get(route('asesor.jadwal.index', ['sort' => 'name_asc']));
-
-        $responseAsc->assertOk();
-        $content = $responseAsc->getContent();
-        $posAnjasmoro = strpos($content, 'Anjasmoro Schedule');
-        $posBromo = strpos($content, 'Bromo Schedule');
-        $posSemeru = strpos($content, 'Semeru Schedule');
-
-        $this->assertTrue($posAnjasmoro < $posBromo);
-        $this->assertTrue($posBromo < $posSemeru);
     }
 
     public function test_ajax_request_returns_table_partial_only(): void

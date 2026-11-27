@@ -173,7 +173,7 @@ class JadwalController extends Controller
             'surat_tugas_date' => ! empty($validated['surat_tugas_date']) ? $validated['surat_tugas_date'] : $validated['date'],
             'letter_city' => ! empty($validated['letter_city']) ? $validated['letter_city'] : 'Bekasi',
             'director_name' => ! empty($validated['director_name']) ? $validated['director_name'] : 'RIDWAN',
-            'selected_instruments' => $validated['selected_instruments'] ?? ['AK01', 'IA01', 'IA01B', 'IA02', 'IA03', 'IA05'],
+            'selected_instruments' => $validated['selected_instruments'] ?? ['AK01', 'IA01', 'IA02', 'IA03', 'IA05'],
             'notes' => $validated['notes'] ?? null,
             'code' => $code,
             'status' => 'ACTIVE',
@@ -299,7 +299,7 @@ class JadwalController extends Controller
             }
         }
 
-        $instruments = $request->input('selected_instruments', $request->input('instruments', $jadwal->selected_instruments ?? ['AK01', 'IA01', 'IA01B', 'IA02', 'IA03', 'IA05']));
+        $instruments = $request->input('selected_instruments', $request->input('instruments', $jadwal->selected_instruments ?? ['AK01', 'IA01', 'IA02', 'IA03', 'IA05']));
         $validated['selected_instruments'] = $instruments;
         unset($validated['instruments']);
 
@@ -490,7 +490,7 @@ class JadwalController extends Controller
             }
             $assessment->proofs()->delete();
 
-            // 2. Delete IA evidence files (e.g. IA01B report sheet evidence)
+            // 2. Delete IA evidence files (e.g. IA02/IA08 evidence)
             foreach ($assessment->iaResponses as $ia) {
                 $evidencePath = $ia->data_json['evidence_image_path'] ?? null;
                 if ($evidencePath && Storage::disk('local')->exists($evidencePath)) {

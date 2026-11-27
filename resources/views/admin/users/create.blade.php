@@ -5,7 +5,7 @@
     <div>
         <a href="{{ route('admin.users.index') }}" class="text-xs text-brand-600 hover:text-brand-700 font-semibold">&larr; Kembali ke Kelola Pengguna</a>
         <h1 class="text-2xl font-black text-slate-900 tracking-tight mt-1">Tambah Pengguna Baru</h1>
-        <p class="text-sm text-slate-500">Daftarkan akun pengguna baru ke dalam portal LSP PrO Indo</p>
+        <p class="text-sm text-slate-500">Daftarkan akun pengguna baru ke dalam portal LSP Wisindo</p>
     </div>
 
     <form action="{{ route('admin.users.store') }}" method="POST" class="space-y-6">
@@ -25,7 +25,7 @@
 
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-1">Email <span class="text-rose-500">*</span></label>
-                    <input type="email" name="email" required value="{{ old('email') }}" placeholder="email@domain.com" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                    <input type="email" name="email" required value="{{ old('email') }}" placeholder="email@gmail.com" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
                     @error('email')
                         <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
                     @enderror
@@ -58,7 +58,6 @@
                         <option value="ASESOR">Asesor Kompetensi</option>
                         <option value="ADMIN_LSP">Admin LSP</option>
                         <option value="SUPER_ADMIN">Super Admin</option>
-                        <option value="KOMITE_TEKNIS">Komite Teknis</option>
                     </select>
                     @error('role')
                         <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>

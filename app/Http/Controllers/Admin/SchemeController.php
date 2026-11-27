@@ -6,9 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Models\CompetencyUnit;
 use App\Models\Kuk;
 use App\Models\Scheme;
+use App\Models\SchemeCommittee;
 use App\Models\UnitElement;
+use App\Services\SignatureHelper;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
@@ -37,7 +40,7 @@ class SchemeController extends Controller
 
     public function show(Scheme $scheme): View
     {
-        $scheme->load('competencyUnits.elements.kuks');
+        $scheme->load(['competencyUnits.elements.kuks', 'penyusun', 'validators']);
 
         return view('admin.schemes.show', compact('scheme'));
     }
@@ -57,16 +60,36 @@ class SchemeController extends Controller
             'description' => 'nullable|string',
             'passing_grade_theory' => 'nullable|numeric|min:0|max:100',
             'is_active' => 'boolean',
+            'penyusun' => 'nullable|array',
+            'penyusun.*.name' => 'nullable|string|max:255',
+            'penyusun.*.no_met' => 'nullable|string|max:100',
+            'penyusun.*.signature' => 'nullable|string',
+            'penyusun.*.signature_file' => 'nullable|file|mimes:png,jpg,jpeg,webp|max:5120',
+            'validator' => 'nullable|array',
+            'validator.*.name' => 'nullable|string|max:255',
+            'validator.*.no_met' => 'nullable|string|max:100',
+            'validator.*.signature' => 'nullable|string',
+            'validator.*.signature_file' => 'nullable|file|mimes:png,jpg,jpeg,webp|max:5120',
         ]);
 
-        Scheme::create($validated);
+        $scheme = DB::transaction(function () use ($validated, $request) {
+            $scheme = Scheme::create(collect($validated)->only([
+                'code', 'name', 'scheme_type', 'version', 'description', 'passing_grade_theory', 'is_active',
+            ])->toArray());
 
-        return redirect()->route('admin.schemes.index')
-            ->with('success', 'Skema berhasil dibuat.');
+            $this->syncCommittees($scheme, $request);
+
+            return $scheme;
+        });
+
+        return redirect()->route('admin.schemes.show', $scheme->id)
+            ->with('success', 'Skema sertifikasi berhasil dibuat.');
     }
 
     public function edit(Scheme $scheme): View
     {
+        $scheme->load(['penyusun', 'validators']);
+
         return view('admin.schemes.edit', compact('scheme'));
     }
 
@@ -80,12 +103,71 @@ class SchemeController extends Controller
             'description' => 'nullable|string',
             'passing_grade_theory' => 'nullable|numeric|min:0|max:100',
             'is_active' => 'boolean',
+            'penyusun' => 'nullable|array',
+            'penyusun.*.name' => 'nullable|string|max:255',
+            'penyusun.*.no_met' => 'nullable|string|max:100',
+            'penyusun.*.signature' => 'nullable|string',
+            'penyusun.*.signature_file' => 'nullable|file|mimes:png,jpg,jpeg,webp|max:5120',
+            'validator' => 'nullable|array',
+            'validator.*.name' => 'nullable|string|max:255',
+            'validator.*.no_met' => 'nullable|string|max:100',
+            'validator.*.signature' => 'nullable|string',
+            'validator.*.signature_file' => 'nullable|file|mimes:png,jpg,jpeg,webp|max:5120',
         ]);
 
-        $scheme->update($validated);
+        DB::transaction(function () use ($scheme, $validated, $request) {
+            $scheme->update(collect($validated)->only([
+                'code', 'name', 'scheme_type', 'version', 'description', 'passing_grade_theory', 'is_active',
+            ])->toArray());
+
+            $this->syncCommittees($scheme, $request);
+        });
 
         return redirect()->route('admin.schemes.show', $scheme->id)
             ->with('success', 'Skema berhasil diperbarui.');
+    }
+
+    private function syncCommittees(Scheme $scheme, Request $request): void
+    {
+        foreach (['PENYUSUN' => 'penyusun', 'VALIDATOR' => 'validator'] as $role => $inputKey) {
+            $rawItems = $request->input($inputKey, []);
+            if (! is_array($rawItems)) {
+                continue;
+            }
+
+            $scheme->committees()->where('role', $role)->delete();
+
+            $sequence = 1;
+            foreach ($rawItems as $origIndex => $itemData) {
+                if (! is_array($itemData)) {
+                    continue;
+                }
+
+                $name = trim((string) ($itemData['name'] ?? ''));
+                if ($name === '') {
+                    continue;
+                }
+
+                $signature = $itemData['signature'] ?? null;
+
+                // Check if file was uploaded for this item directly
+                $file = $request->file("{$inputKey}.{$origIndex}.signature_file");
+                if ($file && $file->isValid()) {
+                    $signature = SignatureHelper::trimSignature($file->getRealPath(), 12);
+                } elseif ($signature) {
+                    $signature = SignatureHelper::trimSignature($signature, 12);
+                }
+
+                SchemeCommittee::create([
+                    'scheme_id' => $scheme->id,
+                    'role' => $role,
+                    'name' => $name,
+                    'no_met' => ! empty($itemData['no_met']) ? trim((string) $itemData['no_met']) : null,
+                    'signature' => $signature,
+                    'sequence' => $sequence++,
+                ]);
+            }
+        }
     }
 
     public function destroy(Scheme $scheme): RedirectResponse

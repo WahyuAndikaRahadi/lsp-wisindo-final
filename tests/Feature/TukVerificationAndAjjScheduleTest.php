@@ -318,13 +318,13 @@ class TukVerificationAndAjjScheduleTest extends TestCase
         $tukShow->assertSee($meetingUrl);
         $tukShow->assertSee('Masuk Ruang Zoom / Meet AJJ');
 
-        // 3. Assessor schedule list displays meeting button
+        // 3. Assessor schedule list displays meeting button (luaran jadwal)
         $assessorIndex = $this->actingAs($assessor)->get(route('asesor.jadwal.index'));
         $assessorIndex->assertOk();
         $assessorIndex->assertSee($meetingUrl);
         $assessorIndex->assertSee('Meet AJJ');
 
-        // 4. Asesi ruang uji hub displays meeting button
+        // 4. Asesi schedule list displays meeting button (luaran jadwal)
         $asesi = User::factory()->create([
             'role' => 'ASESI',
             'status' => 'ACTIVE',
@@ -340,16 +340,36 @@ class TukVerificationAndAjjScheduleTest extends TestCase
             'registered_at' => now(),
         ]);
 
+        $asesiIndex = $this->actingAs($asesi)->get(route('asesi.jadwal.index'));
+        $asesiIndex->assertOk();
+        $asesiIndex->assertSee($meetingUrl);
+        $asesiIndex->assertSee('Zoom / Meet');
+
+        // 5. Ruang Uji and Top Schedule Navigation do not display meeting button (clean room)
         $asesiRuangUji = $this->actingAs($asesi)->get(route('asesi.assessment.ruang-uji', $assessment));
         $asesiRuangUji->assertOk();
-        $asesiRuangUji->assertSee($meetingUrl);
-        $asesiRuangUji->assertSee('Masuk Ruang Zoom / Meet AJJ');
+        $asesiRuangUji->assertDontSee('Masuk Ruang Zoom / Meet AJJ');
 
-        // 5. Assessor schedule navigation displays meeting button once APL is reviewed
         $assessorMapa = $this->actingAs($assessor)->get(route('asesor.schedule.mapa', $schedule));
         $assessorMapa->assertOk();
-        $assessorMapa->assertSee($meetingUrl);
-        $assessorMapa->assertSee('Ruang Meet AJJ');
+        $assessorMapa->assertDontSee('Ruang Meet AJJ');
+
+        // Unlock Ruang Uji to verify schedule-hub view
+        $schedule->update([
+            'mapa01_data' => ['tujuan_asesmen' => 'Sertifikasi'],
+            'ak04_briefed_at' => now(),
+            'ak01_data' => ['completed' => true],
+            'ak07_data' => ['completed' => true],
+        ]);
+        $assessment->update([
+            'ak04_briefed_at' => now(),
+            'ak01_agreed_at' => now(),
+            'assessor_signature' => 'data:image/png;base64,fakesig',
+        ]);
+
+        $assessorRuangUji = $this->actingAs($assessor)->get(route('asesor.schedule.ruang-uji', $schedule));
+        $assessorRuangUji->assertOk();
+        $assessorRuangUji->assertDontSee('Masuk Ruang Zoom / Meet AJJ');
     }
 
     public function test_wilayah_api_and_tuk_dropdown_integration(): void

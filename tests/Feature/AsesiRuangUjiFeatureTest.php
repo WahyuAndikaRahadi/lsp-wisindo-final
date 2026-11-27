@@ -37,7 +37,7 @@ class AsesiRuangUjiFeatureTest extends TestCase
             'date' => now()->toDateString(),
             'start_time' => '08:00:00',
             'end_time' => '16:00:00',
-            'selected_instruments' => ['IA01', 'IA01B', 'IA02', 'IA03', 'IA05'],
+            'selected_instruments' => ['IA01', 'IA02', 'IA03', 'IA05'],
             'status' => 'ACTIVE',
             'created_by' => $admin->id,
         ]);
@@ -47,7 +47,7 @@ class AsesiRuangUjiFeatureTest extends TestCase
             'schedule_id' => $schedule->id,
             'scheme_id' => $scheme->id,
             'apl_status' => 'APPROVED',
-            'ak01_data' => ['selected_instruments' => ['IA01', 'IA01B', 'IA02', 'IA03', 'IA05']],
+            'ak01_data' => ['selected_instruments' => ['IA01', 'IA02', 'IA03', 'IA05']],
         ]);
 
         $response = $this->actingAs($asesi)->get(route('asesi.assessment.ruang-uji', $assessment));
@@ -65,7 +65,7 @@ class AsesiRuangUjiFeatureTest extends TestCase
 
         // Check assessor evaluation instruments
         $response->assertSee('FR.IA.01');
-        $response->assertSee('FR.IA.01B');
+        $response->assertDontSee('FR.IA.01B');
         $response->assertSee('FR.IA.03');
 
         // Check that AK.01, top unlock navbar, and "Selesaikan Asesmen Mandiri" are NOT shown
@@ -89,7 +89,7 @@ class AsesiRuangUjiFeatureTest extends TestCase
             'date' => now()->toDateString(),
             'start_time' => '08:00:00',
             'end_time' => '16:00:00',
-            'selected_instruments' => ['IA01', 'IA01B', 'IA02', 'IA03', 'IA05'],
+            'selected_instruments' => ['IA01', 'IA02', 'IA03', 'IA05'],
             'status' => 'ACTIVE',
             'created_by' => $admin->id,
         ]);
@@ -139,7 +139,7 @@ class AsesiRuangUjiFeatureTest extends TestCase
             'date' => now()->toDateString(),
             'start_time' => '08:00:00',
             'end_time' => '16:00:00',
-            'selected_instruments' => ['IA01', 'IA01B', 'IA02', 'IA03', 'IA05'],
+            'selected_instruments' => ['IA01', 'IA02', 'IA03', 'IA05'],
             'status' => 'ACTIVE',
             'created_by' => $admin->id,
         ]);
@@ -185,7 +185,7 @@ class AsesiRuangUjiFeatureTest extends TestCase
             'date' => now()->toDateString(),
             'start_time' => '08:00:00',
             'end_time' => '16:00:00',
-            'selected_instruments' => ['IA01', 'IA01B', 'IA02', 'IA03'],
+            'selected_instruments' => ['IA01', 'IA02', 'IA03'],
             'status' => 'ACTIVE',
             'created_by' => $admin->id,
         ]);
@@ -198,15 +198,10 @@ class AsesiRuangUjiFeatureTest extends TestCase
             'ak01_agreed_at' => now(),
         ]);
 
-        // Download IA02 template
-        $responseIa02 = $this->actingAs($asesi)->get(route('asesi.assessment.instrument.download-template', [$assessment, 'IA02']));
-        $responseIa02->assertOk();
-        $this->assertEquals('application/pdf', $responseIa02->headers->get('Content-Type'));
-
-        // Download IA01B template
-        $responseIa01b = $this->actingAs($asesi)->get(route('asesi.assessment.instrument.download-template', [$assessment, 'IA01B']));
-        $responseIa01b->assertOk();
-        $this->assertEquals('application/pdf', $responseIa01b->headers->get('Content-Type'));
+        // Download IA01 template
+        $responseIa01 = $this->actingAs($asesi)->get(route('asesi.assessment.instrument.download-template', [$assessment, 'IA01']));
+        $responseIa01->assertOk();
+        $this->assertEquals('application/pdf', $responseIa01->headers->get('Content-Type'));
     }
 
     public function test_ia02_asesi_view_is_review_only_without_upload_or_assessor_notes(): void
@@ -337,56 +332,6 @@ class AsesiRuangUjiFeatureTest extends TestCase
         $resIa03->assertSee('Tanda Tangan Asesi');
     }
 
-    public function test_ia01b_view_has_clean_upload_space_without_bloated_tables_or_duplicate_downloads(): void
-    {
-        $asesi = User::where('role', 'ASESI')->first();
-        $scheme = Scheme::first();
-        $admin = User::where('role', 'ADMIN_LSP')->first();
-
-        $schedule = Schedule::create([
-            'scheme_id' => $scheme->id,
-            'name' => 'Jadwal IA01B Clean',
-            'code' => 'SCH-IA01B-'.uniqid(),
-            'tuk_name' => 'TUK Otomotif Mandiri',
-            'date' => now()->toDateString(),
-            'start_time' => '08:00:00',
-            'end_time' => '16:00:00',
-            'selected_instruments' => ['IA01B'],
-            'status' => 'ACTIVE',
-            'created_by' => $admin->id,
-        ]);
-
-        $assessment = Assessment::create([
-            'asesi_id' => $asesi->id,
-            'schedule_id' => $schedule->id,
-            'scheme_id' => $scheme->id,
-            'apl_status' => 'APPROVED',
-            'ak01_agreed_at' => now(),
-        ]);
-
-        $res = $this->actingAs($asesi)->get(route('asesi.assessment.instrument.view', [$assessment, 'IA01B']));
-        $res->assertOk();
-
-        // Must NOT have PDF template download
-        $res->assertDontSee('Unduh Template PDF');
-        $res->assertDontSee('Unduh Report Sheet PDF');
-        $res->assertDontSee(route('asesi.assessment.instrument.download-template', [$assessment, 'IA01B']));
-
-        // Must NOT have bloated stats or empty digital measurement table
-        $res->assertDontSee('Total Item Ukur');
-        $res->assertDontSee('0% COMPLIANT');
-        $res->assertDontSee('Belum ada data rekaman item pengukuran FR.IA.01B');
-
-        // Must have the clean physical upload space
-        $res->assertSee('Ruang Unggah Lembar Pemeriksaan Teknis Fisik');
-        $res->assertSee('Pilih Berkas Foto / Scan PDF Lembar Report Sheet:');
-        $res->assertSee('Unggah Berkas Fisik');
-
-        // Must NOT have bloated signature explanation paragraphs
-        $res->assertDontSee('Disematkan otomatis secara sah dari data permohonan sertifikasi Anda');
-        $res->assertDontSee('Tanda tangan digital Anda telah disematkan secara otomatis pada instrumen ini');
-    }
-
     public function test_ia05_cbt_flow_and_completion(): void
     {
         $asesi = User::where('role', 'ASESI')->first();
@@ -469,7 +414,7 @@ class AsesiRuangUjiFeatureTest extends TestCase
             'date' => now()->toDateString(),
             'start_time' => '08:00:00',
             'end_time' => '16:00:00',
-            'selected_instruments' => ['IA01B', 'IA01', 'IA03'],
+            'selected_instruments' => ['IA01', 'IA03'],
             'status' => 'ACTIVE',
             'created_by' => $admin->id,
         ]);
@@ -483,39 +428,36 @@ class AsesiRuangUjiFeatureTest extends TestCase
             'ak01_agreed_at' => now(),
         ]);
 
-        // Assessor saves evaluation data for IA01B
+        // Assessor saves evaluation data for IA03
         AssessmentIaResponse::create([
             'assessment_id' => $assessment->id,
-            'instrument_code' => 'IA01B',
+            'instrument_code' => 'IA03',
             'data_json' => [
-                'items' => [
-                    ['component' => 'Komponen A', 'specification' => '10 mm', 'measurement' => '10.02 mm', 'result' => 'SESUAI'],
-                ],
+                'recommendation' => 'K',
             ],
-            'assessor_notes' => 'Pengukuran sangat presisi dan teliti.',
+            'assessor_notes' => 'Tanggapan lisan sangat memuaskan dan tepat.',
             'assessor_signature' => 'data:image/png;base64,mockAsesorSign',
             'assessor_signed_at' => now(),
         ]);
 
-        // Asesi views IA01B
-        $viewRes = $this->actingAs($asesi)->get(route('asesi.assessment.instrument.view', [$assessment, 'IA01B']));
+        // Asesi views IA03
+        $viewRes = $this->actingAs($asesi)->get(route('asesi.assessment.instrument.view', [$assessment, 'IA03']));
         $viewRes->assertOk();
-        $viewRes->assertDontSee('Format Lembar Pemeriksaan FR.IA.01B (PDF Resmi BNSP)');
-        $viewRes->assertSee('FR.IA.01B. LEMBAR PENGUKURAN TEKNIS (REPORT SHEET)');
-        $viewRes->assertSee('Pengukuran sangat presisi dan teliti.');
+        $viewRes->assertSee('FR.IA.03. PERTANYAAN MENDUKUNG OBSERVASI (PMO)');
+        $viewRes->assertSee('Tanggapan lisan sangat memuaskan dan tepat.');
 
         // Asesi submits feedback and signature
         $feedbackRes = $this->actingAs($asesi)->post(
-            route('asesi.assessment.instrument.feedback', [$assessment, 'IA01B']),
+            route('asesi.assessment.instrument.feedback', [$assessment, 'IA03']),
             [
-                'asesi_feedback' => 'Saya setuju dengan hasil pengukuran dan penilaian asesor.',
+                'asesi_feedback' => 'Saya setuju dengan hasil penilaian pertanyaan lisan asesor.',
                 'signature_data' => 'data:image/png;base64,mockAsesiSignature123',
             ]
         );
         $feedbackRes->assertRedirect();
 
-        $updated = AssessmentIaResponse::where('assessment_id', $assessment->id)->where('instrument_code', 'IA01B')->first();
-        $this->assertEquals('Saya setuju dengan hasil pengukuran dan penilaian asesor.', $updated->asesi_feedback);
+        $updated = AssessmentIaResponse::where('assessment_id', $assessment->id)->where('instrument_code', 'IA03')->first();
+        $this->assertEquals('Saya setuju dengan hasil penilaian pertanyaan lisan asesor.', $updated->asesi_feedback);
         $this->assertEquals('data:image/png;base64,mockAsesiSignature123', $updated->asesi_signature);
         $this->assertNotNull($updated->asesi_signed_at);
     }

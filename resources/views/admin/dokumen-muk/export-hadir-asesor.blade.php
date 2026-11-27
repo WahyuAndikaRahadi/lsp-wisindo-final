@@ -28,7 +28,7 @@
             <tr>
                 <td style="vertical-align: top;">3. Alamat</td>
                 <td style="vertical-align: top; text-align: center;">:</td>
-                <td style="vertical-align: top;">{{ $schedule->tuk_address ?? 'Tempat Uji Kompetensi Terverifikasi LSP PrO Indo' }}</td>
+                <td style="vertical-align: top;">{{ $schedule->tuk_address ?? 'Tempat Uji Kompetensi Terverifikasi LSP Wisindo' }}</td>
             </tr>
             <tr>
                 <td style="vertical-align: top;">4. Tanggal Uji</td>

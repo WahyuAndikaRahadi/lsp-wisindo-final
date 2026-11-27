@@ -30,9 +30,9 @@ class LspWorkflowIntegrationTest extends TestCase
 
     public function test_user_seeder_contains_all_22_demo_accounts(): void
     {
-        $this->assertDatabaseHas('users', ['email' => 'lsp.proindo@gmail.com', 'role' => 'SUPER_ADMIN']);
+        $this->assertDatabaseHas('users', ['email' => 'superadmin@gmail.com', 'role' => 'SUPER_ADMIN']);
         $this->assertDatabaseHas('users', ['email' => 'adminlsp@gmail.com', 'role' => 'ADMIN_LSP']);
-        $this->assertDatabaseHas('users', ['email' => 'asesor.randi@gmail.com', 'role' => 'ASESOR']);
+        $this->assertDatabaseHas('users', ['email' => 'asesor.panca@gmail.com', 'role' => 'ASESOR']);
     }
 
     private function createAsesi(string $email = 'asesi1@gmail.com'): User
@@ -68,7 +68,7 @@ class LspWorkflowIntegrationTest extends TestCase
     public function test_auth_login_and_admin_proxy_impersonation(): void
     {
         $admin = User::where('email', 'adminlsp@gmail.com')->first();
-        $asesor = User::where('email', 'asesor.randi@gmail.com')->first();
+        $asesor = User::where('role', 'ASESOR')->first();
 
         // Admin login
         $response = $this->post('/login', [
@@ -127,8 +127,8 @@ class LspWorkflowIntegrationTest extends TestCase
     {
         // Setup Schedule
         $admin = User::where('role', 'ADMIN_LSP')->first();
-        $scheme = Scheme::where('code', 'SKM-01-2026')->first();
-        $asesor = User::where('email', 'asesor.randi@gmail.com')->first();
+        $scheme = Scheme::first();
+        $asesor = User::where('role', 'ASESOR')->first();
         $asesi = $this->createAsesi();
 
         $schedule = Schedule::create([
@@ -539,89 +539,11 @@ class LspWorkflowIntegrationTest extends TestCase
         $this->assertNotEmpty($response->data_json['evidence_image_path']);
     }
 
-    public function test_ia01b_productive_view_and_signature_saving(): void
-    {
-        $asesorUser = User::where('role', 'ASESOR')->first();
-        $asesiUser = User::where('role', 'ASESI')->first();
-        $admin = User::where('role', 'ADMIN_LSP')->first();
-        $scheme = Scheme::first();
-
-        $schedule = Schedule::create([
-            'scheme_id' => $scheme->id,
-            'name' => 'Jadwal IA01B Test',
-            'code' => 'SCH-IA01B-TEST-'.uniqid(),
-            'tuk_name' => 'TUK Otomotif Mandiri',
-            'date' => now()->toDateString(),
-            'start_time' => '08:00:00',
-            'end_time' => '16:00:00',
-            'selected_instruments' => ['IA01B'],
-            'status' => 'ACTIVE',
-            'created_by' => $admin->id,
-        ]);
-        $schedule->assessors()->syncWithoutDetaching([$asesorUser->id]);
-
-        $assessment = Assessment::create([
-            'asesi_id' => $asesiUser->id,
-            'schedule_id' => $schedule->id,
-            'scheme_id' => $scheme->id,
-            'apl_status' => 'APPROVED',
-            'ak01_agreed_at' => now(),
-        ]);
-
-        $sampleItems = [
-            ['measured' => '12.6 Volt', 'result' => 'SESUAI'],
-            ['measured' => '0.45 mm', 'result' => 'SESUAI'],
-            ['measured' => '1.80 mm', 'result' => 'TIDAK'],
-        ];
-
-        $iaResponse = AssessmentIaResponse::create([
-            'assessment_id' => $assessment->id,
-            'instrument_code' => 'IA01B',
-            'data_json' => ['items' => $sampleItems],
-            'assessor_notes' => 'Pemeriksaan dimensi celah katup melebihi limit spesifikasi.',
-            'assessor_signed_at' => now(),
-        ]);
-
-        // 1. Asesi views IA01B - must be productive table, NOT raw JSON
-        $viewRes = $this->actingAs($asesiUser)->get(
-            route('asesi.assessment.instrument.view', [$assessment, 'IA01B'])
-        );
-        $viewRes->assertOk();
-        $viewRes->assertSee('FR.IA.01B');
-        $viewRes->assertDontSee('items: [{"measured":');
-
-        // 2. Asesi signs and submits feedback (verifies no SQL column error)
-        $sigData = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
-        $postRes = $this->actingAs($asesiUser)->post(
-            route('asesi.assessment.instrument.feedback', [$assessment, 'IA01B']),
-            [
-                'asesi_feedback' => 'Proses verifikasi pengukuran objektif dan jelas.',
-                'signature_data' => $sigData,
-            ]
-        );
-        $postRes->assertSessionHasNoErrors();
-        $postRes->assertRedirect();
-
-        // 3. Verify in database
-        $iaResponse->refresh();
-        $this->assertEquals('Proses verifikasi pengukuran objektif dan jelas.', $iaResponse->asesi_feedback);
-        $this->assertEquals($sigData, $iaResponse->asesi_signature);
-        $this->assertNotNull($iaResponse->asesi_signed_at);
-
-        // 4. Verify asesi viewing after signed displays signature
-        $signedViewRes = $this->actingAs($asesiUser)->get(
-            route('asesi.assessment.instrument.view', [$assessment, 'IA01B'])
-        );
-        $signedViewRes->assertOk();
-        $signedViewRes->assertSee('Tanda Tangan Asesi');
-        $signedViewRes->assertSee($sigData);
-    }
-
     public function test_admin_can_batch_approve_candidate_registrations(): void
     {
         $admin = User::where('role', 'ADMIN_LSP')->first();
-        $scheme = Scheme::where('code', 'SKM-01-2026')->first();
-        $asesor = User::where('email', 'asesor.randi@gmail.com')->first();
+        $scheme = Scheme::first();
+        $asesor = User::where('role', 'ASESOR')->first();
         $asesi1 = $this->createAsesi('asesibatch1@test.local');
 
         $schedule = Schedule::create([
@@ -1029,15 +951,6 @@ class LspWorkflowIntegrationTest extends TestCase
         }
 
         // 2. Asesi-level individual documents
-        Storage::fake('local');
-        $uploadedPath = 'ia01b_evidence/test_sheet.pdf';
-        Storage::disk('local')->put($uploadedPath, '%PDF-1.4 sample');
-        AssessmentIaResponse::create([
-            'assessment_id' => $assessment->id,
-            'instrument_code' => 'IA01B',
-            'data_json' => ['evidence_image_path' => $uploadedPath],
-        ]);
-
         $asesiDocExpectations = [
             'apl01' => 'FR.APL.01',
             'apl02' => 'FR.APL.02',
@@ -1047,7 +960,6 @@ class LspWorkflowIntegrationTest extends TestCase
             'ak04' => 'FR.AK.04',
             'ak07' => 'FR.AK.07',
             'ia01' => 'FR.IA.01',
-            'ia01b' => 'FR.IA.01B',
             'ia02' => 'FR.IA.02',
             'ia03' => 'FR.IA.03',
             'ia05a' => 'FR.IA.05.A',
@@ -1059,11 +971,7 @@ class LspWorkflowIntegrationTest extends TestCase
         foreach ($asesiDocExpectations as $type => $expectedSnippet) {
             $res = $this->actingAs($admin)->get(route('admin.dokumen-muk.export-asesi', [$assessment, $type]));
             $res->assertOk();
-            if ($type === 'ia01b') {
-                $this->assertStringContainsString($expectedSnippet, $res->headers->get('Content-Disposition', ''));
-            } else {
-                $res->assertSee($expectedSnippet);
-            }
+            $res->assertSee($expectedSnippet);
         }
     }
 }

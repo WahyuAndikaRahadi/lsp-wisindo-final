@@ -29,6 +29,10 @@
                    class="px-3.5 py-2 rounded-lg text-xs font-bold transition whitespace-nowrap {{ $currentRole === 'ASESI' ? 'bg-brand-600 text-white shadow-xs' : 'bg-slate-100 text-slate-700 hover:bg-slate-200' }}">
                     Asesi Saja
                 </a>
+                <a href="{{ route('admin.proxy.index', array_merge(request()->except('role', 'page'), ['role' => 'TUK_ADMIN'])) }}"
+                   class="px-3.5 py-2 rounded-lg text-xs font-bold transition whitespace-nowrap {{ $currentRole === 'TUK_ADMIN' ? 'bg-brand-600 text-white shadow-xs' : 'bg-slate-100 text-slate-700 hover:bg-slate-200' }}">
+                    Admin TUK
+                </a>
                 <a href="{{ route('admin.proxy.index', array_merge(request()->except('role', 'page'), ['role' => 'ADMIN_LSP'])) }}"
                    class="px-3.5 py-2 rounded-lg text-xs font-bold transition whitespace-nowrap {{ $currentRole === 'ADMIN_LSP' ? 'bg-brand-600 text-white shadow-xs' : 'bg-slate-100 text-slate-700 hover:bg-slate-200' }}">
                     Admin LSP
@@ -68,7 +72,16 @@
                         'ADMIN_LSP' => 'bg-blue-100 text-blue-700 border-blue-200',
                         'ASESOR' => 'bg-emerald-100 text-emerald-700 border-emerald-200',
                         'ASESI' => 'bg-amber-100 text-amber-700 border-amber-200',
+                        'TUK_ADMIN' => 'bg-indigo-100 text-indigo-700 border-indigo-200',
                         default => 'bg-slate-100 text-slate-700 border-slate-200',
+                    };
+                    $roleLabel = match($user->role) {
+                        'TUK_ADMIN' => 'Admin TUK' . ($user->tuk ? ' - ' . $user->tuk->name : ''),
+                        'ADMIN_LSP' => 'Admin LSP',
+                        'SUPER_ADMIN' => 'Super Admin',
+                        'ASESOR' => 'Asesor',
+                        'ASESI' => 'Asesi',
+                        default => $user->role,
                     };
                 @endphp
                 <div class="p-4 space-y-3">
@@ -89,7 +102,7 @@
 
                     <div class="flex items-center justify-between text-xs pt-1 border-t border-slate-100">
                         <span class="px-2.5 py-0.5 text-[11px] font-medium rounded-full border {{ $roleBadge }}">
-                            {{ $user->role }}
+                            {{ $roleLabel }}
                         </span>
                     </div>
 
@@ -142,7 +155,16 @@
                                 'ADMIN_LSP' => 'bg-blue-100 text-blue-700 border-blue-200',
                                 'ASESOR' => 'bg-emerald-100 text-emerald-700 border-emerald-200',
                                 'ASESI' => 'bg-amber-100 text-amber-700 border-amber-200',
+                                'TUK_ADMIN' => 'bg-indigo-100 text-indigo-700 border-indigo-200',
                                 default => 'bg-slate-100 text-slate-700 border-slate-200',
+                            };
+                            $roleLabel = match($user->role) {
+                                'TUK_ADMIN' => 'Admin TUK' . ($user->tuk ? ' - ' . $user->tuk->name : ''),
+                                'ADMIN_LSP' => 'Admin LSP',
+                                'SUPER_ADMIN' => 'Super Admin',
+                                'ASESOR' => 'Asesor',
+                                'ASESI' => 'Asesi',
+                                default => $user->role,
                             };
                         @endphp
                         <tr class="hover:bg-slate-50/60 transition">
@@ -151,8 +173,8 @@
                             </td>
                             <td class="px-6 py-4 text-xs font-mono text-slate-600">{{ $user->email }}</td>
                             <td class="px-6 py-4">
-                                <span class="px-2 py-0.5 text-xs font-medium rounded-full border {{ $roleBadge }}">
-                                    {{ $user->role }}
+                                <span class="px-2.5 py-0.5 text-xs font-medium rounded-full border {{ $roleBadge }}">
+                                    {{ $roleLabel }}
                                 </span>
                             </td>
                             <td class="px-6 py-4">

@@ -40,7 +40,6 @@
                     <option value="ASESOR" @selected(request('role') === 'ASESOR')>Asesor Penguji</option>
                     <option value="ADMIN_LSP" @selected(request('role') === 'ADMIN_LSP')>Admin LSP</option>
                     <option value="SUPER_ADMIN" @selected(request('role') === 'SUPER_ADMIN')>Super Admin</option>
-                    <option value="KOMITE_TEKNIS" @selected(request('role') === 'KOMITE_TEKNIS')>Komite Teknis</option>
                 </select>
             </div>
 

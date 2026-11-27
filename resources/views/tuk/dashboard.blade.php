@@ -175,14 +175,14 @@
                             </p>
                         </div>
 
-                        <div class="flex items-center gap-2 shrink-0">
+                        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 shrink-0">
                             @if(!empty($sch->meeting_link))
-                                <a href="{{ $sch->meeting_link }}" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-xs transition" title="Buka Ruang Zoom / Meet">
+                                <a href="{{ $sch->meeting_link }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-xs transition" title="Buka Ruang Zoom / Meet">
                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
                                     <span>Ruang Virtual AJJ ↗</span>
                                 </a>
                             @endif
-                            <a href="{{ route('tuk.jadwal.show', $sch) }}" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 transition">
+                            <a href="{{ route('tuk.jadwal.show', $sch) }}" class="inline-flex items-center justify-center px-3 py-1.5 rounded-lg text-xs font-bold bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 transition self-start sm:self-auto">
                                 Detail Peserta
                             </a>
                         </div>

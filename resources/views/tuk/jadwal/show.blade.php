@@ -31,8 +31,8 @@
             </div>
 
             @if(!empty($schedule->meeting_link))
-                <a href="{{ $schedule->meeting_link }}" target="_blank"
-                   class="inline-flex items-center justify-center gap-2 px-5 py-3 bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs sm:text-sm rounded-xl shadow-sm transition hover:shadow shrink-0">
+                <a href="{{ $schedule->meeting_link }}" target="_blank" rel="noopener noreferrer"
+                   class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs sm:text-sm rounded-xl shadow-xs transition hover:shadow">
                     <svg class="w-4 h-4 text-blue-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
                     <span>Masuk Ruang Zoom / Meet AJJ ↗</span>
                 </a>
@@ -55,9 +55,14 @@
             <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200/80">
                 <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Tautan Virtual AJJ</span>
                 @if(!empty($schedule->meeting_link))
-                    <a href="{{ $schedule->meeting_link }}" target="_blank" class="font-bold text-blue-600 hover:underline truncate block">
-                        {{ $schedule->meeting_link }}
-                    </a>
+                    <div class="flex items-center gap-1">
+                        <a href="{{ $schedule->meeting_link }}" target="_blank" rel="noopener noreferrer" class="font-bold text-blue-600 hover:underline truncate block text-xs" title="{{ $schedule->meeting_link }}">
+                            {{ $schedule->meeting_link }}
+                        </a>
+                        <button type="button" onclick="navigator.clipboard.writeText('{{ $schedule->meeting_link }}'); (window.Notiflix ? Notiflix.Notify.success('Link meeting disalin!') : alert('Link disalin!'));" class="p-0.5 text-blue-600 hover:text-blue-800 rounded transition shrink-0 cursor-pointer" title="Salin Link">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                        </button>
+                    </div>
                     <span class="text-[10px] text-emerald-600 font-semibold block mt-0.5">✓ Tautan Siap Digunakan</span>
                 @else
                     <span class="text-slate-400 italic">Belum diinput oleh admin</span>

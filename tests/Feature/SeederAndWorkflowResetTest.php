@@ -38,7 +38,7 @@ class SeederAndWorkflowResetTest extends TestCase
 
         // 1. Verify Master & Account Data Exists
         $this->assertGreaterThanOrEqual(16, User::count());
-        $this->assertGreaterThanOrEqual(7, Scheme::count());
+        $this->assertGreaterThanOrEqual(5, Scheme::count());
         $this->assertGreaterThan(0, CompetencyUnit::count());
         $this->assertGreaterThan(0, UnitElement::count());
         $this->assertGreaterThan(0, Kuk::count());
@@ -49,7 +49,7 @@ class SeederAndWorkflowResetTest extends TestCase
         $this->assertNotNull(User::where('role', 'SUPER_ADMIN')->first());
         $this->assertNotNull(User::where('role', 'ADMIN_LSP')->first());
         $this->assertNotNull(User::where('role', 'ASESOR')->first());
-        $this->assertNull(User::where('role', 'TUK_ADMIN')->first());
+        $this->assertNotNull(User::where('role', 'TUK_ADMIN')->first());
 
         // 2. Verify ALL Workflow Tables are Exactly EMPTY (0 rows)
         $workflowTables = [
@@ -150,6 +150,7 @@ class SeederAndWorkflowResetTest extends TestCase
         $_ENV['SEED_PASSWORD'] = '@Kompeten86';
 
         (new UserSeeder)->run();
-        $this->assertDatabaseHas('users', ['email' => 'lsp.proindo@gmail.com']);
+        $this->assertDatabaseHas('users', ['email' => 'adminlsp@gmail.com']);
+        $this->assertDatabaseHas('users', ['email' => 'superadmin@gmail.com']);
     }
 }

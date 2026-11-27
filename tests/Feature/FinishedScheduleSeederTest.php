@@ -3,7 +3,6 @@
 namespace Tests\Feature;
 
 use App\Models\Assessment;
-use App\Models\AssessmentAppeal;
 use App\Models\Certificate;
 use App\Models\Schedule;
 use App\Models\User;
@@ -36,7 +35,7 @@ class FinishedScheduleSeederTest extends TestCase
         $this->assertNotNull($schedule->surat_tugas_number);
         $this->assertNotNull($schedule->surat_tugas_date);
         $this->assertNotNull($schedule->tuk_address);
-        $this->assertSame(20, $schedule->estimated_candidates);
+        $this->assertSame(1, $schedule->estimated_candidates);
         $this->assertSame('01', $schedule->kode_sumber_anggaran);
         $this->assertSame('01', $schedule->kode_kementerian);
 
@@ -56,9 +55,9 @@ class FinishedScheduleSeederTest extends TestCase
         // 2. Verify Assessors
         $this->assertGreaterThanOrEqual(2, $schedule->assessors()->count());
 
-        // 3. Verify 20 Assessments
+        // 3. Verify Assessment (Asesi Ani Rahayu)
         $assessments = $schedule->assessments()->with(['asesi.profile', 'iaResponses', 'ak02Items', 'ak03Item', 'apl02Items', 'proofs', 'certificate', 'appeals'])->get();
-        $this->assertCount(20, $assessments);
+        $this->assertCount(1, $assessments);
 
         $kompetenCount = 0;
         $belumKompetenCount = 0;
@@ -68,6 +67,8 @@ class FinishedScheduleSeederTest extends TestCase
             $this->assertSame('APPROVED', $assessment->apl_status);
             $this->assertSame('APPROVED', $assessment->admin_status);
             $this->assertSame('Sertifikasi', $assessment->tujuan_asesmen);
+            $this->assertSame('Asesi Ani Rahayu', $assessment->asesi->full_name);
+            $this->assertSame('asesi@gmail.com', $assessment->asesi->email);
             $this->assertNotNull($assessment->asesi_signature);
             $this->assertNotNull($assessment->assessor_signature);
             $this->assertNotNull($assessment->final_result_at);
@@ -95,10 +96,9 @@ class FinishedScheduleSeederTest extends TestCase
             // AK-03 Feedback
             $this->assertNotNull($assessment->ak03Item);
 
-            // IA Responses (IA01, IA01B, IA02, IA03, IA05)
+            // IA Responses (IA01, IA02, IA03, IA05)
             $iaCodes = $assessment->iaResponses->pluck('instrument_code')->all();
             $this->assertContains('IA01', $iaCodes);
-            $this->assertContains('IA01B', $iaCodes);
             $this->assertContains('IA02', $iaCodes);
             $this->assertContains('IA03', $iaCodes);
             $this->assertContains('IA05', $iaCodes);
@@ -113,14 +113,11 @@ class FinishedScheduleSeederTest extends TestCase
             }
         }
 
-        $this->assertSame(18, $kompetenCount);
-        $this->assertSame(2, $belumKompetenCount);
+        $this->assertSame(1, $kompetenCount);
+        $this->assertSame(0, $belumKompetenCount);
 
         // Verify Certificate count
-        $this->assertSame(18, Certificate::where('schedule_id', $schedule->id)->count());
-
-        // Verify Appeal for candidate #20
-        $this->assertSame(1, AssessmentAppeal::whereHas('assessment', fn ($q) => $q->where('schedule_id', $schedule->id))->count());
+        $this->assertSame(1, Certificate::where('schedule_id', $schedule->id)->count());
     }
 
     public function test_finished_schedule_seeder_is_idempotent(): void
@@ -143,6 +140,6 @@ class FinishedScheduleSeederTest extends TestCase
         $schedule = Schedule::where('code', 'SCH-FIN-2026')->first();
         $this->assertNotNull($schedule);
         $this->assertSame('FINISHED', $schedule->status);
-        $this->assertSame(20, $schedule->assessments()->count());
+        $this->assertSame(1, $schedule->assessments()->count());
     }
 }

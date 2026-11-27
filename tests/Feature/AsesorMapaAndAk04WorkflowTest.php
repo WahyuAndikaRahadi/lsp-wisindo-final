@@ -278,4 +278,59 @@ class AsesorMapaAndAk04WorkflowTest extends TestCase
         $this->assertTrue($this->schedule->isClosedForAssessor($this->asesor));
         $this->assertEquals('FINISHED', $this->schedule->status);
     }
+
+    public function test_assessor_entering_schedule_redirects_to_mapa_when_still_at_mapa(): void
+    {
+        $this->asesor->profile()->updateOrCreate(
+            ['user_id' => $this->asesor->id],
+            ['signature_data' => 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=']
+        );
+
+        $this->assessment->update(['apl_status' => 'APPROVED']);
+
+        // When entering via schedule.ruang-uji (the "Masuk Ruang Uji / Masuk Jadwal" button),
+        // it must redirect to MAPA 01 (NOT AK 01!)
+        $response = $this->actingAs($this->asesor)->get(route('asesor.schedule.ruang-uji', $this->schedule));
+        $response->assertRedirect(route('asesor.schedule.mapa', $this->schedule));
+        $response->assertSessionHas('warning', 'Harap lengkapi dokumen FR.MAPA.01 terlebih dahulu sebelum masuk ke Ruang Uji.');
+
+        $this->assertEquals(
+            route('asesor.schedule.mapa', $this->schedule),
+            $this->schedule->getAssessorActiveStepRoute($this->asesor)
+        );
+    }
+
+    public function test_assessor_entering_schedule_progresses_through_mapa_ak04_ak01_ak07_ruang_uji(): void
+    {
+        $this->asesor->profile()->updateOrCreate(
+            ['user_id' => $this->asesor->id],
+            ['signature_data' => 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=']
+        );
+
+        $this->assessment->update(['apl_status' => 'APPROVED']);
+
+        // 1. Still at MAPA 01 -> redirects to MAPA
+        $res1 = $this->actingAs($this->asesor)->get(route('asesor.schedule.ruang-uji', $this->schedule));
+        $res1->assertRedirect(route('asesor.schedule.mapa', $this->schedule));
+
+        // 2. Completed MAPA 01, not yet briefed AK.04 -> redirects to AK 04
+        $this->schedule->update(['mapa01_data' => ['tujuan_asesmen' => 'Sertifikasi']]);
+        $res2 = $this->actingAs($this->asesor)->get(route('asesor.schedule.ruang-uji', $this->schedule));
+        $res2->assertRedirect(route('asesor.schedule.ak04', $this->schedule));
+
+        // 3. Confirmed AK.04 briefing, not yet saved AK.01 -> redirects to AK 01
+        $this->schedule->update(['ak04_briefed_at' => now()]);
+        $res3 = $this->actingAs($this->asesor)->get(route('asesor.schedule.ruang-uji', $this->schedule));
+        $res3->assertRedirect(route('asesor.schedule.ak01', $this->schedule));
+
+        // 4. Saved AK.01, not yet saved AK.07 -> redirects to AK 07
+        $this->schedule->update(['ak01_data' => ['evidence' => ['Hasil Observasi Langsung']]]);
+        $res4 = $this->actingAs($this->asesor)->get(route('asesor.schedule.ruang-uji', $this->schedule));
+        $res4->assertRedirect(route('asesor.schedule.ak07', $this->schedule));
+
+        // 5. Saved AK.07 -> Enters Ruang Uji!
+        $this->schedule->update(['ak07_data' => ['notes' => 'Penyesuaian wajar tercatat']]);
+        $res5 = $this->actingAs($this->asesor)->get(route('asesor.schedule.ruang-uji', $this->schedule));
+        $res5->assertOk();
+    }
 }

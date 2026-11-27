@@ -59,7 +59,6 @@
                         <option value="ASESOR">Asesor Kompetensi</option>
                         <option value="ADMIN_LSP">Admin LSP</option>
                         <option value="SUPER_ADMIN">Super Admin</option>
-                        <option value="KOMITE_TEKNIS">Komite Teknis</option>
                     </select>
                     @error('role')
                         <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>

@@ -7,10 +7,10 @@
 <div style="text-align: center; padding: 40px 20px; min-height: 250mm; display: flex; flex-direction: column; justify-content: space-between;">
     <div>
         <div style="font-size: 14pt; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; color: #1e293b;">
-            LEMBAGA SERTIFIKASI PROFESI PRAKTISI OTOMOTIF INDONESIA
+            LEMBAGA SERTIFIKASI PROFESI P3 WISATA INDONESIA
         </div>
         <div style="font-size: 16pt; font-weight: 900; color: #1e3a8a; margin-top: 4px; letter-spacing: 2px;">
-            LSP - PrO INDO
+            LSP - WISINDO
         </div>
         <div style="font-size: 9pt; color: #64748b; margin-top: 6px;">
             Lisensi Badan Nasional Sertifikasi Profesi (BNSP) &bull; SK Lisensi No. KEP.0543/BNSP/III/2021

@@ -691,10 +691,11 @@ def render_master_overlay(master_pdf_path, data, dest_path):
 
     os.makedirs(os.path.dirname(os.path.abspath(dest_path)), exist_ok=True)
     meta = doc.metadata or {}
-    meta["title"] = f"FR.AK.02 ({asesi_name})" if asesi_name else "FR.AK.02 Rekaman Asesmen Kompetensi"
-    meta["author"] = "LSP PrO Indo"
+    asesi_nama = str(data.get("asesi_nama") or "").strip()
+    meta["title"] = f"FR.AK.02 ({asesi_nama})" if asesi_nama else "FR.AK.02 Rekaman Asesmen Kompetensi"
+    meta["author"] = "LSP Wisindo"
     meta["subject"] = "FR.AK.02 Rekaman Asesmen Kompetensi"
-    meta["creator"] = "LSP PrO Indo MUK System"
+    meta["creator"] = "LSP Wisindo MUK System"
     doc.set_metadata(meta)
     doc.save(dest_path)
     doc.close()

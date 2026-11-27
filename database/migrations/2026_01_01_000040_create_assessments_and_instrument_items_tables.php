@@ -75,7 +75,7 @@ return new class extends Migration
         Schema::create('t_assessment_ia_responses', function (Blueprint $table) {
             $table->id();
             $table->foreignId('assessment_id')->constrained('t_assessments')->cascadeOnDelete();
-            $table->enum('instrument_code', ['IA01', 'IA01B', 'IA02', 'IA03', 'IA05']);
+            $table->string('instrument_code', 20);
             $table->json('data_json')->nullable();
             $table->decimal('score', 5, 2)->nullable();
             $table->text('assessor_notes')->nullable();

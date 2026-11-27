@@ -1,14 +1,18 @@
 @extends('layouts.app', ['title' => 'Edit Skema Sertifikasi - ' . $scheme->code])
 
 @section('content')
-<div class="space-y-6 max-w-4xl mx-auto">
+<div class="space-y-6 max-w-4xl mx-auto"
+     x-data="schemeCommitteeManager(
+         {{ json_encode(old('penyusun', $scheme->penyusun_list)) }},
+         {{ json_encode(old('validator', $scheme->validator_list)) }}
+     )">
     <div>
         <a href="{{ route('admin.schemes.show', $scheme->id) }}" class="text-xs text-brand-600 hover:text-brand-700 font-semibold">&larr; Kembali ke Detail Skema</a>
         <h1 class="text-2xl font-black text-slate-900 tracking-tight mt-1">Edit Skema Sertifikasi</h1>
         <p class="text-sm text-slate-500">Perbarui spesifikasi skema sertifikasi <span class="font-mono font-bold text-brand-700">{{ $scheme->code }}</span></p>
     </div>
 
-    <form action="{{ route('admin.schemes.update', $scheme->id) }}" method="POST" class="space-y-6">
+    <form action="{{ route('admin.schemes.update', $scheme->id) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
         @csrf
         @method('PUT')
 
@@ -90,6 +94,9 @@
             </div>
         </div>
 
+        {{-- Tim Penyusun & Validator Section --}}
+        @include('admin.schemes._committee_section')
+
         <div class="flex items-center justify-between">
             <a href="{{ route('admin.schemes.show', $scheme->id) }}" class="px-5 py-2.5 text-sm font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition">Batal</a>
             <button type="submit" class="px-6 py-2.5 text-sm font-bold bg-brand-600 hover:bg-brand-700 text-white rounded-lg shadow-sm transition">
@@ -98,4 +105,143 @@
         </div>
     </form>
 </div>
+
+@push('scripts')
+<script>
+function schemeCommitteeManager(initialPenyusun = [], initialValidator = []) {
+    return {
+        penyusun: (initialPenyusun && initialPenyusun.length > 0) ? initialPenyusun.map(p => ({
+            id: p.id || (Date.now() + Math.random()),
+            name: p.name || '',
+            no_met: p.no_met || '',
+            signature: p.signature || '',
+            ttd_tab: p.signature ? 'preview' : 'upload',
+        })) : [
+            { id: Date.now(), name: '', no_met: '', signature: '', ttd_tab: 'upload' }
+        ],
+        validator: (initialValidator && initialValidator.length > 0) ? initialValidator.map(v => ({
+            id: v.id || (Date.now() + Math.random()),
+            name: v.name || '',
+            no_met: v.no_met || '',
+            signature: v.signature || '',
+            ttd_tab: v.signature ? 'preview' : 'upload',
+        })) : [
+            { id: Date.now() + 1, name: '', no_met: '', signature: '', ttd_tab: 'upload' }
+        ],
+        addPenyusun() {
+            this.penyusun.push({ id: Date.now() + Math.random(), name: '', no_met: '', signature: '', ttd_tab: 'upload' });
+        },
+        removePenyusun(index) {
+            this.penyusun.splice(index, 1);
+        },
+        addValidator() {
+            this.validator.push({ id: Date.now() + Math.random(), name: '', no_met: '', signature: '', ttd_tab: 'upload' });
+        },
+        removeValidator(index) {
+            this.validator.splice(index, 1);
+        },
+        handleFileUpload(event, item) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                item.signature = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        },
+        clearSignature(item) {
+            item.signature = '';
+        },
+        clearCanvasElement(btn) {
+            const canvas = btn.closest('.space-y-2').querySelector('canvas');
+            if (canvas && canvas.clear) {
+                canvas.clear();
+            }
+        },
+        initCanvas(canvasEl, item) {
+            if (!canvasEl) return;
+            const ctx = canvasEl.getContext('2d');
+            let isDrawing = false;
+            ctx.lineWidth = 2.5;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.strokeStyle = '#0f172a';
+
+            const getPos = (e) => {
+                const rect = canvasEl.getBoundingClientRect();
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                return {
+                    x: (clientX - rect.left) * (canvasEl.width / rect.width),
+                    y: (clientY - rect.top) * (canvasEl.height / rect.height)
+                };
+            };
+
+            const start = (e) => {
+                isDrawing = true;
+                const pos = getPos(e);
+                ctx.beginPath();
+                ctx.moveTo(pos.x, pos.y);
+                if (e.cancelable) e.preventDefault();
+            };
+
+            const draw = (e) => {
+                if (!isDrawing) return;
+                const pos = getPos(e);
+                ctx.lineTo(pos.x, pos.y);
+                ctx.stroke();
+                if (e.cancelable) e.preventDefault();
+            };
+
+            const trimCanvas = (canvas) => {
+                const ctx = canvas.getContext('2d');
+                const w = canvas.width;
+                const h = canvas.height;
+                const imgData = ctx.getImageData(0, 0, w, h);
+                const data = imgData.data;
+                let minX = w, minY = h, maxX = 0, maxY = 0;
+                for (let y = 0; y < h; y += 2) {
+                    for (let x = 0; x < w; x += 2) {
+                        const alpha = data[(y * w + x) * 4 + 3];
+                        if (alpha > 20) {
+                            if (x < minX) minX = x;
+                            if (x > maxX) maxX = x;
+                            if (y < minY) minY = y;
+                            if (y > maxY) maxY = y;
+                        }
+                    }
+                }
+                if (maxX <= minX || maxY <= minY) return canvas.toDataURL('image/png');
+                const pad = 12;
+                const cropX = Math.max(0, minX - pad);
+                const cropY = Math.max(0, minY - pad);
+                const cropW = Math.min(w - cropX, (maxX - minX) + pad * 2);
+                const cropH = Math.min(h - cropY, (maxY - minY) + pad * 2);
+                const trimmed = document.createElement('canvas');
+                trimmed.width = cropW;
+                trimmed.height = cropH;
+                const tCtx = trimmed.getContext('2d');
+                tCtx.drawImage(canvas, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
+                return trimmed.toDataURL('image/png');
+            };
+
+            const stop = () => {
+                if (!isDrawing) return;
+                isDrawing = false;
+                item.signature = trimCanvas(canvasEl);
+            };
+
+            canvasEl.onmousedown = canvasEl.ontouchstart = start;
+            canvasEl.onmousemove = canvasEl.ontouchmove = draw;
+            canvasEl.onmouseup = canvasEl.ontouchend = canvasEl.onmouseleave = stop;
+
+            canvasEl.clear = () => {
+                ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
+                item.signature = '';
+            };
+        }
+    };
+}
+</script>
+@endpush
 @endsection

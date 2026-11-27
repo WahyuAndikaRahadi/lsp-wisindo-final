@@ -35,8 +35,8 @@ class RegistrationTokenService
     }
 
     /**
-     * Generate and store a new weekly registration token (proindo + 4 random digits).
-     * Example: proindo1234, proindo7865
+     * Generate and store a new weekly registration token (wisindo + 4 random digits).
+     * Example: wisindo1234, wisindo7865
      * Automatically preserves current token as previous token for grace period.
      */
     public static function generateNewToken(): string
@@ -88,11 +88,11 @@ class RegistrationTokenService
     }
 
     /**
-     * Check if a token string has the expected format (wisindo or proindo followed by 4 digits).
+     * Check if a token string has the expected format (wisindo followed by 4 digits).
      */
     public static function isValidFormat(string $token): bool
     {
-        return (bool) preg_match('/^(wisindo|proindo)[0-9]{4}$/i', trim($token));
+        return (bool) preg_match('/^wisindo[0-9]{4}$/i', trim($token));
     }
 
     /**

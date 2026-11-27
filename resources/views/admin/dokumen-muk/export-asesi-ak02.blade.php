@@ -117,7 +117,7 @@
 @section('content')
 @php
     $dummySkemaJudul = $scheme->name ?? 'Maintenance Gasoline Engine Injection System';
-    $dummySkemaNomor = $scheme->code ?? '02/LSP PrO Indo/I/2026';
+    $dummySkemaNomor = $scheme->code ?? 'SKM/LSP-WISINDO/2026';
     $dummyTukTipe = 'Sewaktu/Tempat Kerja/Mandiri*';
     $dummyAsesorNama = $assessor?->full_name ?? $assessor?->name ?? 'Drs. Budi Santoso, M.T.';
     $dummyNoReg = $assessor?->profile?->met_number ?? 'MET.000.001234 2022';
@@ -151,7 +151,7 @@
                 <img src="{{ asset('storage/assets/logo.png') }}" onerror="this.onerror=null; this.src='{{ asset('images/logo.png') }}';" class="header-logo-img" alt="Logo LSP">
             </td>
             <td class="header-title-cell">
-                Lembaga Sertifikasi Profesi Praktisi Otomotif &nbsp;LSP-PrO Indo
+                Lembaga Sertifikasi Profesi P3 Wisata Indonesia &nbsp;LSP Wisindo
             </td>
         </tr>
     </table>
@@ -347,7 +347,7 @@
                 <img src="{{ asset('storage/assets/logo.png') }}" onerror="this.onerror=null; this.src='{{ asset('images/logo.png') }}';" class="header-logo-img" alt="Logo LSP">
             </td>
             <td class="header-title-cell">
-                Lembaga Sertifikasi Profesi Praktisi Otomotif &nbsp;LSP-PrO Indo
+                Lembaga Sertifikasi Profesi P3 Wisata Indonesia &nbsp;LSP Wisindo
             </td>
         </tr>
     </table>
@@ -424,7 +424,7 @@
                 <img src="{{ asset('storage/assets/logo.png') }}" onerror="this.onerror=null; this.src='{{ asset('images/logo.png') }}';" class="header-logo-img" alt="Logo LSP">
             </td>
             <td class="header-title-cell" style="vertical-align: middle;">
-                Lembaga Sertifikasi Profesi Praktisi Otomotif &nbsp;LSP-PrO Indo
+                Lembaga Sertifikasi Profesi P3 Wisata Indonesia &nbsp;LSP Wisindo
             </td>
         </tr>
     </table>

@@ -13,7 +13,7 @@ class ProxyController extends Controller
 {
     public function index(Request $request): View
     {
-        $query = User::whereNotIn('role', ['SUPER_ADMIN', 'TUK_ADMIN']);
+        $query = User::with('tuk')->whereNotIn('role', ['SUPER_ADMIN']);
 
         if ($request->filled('role') && $request->input('role') !== 'ALL') {
             $query->where('role', $request->input('role'));
@@ -59,6 +59,9 @@ class ProxyController extends Controller
         return match ($user->role) {
             'ASESOR' => redirect()->route('asesor.jadwal.index'),
             'ASESI' => redirect()->route('asesi.dashboard'),
+            'TUK_ADMIN' => $user->tuk && $user->tuk->isVerified()
+                ? redirect()->route('tuk.dashboard')
+                : redirect()->route('tuk.data.edit'),
             default => redirect()->route('admin.dashboard'),
         };
     }

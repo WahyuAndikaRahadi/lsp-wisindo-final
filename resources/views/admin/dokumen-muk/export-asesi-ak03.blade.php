@@ -7,7 +7,7 @@
 <div style="font-size: 9.5pt; line-height: 1.35;">
     {{-- Header Kop --}}
     <div class="header-kop">
-        <div class="title-lsp">Lembaga Sertifikasi Profesi Praktisi Otomotif LSP-PrO Indo</div>
+        <div class="title-lsp">Lembaga Sertifikasi Profesi P3 Wisata Indonesia (LSP Wisindo)</div>
         <div class="doc-code">FR.AK.03. UMPAN BALIK DAN CATATAN ASESMEN</div>
     </div>
 

@@ -30,8 +30,8 @@ class FinishedScheduleSeeder extends Seeder
         $admin = User::whereIn('role', ['ADMIN_LSP', 'SUPER_ADMIN'])->first();
         if (! $admin) {
             $admin = User::create([
-                'full_name' => 'Admin LSP Pro Indo',
-                'email' => 'admin.lsp@proindo.id',
+                'full_name' => 'Admin LSP Wisindo',
+                'email' => 'adminlsp@gmail.com',
                 'phone' => '081234567890',
                 'role' => 'ADMIN_LSP',
                 'status' => 'ACTIVE',
@@ -107,7 +107,7 @@ class FinishedScheduleSeeder extends Seeder
             ['code' => 'SCH-FIN-2026'],
             [
                 'name' => 'Uji Kompetensi Selesai - '.$scheme->name,
-                'surat_tugas_number' => '001/ST/PRO-INDO/INT/XI/2026',
+                'surat_tugas_number' => '001/ST/WISINDO/INT/XI/2026',
                 'scheme_id' => $scheme->id,
                 'tuk_id' => $tuk->id,
                 'tuk_name' => $tukName,
@@ -117,14 +117,14 @@ class FinishedScheduleSeeder extends Seeder
                 'start_time' => '08:00:00',
                 'end_time' => '16:30:00',
                 'duration_minutes' => 510,
-                'estimated_candidates' => 20,
+                'estimated_candidates' => 1,
                 'surat_tugas_date' => $suratTugasDate,
                 'letter_city' => 'Bekasi',
                 'director_name' => 'RIDWAN',
                 'pic_name' => 'Drs. H. Mulyadi, M.Pd.',
                 'pic_position' => 'Penanggung Jawab TUK',
                 'pic_signature' => $sampleSignature,
-                'selected_instruments' => ['AK01', 'IA01', 'IA01B', 'IA02', 'IA03', 'IA05'],
+                'selected_instruments' => ['AK01', 'IA01', 'IA02', 'IA03', 'IA05'],
                 'cbt_question_ids' => $cbtQuestionIds,
                 'kode_sumber_anggaran' => '01',
                 'kode_kementerian' => '01',
@@ -135,7 +135,7 @@ class FinishedScheduleSeeder extends Seeder
                     'tuk_type' => 'Sewaktu',
                     'agreed_date' => $scheduleDate,
                     'agreed_time' => '08:00 - 16:30 WIB',
-                    'selected_instruments' => ['AK01', 'IA01', 'IA01B', 'IA02', 'IA03', 'IA05'],
+                    'selected_instruments' => ['AK01', 'IA01', 'IA02', 'IA03', 'IA05'],
                 ],
                 'ak07_data' => [
                     'saved_at' => Carbon::parse($scheduleDate)->setTime(8, 20)->toIso8601String(),
@@ -247,28 +247,9 @@ class FinishedScheduleSeeder extends Seeder
         // Sync assessors to schedule
         $schedule->assessors()->sync($assessors->pluck('id')->toArray());
 
-        // 6. Candidates (20 Assessees)
+        // 6. Candidate (Single Assessee: Asesi Ani Rahayu for clean testing)
         $candidateNames = [
-            'Achmad Fauzi',
-            'Aisyah Putri Rahmawati',
-            'Bagus Pratama Putra',
-            'Bayu Setiawan',
-            'Citra Lestari Dewi',
-            'Danu Wicaksono',
-            'Dewi Anggraini Kusuma',
-            'Dimas Wahyu Saputra',
-            'Eka Rahmawati',
-            'Fajar Hidayatullah',
-            'Gilang Ramadhan',
-            'Hana Safitri',
-            'Ilham Kurniawan',
-            'Indah Permata Sari',
-            'Joko Susilo Utomo',
-            'Muhammad Rizky Ananda',
-            'Nadia Nuraini',
-            'Rian Kurniawan Pratama',
-            'Siti Nurhaliza',
-            'Wahyu Tri Handoko',
+            'Asesi Ani Rahayu',
         ];
 
         $units = $scheme->competencyUnits;
@@ -278,10 +259,10 @@ class FinishedScheduleSeeder extends Seeder
         foreach ($candidateNames as $idx => $name) {
             $num = $idx + 1;
             $paddedNum = str_pad((string) $num, 2, '0', STR_PAD_LEFT);
-            $email = "asesi.fin{$paddedNum}@lsp-proindo.test";
-            $nik = '321601'.str_pad((string) (20261100 + $num), 10, '0', STR_PAD_LEFT);
-            $phone = '081299900'.str_pad((string) $num, 3, '0', STR_PAD_LEFT);
-            $gender = in_array($num, [2, 5, 7, 9, 12, 14, 17, 19], true) ? 'P' : 'L';
+            $email = 'asesi@gmail.com';
+            $nik = '3216012026110001';
+            $phone = '081987654321';
+            $gender = 'P';
 
             $user = User::updateOrCreate(
                 ['email' => $email],
@@ -319,11 +300,9 @@ class FinishedScheduleSeeder extends Seeder
             );
 
             $assignedAssessor = $assessors[$idx % $assessors->count()];
-            $isKompeten = ($num <= 18);
-            $finalResult = $isKompeten ? 'KOMPETEN' : 'BELUM_KOMPETEN';
-            $followUpAction = $isKompeten
-                ? 'Direkomendasikan untuk diterbitkan sertifikat kompetensi BNSP'
-                : 'Perlu penguatan uji praktik ulang pada unit kompetensi inti';
+            $isKompeten = true;
+            $finalResult = 'KOMPETEN';
+            $followUpAction = 'Direkomendasikan untuk diterbitkan sertifikat kompetensi BNSP';
 
             $assessment = Assessment::updateOrCreate(
                 [
@@ -442,25 +421,6 @@ class FinishedScheduleSeeder extends Seeder
                 ]
             );
 
-            // 12. IA-01B Report Sheet (practical worksheet upload)
-            AssessmentIaResponse::updateOrCreate(
-                ['assessment_id' => $assessment->id, 'instrument_code' => 'IA01B'],
-                [
-                    'data_json' => [
-                        'uploaded_file' => 'mock_ia01b_report.pdf',
-                        'evidence_image_path' => 'mock_ia01b_report.pdf',
-                        'notes' => 'Laporan lembar kerja demonstrasi telah diunggah dan diverifikasi asesor.',
-                        'uploaded_at' => Carbon::parse($scheduleDate)->setTime(13, 0)->toIso8601String(),
-                    ],
-                    'score' => $isKompeten ? 90.00 : 60.00,
-                    'assessor_notes' => 'Hasil observasi dan dokumentasi demonstrasi valid.',
-                    'assessor_signature' => $sampleSignature,
-                    'asesi_signature' => $sampleSignature,
-                    'assessor_signed_at' => Carbon::parse($scheduleDate)->setTime(15, 30),
-                    'asesi_signed_at' => Carbon::parse($scheduleDate)->setTime(15, 0),
-                ]
-            );
-
             // 13. IA-02 Practical Task
             AssessmentIaResponse::updateOrCreate(
                 ['assessment_id' => $assessment->id, 'instrument_code' => 'IA02'],
@@ -551,7 +511,7 @@ class FinishedScheduleSeeder extends Seeder
                         'schedule_id' => $schedule->id,
                         'asesi_id' => $user->id,
                         'scheme_id' => $scheme->id,
-                        'certificate_number' => "CERT/LSP-PROINDO/2026/{$paddedNum}",
+                        'certificate_number' => "CERT/LSP-WISINDO/2026/{$paddedNum}",
                         'blanko_number' => "BNSP-BL-2026-{$paddedNum}",
                         'issued_date' => $scheduleDate,
                         'valid_until' => Carbon::parse($scheduleDate)->addYears(3)->toDateString(),

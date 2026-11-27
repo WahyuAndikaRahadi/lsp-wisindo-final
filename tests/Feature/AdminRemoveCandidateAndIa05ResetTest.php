@@ -117,7 +117,7 @@ class AdminRemoveCandidateAndIa05ResetTest extends TestCase
         ]);
 
         // 2. Create IA evidence file and IA response
-        $iaEvidencePath = 'ia_evidence/test_ia01b.jpg';
+        $iaEvidencePath = 'ia_evidence/test_ia01.jpg';
         Storage::disk('local')->put($iaEvidencePath, 'dummy image content');
 
         AssessmentIaResponse::create([

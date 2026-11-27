@@ -76,7 +76,7 @@ class DynamicMukExportTest extends TestCase
         $service = app(MukDynamicDocumentService::class);
         $scheme = $this->schedule->scheme;
 
-        $types = ['apl01', 'apl02', 'ak01', 'ak02', 'ak03', 'ak07', 'ia01', 'ia01b', 'ia02', 'ia03', 'ia05c', 'ba', 'hadir-asesor'];
+        $types = ['apl01', 'apl02', 'ak01', 'ak02', 'ak03', 'ak07', 'ia01', 'ia02', 'ia03', 'ia05c', 'ba', 'hadir-asesor'];
         foreach ($types as $type) {
             $path = $service->getDynamicFilePath($scheme, $type);
             $this->assertNotNull($path, "Failed finding dynamic path for type: {$type}");
@@ -335,25 +335,6 @@ class DynamicMukExportTest extends TestCase
         $this->assertStringContainsString('Bambang Sudarmono', $pdfText);
         $this->assertStringContainsString('Ir. Hendra Gunawan, S.T.', $pdfText);
         $this->assertStringContainsString('PENYUSUN DAN VALIDATOR', $pdfText);
-    }
-
-    public function test_admin_sees_not_uploaded_page_when_candidate_has_not_uploaded_ia01b(): void
-    {
-        // Ensure no IA01B upload
-        AssessmentIaResponse::where('assessment_id', $this->assessment->id)
-            ->whereIn('instrument_code', ['IA01B', 'ia01b'])
-            ->delete();
-
-        $response = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.asesi-dynamic', [
-            'assessment' => $this->assessment->id,
-            'type' => 'ia01b',
-        ]));
-
-        $response->assertOk();
-        $response->assertViewIs('admin.dokumen-muk.not-uploaded');
-        $response->assertSee('Dokumen Belum Diunggah');
-        $response->assertSee('FR.IA.01B');
-        $response->assertSee('Bambang Sudarmono');
     }
 
     public function test_admin_can_export_dynamic_candidate_ia03_pdf(): void

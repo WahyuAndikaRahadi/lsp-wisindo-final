@@ -183,7 +183,7 @@ def draw_header_box(c, pnum):
     # Logo
     logo_file = os.path.join(ASSETS, "logo.png")
     if not os.path.exists(logo_file):
-        logo_file = os.path.join(PROJECT_ROOT, "public", "images", "logo-lsp-proindo.png")
+        logo_file = os.path.join(PROJECT_ROOT, "public", "images", "logo-lsp-wisindo.png")
     if os.path.exists(logo_file):
         c.drawImage(logo_file, 77.3, Y(97.8), 69.4, 61.5, mask="auto")
         

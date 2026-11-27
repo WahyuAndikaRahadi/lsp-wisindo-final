@@ -11,7 +11,7 @@
             SURAT PERNYATAAN PEMEGANG SERTIFIKAT KOMPETENSI
         </h2>
         <div style="font-size: 10.5pt; font-weight: bold; margin-top: 4px;">
-            LEMBAGA SERTIFIKASI PROFESI PIHAK KETIGA<br>PRAKTISI OTOMOTIF INDONESIA (LSP P3 PRO INDO)
+            LEMBAGA SERTIFIKASI PROFESI PIHAK KETIGA<br>WISATA INDONESIA (LSP P3 WISINDO)
         </div>
         <div style="border-bottom: 2px solid #000; margin-top: 15px; width: 100%;"></div>
     </div>
@@ -69,10 +69,10 @@
             Menggunakan sertifikat hanya untuk ruang lingkup sertifikasi yang diberikan.
         </li>
         <li style="margin-bottom: 8px;">
-            Tidak menggunakan sertifikat yang dapat mencemarkan / merugikan Lembaga Sertifikasi Profesi Pihak Ketiga Praktisi Otomotif Indonesia (LSP P3 PrO Indo) dan tidak memberikan pernyataan terkait sertifikasi yang oleh Lembaga Sertifikasi Profesi Pihak Ketiga Praktisi Otomotif Indonesia (LSP P3 PrO Indo) dianggap dapat menyesatkan atau tidak dapat dipertanggungjawabkan.
+            Tidak menggunakan sertifikat yang dapat mencemarkan / merugikan Lembaga Sertifikasi Profesi Pihak Ketiga Wisata Indonesia (LSP P3 Wisindo) dan tidak memberikan pernyataan terkait sertifikasi yang oleh Lembaga Sertifikasi Profesi Pihak Ketiga Wisata Indonesia (LSP P3 Wisindo) dianggap dapat menyesatkan atau tidak dapat dipertanggungjawabkan.
         </li>
         <li style="margin-bottom: 8px;">
-            Menghentikan penggunaan atau pengakuan sertifikat setelah sertifikat dibekukan atau dicabut oleh Lembaga Sertifikasi Profesi Pihak Ketiga Praktisi Otomotif Indonesia (LSP P3 PrO Indo) dan mengembalikan sertifikat kepada Lembaga Sertifikasi Profesi Pihak Ketiga Praktisi Otomotif Indonesia (LSP P3 PrO Indo).
+            Menghentikan penggunaan atau pengakuan sertifikat setelah sertifikat dibekukan atau dicabut oleh Lembaga Sertifikasi Profesi Pihak Ketiga Wisata Indonesia (LSP P3 Wisindo) dan mengembalikan sertifikat kepada Lembaga Sertifikasi Profesi Pihak Ketiga Wisata Indonesia (LSP P3 Wisindo).
         </li>
     </ol>
 

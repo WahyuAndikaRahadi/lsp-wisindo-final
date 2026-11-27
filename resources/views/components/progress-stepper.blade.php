@@ -5,7 +5,7 @@
 
 @php
     $normalizedCurrent = strtolower((string) $currentStep);
-    if (in_array($normalizedCurrent, ['ak01', 'ak07', 'ia01', 'ia01b', 'ia02', 'ia03', 'ia05', 'ruang-uji', 'ruang_uji'])) {
+    if (in_array($normalizedCurrent, ['ak01', 'ak07', 'ia01', 'ia02', 'ia03', 'ia05', 'ruang-uji', 'ruang_uji'])) {
         $normalizedCurrent = 'ruang-uji';
     }
 

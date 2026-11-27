@@ -57,7 +57,7 @@
     ];
 @endphp
 
-<div class="bg-white rounded-xl border border-slate-200 shadow-xs p-2 overflow-x-auto">
+<div class="sticky top-[66px] md:top-[58px] z-20 bg-white/95 backdrop-blur-md rounded-xl border border-slate-200 shadow-sm p-2 overflow-x-auto scrollbar-thin touch-pan-x">
     <div class="flex items-center space-x-1.5 min-w-max">
         <a href="{{ route('asesor.jadwal.index') }}" 
            class="inline-flex items-center space-x-1 px-3 py-2 text-xs font-semibold text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition mr-1 border-r border-slate-200 pr-3"
@@ -67,15 +67,6 @@
             </svg>
             <span class="hidden sm:inline">Jadwal</span>
         </a>
-
-        @if(!empty($schedule->meeting_link))
-            <a href="{{ $schedule->meeting_link }}" target="_blank" rel="noopener noreferrer"
-               class="inline-flex items-center px-3 py-2 rounded-lg text-xs font-black bg-blue-600 hover:bg-blue-700 text-white shadow-xs transition mr-1.5 shrink-0"
-               title="Masuk Ruang Pertemuan Video AJJ (Zoom / Google Meet)">
-                <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-                <span>Ruang Meet AJJ ↗</span>
-            </a>
-        @endif
 
         @php
             $isClosedForMe = $schedule->isClosedForAssessor();

@@ -21,7 +21,7 @@ class UserSeeder extends Seeder
         $coreUsers = [
             [
                 'full_name' => 'Super Admin LSP Wisindo',
-                'email' => 'superadmin@lsp-wisindo.id',
+                'email' => 'superadmin@gmail.com',
                 'phone' => '08111111111',
                 'role' => 'SUPER_ADMIN',
                 'status' => 'ACTIVE',
@@ -29,7 +29,7 @@ class UserSeeder extends Seeder
             ],
             [
                 'full_name' => 'Admin LSP Wisindo',
-                'email' => 'adminlsp@lsp-wisindo.id',
+                'email' => 'adminlsp@gmail.com',
                 'phone' => '08222222222',
                 'role' => 'ADMIN_LSP',
                 'status' => 'ACTIVE',
@@ -44,7 +44,7 @@ class UserSeeder extends Seeder
                 'password' => $password,
             ],
             [
-                'full_name' => 'Asesi Uji Kompetensi',
+                'full_name' => 'Asesi Ani Rahayu',
                 'email' => 'asesi@gmail.com',
                 'phone' => '081987654321',
                 'role' => 'ASESI',
@@ -64,8 +64,8 @@ class UserSeeder extends Seeder
                 [
                     'signature_data' => 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
                     'tempat_lahir' => 'Jakarta',
-                    'tanggal_lahir' => '1990-01-01',
-                    'jenis_kelamin' => 'L',
+                    'tanggal_lahir' => ($uData['role'] === 'ASESI') ? '1998-05-12' : '1990-01-01',
+                    'jenis_kelamin' => ($uData['role'] === 'ASESI') ? 'P' : 'L',
                     'alamat_rumah' => 'Jl. Wisata No. 1, Jakarta',
                 ]
             );
@@ -76,126 +76,126 @@ class UserSeeder extends Seeder
         $assessors = [
             [
                 'name' => 'Panca Nugraha',
-                'email' => 'asesor.panca@lspwisindo.id',
+                'email' => 'asesor.panca@gmail.com',
                 'met' => 'MET. 000.002973 2023',
                 'phone' => '081230000001',
                 'schemes' => ['SKM-CC-02', 'SKM-CDP-01'], // Commis Chef Hotel, Chef De Partie Hotel
             ],
             [
                 'name' => 'Lulut Budiyono',
-                'email' => 'asesor.lulut@lspwisindo.id',
+                'email' => 'asesor.lulut@gmail.com',
                 'met' => 'MET. 000.002985 2023',
                 'phone' => '081230000002',
                 'schemes' => ['SKM-CC-02', 'SKM-CDP-01', 'SKM-FB-05'], // Commis Chef Hotel, Chef De Partie Hotel, Waiter Server
             ],
             [
                 'name' => 'Hendryan Afrianto',
-                'email' => 'asesor.hendryan@lspwisindo.id',
+                'email' => 'asesor.hendryan@gmail.com',
                 'met' => 'MET. 000.002975 2023',
                 'phone' => '081230000003',
                 'schemes' => ['SKM-CC-02', 'SKM-CDP-01'], // Commis Chef Hotel, Chef De Partie Hotel
             ],
             [
                 'name' => 'George Edwin A',
-                'email' => 'asesor.george@lspwisindo.id',
+                'email' => 'asesor.george@gmail.com',
                 'met' => 'MET. 000.000683 2021',
                 'phone' => '081230000004',
                 'schemes' => ['SKM-CC-02', 'SKM-CDP-01'], // Commis Chef Hotel, Chef De Partie Hotel
             ],
             [
                 'name' => 'Efnu Nugroho',
-                'email' => 'asesor.efnu@lspwisindo.id',
+                'email' => 'asesor.efnu@gmail.com',
                 'met' => 'MET. 000.000697 2021',
                 'phone' => '081230000005',
                 'schemes' => ['SKM-CC-02', 'SKM-CDP-01'], // Commis Chef Hotel, Chef De Partie Hotel
             ],
             [
                 'name' => 'Rita Irawati P',
-                'email' => 'asesor.rita@lspwisindo.id',
+                'email' => 'asesor.rita@gmail.com',
                 'met' => 'MET. 000.000699 2021',
                 'phone' => '081230000006',
                 'schemes' => ['SKM-HK-04', 'SKM-FO-03', 'SKM-FB-05'], // Room Attendant, Receptionist, Waiter Server
             ],
             [
                 'name' => 'Dwi Agung Jayan Nurcahyo',
-                'email' => 'asesor.dwiagung@lspwisindo.id',
+                'email' => 'asesor.dwiagung@gmail.com',
                 'met' => 'MET. 000.002977 2023',
                 'phone' => '081230000007',
                 'schemes' => ['SKM-HK-04'], // Room Attendant
             ],
             [
                 'name' => 'Ahmad Rosyid Rafiudin',
-                'email' => 'asesor.ahmadrosyid@lspwisindo.id',
+                'email' => 'asesor.ahmadrosyid@gmail.com',
                 'met' => 'MET. 000.002980 2023',
                 'phone' => '081230000008',
                 'schemes' => ['SKM-HK-04'], // Room Attendant
             ],
             [
                 'name' => 'Agus Setyawan',
-                'email' => 'asesor.agussetyawan@lspwisindo.id',
+                'email' => 'asesor.agussetyawan@gmail.com',
                 'met' => 'MET. 000.002981 2023',
                 'phone' => '081230000009',
                 'schemes' => ['SKM-HK-04'], // Room Attendant
             ],
             [
                 'name' => 'Agus Budiyono',
-                'email' => 'asesor.agusbudiyono@lspwisindo.id',
+                'email' => 'asesor.agusbudiyono@gmail.com',
                 'met' => 'MET. 000.002979 2023',
                 'phone' => '081230000010',
                 'schemes' => ['SKM-HK-04'], // Room Attendant
             ],
             [
                 'name' => 'Supriono',
-                'email' => 'asesor.supriono@lspwisindo.id',
+                'email' => 'asesor.supriono@gmail.com',
                 'met' => 'MET. 000.002972 2023',
                 'phone' => '081230000011',
                 'schemes' => ['SKM-FO-03'], // Receptionist
             ],
             [
                 'name' => 'Silvia Herliana Pramono',
-                'email' => 'asesor.silvia@lspwisindo.id',
+                'email' => 'asesor.silvia@gmail.com',
                 'met' => 'MET. 000.002970 2023',
                 'phone' => '081230000012',
                 'schemes' => ['SKM-FO-03'], // Receptionist
             ],
             [
                 'name' => 'Deni Dwi Ken Hamam Nurrosyid',
-                'email' => 'asesor.deni@lspwisindo.id',
+                'email' => 'asesor.deni@gmail.com',
                 'met' => 'MET. 000.002969 2023',
                 'phone' => '081230000013',
                 'schemes' => ['SKM-FO-03'], // Receptionist
             ],
             [
                 'name' => 'Rubi',
-                'email' => 'asesor.rubi@lspwisindo.id',
+                'email' => 'asesor.rubi@gmail.com',
                 'met' => 'MET. 000.002971 2023',
                 'phone' => '081230000014',
                 'schemes' => ['SKM-FO-03'], // Receptionist
             ],
             [
                 'name' => 'Stephanus Arry Briantoro Santoso',
-                'email' => 'asesor.stephanus@lspwisindo.id',
+                'email' => 'asesor.stephanus@gmail.com',
                 'met' => 'MET. 000.000693 2021',
                 'phone' => '081230000015',
                 'schemes' => ['SKM-FB-05'], // Waiter Server
             ],
             [
                 'name' => 'Agil Ardiansyah',
-                'email' => 'asesor.agil@lspwisindo.id',
+                'email' => 'asesor.agil@gmail.com',
                 'met' => 'MET. 000.002986 2023',
                 'phone' => '081230000016',
                 'schemes' => ['SKM-FB-05'], // Waiter Server
             ],
             [
                 'name' => 'Novi Primadani',
-                'email' => 'asesor.novi@lspwisindo.id',
+                'email' => 'asesor.novi@gmail.com',
                 'met' => 'MET. 000.002964 2023',
                 'phone' => '081230000017',
                 'schemes' => ['SKM-FB-05'], // Waiter Server
             ],
             [
                 'name' => 'Suwartono',
-                'email' => 'asesor.suwartono@lspwisindo.id',
+                'email' => 'asesor.suwartono@gmail.com',
                 'met' => 'MET. 000.002976 2023',
                 'phone' => '081230000018',
                 'schemes' => ['SKM-FB-05'], // Waiter Server

@@ -216,7 +216,6 @@ class DokumenMukController extends Controller
             'fr-mapa-02' => 'mapa02',
             'ia05' => 'ia05a',
             'fr-ia-01' => 'ia01',
-            'fr-ia-01b' => 'ia01b',
             'fr-ia-02' => 'ia02',
             'fr-ia-03' => 'ia03',
             'fr-ia-05a' => 'ia05a',
@@ -256,8 +255,8 @@ class DokumenMukController extends Controller
             return $this->exporter->exportAssessmentAsesiXls($assessment);
         }
 
-        $dynamicTypes = ['apl01', 'apl02', 'ak01', 'ak02', 'ak03', 'ak04', 'ak05', 'ak07', 'ia01', 'ia01b', 'ia02', 'ia03', 'ia05a', 'ia05c', 'ia08', 'ia09', 'pernyataan', 'mapa', 'mapa01', 'frmapa01', 'mapa02', 'frmapa02'];
-        if ($request->query('format') !== 'html' && (in_array($targetType, ['ia08', 'ia09', 'ia01b', 'ak05', 'mapa', 'mapa01', 'frmapa01', 'mapa02', 'frmapa02'], true) || $request->query('source') === 'dynamic' || ($request->query('format') === 'pdf' && in_array($targetType, $dynamicTypes, true)))) {
+        $dynamicTypes = ['apl01', 'apl02', 'ak01', 'ak02', 'ak03', 'ak04', 'ak05', 'ak07', 'ia01', 'ia02', 'ia03', 'ia05a', 'ia05c', 'ia08', 'ia09', 'pernyataan', 'mapa', 'mapa01', 'frmapa01', 'mapa02', 'frmapa02'];
+        if ($request->query('format') !== 'html' && (in_array($targetType, ['ia08', 'ia09', 'ak05', 'mapa', 'mapa01', 'frmapa01', 'mapa02', 'frmapa02'], true) || $request->query('source') === 'dynamic' || ($request->query('format') === 'pdf' && in_array($targetType, $dynamicTypes, true)))) {
             return $this->dynamicService->exportAssessment($assessment, $targetType, $request->boolean('download'));
         }
 

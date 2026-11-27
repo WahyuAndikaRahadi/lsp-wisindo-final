@@ -360,7 +360,7 @@
                                 </div>
                             @endif
 
-                        @elseif(auth()->user()->isAdmin() || in_array(auth()->user()->role, ['KOMITE_TEKNIS']))
+                        @elseif(auth()->user()->isAdmin())
                             <div class="px-3 pt-3 pb-1 text-[10px] font-extrabold text-lsp-muted uppercase tracking-wider">
                                 Manajemen Asesmen
                             </div>
@@ -476,79 +476,7 @@
                     </nav>
                 </div>
 
-                <!-- Sidebar Bottom: User Profile & Quick Actions -->
-                <div class="p-3 border-t border-slate-200 bg-slate-50/50 shrink-0">
-                    <div class="flex items-center justify-between p-1">
-                        @php
-                            $userProfileLink = match(true) {
-                                auth()->user()->isRole('ASESI') => route('asesi.profile.edit'),
-                                auth()->user()->isRole('ASESOR') => route('asesor.profile.edit'),
-                                auth()->user()->isAdmin() => route('admin.profile.edit'),
-                                default => null,
-                            };
-                        @endphp
-                        @if($userProfileLink)
-                            <a href="{{ $userProfileLink }}" title="Buka Profil &amp; Pengaturan" class="flex items-center space-x-2.5 overflow-hidden group hover:opacity-85 transition w-full">
-                                <div class="w-8 h-8 rounded bg-lsp-navy group-hover:bg-lsp-navy-dark text-white font-bold text-xs flex items-center justify-center flex-shrink-0 shadow-sm">
-                                    {{ strtoupper(substr(auth()->user()->full_name, 0, 2)) }}
-                                </div>
-                                <div class="truncate flex-1 min-w-0">
-                                    <p class="text-xs font-bold text-slate-800 group-hover:text-lsp-navy truncate leading-tight">
-                                        {{ auth()->user()->full_name }}
-                                    </p>
-                                    <span class="inline-block px-1.5 py-0.2 text-[9px] font-bold rounded bg-lsp-navy/10 text-lsp-navy uppercase tracking-wider mt-0.5">
-                                        {{ auth()->user()->role }}
-                                    </span>
-                                </div>
-                            </a>
-                        @else
-                            <div class="flex items-center space-x-2.5 overflow-hidden w-full">
-                                <div class="w-8 h-8 rounded bg-lsp-navy text-white font-bold text-xs flex items-center justify-center flex-shrink-0 shadow-sm">
-                                    {{ strtoupper(substr(auth()->user()->full_name, 0, 2)) }}
-                                </div>
-                                <div class="truncate flex-1 min-w-0">
-                                    <p class="text-xs font-bold text-slate-800 truncate leading-tight">
-                                        {{ auth()->user()->full_name }}
-                                    </p>
-                                    <span class="inline-block px-1.5 py-0.2 text-[9px] font-bold rounded bg-lsp-navy/10 text-lsp-navy uppercase tracking-wider mt-0.5">
-                                        {{ auth()->user()->role }}
-                                    </span>
-                                </div>
-                            </div>
-                        @endif
-                    </div>
 
-                    <!-- Tombol Logout / Kembali ke Admin Langsung di Bawah Profil (Selalu Terlihat di Mobile & Desktop) -->
-                    @if(session('admin_impersonator_id'))
-                        <div class="mt-2.5 pt-2 border-t border-slate-200">
-                            <form action="{{ route('proxy.switch-back') }}" method="POST" class="w-full">
-                                @csrf
-                                <button type="submit" 
-                                        title="Kembali ke Sesi Admin" 
-                                        class="w-full flex items-center justify-center space-x-2 px-3 py-2 rounded text-xs font-bold transition text-white bg-amber-600 hover:bg-amber-700 active:bg-amber-800 shadow-xs focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-1 cursor-pointer">
-                                    <svg class="w-4 h-4 text-white shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
-                                    </svg>
-                                    <span>Kembali ke Admin</span>
-                                </button>
-                            </form>
-                        </div>
-                    @else
-                        <div class="mt-2.5 pt-2 border-t border-slate-200">
-                            <form action="{{ route('logout') }}" method="POST" class="w-full">
-                                @csrf
-                                <button type="submit" 
-                                        title="Keluar dari Sistem" 
-                                        class="w-full flex items-center justify-center space-x-2 px-3 py-2 rounded text-xs font-bold transition text-white bg-red-600 hover:bg-red-700 active:bg-red-800 shadow-xs hover:shadow focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 cursor-pointer">
-                                    <svg class="w-4 h-4 text-white shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
-                                    </svg>
-                                    <span>Log Out</span>
-                                </button>
-                            </form>
-                        </div>
-                    @endif
-                </div>
 
             </aside>
 
@@ -593,12 +521,126 @@
                                 </div>
                             @endif
 
-                            <div class="hidden sm:flex items-center space-x-2 text-xs text-slate-500 font-medium">
-                                <svg class="w-3.5 h-3.5 text-lsp-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                </svg>
-                                <span>{{ now()->isoFormat('D MMMM Y') }}</span>
+                            {{-- Profile Avatar & Dropdown (Menggantikan Tanggal) --}}
+                            @auth
+                            <div class="relative" x-data="{ profileDropdownOpen: false }" @click.outside="profileDropdownOpen = false">
+                                <button @click="profileDropdownOpen = !profileDropdownOpen" 
+                                        type="button" 
+                                        class="flex items-center space-x-2 p-1 sm:px-2.5 sm:py-1.5 rounded-full sm:rounded-xl border border-slate-200/90 bg-slate-50/80 hover:bg-slate-100 hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-lsp-navy/20 transition group cursor-pointer"
+                                        id="navbar-profile-button"
+                                        aria-label="Menu Profil & Akun"
+                                        :aria-expanded="profileDropdownOpen">
+                                    <!-- Avatar Initials Circle -->
+                                    <div class="w-8 h-8 rounded-full bg-gradient-to-br from-lsp-navy to-indigo-900 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs ring-2 ring-white">
+                                        {{ strtoupper(substr(auth()->user()->full_name, 0, 2)) }}
+                                    </div>
+                                    
+                                    <!-- User Name & Role Label (Desktop) -->
+                                    <div class="hidden sm:block text-left leading-tight pr-0.5">
+                                        <div class="text-xs font-bold text-slate-800 group-hover:text-lsp-navy truncate max-w-[130px]">
+                                            {{ auth()->user()->full_name }}
+                                        </div>
+                                        <div class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
+                                            {{ str_replace('_', ' ', auth()->user()->role) }}
+                                        </div>
+                                    </div>
+
+                                    <!-- Dropdown Arrow -->
+                                    <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-600 transition-transform duration-200 hidden sm:block shrink-0"
+                                         :class="profileDropdownOpen ? 'rotate-180' : ''"
+                                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                    </svg>
+                                </button>
+
+                                <!-- Dropdown Panel -->
+                                <div x-show="profileDropdownOpen"
+                                     x-transition:enter="transition ease-out duration-150"
+                                     x-transition:enter-start="opacity-0 translate-y-1 scale-95"
+                                     x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                                     x-transition:leave="transition ease-in duration-100"
+                                     x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                                     x-transition:leave-end="opacity-0 translate-y-1 scale-95"
+                                     x-cloak
+                                     class="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-slate-200/90 py-2 z-50 divide-y divide-slate-100 focus:outline-none">
+                                     
+                                    <!-- User Card Header -->
+                                    <div class="px-4 py-2.5 bg-slate-50/60 rounded-t-xl -mt-2">
+                                        <p class="text-xs font-black text-slate-900 truncate">
+                                            {{ auth()->user()->full_name }}
+                                        </p>
+                                        <p class="text-[11px] text-slate-500 font-medium truncate mt-0.5">
+                                            {{ auth()->user()->email }}
+                                        </p>
+                                        <div class="mt-1.5 flex items-center gap-1.5">
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-lsp-navy/10 text-lsp-navy uppercase tracking-wider">
+                                                {{ str_replace('_', ' ', auth()->user()->role) }}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Menu: Akun -->
+                                    <div class="py-1">
+                                        @php
+                                            $accountRoute = auth()->user()->isAdmin() ? route('admin.profile.edit') : route('account.edit');
+                                            $isAccountActive = auth()->user()->isAdmin() ? request()->routeIs('admin.profile.*') : request()->routeIs('account.*');
+                                        @endphp
+                                        <a href="{{ $accountRoute }}" 
+                                           class="group flex items-center gap-3 px-4 py-2.5 text-xs font-bold transition {{ $isAccountActive ? 'bg-lsp-navy/10 text-lsp-navy' : 'text-slate-700 hover:bg-slate-50 hover:text-lsp-navy' }}">
+                                            <div class="w-7 h-7 rounded-lg bg-indigo-50 text-lsp-navy flex items-center justify-center shrink-0 border border-indigo-100 group-hover:scale-105 transition-transform">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                                </svg>
+                                            </div>
+                                            <div class="flex-1 min-w-0">
+                                                <span class="block text-slate-900 group-hover:text-lsp-navy">Akun</span>
+                                                <span class="block text-[10px] font-normal text-slate-400">Email &amp; Ganti Password</span>
+                                            </div>
+                                            <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-lsp-navy transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                            </svg>
+                                        </a>
+                                    </div>
+
+                                    <!-- Menu: Logout / Switch Back -->
+                                    <div class="py-1">
+                                        @if(session('admin_impersonator_id'))
+                                            <form action="{{ route('proxy.switch-back') }}" method="POST" class="w-full">
+                                                @csrf
+                                                <button type="submit" 
+                                                        class="w-full flex items-center gap-3 px-4 py-2 text-xs font-bold text-amber-700 hover:bg-amber-50 hover:text-amber-800 transition text-left cursor-pointer">
+                                                    <div class="w-7 h-7 rounded-lg bg-amber-100 text-amber-800 flex items-center justify-center shrink-0">
+                                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
+                                                        </svg>
+                                                    </div>
+                                                    <div class="flex-1 min-w-0">
+                                                        <span>Kembali ke Admin</span>
+                                                        <span class="block text-[10px] font-normal text-amber-600/80">Selesaikan proxy</span>
+                                                    </div>
+                                                </button>
+                                            </form>
+                                        @else
+                                            <form action="{{ route('logout') }}" method="POST" class="w-full">
+                                                @csrf
+                                                <button type="submit" 
+                                                        class="w-full flex items-center gap-3 px-4 py-2 text-xs font-bold text-rose-600 hover:bg-rose-50 hover:text-rose-700 transition text-left cursor-pointer">
+                                                    <div class="w-7 h-7 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center shrink-0 border border-rose-100">
+                                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                                                        </svg>
+                                                    </div>
+                                                    <div class="flex-1 min-w-0">
+                                                        <span>Keluar (Logout)</span>
+                                                        <span class="block text-[10px] font-normal text-rose-400">Tutup sesi login</span>
+                                                    </div>
+                                                </button>
+                                            </form>
+                                        @endif
+                                    </div>
+                                </div>
                             </div>
+                            @endauth
                         </div>
                     </div>
                 </header>

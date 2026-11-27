@@ -9,7 +9,7 @@
 
 <div class="mb-3">
     <h3 class="text-xs font-bold uppercase tracking-wider text-slate-800">Kunci Jawaban Pertanyaan Tertulis – Pilihan Ganda (DPT)</h3>
-    <p class="text-[11px] text-slate-600">Dokumen rahasia instrumen asesmen. Hanya diperuntukkan bagi Asesor Kompetensi LSP-PrO Indo.</p>
+    <p class="text-[11px] text-slate-600">Dokumen rahasia instrumen asesmen. Hanya diperuntukkan bagi Asesor Kompetensi LSP Wisindo.</p>
 </div>
 
 @php

@@ -6,7 +6,6 @@ use App\Models\Assessment;
 use App\Models\AssessmentAk02Item;
 use App\Models\AssessmentAk03Item;
 use App\Models\AssessmentAppeal;
-use App\Models\AssessmentIaResponse;
 use App\Models\CompetencyUnit;
 use App\Models\Schedule;
 use App\Models\Scheme;
@@ -14,7 +13,6 @@ use App\Models\User;
 use App\Services\MukDynamicDocumentService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class DokumenMukPrintViewsTest extends TestCase
@@ -448,11 +446,19 @@ class DokumenMukPrintViewsTest extends TestCase
         $response = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.export', [
             'schedule' => $this->schedule->id,
             'type' => 'mapa02',
+            'format' => 'html',
         ]));
         $response->assertOk();
         $response->assertSee('FR.MAPA.02');
         $response->assertSee('PETA INSTRUMEN ASESMEN');
         $response->assertSee('Engine Junior Technician');
+
+        $pdfResponse = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.export', [
+            'schedule' => $this->schedule->id,
+            'type' => 'mapa02',
+        ]));
+        $pdfResponse->assertOk();
+        $this->assertEquals('application/pdf', $pdfResponse->headers->get('Content-Type'));
     }
 
     public function test_can_render_fr_ia05_variants_a_b_c(): void
@@ -500,7 +506,7 @@ class DokumenMukPrintViewsTest extends TestCase
         $resAsesiC->assertOk();
     }
 
-    public function test_can_render_fr_ia01_ia01b_ia02_ia03(): void
+    public function test_can_render_fr_ia01_ia02_ia03(): void
     {
         // IA.01 Observation Checklist
         $res01 = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.export-asesi', [
@@ -510,39 +516,6 @@ class DokumenMukPrintViewsTest extends TestCase
         $res01->assertOk();
         $res01->assertSee('FR.IA.01');
         $res01->assertSee('CEKLIS OBSERVASI AKTIVITAS');
-
-        // IA.01B Report Sheet (exports assessee's uploaded file or shows not-uploaded view)
-        $res01bMissing = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.export-asesi', [
-            'assessment' => $this->assessment->id,
-            'type' => 'ia01b',
-        ]));
-        $res01bMissing->assertOk();
-        $res01bMissing->assertViewIs('admin.dokumen-muk.not-uploaded');
-
-        Storage::fake('local');
-        $uploadedPath = 'ia01b_evidence/test_report_sheet.pdf';
-        Storage::disk('local')->put($uploadedPath, '%PDF-1.4 sample report sheet');
-
-        AssessmentIaResponse::create([
-            'assessment_id' => $this->assessment->id,
-            'instrument_code' => 'IA01B',
-            'data_json' => [
-                'evidence_image_path' => $uploadedPath,
-                'evidence_original_name' => 'Report_Sheet_Asesi.pdf',
-            ],
-        ]);
-
-        $res01b = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.export-asesi', [
-            'assessment' => $this->assessment->id,
-            'type' => 'ia01b',
-        ]));
-        $res01b->assertOk();
-
-        $resDynamic01b = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.asesi-dynamic', [
-            'assessment' => $this->assessment->id,
-            'type' => 'ia01b',
-        ]));
-        $resDynamic01b->assertOk();
 
         // IA.02 Practical Demonstration
         $res02 = $this->actingAs($this->admin)->get(route('admin.dokumen-muk.export-asesi', [

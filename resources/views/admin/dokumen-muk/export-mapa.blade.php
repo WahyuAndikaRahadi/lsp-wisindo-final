@@ -41,13 +41,13 @@
     $pTuj = strtolower($mapaData['tujuan_asesmen'] ?? 'sertifikasi');
     $isNyata = ($tukType === 'Tempat Kerja') || str_contains(strtolower($mapaData['konteks_lingkungan'] ?? ''), 'nyata');
     $peluangBukti = strtolower($mapaData['peluang_bukti'] ?? 'tersedia');
-    $pelaksanaAsesmen = $mapaData['pelaksana_asesmen'] ?? 'Lembaga Sertifikasi LSP Praktisi Otomotif Indonesia';
-    $standarTolokUkur = $mapaData['standar_tolok_ukur'] ?? 'Standar Kompetensi Kerja Nasional Indonesia (SKKNI) Bidang Otomotif sesuai Lisensi BNSP';
+    $pelaksanaAsesmen = $mapaData['pelaksana_asesmen'] ?? 'Lembaga Sertifikasi Profesi P3 Wisata Indonesia (LSP Wisindo)';
+    $standarTolokUkur = $mapaData['standar_tolok_ukur'] ?? 'Standar Kompetensi Kerja Nasional Indonesia (SKKNI) Bidang Pariwisata & Perhotelan sesuai Lisensi BNSP';
 @endphp
 <div style="font-size: 8.5pt; line-height: 1.35;">
     {{-- Header Kop --}}
     <div class="header-kop">
-        <div class="title-lsp">Lembaga Sertifikasi Profesi Praktisi Otomotif LSP-PrO Indo</div>
+        <div class="title-lsp">Lembaga Sertifikasi Profesi P3 Wisata Indonesia (LSP Wisindo)</div>
         <div class="doc-code">FR.MAPA.01. MERENCANAKAN AKTIVITAS DAN PROSES ASESMEN</div>
     </div>
 

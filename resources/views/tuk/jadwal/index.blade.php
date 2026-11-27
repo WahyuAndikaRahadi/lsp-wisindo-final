@@ -64,8 +64,8 @@
                     {{-- Actions: Zoom Button & Detail --}}
                     <div class="flex flex-wrap items-center gap-2.5 shrink-0 border-t md:border-t-0 pt-3 md:pt-0">
                         @if(!empty($schedule->meeting_link))
-                            <a href="{{ $schedule->meeting_link }}" target="_blank"
-                               class="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs rounded-xl shadow-sm transition hover:shadow">
+                            <a href="{{ $schedule->meeting_link }}" target="_blank" rel="noopener noreferrer"
+                               class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs rounded-xl shadow-xs transition hover:shadow">
                                 <svg class="w-4 h-4 text-blue-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
                                 <span>Buka Ruang Zoom / Meet ↗</span>
                             </a>

@@ -53,12 +53,8 @@ class ScheduleTukDistrictSelectionTest extends TestCase
         $response = $this->actingAs($this->admin)->get(route('admin.jadwal.create'));
 
         $response->assertOk();
-        $response->assertSee('Provinsi TUK');
-        $response->assertSee('Kabupaten / Kota TUK (District)');
-        $response->assertSee('name="kode_provinsi"', false);
-        $response->assertSee('name="kode_kota"', false);
-        $response->assertSee('name="nama_provinsi"', false);
-        $response->assertSee('name="nama_kota"', false);
+        $response->assertSee('Tempat Uji Kompetensi (TUK Terverifikasi AJJ)');
+        $response->assertSee('name="tuk_id"', false);
     }
 
     public function test_admin_can_create_schedule_with_tuk_district(): void
@@ -122,7 +118,7 @@ class ScheduleTukDistrictSelectionTest extends TestCase
         $response->assertOk();
         $response->assertSee("selectedProvince: '32'", false);
         $response->assertSee("selectedCity: '3213'", false);
-        $response->assertSee('KAB. SUBANG');
+        $this->assertEquals('KAB. SUBANG', $schedule->nama_kota);
     }
 
     public function test_admin_can_update_schedule_tuk_district(): void

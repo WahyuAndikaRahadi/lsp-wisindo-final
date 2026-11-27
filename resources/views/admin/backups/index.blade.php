@@ -12,7 +12,7 @@
                 <h1 class="text-2xl font-black text-slate-900 tracking-tight">Backup Database Sistem</h1>
             </div>
             <p class="text-xs sm:text-sm text-slate-500 mt-1">
-                Pencadangan snapshot data operasional LSP PrO Indo berformat SQL standar untuk mitigasi bencana (Disaster Recovery).
+                Pencadangan snapshot data operasional LSP Wisindo berformat SQL standar untuk mitigasi bencana (Disaster Recovery).
             </p>
         </div>
 

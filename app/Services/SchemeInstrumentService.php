@@ -115,23 +115,15 @@ class SchemeInstrumentService
     }
 
     /**
-     * Map of Scheme IDs to directory in all-document-lsp-ProIndo.
+     * Map of Scheme IDs to directory in all-document-lsp-Wisindo.
      */
     protected array $schemeDirectoryMap = [
-        1 => 'MUK SKEMA 1 Engine Junior Technician',
-        2 => 'MUK SKEMA 2 Klaster Maintenance Gasoline Engine Injection',
-        3 => 'MUK SKEMA 3 Maintenence Electrical Vehicle.pdf',
-        4 => 'MUK SKEMA 4 Memperbaiki Panel Bodi Kendaraan',
-        5 => 'MUK SKEMA 5 Mekanik Junior pdf',
-        6 => 'MUK SKEMA 6 Servis Sepeda Motor Listrik.pdf',
-        7 => 'MUK SKEMA 7 Klaster Servis Sepeda Motor Injeksi',
-        106 => 'MUK SKEMA 1 Engine Junior Technician',
-        107 => 'MUK SKEMA 2 Klaster Maintenance Gasoline Engine Injection',
-        108 => 'MUK SKEMA 3 Maintenence Electrical Vehicle.pdf',
-        109 => 'MUK SKEMA 4 Memperbaiki Panel Bodi Kendaraan',
-        110 => 'MUK SKEMA 5 Mekanik Junior pdf',
-        111 => 'MUK SKEMA 6 Servis Sepeda Motor Listrik.pdf',
-        112 => 'MUK SKEMA 7 Klaster Servis Sepeda Motor Injeksi',
+        1 => 'Skema Sertifikasi  Okupasi Chef de Partie Hotel',
+        2 => 'Skema Sertifikasi  Okupasi Commis Chef Hotel',
+        3 => 'Skema Sertifikasi Okupasi Receptionist  atau Front Desk Agent  atau Guest Service Agent  atau Guest Service Associate  atau Guest Service Attendant  atau Guest Service Assistant  atau Resort Host Hotel',
+        4 => 'Skema Sertifikasi Okupasi Room Attendant  atau Room Boy  atau Room Maid',
+        5 => 'Skema Sertifikasi Okupasi Waiter Server atau Wait Person Hotel',
+        6 => 'Skema Sertifikasi Okupasi Public Area Cleaner atau Public Area Attendant Hotel',
     ];
 
     /**
@@ -150,7 +142,7 @@ class SchemeInstrumentService
         }
 
         if ($dirName) {
-            $fullPath = base_path('all-document-lsp-ProIndo/'.$dirName);
+            $fullPath = base_path('all-document-lsp-Wisindo/'.$dirName);
             if (is_dir($fullPath)) {
                 return $fullPath;
             }
@@ -253,7 +245,7 @@ class SchemeInstrumentService
         $searchPaths = [];
         if ($dirName) {
             $searchPaths[] = base_path("lsp-document-fixed/extracted/{$dirName}");
-            $searchPaths[] = base_path("all-document-lsp-ProIndo/extracted/{$dirName}");
+            $searchPaths[] = base_path("all-document-lsp-Wisindo/extracted/{$dirName}");
             $searchPaths[] = base_path("lsp-document-dynamic/extracted/{$dirName}");
         }
 

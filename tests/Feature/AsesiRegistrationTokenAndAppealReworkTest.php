@@ -31,7 +31,7 @@ class AsesiRegistrationTokenAndAppealReworkTest extends TestCase
 
         $this->admin = User::create([
             'full_name' => 'Admin LSP System',
-            'email' => 'admin@proindo.id',
+            'email' => 'admin@wisindo.id',
             'password' => Hash::make('Kompeten86'),
             'role' => 'ADMIN_LSP',
             'status' => 'ACTIVE',
@@ -39,7 +39,7 @@ class AsesiRegistrationTokenAndAppealReworkTest extends TestCase
 
         $this->asesor = User::create([
             'full_name' => 'Asesor Lapangan',
-            'email' => 'asesor@proindo.id',
+            'email' => 'asesor@wisindo.id',
             'password' => Hash::make('Kompeten86'),
             'role' => 'ASESOR',
             'status' => 'ACTIVE',
@@ -102,7 +102,7 @@ class AsesiRegistrationTokenAndAppealReworkTest extends TestCase
     public function test_registration_succeeds_with_valid_registration_token(): void
     {
         $validToken = RegistrationTokenService::getCurrentToken();
-        $this->assertMatchesRegularExpression('/^proindo\d{4}$/', $validToken);
+        $this->assertMatchesRegularExpression('/^wisindo\d{4}$/', $validToken);
 
         $response = $this->post(route('register'), [
             'full_name' => 'Asesi Sukses Daftar',
@@ -138,7 +138,7 @@ class AsesiRegistrationTokenAndAppealReworkTest extends TestCase
 
         $newToken = Setting::get('asesi_registration_token');
         $this->assertNotNull($newToken);
-        $this->assertMatchesRegularExpression('/^proindo\d{4}$/', $newToken);
+        $this->assertMatchesRegularExpression('/^wisindo\d{4}$/', $newToken);
     }
 
     public function test_token_auto_rotates_when_expired_past_seven_days(): void
@@ -166,7 +166,7 @@ class AsesiRegistrationTokenAndAppealReworkTest extends TestCase
         $this->assertNotEquals($oldToken, $newToken);
         $this->assertTrue(RegistrationTokenService::validateToken($newToken));
         $this->assertTrue(RegistrationTokenService::validateToken($oldToken));
-        $this->assertFalse(RegistrationTokenService::validateToken('proindo0000'));
+        $this->assertFalse(RegistrationTokenService::validateToken('wisindo0000'));
     }
 
     public function test_admin_can_manually_rotate_registration_token(): void
@@ -220,7 +220,7 @@ class AsesiRegistrationTokenAndAppealReworkTest extends TestCase
             'code' => 'SCH-APPEAL-01',
             'name' => 'Jadwal Banding LSP',
             'scheme_id' => $this->scheme->id,
-            'tuk_name' => 'TUK Proindo',
+            'tuk_name' => 'TUK Wisindo',
             'date' => now()->toDateString(),
             'start_time' => '08:00',
             'end_time' => '17:00',
@@ -369,7 +369,7 @@ class AsesiRegistrationTokenAndAppealReworkTest extends TestCase
             'code' => 'SCH-APPEAL-02',
             'name' => 'Jadwal Banding LSP 2',
             'scheme_id' => $this->scheme->id,
-            'tuk_name' => 'TUK Proindo',
+            'tuk_name' => 'TUK Wisindo',
             'date' => now()->toDateString(),
             'start_time' => '08:00',
             'end_time' => '17:00',

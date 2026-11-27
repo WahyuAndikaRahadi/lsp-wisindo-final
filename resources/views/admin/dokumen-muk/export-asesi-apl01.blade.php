@@ -26,7 +26,7 @@
 <div style="font-size: 9pt; line-height: 1.35;">
     {{-- Header Kop --}}
     <div class="header-kop">
-        <div class="title-lsp">Lembaga Sertifikasi Profesi Praktisi Otomotif LSP-PrO Indo</div>
+        <div class="title-lsp">Lembaga Sertifikasi Profesi P3 Wisata Indonesia (LSP Wisindo)</div>
         <div class="doc-code">FR.APL.01. PERMOHONAN SERTIFIKASI KOMPETENSI</div>
     </div>
 

@@ -52,14 +52,6 @@ class InstrumentController extends Controller
             'badge_color' => 'bg-blue-50 text-blue-700 border-blue-200',
             'route_code' => 'ia01',
         ],
-        'IA01B' => [
-            'code' => 'FR.IA.01B',
-            'title' => 'Lembar Pemeriksaan Teknis (Report Sheet)',
-            'desc' => 'Pencatatan dan verifikasi hasil pengukuran parameter fisik komponen serta lembar kerja asesi.',
-            'badge' => 'Report Sheet',
-            'badge_color' => 'bg-cyan-50 text-cyan-700 border-cyan-200',
-            'route_code' => 'ia01b',
-        ],
         'IA02' => [
             'code' => 'FR.IA.02',
             'title' => 'Tugas Praktik Demonstrasi (TPD)',
@@ -115,7 +107,25 @@ class InstrumentController extends Controller
         }
 
         if (! $schedule->isStepUnlocked('ruang-uji')) {
+            if (! $schedule->isStepUnlocked('mapa')) {
+                return redirect()->route('asesor.schedule.instrument', ['schedule' => $schedule->id, 'code' => 'apl'])
+                    ->with('warning', 'Harap selesaikan peninjauan seluruh berkas APL asesi terlebih dahulu sebelum masuk ke Ruang Uji.');
+            }
+
             if (! $schedule->isStepUnlocked('ak07')) {
+                if (! $schedule->isStepUnlocked('ak04')) {
+                    return redirect()->route('asesor.schedule.mapa', $schedule->id)
+                        ->with('warning', 'Harap lengkapi dokumen FR.MAPA.01 terlebih dahulu sebelum masuk ke Ruang Uji.');
+                }
+
+                $hasBriefed = ! empty($schedule->ak04_briefed_at)
+                    || $schedule->assessorAssessmentsQuery()->whereNotNull('ak04_briefed_at')->exists();
+
+                if (! $hasBriefed) {
+                    return redirect()->route('asesor.schedule.ak04', $schedule->id)
+                        ->with('warning', 'Harap lakukan briefing pengenalan banding FR.AK.04 terlebih dahulu sebelum masuk ke Ruang Uji.');
+                }
+
                 return redirect()->route('asesor.schedule.ak01', $schedule->id)
                     ->with('warning', 'Lengkapi persetujuan FR.AK.01 terlebih dahulu sebelum masuk ke Ruang Uji.');
             }
@@ -143,7 +153,7 @@ class InstrumentController extends Controller
 
         if (empty($allAssignedIaCodes)) {
             $allAssignedIaCodes = array_values(array_filter(
-                (array) ($schedule->selected_instruments ?? ['IA01', 'IA01B', 'IA02', 'IA03', 'IA05']),
+                (array) ($schedule->selected_instruments ?? ['IA01', 'IA02', 'IA03', 'IA05']),
                 fn ($c) => str_starts_with(strtoupper($c), 'IA')
             ));
         }
@@ -184,11 +194,6 @@ class InstrumentController extends Controller
                 }
                 if ($c === 'IA02') {
                     return ! empty($resp->assessor_signed_at);
-                }
-                if ($c === 'IA01B') {
-                    $isRevisionRequested = ! empty($resp->data_json['revision_requested']) || ($resp->data_json['revision_status'] ?? '') === 'REVISION_REQUESTED';
-
-                    return ! empty($resp->assessor_signed_at) && ! $isRevisionRequested;
                 }
 
                 return ! empty($resp->assessor_signed_at);
@@ -284,33 +289,7 @@ class InstrumentController extends Controller
                         $isCompleted = $isSigned;
                         $statusLabel = $isSigned ? 'Sudah Ditandatangani' : 'Belum Ditandatangani';
                         $statusClass = $isSigned ? 'bg-emerald-50 text-emerald-700 border-emerald-300' : 'bg-amber-50 text-amber-700 border-amber-300';
-                    } elseif ($codeUpper === 'IA01B') {
-                        $hasUploadedEvidence = ! empty($response->data_json['evidence_image_path']);
-                        $isSignedByAssessor = ! empty($response->assessor_signed_at);
-                        $isRevisionRequested = ! empty($response->data_json['revision_requested']) || ($response->data_json['revision_status'] ?? '') === 'REVISION_REQUESTED';
-                        $isResubmitted = ($response->data_json['revision_status'] ?? '') === 'RESUBMITTED';
 
-                        if ($isSignedByAssessor && ! $isRevisionRequested) {
-                            $isCompleted = true;
-                            $statusLabel = 'Sudah Dinilai';
-                            $statusClass = 'bg-emerald-50 text-emerald-700 border-emerald-300';
-                        } elseif ($isRevisionRequested) {
-                            $isCompleted = false;
-                            $statusLabel = 'Perlu Revisi Asesi';
-                            $statusClass = 'bg-rose-50 text-rose-700 border-rose-300';
-                        } elseif ($isResubmitted) {
-                            $isCompleted = false;
-                            $statusLabel = 'Revisi Telah Diunggah';
-                            $statusClass = 'bg-blue-50 text-blue-800 border-blue-300';
-                        } elseif ($hasUploadedEvidence) {
-                            $isCompleted = false;
-                            $statusLabel = 'Menunggu Penilaian Asesor';
-                            $statusClass = 'bg-amber-50 text-amber-800 border-amber-300';
-                        } else {
-                            $isCompleted = false;
-                            $statusLabel = 'Belum Diunggah Asesi';
-                            $statusClass = 'bg-slate-100 text-slate-600 border-slate-300';
-                        }
                     } elseif ($codeUpper === 'IA08') {
                         $hasPortfolios = ! empty($response->data_json['portfolios']);
                         $isSignedByAssessor = ! empty($response->assessor_signed_at);
@@ -354,7 +333,7 @@ class InstrumentController extends Controller
                     if ($codeUpper === 'IA02') {
                         $statusLabel = 'Belum Ditandatangani';
                         $statusClass = 'bg-amber-50 text-amber-700 border-amber-300';
-                    } elseif ($codeUpper === 'IA01B' || $codeUpper === 'IA08') {
+                    } elseif ($codeUpper === 'IA08') {
                         $statusLabel = 'Belum Diunggah Asesi';
                         $statusClass = 'bg-slate-100 text-slate-600 border-slate-300';
                     } elseif ($codeUpper === 'IA09') {
@@ -647,7 +626,7 @@ class InstrumentController extends Controller
             $request->validate([
                 'evidence_image' => 'required|file|mimes:jpeg,jpg,png,webp,pdf|max:10240',
             ]);
-            $folder = strtolower($code) === 'ia01b' ? 'ia01b_evidence' : 'ia_evidence';
+            $folder = 'ia_evidence';
             $path = $request->file('evidence_image')->store($folder, 'local');
 
             if (! empty($data['evidence_image_path'])) {
@@ -873,103 +852,5 @@ class InstrumentController extends Controller
         });
 
         return back()->with('success', "Status pengerjaan CBT (FR.IA.05) untuk asesi {$asesiName} berhasil di-reset. Asesi sekarang dapat mengerjakan remedial ujian CBT.");
-    }
-
-    /**
-     * Meminta revisi lembar hasil pemeriksaan teknis (Report Sheet FR.IA.01B) ke asesi.
-     */
-    public function requestIa01bRevision(Assessment $assessment, Request $request): RedirectResponse
-    {
-        $this->authorizeAssessorAssessment($assessment);
-
-        if ($assessment->schedule && $assessment->schedule->isClosedForAssessor()) {
-            return back()->with('error', 'Jadwal asesmen sudah resmi ditutup dan dikunci.');
-        }
-
-        $request->validate([
-            'revision_notes' => 'required|string|max:2000',
-        ]);
-
-        $response = AssessmentIaResponse::firstOrNew([
-            'assessment_id' => $assessment->id,
-            'instrument_code' => 'IA01B',
-        ]);
-
-        $data = is_array($response->data_json)
-            ? $response->data_json
-            : (json_decode($response->data_json ?? '[]', true) ?: []);
-
-        $data['revision_requested'] = true;
-        $data['revision_status'] = 'REVISION_REQUESTED';
-        $data['revision_notes'] = trim($request->input('revision_notes'));
-        $data['revision_requested_at'] = now()->toIso8601String();
-        $data['revision_requested_by_id'] = auth()->id();
-        $data['revision_requested_by_name'] = auth()->user()?->full_name ?? auth()->user()?->name;
-
-        // Reset tanda tangan asesor karena penilaian memerlukan revisi berkas dari asesi
-        $response->assessor_signature = null;
-        $response->assessor_signed_at = null;
-        $response->data_json = $data;
-        $response->save();
-
-        if ($assessment->status === 'COMPLETED' || $assessment->final_result === 'KOMPETEN') {
-            $assessment->update([
-                'status' => 'IN_PROGRESS',
-                'final_result' => 'BELUM_SELESAI',
-                'final_result_at' => null,
-                'completed_at' => null,
-            ]);
-        }
-
-        // Invalidate cached MUK PDF for IA.01B & AK05
-        $cacheDir = storage_path('app/muk-cache');
-        if (File::isDirectory($cacheDir)) {
-            $filesToDelete = array_merge(
-                File::glob($cacheDir."/dyn_{$assessment->schedule_id}_{$assessment->id}_ia01b*.pdf") ?: [],
-                File::glob($cacheDir."/dyn_{$assessment->schedule_id}_sch_ak05*.pdf") ?: []
-            );
-            foreach ($filesToDelete as $f) {
-                File::delete($f);
-            }
-        }
-
-        $asesiName = $assessment->asesi?->full_name ?? "Asesi #{$assessment->id}";
-        Log::info('Asesor ID '.auth()->id()." meminta revisi Report Sheet FR.IA.01B untuk asesmen #{$assessment->id} ({$asesiName})");
-
-        return back()->with('success', "Permintaan revisi berkas Report Sheet FR.IA.01B untuk {$asesiName} berhasil dikirim. Asesi sekarang dapat mengunggah ulang berkas baru.");
-    }
-
-    /**
-     * Membatalkan permintaan revisi lembar FR.IA.01B.
-     */
-    public function cancelIa01bRevision(Assessment $assessment): RedirectResponse
-    {
-        $this->authorizeAssessorAssessment($assessment);
-
-        if ($assessment->schedule && $assessment->schedule->isClosedForAssessor()) {
-            return back()->with('error', 'Jadwal asesmen sudah resmi ditutup dan dikunci.');
-        }
-
-        $response = AssessmentIaResponse::where('assessment_id', $assessment->id)
-            ->where('instrument_code', 'IA01B')
-            ->first();
-
-        if ($response) {
-            $data = is_array($response->data_json)
-                ? $response->data_json
-                : (json_decode($response->data_json ?? '[]', true) ?: []);
-
-            $data['revision_requested'] = false;
-            $data['revision_status'] = null;
-            $data['revision_canceled_at'] = now()->toIso8601String();
-
-            $response->data_json = $data;
-            $response->save();
-        }
-
-        $asesiName = $assessment->asesi?->full_name ?? "Asesi #{$assessment->id}";
-        Log::info('Asesor ID '.auth()->id()." membatalkan permintaan revisi FR.IA.01B untuk asesmen #{$assessment->id}");
-
-        return back()->with('success', "Permintaan revisi berkas Report Sheet FR.IA.01B untuk {$asesiName} berhasil dibatalkan.");
     }
 }

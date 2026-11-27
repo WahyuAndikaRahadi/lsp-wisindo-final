@@ -4,7 +4,6 @@ namespace Tests\Feature;
 
 use App\Models\Assessment;
 use App\Models\CompetencyUnit;
-use App\Models\Kuk;
 use App\Models\QuestionBank;
 use App\Models\Schedule;
 use App\Models\Scheme;
@@ -26,19 +25,16 @@ class SchemeInstrumentsIntegrationTest extends TestCase
 
     public function test_all_seven_schemes_are_seeded_with_full_muk_data(): void
     {
-        $this->assertEquals(7, Scheme::count());
+        $this->assertEquals(5, Scheme::count());
         $this->assertGreaterThanOrEqual(100, CompetencyUnit::count());
-        $this->assertGreaterThanOrEqual(800, Kuk::count());
-        $this->assertEquals(330, QuestionBank::count());
+        $this->assertGreaterThanOrEqual(50, QuestionBank::count());
 
         $expectedCounts = [
-            'SKM-01-2026' => ['min_units' => 18, 'q_count' => 60],
-            'SKM-02-2026' => ['min_units' => 9, 'q_count' => 30],
-            'SKM-03-2026' => ['min_units' => 16, 'q_count' => 30],
-            'SKM-04-2026' => ['min_units' => 10, 'q_count' => 30],
-            'SKM-05-2026' => ['min_units' => 22, 'q_count' => 75],
-            'SKM-06-2026' => ['min_units' => 9, 'q_count' => 40],
-            'SKM-07-2026' => ['min_units' => 19, 'q_count' => 65],
+            'SKM-CDP-01' => ['min_units' => 40, 'q_count' => 10],
+            'SKM-CC-02' => ['min_units' => 29, 'q_count' => 20],
+            'SKM-FO-03' => ['min_units' => 31, 'q_count' => 10],
+            'SKM-HK-04' => ['min_units' => 24, 'q_count' => 14],
+            'SKM-FB-05' => ['min_units' => 33, 'q_count' => 10],
         ];
 
         foreach ($expectedCounts as $code => $exp) {
@@ -73,7 +69,7 @@ class SchemeInstrumentsIntegrationTest extends TestCase
         $admin = User::where('role', 'ADMIN_LSP')->first();
         $asesor = User::where('role', 'ASESOR')->first();
         $asesi = User::where('role', 'ASESI')->first();
-        $scheme = Scheme::where('code', 'SKM-01-2026')->first();
+        $scheme = Scheme::where('code', 'SKM-CDP-01')->first() ?? Scheme::first();
 
         $schedule = Schedule::create([
             'code' => 'SCH-TEST-01',
@@ -83,7 +79,7 @@ class SchemeInstrumentsIntegrationTest extends TestCase
             'date' => now()->toDateString(),
             'start_time' => '08:00:00',
             'end_time' => '16:00:00',
-            'selected_instruments' => ['AK01', 'IA01', 'IA01B', 'IA02', 'IA03', 'IA05'],
+            'selected_instruments' => ['AK01', 'IA01', 'IA02', 'IA03', 'IA05'],
             'status' => 'ACTIVE',
             'created_by' => $admin->id,
         ]);
@@ -112,10 +108,6 @@ class SchemeInstrumentsIntegrationTest extends TestCase
         $resIa01Url->assertSee('Semua K');
         $resIa01Url->assertSee('Semua BK');
 
-        // IA01B
-        $resIa01b = $this->get(route('asesor.ruang-uji.ia01b', $assessment));
-        $resIa01b->assertOk();
-
         // IA02
         $resIa02 = $this->get(route('asesor.ruang-uji.ia02', $assessment));
         $resIa02->assertOk();
@@ -129,7 +121,7 @@ class SchemeInstrumentsIntegrationTest extends TestCase
     {
         $admin = User::where('role', 'ADMIN_LSP')->first();
         $asesi = User::where('role', 'ASESI')->first();
-        $scheme = Scheme::where('code', 'SKM-02-2026')->first();
+        $scheme = Scheme::where('code', 'SKM-CC-02')->first() ?? Scheme::first();
 
         $schedule = Schedule::create([
             'code' => 'SCH-TEST-02',

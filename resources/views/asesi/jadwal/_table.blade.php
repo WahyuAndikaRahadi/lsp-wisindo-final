@@ -106,12 +106,12 @@
                         Terdaftar: {{ $item->created_at ? $item->created_at->diffForHumans() : '-' }}
                     </span>
 
-                    <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+                    <div class="flex flex-wrap sm:flex-nowrap items-center gap-2 w-full sm:w-auto justify-end">
                         @if(!empty($sch->meeting_link))
                             <a href="{{ $sch->meeting_link }}" target="_blank" rel="noopener noreferrer"
-                               class="w-full sm:w-auto px-3 py-2 text-xs font-bold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg shadow-2xs transition inline-flex items-center justify-center gap-1.5 text-center"
+                               class="w-full sm:w-auto px-3.5 py-2 text-xs font-bold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg shadow-2xs transition inline-flex items-center justify-center gap-1.5 text-center cursor-pointer min-h-[38px]"
                                title="Masuk Ruang Video Meeting AJJ">
-                                <svg class="w-3.5 h-3.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                                <svg class="w-3.5 h-3.5 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
                                 <span>Zoom / Meet ↗</span>
                             </a>
                         @endif

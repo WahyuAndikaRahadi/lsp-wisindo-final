@@ -28,7 +28,7 @@ class AdminSuperAdminLinkedSignatureTest extends TestCase
             'role' => 'SUPER_ADMIN',
             'status' => 'ACTIVE',
             'full_name' => 'Bambang Super Admin',
-            'email' => 'superadmin@lsp-proindo.test',
+            'email' => 'superadmin@lsp-wisindo.test',
             'password' => Hash::make('password123'),
         ]);
 
@@ -36,7 +36,7 @@ class AdminSuperAdminLinkedSignatureTest extends TestCase
             'role' => 'ADMIN_LSP',
             'status' => 'ACTIVE',
             'full_name' => 'Siti Admin LSP',
-            'email' => 'adminlsp@lsp-proindo.test',
+            'email' => 'adminlsp@lsp-wisindo.test',
             'password' => Hash::make('password123'),
         ]);
     }
@@ -45,7 +45,7 @@ class AdminSuperAdminLinkedSignatureTest extends TestCase
     {
         $response = $this->actingAs($this->superAdmin)->post(route('admin.profile.update'), [
             'full_name' => 'Bambang Super Admin, S.T., M.Kom.',
-            'email' => 'superadmin.updated@lsp-proindo.test',
+            'email' => 'superadmin.updated@lsp-wisindo.test',
             'phone' => '081234567890',
             'signature_data' => $this->sampleSignature,
         ]);
@@ -103,7 +103,7 @@ class AdminSuperAdminLinkedSignatureTest extends TestCase
         // Admin LSP attempts to pass an empty or malicious signature string in request
         $response = $this->actingAs($this->adminLsp)->post(route('admin.profile.update'), [
             'full_name' => 'Siti Admin LSP Baru',
-            'email' => 'siti.baru@lsp-proindo.test',
+            'email' => 'siti.baru@lsp-wisindo.test',
             'phone' => '089876543210',
             'jabatan' => 'Koordinator Administrasi Uji',
             'signature_data' => 'attacker_hacked_signature',
@@ -117,7 +117,7 @@ class AdminSuperAdminLinkedSignatureTest extends TestCase
 
         $this->adminLsp->refresh();
         $this->assertEquals('Siti Admin LSP Baru', $this->adminLsp->full_name);
-        $this->assertEquals('siti.baru@lsp-proindo.test', $this->adminLsp->email);
+        $this->assertEquals('siti.baru@lsp-wisindo.test', $this->adminLsp->email);
         $this->assertEquals('089876543210', $this->adminLsp->phone);
         $this->assertTrue(Hash::check('newsecretpassword123', $this->adminLsp->password));
 

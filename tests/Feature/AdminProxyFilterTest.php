@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Tuk;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -138,43 +139,34 @@ class AdminProxyFilterTest extends TestCase
         $this->assertTrue(auth()->check());
     }
 
-    public function test_sidebar_logout_button_is_rendered_at_the_bottom_for_all_roles_with_red_styling(): void
+    public function test_navbar_logout_is_rendered_in_dropdown_and_sidebar_bottom_profile_is_removed(): void
     {
         // 1. Super Admin
         $superAdminRes = $this->actingAs($this->admin)->get(route('admin.dashboard'));
         $superAdminRes->assertOk();
         $superAdminContent = $superAdminRes->getContent();
         $this->assertStringContainsString('Backup Database (SQL)', $superAdminContent);
-        $this->assertStringContainsString('bg-red-600', $superAdminContent);
-        $this->assertStringContainsString('Log Out', $superAdminContent);
-        $this->assertTrue(
-            strpos($superAdminContent, 'Backup Database (SQL)') < strpos($superAdminContent, 'Log Out'),
-            'Log Out button should appear after Backup Database (SQL) in Super Admin sidebar.'
-        );
+        $this->assertStringContainsString('id="navbar-profile-button"', $superAdminContent);
+        $this->assertStringContainsString('action="'.route('logout').'"', $superAdminContent);
+        $this->assertStringNotContainsString('Sidebar Bottom: User Profile & Quick Actions', $superAdminContent);
 
         // 2. Asesi
         $asesiRes = $this->actingAs($this->asesi)->get(route('asesi.dashboard'));
         $asesiRes->assertOk();
         $asesiContent = $asesiRes->getContent();
         $this->assertStringContainsString('Sertifikat Saya', $asesiContent);
-        $this->assertStringContainsString('bg-red-600', $asesiContent);
-        $this->assertStringContainsString('Log Out', $asesiContent);
-        $this->assertTrue(
-            strpos($asesiContent, 'Sertifikat Saya') < strpos($asesiContent, 'Log Out'),
-            'Log Out button should appear after Sertifikat Saya in Asesi sidebar.'
-        );
+        $this->assertStringContainsString('id="navbar-profile-button"', $asesiContent);
+        $this->assertStringContainsString('action="'.route('logout').'"', $asesiContent);
+        $this->assertStringNotContainsString('Sidebar Bottom: User Profile & Quick Actions', $asesiContent);
 
         // 3. Asesor
         $asesorRes = $this->actingAs($this->asesor)->get(route('asesor.jadwal.index'));
         $asesorRes->assertOk();
         $asesorContent = $asesorRes->getContent();
         $this->assertStringContainsString('Jadwal Penugasan Uji', $asesorContent);
-        $this->assertStringContainsString('bg-red-600', $asesorContent);
-        $this->assertStringContainsString('Log Out', $asesorContent);
-        $this->assertTrue(
-            strpos($asesorContent, 'Jadwal Penugasan Uji') < strpos($asesorContent, 'Log Out'),
-            'Log Out button should appear after role links in Asesor sidebar.'
-        );
+        $this->assertStringContainsString('id="navbar-profile-button"', $asesorContent);
+        $this->assertStringContainsString('action="'.route('logout').'"', $asesorContent);
+        $this->assertStringNotContainsString('Sidebar Bottom: User Profile & Quick Actions', $asesorContent);
 
         // 4. Admin LSP (non Super Admin)
         $adminLspRes = $this->actingAs($this->adminLsp)->get(route('admin.dashboard'));
@@ -182,11 +174,41 @@ class AdminProxyFilterTest extends TestCase
         $adminLspContent = $adminLspRes->getContent();
         $this->assertStringContainsString('Switch Role (Proxy)', $adminLspContent);
         $this->assertStringNotContainsString('Backup Database (SQL)', $adminLspContent);
-        $this->assertStringContainsString('bg-red-600', $adminLspContent);
-        $this->assertStringContainsString('Log Out', $adminLspContent);
-        $this->assertTrue(
-            strpos($adminLspContent, 'Switch Role (Proxy)') < strpos($adminLspContent, 'Log Out'),
-            'Log Out button should appear after Switch Role (Proxy) in Admin LSP sidebar.'
-        );
+        $this->assertStringContainsString('id="navbar-profile-button"', $adminLspContent);
+        $this->assertStringContainsString('action="'.route('logout').'"', $adminLspContent);
+        $this->assertStringNotContainsString('Sidebar Bottom: User Profile & Quick Actions', $adminLspContent);
+    }
+
+    public function test_admin_can_filter_and_impersonate_tuk_admin(): void
+    {
+        $tuk = Tuk::create([
+            'name' => 'TUK Hotel Nusantara',
+            'code' => 'TUK-NUSA-01',
+            'verification_status' => 'VERIFIED',
+        ]);
+
+        $tukAdmin = User::factory()->create([
+            'full_name' => 'Bambang Admin TUK',
+            'email' => 'bambang.tuk@example.com',
+            'role' => 'TUK_ADMIN',
+            'status' => 'ACTIVE',
+            'tuk_id' => $tuk->id,
+        ]);
+
+        // Filter by TUK_ADMIN role
+        $response = $this->actingAs($this->admin)->get(route('admin.proxy.index', [
+            'role' => 'TUK_ADMIN',
+        ]));
+
+        $response->assertOk();
+        $response->assertSee('Bambang Admin TUK');
+        $response->assertSee('Admin TUK');
+        $response->assertDontSee('Budi Santoso Asesor');
+
+        // Impersonate TUK_ADMIN
+        $switchRes = $this->actingAs($this->admin)->post(route('proxy.switch', $tukAdmin->id));
+        $switchRes->assertRedirect(route('tuk.dashboard'));
+        $this->assertSame($tukAdmin->id, auth()->id());
+        $this->assertSame($this->admin->id, session('admin_impersonator_id'));
     }
 }

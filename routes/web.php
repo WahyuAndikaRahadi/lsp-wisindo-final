@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AccountController;
 use App\Http\Controllers\Admin;
 use App\Http\Controllers\Asesi;
 use App\Http\Controllers\Asesor;
@@ -83,14 +84,6 @@ Route::prefix('print-example')->group(function () {
                 'desc' => 'Ceklis Observasi 3 Kelompok Pekerjaan, 9 Unit Kompetensi & 74 KUK Praktik (Tanpa Watermark)',
             ],
             [
-                'code' => 'FR.IA.01.B',
-                'title' => 'Report Sheet Observasi Praktik',
-                'url' => url('/print-example/ia01b'),
-                'ref_url' => url('/print-example/ia01b?ref=1'),
-                'pages' => '3 Halaman',
-                'desc' => 'Lembar Kerja Pengukuran Engine, Baterai, Pengaman & Manajemen Engine EFI (Tanpa Watermark)',
-            ],
-            [
                 'code' => 'FR.IA.03',
                 'title' => 'Pertanyaan Mendukung Observasi (PMO)',
                 'url' => url('/print-example/ia03'),
@@ -145,7 +138,7 @@ Route::prefix('print-example')->group(function () {
               .'<div class="max-w-4xl mx-auto space-y-6">'
               .'<div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">'
               .'<span class="text-xs font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded">Rute Sementara (Untuk Verifikasi/Audit)</span>'
-              .'<h1 class="text-2xl font-black text-slate-900 mt-2">Pratinjau Dokumen Cetak MUK Dinamis (LSP PrO Indo)</h1>'
+              .'<h1 class="text-2xl font-black text-slate-900 mt-2">Pratinjau Dokumen Cetak MUK Dinamis (LSP Wisindo)</h1>'
               .'<p class="text-xs text-slate-600 mt-1">Bandingkan hasil render dokumen Python ReportLab dengan PDF Master resmi secara langsung.</p>'
               .'</div>'
               .'<div class="grid grid-cols-1 gap-4">';
@@ -182,7 +175,6 @@ Route::prefix('print-example')->group(function () {
     Route::get('/ak04', [PrintExampleController::class, 'ak04'])->name('print-example.ak04');
     Route::get('/ak07', [PrintExampleController::class, 'ak07'])->name('print-example.ak07');
     Route::get('/ia01', [PrintExampleController::class, 'ia01'])->name('print-example.ia01');
-    Route::get('/ia01b', [PrintExampleController::class, 'ia01b'])->name('print-example.ia01b');
     Route::get('/ia03', [PrintExampleController::class, 'ia03'])->name('print-example.ia03');
     Route::get('/ia05c', [PrintExampleController::class, 'ia05c'])->name('print-example.ia05c');
     Route::get('/berita-acara', [PrintExampleController::class, 'beritaAcara'])->name('print-example.ba');
@@ -210,6 +202,13 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::post('/proxy/switch-back', [AuthController::class, 'proxySwitchBack'])->name('proxy.switch-back');
+
+    // Account Settings (Email & Password Management)
+    Route::get('/account', [AccountController::class, 'edit'])->name('account.edit');
+    Route::put('/account', [AccountController::class, 'update'])->name('account.update');
+    Route::get('/asesi/account', [AccountController::class, 'edit'])->name('asesi.account');
+    Route::get('/asesor/account', [AccountController::class, 'edit'])->name('asesor.account');
+    Route::get('/tuk/account', [AccountController::class, 'edit'])->name('tuk.account');
 
     // Secure Document & Evidence Access
     Route::get('/secure-file/proof/{proof}', [SecureFileController::class, 'showProof'])->name('secure-file.proof');
@@ -319,16 +318,9 @@ Route::middleware(['auth', 'role:ASESOR'])->prefix('asesor')->name('asesor.')->g
     Route::get('/assessment/{assessment}/instrument/{code}', [Asesor\InstrumentController::class, 'instrumentShow'])->name('assessment.instrument');
     Route::post('/assessment/{assessment}/instrument/{code}', [Asesor\InstrumentController::class, 'instrumentStore'])->name('assessment.instrument.store');
     Route::post('/assessment/{assessment}/instrument/ia05/reset', [Asesor\InstrumentController::class, 'resetIa05Status'])->name('assessment.ia05.reset');
-    Route::post('/assessment/{assessment}/instrument/ia01b/request-revision', [Asesor\InstrumentController::class, 'requestIa01bRevision'])->name('assessment.ia01b.request-revision');
-    Route::post('/assessment/{assessment}/instrument/ia01b/cancel-revision', [Asesor\InstrumentController::class, 'cancelIa01bRevision'])->name('assessment.ia01b.cancel-revision');
 
     Route::get('/ruang-uji/{assessment}/ia01', fn (Assessment $assessment) => app()->call([app(Asesor\InstrumentController::class), 'instrumentShow'], ['assessment' => $assessment, 'code' => 'ia01']))->name('ruang-uji.ia01');
     Route::post('/ruang-uji/{assessment}/ia01', fn (Assessment $assessment, Request $req) => app(Asesor\InstrumentController::class)->instrumentStore($assessment, 'ia01', $req))->name('ruang-uji.ia01.store');
-
-    Route::get('/ruang-uji/{assessment}/ia01b', fn (Assessment $assessment) => app()->call([app(Asesor\InstrumentController::class), 'instrumentShow'], ['assessment' => $assessment, 'code' => 'ia01b']))->name('ruang-uji.ia01b');
-    Route::post('/ruang-uji/{assessment}/ia01b', fn (Assessment $assessment, Request $req) => app(Asesor\InstrumentController::class)->instrumentStore($assessment, 'ia01b', $req))->name('ruang-uji.ia01b.store');
-    Route::post('/ruang-uji/{assessment}/ia01b/request-revision', fn (Assessment $assessment, Request $req) => app(Asesor\InstrumentController::class)->requestIa01bRevision($assessment, $req))->name('ruang-uji.ia01b.request-revision');
-    Route::post('/ruang-uji/{assessment}/ia01b/cancel-revision', fn (Assessment $assessment) => app(Asesor\InstrumentController::class)->cancelIa01bRevision($assessment))->name('ruang-uji.ia01b.cancel-revision');
 
     Route::get('/ruang-uji/{assessment}/ia02', fn (Assessment $assessment) => app()->call([app(Asesor\InstrumentController::class), 'instrumentShow'], ['assessment' => $assessment, 'code' => 'ia02']))->name('ruang-uji.ia02');
     Route::post('/ruang-uji/{assessment}/ia02', fn (Assessment $assessment, Request $req) => app(Asesor\InstrumentController::class)->instrumentStore($assessment, 'ia02', $req))->name('ruang-uji.ia02.store');

@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             SchemeSeeder::class,
+            SchemeCommitteeSeeder::class,
             UserSeeder::class,
             TukSeeder::class,
         ]);

@@ -22,11 +22,11 @@
     <table style="width: 100%; border: 1px solid #000; border-collapse: collapse; margin-bottom: 8px;">
         <tr>
             <td style="width: 110px; text-align: center; vertical-align: middle; border-right: 1px solid #000; padding: 4px;">
-                <img src="{{ asset('images/logo-lsp-proindo.png') }}" style="max-height: 52px; max-width: 95px; object-fit: contain;" alt="Logo LSP">
+                <img src="{{ asset('images/logo-lsp-wisindo.png') }}" style="max-height: 52px; max-width: 95px; object-fit: contain;" alt="Logo LSP Wisindo">
             </td>
             <td style="text-align: center; vertical-align: middle; padding: 6px 12px;">
                 <span style="font-size: 11pt; font-family: Tahoma, Arial, sans-serif;">
-                    <strong>L</strong>embaga <strong>S</strong>ertifikasi <strong>P</strong>rofesi <strong>P</strong>raktisi <strong>O</strong>tomotif &nbsp;<strong>LSP-PrO Indo</strong>
+                    <strong>L</strong>embaga <strong>S</strong>ertifikasi <strong>P</strong>rofesi <strong>P3</strong> <strong>W</strong>isata <strong>I</strong>ndonesia &nbsp;<strong>LSP Wisindo</strong>
                 </span>
             </td>
         </tr>

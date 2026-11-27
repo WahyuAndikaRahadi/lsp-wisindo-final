@@ -7,34 +7,31 @@
     $selectedAssessmentId = $selectedAssessmentId ?? request('assessment');
     $isClosedForMe = $jadwal->isClosedForAssessor();
 
-    // Default values
-    $savedPendekatan = old('pendekatan_asesi', $mapaData['pendekatan_asesi'] ?? $pendekatanOptions[0]);
-    $savedTujuan = old('tujuan_asesmen', $mapaData['tujuan_asesmen'] ?? 'Sertifikasi');
-    $savedLingkungan = old('konteks_lingkungan', $mapaData['konteks_lingkungan'] ?? 'Tempat kerja simulasi');
-    $savedPeluang = old('peluang_bukti', $mapaData['peluang_bukti'] ?? 'Tersedia');
-    $savedHubungan = old('hubungan_standar', $mapaData['hubungan_standar'] ?? 'Bukti untuk mendukung asesmen');
-    $savedPelaksana = old('pelaksana_asesmen', $mapaData['pelaksana_asesmen'] ?? 'Lembaga Sertifikasi LSP Praktisi Otomotif Indonesia');
-    $savedOrangRelevan = old('orang_relevan', $mapaData['orang_relevan'] ?? [
-        'Master Asesor / Master Trainer / Lead Asesor Kompetensi',
-        'Manajer sertifikasi',
-    ]);
+    // Default values (Wisindo: kosongan tanpa bawaan input)
+    $savedPendekatan = old('pendekatan_asesi', $mapaData['pendekatan_asesi'] ?? '');
+    $savedTujuan = old('tujuan_asesmen', $mapaData['tujuan_asesmen'] ?? '');
+    $savedLingkungan = old('konteks_lingkungan', $mapaData['konteks_lingkungan'] ?? '');
+    $savedPeluang = old('peluang_bukti', $mapaData['peluang_bukti'] ?? '');
+    $savedHubungan = old('hubungan_standar', $mapaData['hubungan_standar'] ?? '');
+    $savedPelaksana = old('pelaksana_asesmen', $mapaData['pelaksana_asesmen'] ?? '');
+    $savedOrangRelevan = old('orang_relevan', $mapaData['orang_relevan'] ?? []);
     if (!is_array($savedOrangRelevan)) {
         $savedOrangRelevan = [];
     }
 
     $savedStandarIndustri = old('standar_industri_opt', isset($mapaData['standar_industri'])
         ? array_keys(array_filter($mapaData['standar_industri'], fn($item) => !empty($item['checked'])))
-        : ['standar_kompetensi', 'spesifikasi_kinerja']);
+        : []);
     if (!is_array($savedStandarIndustri)) {
         $savedStandarIndustri = [];
     }
 
-    $savedStandarKompetensiVal = old('standar_kompetensi_val', $mapaData['standar_industri']['standar_kompetensi']['text'] ?? 'SKKNI Nomor 97 Tahun 2018');
-    $savedSpesifikasiKinerjaVal = old('spesifikasi_kinerja_val', $mapaData['standar_industri']['spesifikasi_kinerja']['text'] ?? 'Repair Manual');
+    $savedStandarKompetensiVal = old('standar_kompetensi_val', $mapaData['standar_industri']['standar_kompetensi']['text'] ?? '');
+    $savedSpesifikasiKinerjaVal = old('spesifikasi_kinerja_val', $mapaData['standar_industri']['spesifikasi_kinerja']['text'] ?? '');
     $savedSpesifikasiProdukVal = old('spesifikasi_produk_val', $mapaData['standar_industri']['spesifikasi_produk']['text'] ?? '');
     $savedPedomanKhususVal = old('pedoman_khusus_val', $mapaData['standar_industri']['pedoman_khusus']['text'] ?? '');
 
-    $savedStandar = old('standar_tolok_ukur', $mapaData['standar_tolok_ukur'] ?? 'Standar Kompetensi: SKKNI');
+    $savedStandar = old('standar_tolok_ukur', $mapaData['standar_tolok_ukur'] ?? '');
 
     // Sub 3 Defaults
     $hasKarakteristik = old('has_karakteristik', !empty($mapaData['has_karakteristik']) ? '1' : '0');
@@ -49,9 +46,9 @@
     $hasPenyesuaian = old('has_penyesuaian', !empty($mapaData['has_penyesuaian']) ? '1' : '0');
     $penyesuaianDetail = old('penyesuaian_detail', $mapaData['penyesuaian_detail'] ?? '');
 
-    $hasTerintegrasi = old('has_terintegrasi', isset($mapaData['has_terintegrasi']) ? ($mapaData['has_terintegrasi'] ? '1' : '0') : '1');
+    $hasTerintegrasi = old('has_terintegrasi', isset($mapaData['has_terintegrasi']) ? ($mapaData['has_terintegrasi'] ? '1' : '0') : '0');
     $terintegrasiDetail = old('terintegrasi_detail', $mapaData['terintegrasi_detail'] ?? '');
-    $savedIntegratedTasks = old('integrated_tasks', $mapaData['integrated_tasks'] ?? $defaultIntegratedTasks);
+    $savedIntegratedTasks = old('integrated_tasks', $mapaData['integrated_tasks'] ?? ($defaultIntegratedTasks ?? []));
     if (!is_array($savedIntegratedTasks)) {
         $savedIntegratedTasks = [];
     }
@@ -100,7 +97,7 @@
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
             <h1 class="text-2xl font-black text-slate-900 tracking-tight">FR.MAPA.01. MERENCANAKAN AKTIVITAS DAN PROSES ASESMEN</h1>
-            <p class="text-xs text-slate-500 font-medium">Lembaga Sertifikasi Profesi Praktisi Otomotif (LSP PrO Indo)</p>
+            <p class="text-xs text-slate-500 font-medium">LSP Pariwisata dan Perhotelan Wisindo (LSP Wisindo)</p>
         </div>
     </div>
 
@@ -137,6 +134,7 @@
                         1.1. Calon Asesi <span class="text-rose-500">*</span>
                     </label>
                     <select name="pendekatan_asesi" @disabled($isClosedForMe) required class="w-full text-xs rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 focus:outline-none transition">
+                        <option value="" disabled {{ empty($savedPendekatan) ? 'selected' : '' }}>-- Pilih Pendekatan Asesi --</option>
                         @foreach($pendekatanOptions as $opt)
                             <option value="{{ $opt }}" {{ $savedPendekatan === $opt ? 'selected' : '' }}>
                                 {{ $opt }}
@@ -152,6 +150,7 @@
                             1.2. Tujuan Asesmen <span class="text-rose-500">*</span>
                         </label>
                         <select name="tujuan_asesmen" @disabled($isClosedForMe) required class="w-full text-xs rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 focus:outline-none transition">
+                            <option value="" disabled {{ empty($savedTujuan) ? 'selected' : '' }}>-- Pilih Tujuan Asesmen --</option>
                             @foreach($tujuanOptions as $opt)
                                 <option value="{{ $opt }}" {{ $savedTujuan === $opt ? 'selected' : '' }}>
                                     {{ $opt }}
@@ -165,6 +164,7 @@
                             1.3. Konteks Asesmen: Lingkungan <span class="text-rose-500">*</span>
                         </label>
                         <select name="konteks_lingkungan" @disabled($isClosedForMe) required class="w-full text-xs rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 focus:outline-none transition">
+                            <option value="" disabled {{ empty($savedLingkungan) ? 'selected' : '' }}>-- Pilih Lingkungan --</option>
                             @foreach($lingkunganOptions as $opt)
                                 <option value="{{ $opt }}" {{ $savedLingkungan === $opt ? 'selected' : '' }}>
                                     {{ $opt }}
@@ -181,6 +181,7 @@
                             Peluang untuk Mengumpulkan Bukti <span class="text-rose-500">*</span>
                         </label>
                         <select name="peluang_bukti" @disabled($isClosedForMe) required class="w-full text-xs rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 focus:outline-none transition">
+                            <option value="" disabled {{ empty($savedPeluang) ? 'selected' : '' }}>-- Pilih Peluang Bukti --</option>
                             @foreach($peluangBuktiOptions as $opt)
                                 <option value="{{ $opt }}" {{ $savedPeluang === $opt ? 'selected' : '' }}>
                                     {{ $opt }}
@@ -194,6 +195,7 @@
                             Hubungan antara Standar Kompetensi dan: <span class="text-rose-500">*</span>
                         </label>
                         <select name="hubungan_standar" @disabled($isClosedForMe) required class="w-full text-xs rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 focus:outline-none transition">
+                            <option value="" disabled {{ empty($savedHubungan) ? 'selected' : '' }}>-- Pilih Hubungan Standar --</option>
                             @foreach($hubunganStandarOptions as $opt)
                                 <option value="{{ $opt }}" {{ $savedHubungan === $opt ? 'selected' : '' }}>
                                     {{ $opt }}
@@ -209,6 +211,7 @@
                         Siapa yang Melakukan Asesmen / RPL <span class="text-rose-500">*</span>
                     </label>
                     <select name="pelaksana_asesmen" @disabled($isClosedForMe) required class="w-full text-xs rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 focus:outline-none transition">
+                        <option value="" disabled {{ empty($savedPelaksana) ? 'selected' : '' }}>-- Pilih Pelaksana Asesmen --</option>
                         @foreach($pelaksanaOptions as $opt)
                             <option value="{{ $opt }}" {{ $savedPelaksana === $opt ? 'selected' : '' }}>
                                 {{ $opt }}
@@ -238,7 +241,7 @@
                             </label>
                             <div class="pl-6">
                                 <input type="text" name="standar_kompetensi_val" value="{{ $savedStandarKompetensiVal }}"
-                                       placeholder="Contoh: SKKNI Nomor 97 Tahun 2018"
+                                       placeholder="Contoh: SKKNI Bidang Hotel dan Restoran"
                                        @disabled($isClosedForMe)
                                        class="w-full text-xs rounded-md border border-slate-300 bg-white px-3 py-1.5 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 focus:outline-none transition">
                             </div>
@@ -264,7 +267,7 @@
                             </label>
                             <div class="pl-6">
                                 <input type="text" name="spesifikasi_kinerja_val" value="{{ $savedSpesifikasiKinerjaVal }}"
-                                       placeholder="Contoh: Repair Manual"
+                                       placeholder="Contoh: Standard Operating Procedure (SOP) Hotel"
                                        @disabled($isClosedForMe)
                                        class="w-full text-xs rounded-md border border-slate-300 bg-white px-3 py-1.5 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 focus:outline-none transition">
                             </div>
@@ -394,7 +397,7 @@
                     <div x-show="hasKontekstualisasi === '1'" x-cloak class="pt-2 border-t border-slate-100">
                         <label class="block text-[11px] font-semibold text-slate-700 mb-1">Jika Ada, tuliskan:</label>
                         <textarea name="kontekstualisasi_detail" rows="2" @disabled($isClosedForMe)
-                                  placeholder="Contoh: Menggunakan SOP dan format checklist perawatan bengkel resmi tempat asesi bekerja..."
+                                  placeholder="Contoh: Menggunakan SOP dan format checklist operasional hotel tempat asesi bekerja..."
                                   class="w-full text-xs rounded-lg border border-slate-300 bg-white p-3 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 focus:outline-none transition">{{ $kontekstualisasiDetail }}</textarea>
                     </div>
                 </div>

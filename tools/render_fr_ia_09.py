@@ -33,7 +33,7 @@ PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 ASSETS_DIR = os.path.join(PROJECT_ROOT, "tests", "Fixtures", "muk", "assets")
 LOGO_PATH = os.path.join(ASSETS_DIR, "logo.png")
 if not os.path.isfile(LOGO_PATH):
-    LOGO_PATH = os.path.join(PROJECT_ROOT, "public", "images", "logo-lsp-proindo.png")
+    LOGO_PATH = os.path.join(PROJECT_ROOT, "public", "images", "logo-lsp-wisindo.png")
 
 IA09_IMAGES_DIR = os.path.join(PROJECT_ROOT, "public", "images", "muk", "ia09")
 if not os.path.isdir(IA09_IMAGES_DIR):

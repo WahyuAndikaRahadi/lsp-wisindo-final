@@ -13,7 +13,6 @@
 
     $instrumentCatalog = [
         'IA01' => ['code' => 'FR.IA.01', 'title' => 'Ceklis Observasi Aktivitas Praktik', 'desc' => 'Observasi langsung demonstrasi keterampilan kerja asesi.'],
-        'IA01B' => ['code' => 'FR.IA.01.B', 'title' => 'Ceklis Persiapan Tempat Uji', 'desc' => 'Verifikasi kelaikan peralatan, bahan, dan K3 pada TUK.'],
         'IA02' => ['code' => 'FR.IA.02', 'title' => 'Tugas Praktik Demonstrasi', 'desc' => 'Instruksi kerja terstruktur dan unjuk kerja praktik.'],
         'IA03' => ['code' => 'FR.IA.03', 'title' => 'Pertanyaan Lisan Pendukung', 'desc' => 'Daftar pertanyaan lisan klarifikasi kompetensi di tempat uji.'],
         'IA05' => ['code' => 'FR.IA.05', 'title' => 'Pertanyaan Tertulis Pilihan Ganda (CBT)', 'desc' => 'Ujian teori objektif CBT 20 butir acak per skema jadwal.'],
@@ -455,14 +454,13 @@
                         @php
                             $availableIa = [
                                 'IA01' => ['title' => 'FR.IA.01 - Ceklis Observasi Praktik', 'desc' => 'Observasi aktivitas demonstrasi kerja asesi'],
-                                'IA01B' => ['title' => 'FR.IA.01.B - Lembar Kerja / Report Sheet', 'desc' => 'Pengukuran engine, baterai, & kelistrikan EFI'],
                                 'IA02' => ['title' => 'FR.IA.02 - Tugas Praktik Demonstrasi', 'desc' => 'Lembar tugas fisik dan verifikasi lembar kerja'],
                                 'IA03' => ['title' => 'FR.IA.03 - Pertanyaan Pendukung Observasi (PMO)', 'desc' => 'Daftar pertanyaan lisan konfirmasi praktik'],
                                 'IA05' => ['title' => 'FR.IA.05 - Pertanyaan Tertulis (CBT 20 Soal)', 'desc' => 'Ujian teori pilihan ganda terstandar'],
                                 'IA08' => ['title' => 'FR.IA.08 - Ceklis Verifikasi Portofolio (CVP)', 'desc' => 'Verifikasi bukti portofolio (VATM) dan klarifikasi unjuk kerja'],
                                 'IA09' => ['title' => 'FR.IA.09 - Pertanyaan Wawancara (PW)', 'desc' => 'Daftar pertanyaan wawancara terstruktur dan klarifikasi portofolio'],
                             ];
-                            $currentSelected = $selectedInstruments ?? ['AK01', 'IA01', 'IA01B', 'IA02', 'IA03', 'IA05'];
+                            $currentSelected = $selectedInstruments ?? ['AK01', 'IA01', 'IA02', 'IA03', 'IA05'];
                         @endphp
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             @foreach($availableIa as $iaCode => $iaMeta)

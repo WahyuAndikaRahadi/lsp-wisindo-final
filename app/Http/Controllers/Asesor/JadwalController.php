@@ -50,40 +50,26 @@ class JadwalController extends Controller
             }
         }
 
-        // 3. Filter by Date Range (start_date / end_date or date_from / date_to)
-        $startDate = $request->input('start_date', $request->input('date_from'));
-        $endDate = $request->input('end_date', $request->input('date_to'));
+        // 3. Filter by Date (single date with fallback for date range)
+        if ($request->filled('date')) {
+            $query->whereDate('t_schedules.date', $request->date);
+        } elseif ($request->filled('start_date') || $request->filled('end_date') || $request->filled('date_from') || $request->filled('date_to')) {
+            $startDate = $request->input('start_date', $request->input('date_from'));
+            $endDate = $request->input('end_date', $request->input('date_to'));
 
-        if (! empty($startDate) && ! empty($endDate)) {
-            $from = min($startDate, $endDate);
-            $to = max($startDate, $endDate);
-            $query->whereBetween('t_schedules.date', [$from, $to]);
-        } elseif (! empty($startDate)) {
-            $query->whereDate('t_schedules.date', '>=', $startDate);
-        } elseif (! empty($endDate)) {
-            $query->whereDate('t_schedules.date', '<=', $endDate);
+            if (! empty($startDate) && ! empty($endDate)) {
+                $from = min($startDate, $endDate);
+                $to = max($startDate, $endDate);
+                $query->whereBetween('t_schedules.date', [$from, $to]);
+            } elseif (! empty($startDate)) {
+                $query->whereDate('t_schedules.date', '>=', $startDate);
+            } elseif (! empty($endDate)) {
+                $query->whereDate('t_schedules.date', '<=', $endDate);
+            }
         }
 
-        // 4. Sorting
-        $sort = $request->input('sort', 'date_desc');
-        match ($sort) {
-            'date_asc' => $query->orderBy('t_schedules.date', 'asc')->orderBy('t_schedules.start_time', 'asc'),
-            'name_asc' => $query->orderBy('t_schedules.name', 'asc'),
-            'name_desc' => $query->orderBy('t_schedules.name', 'desc'),
-            default => $query->orderBy('t_schedules.date', 'desc')->orderBy('t_schedules.start_time', 'desc'),
-        };
-
-        // Compute counts for quick filter chips
-        $baseQuery = $user->assignedSchedules();
-        $counts = [
-            'total' => (clone $baseQuery)->count(),
-            'active' => (clone $baseQuery)->where('t_schedules.is_closed', false)
-                ->whereNotIn('t_schedules.status', ['COMPLETED', 'FINISHED', 'CANCELLED'])->count(),
-            'completed' => (clone $baseQuery)->where(function ($q) {
-                $q->where('t_schedules.is_closed', true)
-                    ->orWhereIn('t_schedules.status', ['COMPLETED', 'FINISHED']);
-            })->count(),
-        ];
+        // 4. Sorting: always default to latest date and start time
+        $query->orderBy('t_schedules.date', 'desc')->orderBy('t_schedules.start_time', 'desc');
 
         $schedules = $query->paginate(12)->withQueryString();
         $jadwals = $schedules;
@@ -95,7 +81,7 @@ class JadwalController extends Controller
         $tokenInfo = RegistrationTokenService::getTokenInfo();
         $registrationToken = $tokenInfo['token'];
 
-        return view('asesor.jadwal.index', compact('schedules', 'jadwals', 'registrationToken', 'tokenInfo', 'counts'));
+        return view('asesor.jadwal.index', compact('schedules', 'jadwals', 'registrationToken', 'tokenInfo'));
     }
 
     public function suratTugas(Request $request, Schedule $schedule): View

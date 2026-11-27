@@ -72,39 +72,18 @@
         </div>
     @endif
 
-    {{-- Quick Filter Chips --}}
     @php
-        $currentStatus = request('status', 'all');
         $hasFilter = request()->filled('search') 
             || (request()->filled('status') && request('status') !== 'all') 
-            || request()->filled('start_date') 
-            || request()->filled('end_date')
-            || (request()->filled('sort') && request('sort') !== 'date_desc');
+            || request()->filled('date');
     @endphp
 
-    <div class="flex items-center gap-2 overflow-x-auto text-xs pb-1">
-        <a href="{{ route('asesor.jadwal.index', array_merge(request()->except(['status', 'page']), ['status' => 'all'])) }}"
-           class="px-3.5 py-1.5 rounded-lg border font-bold transition whitespace-nowrap {{ $currentStatus === 'all' || empty($currentStatus) ? 'bg-slate-900 text-white border-slate-900 shadow-xs' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50' }}">
-            Semua Jadwal ({{ $counts['total'] ?? $schedules->total() }})
-        </a>
-        <a href="{{ route('asesor.jadwal.index', array_merge(request()->except(['status', 'page']), ['status' => 'active'])) }}"
-           class="px-3.5 py-1.5 rounded-lg border font-bold transition whitespace-nowrap flex items-center gap-1.5 {{ $currentStatus === 'active' ? 'bg-blue-600 text-white border-blue-600 shadow-xs' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50' }}">
-            <span class="w-2 h-2 rounded-full {{ $currentStatus === 'active' ? 'bg-white' : 'bg-blue-500' }}"></span>
-            <span>Jadwal Aktif ({{ $counts['active'] ?? 0 }})</span>
-        </a>
-        <a href="{{ route('asesor.jadwal.index', array_merge(request()->except(['status', 'page']), ['status' => 'completed'])) }}"
-           class="px-3.5 py-1.5 rounded-lg border font-bold transition whitespace-nowrap flex items-center gap-1.5 {{ in_array($currentStatus, ['completed', 'finished', 'selesai']) ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50' }}">
-            <span class="w-2 h-2 rounded-full {{ in_array($currentStatus, ['completed', 'finished', 'selesai']) ? 'bg-white' : 'bg-emerald-500' }}"></span>
-            <span>Jadwal Selesai ({{ $counts['completed'] ?? 0 }})</span>
-        </a>
-    </div>
-
-    {{-- Filter, Search & Sort Form --}}
+    {{-- Filter & Search Form --}}
     <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
         <form action="{{ route('asesor.jadwal.index') }}" method="GET" data-ajax-filter="asesor-jadwal" data-no-loading="true" class="space-y-3">
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 items-end text-xs">
                 {{-- Search Bar: Nama Jadwal, Kode, TUK --}}
-                <div class="col-span-1 sm:col-span-2 lg:col-span-4">
+                <div class="col-span-1 sm:col-span-2 lg:col-span-6">
                     <label class="block text-xs font-bold text-slate-700 mb-1">Cari Jadwal</label>
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
@@ -118,7 +97,7 @@
                 </div>
 
                 {{-- Status Filter --}}
-                <div class="col-span-1 sm:col-span-1 lg:col-span-2">
+                <div class="col-span-1 sm:col-span-1 lg:col-span-3">
                     <label class="block text-xs font-bold text-slate-700 mb-1">Status</label>
                     <select name="status" class="w-full py-2 px-3 text-xs rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:outline-none bg-white text-slate-800 shadow-2xs">
                         <option value="all" {{ request('status', 'all') === 'all' ? 'selected' : '' }}>Semua Status</option>
@@ -127,36 +106,18 @@
                     </select>
                 </div>
 
-                {{-- Dari Tanggal --}}
-                <div class="col-span-1 sm:col-span-1 lg:col-span-2">
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Dari Tanggal</label>
-                    <input type="date" name="start_date" value="{{ request('start_date') }}"
+                {{-- Tanggal --}}
+                <div class="col-span-1 sm:col-span-1 lg:col-span-3">
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Tanggal</label>
+                    <input type="date" name="date" value="{{ request('date') }}"
                         class="w-full py-2 px-3 text-xs rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:outline-none bg-white text-slate-800 shadow-2xs">
-                </div>
-
-                {{-- Sampai Tanggal --}}
-                <div class="col-span-1 sm:col-span-1 lg:col-span-2">
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Sampai Tanggal</label>
-                    <input type="date" name="end_date" value="{{ request('end_date') }}"
-                        class="w-full py-2 px-3 text-xs rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:outline-none bg-white text-slate-800 shadow-2xs">
-                </div>
-
-                {{-- Urutkan (Sort) --}}
-                <div class="col-span-1 sm:col-span-1 lg:col-span-2">
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Urutan</label>
-                    <select name="sort" class="w-full py-2 px-3 text-xs rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:outline-none bg-white text-slate-800 shadow-2xs">
-                        <option value="date_desc" {{ request('sort', 'date_desc') === 'date_desc' ? 'selected' : '' }}>Tanggal Terbaru</option>
-                        <option value="date_asc" {{ request('sort') === 'date_asc' ? 'selected' : '' }}>Tanggal Terlama</option>
-                        <option value="name_asc" {{ request('sort') === 'name_asc' ? 'selected' : '' }}>Nama Jadwal (A-Z)</option>
-                        <option value="name_desc" {{ request('sort') === 'name_desc' ? 'selected' : '' }}>Nama Jadwal (Z-A)</option>
-                    </select>
                 </div>
             </div>
 
             <div class="flex items-center justify-between pt-2 border-t border-slate-100 text-xs">
                 <div class="text-slate-500 text-[11px]">
                     @if($hasFilter)
-                        <span>Menampilkan hasil penyortiran & filter</span>
+                        <span>Menampilkan hasil filter</span>
                     @else
                         <span>Menampilkan seluruh jadwal penugasan</span>
                     @endif
