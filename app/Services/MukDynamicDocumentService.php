@@ -39,6 +39,10 @@ class MukDynamicDocumentService
      */
     public function getSchemeDir(Scheme $scheme): ?string
     {
+        if (! File::isDirectory($this->baseDir)) {
+            return null;
+        }
+
         $schemeId = $scheme->id;
         $name = strtolower($scheme->name ?? '');
         $code = strtolower($scheme->code ?? '');

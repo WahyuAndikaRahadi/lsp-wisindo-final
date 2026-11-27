@@ -873,7 +873,9 @@ def page3_large(c, d, pnum=3):
 
 # --- Generator Utama dengan Flow Kontrol ---
 def build(d=DATA, out=OUT):
-    os.makedirs(os.path.dirname(out), exist_ok=True)
+    out_dir = os.path.dirname(out)
+    if out_dir:
+        os.makedirs(out_dir, exist_ok=True)
     c = canvas.Canvas(out, pagesize=(W, H))
     c.setTitle("FR.APL.01 Permohonan Sertifikasi Kompetensi")
     c.setAuthor("LSP PrO Indo - ReportLab Generator")
