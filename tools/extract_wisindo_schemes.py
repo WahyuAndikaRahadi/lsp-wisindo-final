@@ -10,7 +10,7 @@ OUT_DIR = "/home/wahyuandika/Dokumen/coding-project/lsp-wisindo-final/database/s
 
 SCHEMES_CONFIG = [
     {
-        "folder": "Skema Sertifikasi  Okupasi Chef de Partie Hotel",
+        "folder": "Skema Sertifikasi Okupasi Chef de Partie Hotel",
         "code": "SKM-CDP-01",
         "nomor": "459/PAR/2026",
         "name": "Skema Sertifikasi Okupasi Chef de Partie Hotel",
@@ -19,7 +19,7 @@ SCHEMES_CONFIG = [
         "passing_grade": 75.0,
     },
     {
-        "folder": "Skema Sertifikasi  Okupasi Commis Chef Hotel",
+        "folder": "Skema Sertifikasi Okupasi Commis Chef Hotel",
         "code": "SKM-CC-02",
         "nomor": "458/PAR/2026",
         "name": "Skema Sertifikasi Okupasi Commis Chef Hotel",
@@ -28,7 +28,7 @@ SCHEMES_CONFIG = [
         "passing_grade": 75.0,
     },
     {
-        "folder": "Skema Sertifikasi Okupasi Receptionist  atau Front Desk Agent  atau Guest Service Agent  atau Guest Service Associate  atau Guest Service Attendant  atau Guest Service Assistant  atau Resort Host Hotel",
+        "folder": "Skema Sertifikasi Okupasi Receptionist",
         "code": "SKM-FO-03",
         "nomor": "448/PAR/2026",
         "name": "Skema Sertifikasi Okupasi Receptionist Hotel",
@@ -37,7 +37,7 @@ SCHEMES_CONFIG = [
         "passing_grade": 75.0,
     },
     {
-        "folder": "Skema Sertifikasi Okupasi Room Attendant  atau Room Boy  atau Room Maid",
+        "folder": "Skema Sertifikasi Okupasi Room Attendant",
         "code": "SKM-HK-04",
         "nomor": "451/PAR/2026",
         "name": "Skema Sertifikasi Okupasi Room Attendant Hotel",
@@ -46,7 +46,7 @@ SCHEMES_CONFIG = [
         "passing_grade": 75.0,
     },
     {
-        "folder": "Skema Sertifikasi Okupasi Waiter Server atau Wait Person Hotel",
+        "folder": "Skema Sertifikasi Okupasi Waiter Server",
         "code": "SKM-FB-05",
         "nomor": "455/PAR/2026",
         "name": "Skema Sertifikasi Okupasi Waiter Server Hotel",

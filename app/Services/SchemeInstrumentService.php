@@ -118,12 +118,12 @@ class SchemeInstrumentService
      * Map of Scheme IDs to directory in all-document-lsp-Wisindo.
      */
     protected array $schemeDirectoryMap = [
-        1 => 'Skema Sertifikasi  Okupasi Chef de Partie Hotel',
-        2 => 'Skema Sertifikasi  Okupasi Commis Chef Hotel',
-        3 => 'Skema Sertifikasi Okupasi Receptionist  atau Front Desk Agent  atau Guest Service Agent  atau Guest Service Associate  atau Guest Service Attendant  atau Guest Service Assistant  atau Resort Host Hotel',
-        4 => 'Skema Sertifikasi Okupasi Room Attendant  atau Room Boy  atau Room Maid',
-        5 => 'Skema Sertifikasi Okupasi Waiter Server atau Wait Person Hotel',
-        6 => 'Skema Sertifikasi Okupasi Public Area Cleaner atau Public Area Attendant Hotel',
+        1 => 'Skema Sertifikasi Okupasi Chef de Partie Hotel',
+        2 => 'Skema Sertifikasi Okupasi Commis Chef Hotel',
+        3 => 'Skema Sertifikasi Okupasi Receptionist',
+        4 => 'Skema Sertifikasi Okupasi Room Attendant',
+        5 => 'Skema Sertifikasi Okupasi Waiter Server',
+        6 => 'Skema Sertifikasi Okupasi Public Area Cleaner',
     ];
 
     /**
