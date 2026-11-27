@@ -50,38 +50,49 @@ DATA = {
 def draw_header(c):
     x0, x1 = 50.4, 536.2
     top, bot = 35.4, 99.3
-    
+
     c.setLineWidth(0.65)
     c.setStrokeColor(black)
     c.rect(x0, Y(bot), x1 - x0, bot - top)
-    
+
     # Logo divider line
     x_div = 147.7
     c.line(x_div, Y(top), x_div, Y(bot))
-    
-    # Logo image
-    logo_file = os.path.join(ASSETS, "logo.png")
+
+    # Logo image (Wisindo)
+    logo_file = os.path.join(PROJECT_ROOT, "public", "images", "logo-wisindo-alt-bawah.png")
+    if not os.path.exists(logo_file):
+        logo_file = os.path.join(ASSETS, "logo.png")
     if os.path.exists(logo_file):
-        c.drawImage(logo_file, 67.0, Y(97.2), 69.4, 61.4, mask="auto")
-        
-    # Header text with exact initial capitals in bold
-    words = [
-        ("L", "Lib-B", 174.2),
-        ("embaga ", "Lib", 181.1),
-        ("S", "Lib-B", 227.2),
-        ("ertifikasi ", "Lib", 234.8),
-        ("P", "Lib-B", 282.9),
-        ("rofesi ", "Lib", 290.8),
-        ("P", "Lib-B", 323.6),
-        ("raktisi ", "Lib", 331.4),
-        ("O", "Lib-B", 366.6),
-        ("tomotif  ", "Lib", 375.9),
-        ("LSP-PrO Indo", "Lib-B", 421.1),
-    ]
-    for text_val, f_name, pos_x in words:
-        c.setFont(f_name, 12.0)
+        try:
+            with Image.open(logo_file) as im:
+                iw, ih = im.size
+            aspect = (iw / ih) if ih else 1.0
+        except Exception:
+            aspect = 1.0
+        max_w, max_h = 82.0, 56.0
+        draw_h = max_h
+        draw_w = draw_h * aspect
+        if draw_w > max_w:
+            draw_w = max_w
+            draw_h = draw_w / aspect
+        logo_x = x0 + ((x_div - x0) - draw_w) / 2.0
+        logo_y = Y(bot) + ((bot - top) - draw_h) / 2.0
+        c.drawImage(logo_file, logo_x, logo_y, draw_w, draw_h, mask="auto")
+
+    # Header text: Lembaga Sertifikasi Profesi Wisata Indonesia
+    segs = [("L", "Lib-B"), ("embaga ", "Lib"), ("S", "Lib-B"), ("ertifikasi ", "Lib"),
+            ("P", "Lib-B"), ("rofesi ", "Lib"), ("W", "Lib-B"), ("isata ", "Lib"),
+            ("I", "Lib-B"), ("ndonesia", "Lib")]
+    font_size = 13.0
+    total_w = sum(pdfmetrics.stringWidth(txt, fname, font_size) for txt, fname in segs)
+    xp = x_div + ((x1 - x_div) - total_w) / 2.0
+    yp = Y((top + bot) / 2.0) - font_size * 0.32
+    for text_val, f_name in segs:
+        c.setFont(f_name, font_size)
         c.setFillColor(black)
-        c.drawString(pos_x, 762.6, text_val)
+        c.drawString(xp, yp, text_val)
+        xp += pdfmetrics.stringWidth(text_val, f_name, font_size)
 
 def draw_cb(c, cx, cy, checked=False):
     sz = 8.6
@@ -374,7 +385,328 @@ def draw_elements_table_generic(c, L, R, y_hdr_top, y_hdr_bot, rows_data, is_fir
             for line_idx, line_str in enumerate(wrapped_lines):
                 c.drawString(c3 + 8.0, Y(start_y + line_idx * line_h), line_str)
 
+def draw_unit_header_dynamic(c, num, code, title, y_top, L=53.4, R=541.2):
+    c1, c2, c3 = 160.2, 227.5, 242.9
+    title_max_w = R - (c3 + 12.0)
+    title_lines = wrap_text_width(str(title or ""), "Lib-B", 9.5, title_max_w) or [""]
+    top_row_h = 20.0
+    bot_row_h = max(20.0, 8.0 + len(title_lines) * 12.0)
+    y_mid = y_top + top_row_h
+    y_bot = y_mid + bot_row_h
+
+    c.setLineWidth(0.65)
+    c.setStrokeColor(black)
+    c.rect(L, Y(y_bot), R - L, y_bot - y_top)
+    c.line(c1, Y(y_mid), R, Y(y_mid))
+
+    c.line(c1, Y(y_bot), c1, Y(y_top))
+    c.line(c2, Y(y_bot), c2, Y(y_top))
+    c.line(c3, Y(y_bot), c3, Y(y_top))
+
+    c.setFont("Lib-B", 9.5)
+    c.setFillColor(black)
+    c.drawString(L + 7.5, Y((y_top + y_bot) / 2.0 + 3.0), f"Unit Kompetensi {num}")
+
+    c.drawString(c1 + 6.0, Y(y_top + 13.5), "Kode Unit")
+    c.drawString(c2 + 5.0, Y(y_top + 13.5), ":")
+    c.drawString(c3 + 6.0, Y(y_top + 13.5), str(code or ""))
+
+    c.drawString(c1 + 6.0, Y(y_mid + 13.5), "Judul Unit")
+    c.drawString(c2 + 5.0, Y(y_mid + 13.5), ":")
+    for idx, ln in enumerate(title_lines):
+        c.drawString(c3 + 6.0, Y(y_mid + 13.5 + idx * 12.0), ln)
+
+    return y_bot
+
+
+def draw_rekomendasi_box(c, r_top, L=53.4, R=541.2):
+    r_bot = r_top + 128.9
+    c_mid = 283.5
+    c_lbl = 375.6
+
+    c.setLineWidth(0.65)
+    c.setStrokeColor(black)
+    c.rect(L, Y(r_bot), R - L, r_bot - r_top)
+    c.line(c_mid, Y(r_bot), c_mid, Y(r_top))
+
+    offsets = [17.2, 48.0, 61.7, 79.8, 97.8]
+    for off in offsets:
+        c.line(c_mid, Y(r_top + off), R, Y(r_top + off))
+
+    c.line(c_lbl, Y(r_top + 17.2), c_lbl, Y(r_top))
+    c.line(c_lbl, Y(r_top + 48.0), c_lbl, Y(r_top + 17.2))
+    c.line(c_lbl, Y(r_top + 79.8), c_lbl, Y(r_top + 61.7))
+    c.line(c_lbl, Y(r_top + 97.8), c_lbl, Y(r_top + 79.8))
+    c.line(c_lbl, Y(r_bot), c_lbl, Y(r_top + 97.8))
+
+    # Left Section: Rekomendasi
+    c.setFont("Lib", 10.0)
+    c.setFillColor(black)
+    ok = bool(DATA.get("is_kompeten", True))
+    w1 = pdfmetrics.stringWidth("Asesmen ", "Lib", 10.0)
+    w2 = pdfmetrics.stringWidth("dapat", "Lib", 10.0)
+    w3 = pdfmetrics.stringWidth(" / ", "Lib", 10.0)
+    w4 = pdfmetrics.stringWidth("tidak dapat", "Lib", 10.0)
+    y_rek = r_top + 14.1
+    c.drawString(L + 7.0, Y(y_rek), "Asesmen ")
+    c.drawString(L + 7.0 + w1, Y(y_rek), "dapat")
+    c.drawString(L + 7.0 + w1 + w2, Y(y_rek), " / ")
+    c.drawString(L + 7.0 + w1 + w2 + w3, Y(y_rek), "tidak dapat")
+    c.drawString(L + 7.0 + w1 + w2 + w3 + w4, Y(y_rek), " dilanjutkan")
+    c.setLineWidth(0.6)
+    if ok:
+        c.line(L + 7.0 + w1 + w2 + w3, Y(y_rek - 3.0), L + 7.0 + w1 + w2 + w3 + w4, Y(y_rek - 3.0))
+    else:
+        c.line(L + 7.0 + w1, Y(y_rek - 3.0), L + 7.0 + w1 + w2, Y(y_rek - 3.0))
+
+    # Right Section: Asesi
+    c.setFont("Lib", 10.0)
+    c.drawString(c_mid + 6.0, Y(r_top + 11.1), "Nama")
+    c.drawString(c_lbl + 6.0, Y(r_top + 11.1), str(DATA.get("asesi_nama", "")))
+
+    c.drawString(c_mid + 6.0, Y(r_top + 28.1), "Tanda tangan/")
+    c.drawString(c_mid + 6.0, Y(r_top + 40.1), "Tanggal")
+    x_cell_ctr = (c_lbl + R) / 2.0
+    draw_signature(c, DATA.get("signature_asesi") or DATA.get("asesi_signature"), x_cell_ctr - 35.0, r_top + 35.6, w=70.0, h=18.0)
+    c.setFont("Lib", 8.5)
+    c.drawCentredString(x_cell_ctr, Y(r_top + 44.6), str(DATA.get("tanggal", "")))
+
+    # Right Section: Asesor
+    c.setFont("Lib-B", 10.0)
+    c.drawString(c_mid + 6.0, Y(r_top + 56.6), "Ditinjau Oleh Asesor :")
+
+    c.setFont("Lib", 10.0)
+    c.drawString(c_mid + 6.0, Y(r_top + 72.1), "Nama :")
+    c.drawString(c_lbl + 6.0, Y(r_top + 72.1), str(DATA.get("asesor_nama", "")))
+
+    c.drawString(c_mid + 6.0, Y(r_top + 90.1), "No. Reg:")
+    c.drawString(c_lbl + 6.0, Y(r_top + 90.1), str(DATA.get("asesor_reg", "")))
+
+    c.drawString(c_mid + 6.0, Y(r_top + 108.1), "Tanda tangan/")
+    c.drawString(c_mid + 6.0, Y(r_top + 120.1), "Tanggal")
+    draw_signature(c, DATA.get("signature_asesor") or DATA.get("assessor_signature"), x_cell_ctr - 35.0, r_top + 116.6, w=70.0, h=18.0)
+    c.setFont("Lib", 8.5)
+    c.drawCentredString(x_cell_ctr, Y(r_top + 125.6), str(DATA.get("tanggal", "")))
+    return r_bot
+
+
+def build_element_lines(elem):
+    """Build wrapped lines (text, font_name, font_size, x_indent) for one element & its KUKs."""
+    lines = []
+    elem_num = elem.get("number", 1)
+    elem_title = str(elem.get("title") or "").strip()
+    col0_left = 53.4
+    c1 = 321.4
+
+    # Element header wrapped
+    ele_indent = 10.0
+    ele_max_w = (c1 - 6.0) - (col0_left + ele_indent)
+    ele_wrapped = wrap_text_width(f"{elem_num}. Elemen: {elem_title}", "Lib-B", 9.5, ele_max_w)
+    for idx, ln in enumerate(ele_wrapped):
+        lines.append((ln, "Lib-B", 9.5, ele_indent if idx == 0 else ele_indent + 12.0))
+
+    kuks = elem.get("kuks") or []
+    if kuks:
+        lines.append(("•  Kriteria Unjuk Kerja:", "Lib-B", 9.0, 22.0))
+        kuk_indent = 32.0
+        kuk_max_w = (c1 - 6.0) - (col0_left + kuk_indent)
+        for k in kuks:
+            code_num = str(k.get("code_number") or "").strip()
+            stmt = str(k.get("statement") or "").strip()
+            kuk_text = f"{code_num} {stmt}".strip()
+            kuk_wrapped = wrap_text_width(kuk_text, "Lib", 9.0, kuk_max_w)
+            for idx, ln in enumerate(kuk_wrapped):
+                lines.append((ln, "Lib", 9.0, kuk_indent if idx == 0 else kuk_indent + 10.0))
+
+    return lines
+
+
+def draw_elements_table_header_dynamic(c, y_hdr_top, L=53.4, R=541.2):
+    c1, c2, c3 = 321.4, 348.2, 375.2
+    y_hdr_bot = y_hdr_top + 15.0
+    c.setLineWidth(0.65)
+    c.setStrokeColor(black)
+    c.line(L, Y(y_hdr_top), R, Y(y_hdr_top))
+    c.line(L, Y(y_hdr_bot), R, Y(y_hdr_bot))
+    c.setFont("Lib-B", 9.5)
+    c.setFillColor(black)
+    c.drawString(L + 6.0, Y(y_hdr_top + 11.0), "Dapatkah Saya ................?")
+    c.drawCentredString((c1 + c2) / 2.0, Y(y_hdr_top + 11.0), "K")
+    c.drawCentredString((c2 + c3) / 2.0, Y(y_hdr_top + 11.0), "BK")
+    c.drawString(c3 + 8.0, Y(y_hdr_top + 11.0), "Bukti yang relevan")
+    return y_hdr_bot
+
+
+def close_elements_table_box(c, box_top, box_bot, L=53.4, R=541.2):
+    c1, c2, c3 = 321.4, 348.2, 375.2
+    c.setLineWidth(0.65)
+    c.setStrokeColor(black)
+    c.line(L, Y(box_bot), R, Y(box_bot))
+    for x in (L, c1, c2, c3, R):
+        c.line(x, Y(box_bot), x, Y(box_top))
+
+
+def render_dynamic(dest_path):
+    c = canvas.Canvas(dest_path, pagesize=(PAGE_W, PAGE_H))
+    L, R = 53.4, 541.2
+    c1, c2, c3 = 321.4, 348.2, 375.2
+    Y_TOP_CONT = 113.4
+    Y_MAX = 775.0
+    LINE_H = 11.2
+
+    pnum = 1
+    draw_header(c)
+
+    # Title + Skema + Panduan on Page 1
+    c.setFont("Lib-B", 10.0)
+    c.setFillColor(black)
+    c.drawString(53.4, 718.37, "FR.APL.02. ASESMEN MANDIRI")
+
+    # Skema Table
+    sc1, sc2, sc3 = 167.2, 220.5, 234.7
+    r_top = 132.4
+    skema_judul = str(DATA.get("skema_judul") or "-")
+    judul_lines = wrap_text_width(skema_judul, "Lib-B", 9.5, R - (sc3 + 10.0)) or [skema_judul]
+    r_mid = r_top + max(24.0, 10.0 + len(judul_lines) * 12.0)
+    r_bot = r_mid + 21.0
+
+    c.setLineWidth(0.65)
+    c.setStrokeColor(black)
+    c.rect(L, Y(r_bot), R - L, r_bot - r_top)
+    c.line(sc1, Y(r_mid), R, Y(r_mid))
+    c.line(sc1, Y(r_bot), sc1, Y(r_top))
+    c.line(sc2, Y(r_bot), sc2, Y(r_top))
+    c.line(sc3, Y(r_bot), sc3, Y(r_top))
+
+    c.setFont("Lib-B", 10.0)
+    c.drawString(L + 5.5, Y(r_top + 17.0), "Skema Sertifikasi")
+    c.setFont("Lib", 8.0)
+    c.drawString(L + 5.5, Y(r_top + 28.5), "(KKNI/Okupasi/Klaster)")
+
+    c.setFont("Lib-B", 9.5)
+    c.drawString(sc1 + 5.5, Y(r_top + 16.0), "Judul")
+    c.drawString(sc2 + 5.0, Y(r_top + 16.0), ":")
+    for idx, jl in enumerate(judul_lines):
+        c.drawString(sc3 + 5.5, Y(r_top + 15.0 + idx * 12.0), jl)
+
+    c.drawString(sc1 + 5.5, Y(r_mid + 14.5), "Nomor")
+    c.drawString(sc2 + 5.0, Y(r_mid + 14.5), ":")
+    c.drawString(sc3 + 5.5, Y(r_mid + 14.5), str(DATA.get("skema_nomor") or "-"))
+
+    # Panduan Asesmen Mandiri
+    p_top = r_bot + 12.0
+    p_hdr_bot = p_top + 14.6
+    p_bot = p_top + 101.2
+    c.rect(L, Y(p_bot), R - L, p_bot - p_top)
+    c.line(L, Y(p_hdr_bot), R, Y(p_hdr_bot))
+
+    c.setFont("Lib-B", 10.0)
+    c.drawString(L + 6.0, Y(p_top + 11.5), "PANDUAN ASESMEN MANDIRI")
+    c.setFont("Lib", 10.0)
+    c.drawString(L + 6.0, Y(p_top + 31.5), "Instruksi:")
+    c.drawString(L + 6.0, Y(p_top + 45.5), "•  Baca setiap pertanyaan di kolom sebelah kiri")
+    c.drawString(L + 6.0, Y(p_top + 60.5), "•  Beri tanda centang (☑) pada kotak jika Anda yakin dapat melakukan tugas yang dijelaskan.")
+    c.drawString(L + 6.0, Y(p_top + 76.0), "•  Isi kolom di sebelah kanan dengan menuliskan bukti yang relevan anda miliki untuk menunjukkan")
+    c.drawString(L + 24.0, Y(p_top + 91.0), "bahwa anda melakukan pekerjaan")
+
+    cur_y = p_bot + 12.0
+
+    def start_new_page():
+        nonlocal pnum, cur_y
+        draw_page_num(c, pnum)
+        c.showPage()
+        pnum += 1
+        draw_header(c)
+        cur_y = Y_TOP_CONT
+
+    units = DATA.get("units") or []
+    for unit_idx, unit in enumerate(units, 1):
+        elements = unit.get("elements") or []
+        first_elem_h = 36.0
+        if elements:
+            first_lines = build_element_lines(elements[0])
+            first_elem_h = max(36.0, 12.0 + len(first_lines) * LINE_H + 8.0)
+
+        # Estimate unit header height (~42-54 pt) + table header (15 pt) + first element
+        if cur_y + 56.0 + 15.0 + min(first_elem_h, 120.0) > Y_MAX and cur_y > Y_TOP_CONT + 10.0:
+            start_new_page()
+
+        unit_bot = draw_unit_header_dynamic(c, unit_idx, unit.get("code", ""), unit.get("title", ""), cur_y, L, R)
+        cur_y = unit_bot + 8.0
+
+        if not elements:
+            cur_y += 6.0
+            continue
+
+        box_top = cur_y
+        cur_y = draw_elements_table_header_dynamic(c, box_top, L, R)
+        has_rows_in_box = False
+
+        for elem in elements:
+            lines = build_element_lines(elem)
+            row_h = max(36.0, 12.0 + len(lines) * LINE_H + 8.0)
+
+            if cur_y + row_h > Y_MAX and has_rows_in_box:
+                close_elements_table_box(c, box_top, cur_y, L, R)
+                start_new_page()
+                box_top = cur_y
+                cur_y = draw_elements_table_header_dynamic(c, box_top, L, R)
+                has_rows_in_box = False
+
+            yt = cur_y
+            yb = cur_y + row_h
+            if has_rows_in_box:
+                c.setLineWidth(0.65)
+                c.setStrokeColor(black)
+                c.line(L, Y(yt), R, Y(yt))
+
+            text_y = yt + 12.0
+            for txt, fname, fsize, indent in lines:
+                c.setFont(fname, fsize)
+                c.setFillColor(black)
+                c.drawString(L + indent, Y(text_y), txt)
+                text_y += LINE_H
+
+            # Checkboxes
+            cb_y = (Y(yt) + Y(yb)) / 2.0
+            is_k = bool(elem.get("is_k", True))
+            draw_cb(c, (c1 + c2) / 2.0, cb_y, is_k)
+            draw_cb(c, (c2 + c3) / 2.0, cb_y, not is_k)
+
+            # Bukti yang relevan
+            proof_text = str(elem.get("proof") or DATA.get("default_proof") or "Ijazah SMK Perhotelan / Pariwisata")
+            c.setFillColor(black)
+            c.setFont("Lib", 8.5)
+            max_text_w = (R - 6.0) - (c3 + 8.0)
+            wrapped_proof = wrap_text_width(proof_text, "Lib", 8.5, max_text_w)
+            p_line_h = 10.5
+            total_ph = len(wrapped_proof) * p_line_h
+            p_start_y = ((yt + yb) / 2.0) - (total_ph / 2.0) + 8.0
+            for p_idx, p_str in enumerate(wrapped_proof):
+                c.drawString(c3 + 8.0, Y(p_start_y + p_idx * p_line_h), p_str)
+
+            cur_y = yb
+            has_rows_in_box = True
+
+        close_elements_table_box(c, box_top, cur_y, L, R)
+        cur_y += 12.0
+
+    # Rekomendasi & Signature Box
+    if cur_y + 132.0 > Y_MAX:
+        start_new_page()
+
+    draw_rekomendasi_box(c, cur_y, L, R)
+    draw_page_num(c, pnum)
+    c.showPage()
+    c.save()
+    print(f"OK -> Sukses generate APL 02 Dinamis ({pnum} Halaman): {dest_path}")
+
+
 def render(dest_path):
+    if isinstance(DATA.get("units"), list) and len(DATA["units"]) > 0:
+        render_dynamic(dest_path)
+        return
+
     c = canvas.Canvas(dest_path, pagesize=(PAGE_W, PAGE_H))
     
     with open(CELLS_FILE) as f:

@@ -666,7 +666,7 @@ class MukDynamicDocumentService
         $proofs = [];
 
         $proofLabels = [
-            'IJAZAH_SMK' => 'Ijazah SMK Otomotif',
+            'IJAZAH_SMK' => 'Ijazah SMK Perhotelan / Pariwisata',
             'SURAT_SISWA_AKTIF' => 'Surat Keterangan Siswa Aktif',
             'IJAZAH_SMA_SERTIFIKAT' => 'Ijazah SMA + Sertifikat Pelatihan',
             'PENGALAMAN_KERJA' => 'Surat Pengalaman Kerja',
@@ -678,35 +678,70 @@ class MukDynamicDocumentService
         $candidateBasicProof = $assessment->proofs
             ->whereIn('proof_type', ['IJAZAH_SMK', 'SURAT_SISWA_AKTIF', 'IJAZAH_SMA_SERTIFIKAT', 'PENGALAMAN_KERJA'])
             ->first()?->proof_type;
-        $defaultProof = $candidateBasicProof ? ($proofLabels[$candidateBasicProof] ?? 'Ijazah SMK Otomotif') : 'Ijazah SMK Otomotif';
+        $defaultProof = $candidateBasicProof ? ($proofLabels[$candidateBasicProof] ?? 'Ijazah SMK Perhotelan / Pariwisata') : 'Ijazah SMK Perhotelan / Pariwisata';
+
+        $unitsPayload = [];
 
         if ($scheme) {
+            $scheme->loadMissing('competencyUnits.elements.kuks');
+
             foreach ($scheme->competencyUnits as $unitIdx => $unit) {
+                $elementsPayload = [];
+
                 foreach ($unit->elements as $elemIdx => $elem) {
                     $allK = true;
                     $elemProof = null;
-                    if ($savedApl02->isNotEmpty()) {
-                        foreach ($elem->kuks as $kuk) {
-                            $item = $savedApl02->get($kuk->id);
-                            if ($item) {
-                                if ($item->assessment_value === 'BK' || ($item->is_competent ?? true) === false) {
-                                    $allK = false;
-                                }
-                                if (! empty($item->selected_proof_type) && ! $elemProof) {
-                                    $elemProof = $proofLabels[$item->selected_proof_type] ?? $item->selected_proof_type;
+                    $kuksPayload = [];
+
+                    foreach ($elem->kuks as $kuk) {
+                        $item = $savedApl02->get($kuk->id);
+                        $kukIsK = true;
+                        $kukProof = null;
+
+                        if ($item) {
+                            if ($item->assessment_value === 'BK' || ($item->is_competent ?? true) === false) {
+                                $allK = false;
+                                $kukIsK = false;
+                            }
+                            if (! empty($item->selected_proof_type)) {
+                                $kukProof = $proofLabels[$item->selected_proof_type] ?? $item->selected_proof_type;
+                                if (! $elemProof) {
+                                    $elemProof = $kukProof;
                                 }
                             }
                         }
+
+                        $kuksPayload[] = [
+                            'code_number' => $kuk->code_number,
+                            'statement' => $kuk->statement,
+                            'value' => $kukIsK ? 'K' : 'BK',
+                            'proof' => $kukProof ?? $defaultProof,
+                        ];
                     }
+
                     $answers[] = $allK;
                     $proofs[] = $elemProof ?? $defaultProof;
 
-                    // Unit 5 Elemen 2 (element index 1) is split across Page 2 and Page 3 in ReportLab template
+                    // Unit 5 Elemen 2 (element index 1) is split across Page 2 and Page 3 in legacy fixed template
                     if (($unitIdx === 4 || str_contains($unit->code, '009')) && $elemIdx === 1) {
                         $answers[] = $allK;
                         $proofs[] = $elemProof ?? $defaultProof;
                     }
+
+                    $elementsPayload[] = [
+                        'number' => $elemIdx + 1,
+                        'title' => $elem->title,
+                        'is_k' => $allK,
+                        'proof' => $elemProof ?? $defaultProof,
+                        'kuks' => $kuksPayload,
+                    ];
                 }
+
+                $unitsPayload[] = [
+                    'code' => $unit->code,
+                    'title' => $unit->title,
+                    'elements' => $elementsPayload,
+                ];
             }
         }
 
@@ -718,6 +753,7 @@ class MukDynamicDocumentService
             'asesor_reg' => $assessor?->profile?->no_reg ?? ($assessor?->no_reg ?? 'MET.000.001234 2022'),
             'tanggal' => $tgl,
             'is_kompeten' => $isKompeten,
+            'units' => $unitsPayload,
             'answers' => $answers,
             'proofs' => $proofs,
             'default_proof' => $defaultProof,
