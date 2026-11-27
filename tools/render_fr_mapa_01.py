@@ -801,10 +801,920 @@ def draw_clean_section_2(doc, data, reg_font=None, bold_font=None):
                     put_text(page, fitz.Point(x_text, line2_y), evidence_lines[1], size=8.6, reg_font=reg_font, bold_font=bold_font)
                     put_text(page, fitz.Point(x_text, line3_y), evidence_lines[2], size=8.4, reg_font=reg_font, bold_font=bold_font)
 
+def render_mapa_dynamic(data, dest_path):
+    """Generate clean, fully dynamic FR.MAPA.01 PDF from assessor MAPA.01 + AK.01 + scheme units."""
+    from reportlab.pdfgen import canvas as rl_canvas
+    from reportlab.lib.colors import black as rl_black, Color as rl_Color
+    from reportlab.pdfbase import pdfmetrics as rl_pdfmetrics
+    from reportlab.lib.utils import ImageReader as rl_ImageReader
+    from font_helper import register_reportlab_fonts
+
+    register_reportlab_fonts(["Lib", "Lib-B", "Lib-I", "Cal", "Cal-B", "Times"])
+
+    PAGE_W, PAGE_H = 595.28, 841.89
+    Y = lambda top: PAGE_H - top
+    BLUE_NUM = rl_Color(0.267, 0.447, 0.769)
+    L, R = 50.4, 544.8
+    Y_TOP_CONT = 112.0
+    Y_MAX = 780.0
+
+    def wrap_w(txt, font_name, font_size, max_w):
+        words = str(txt or "").split()
+        if not words:
+            return []
+        lines, cur = [], []
+        for w in words:
+            test = " ".join(cur + [w])
+            if rl_pdfmetrics.stringWidth(test, font_name, font_size) <= max_w:
+                cur.append(w)
+            else:
+                if cur:
+                    lines.append(" ".join(cur))
+                    cur = [w]
+                else:
+                    lines.append(w)
+                    cur = []
+        if cur:
+            lines.append(" ".join(cur))
+        return lines
+
+    def draw_header(c):
+        x0, x1 = 50.4, 544.8
+        top, bot = 35.4, 99.3
+        c.setLineWidth(0.65)
+        c.setStrokeColor(rl_black)
+        c.rect(x0, Y(bot), x1 - x0, bot - top)
+        x_div = 147.7
+        c.line(x_div, Y(top), x_div, Y(bot))
+
+        logo_file = os.path.join(PROJECT_ROOT, "public", "images", "logo-wisindo-alt-bawah.png")
+        if not os.path.exists(logo_file):
+            logo_file = os.path.join(PROJECT_ROOT, "tests", "Fixtures", "muk", "assets", "logo.png")
+        if os.path.exists(logo_file):
+            try:
+                with Image.open(logo_file) as im:
+                    iw, ih = im.size
+                aspect = (iw / ih) if ih else 1.0
+            except Exception:
+                aspect = 1.0
+            max_w, max_h = 82.0, 56.0
+            draw_h = max_h
+            draw_w = draw_h * aspect
+            if draw_w > max_w:
+                draw_w = max_w
+                draw_h = draw_w / aspect
+            lx = x0 + ((x_div - x0) - draw_w) / 2.0
+            ly = Y(bot) + ((bot - top) - draw_h) / 2.0
+            c.drawImage(logo_file, lx, ly, draw_w, draw_h, mask="auto")
+
+        segs = [("L", "Lib-B"), ("embaga ", "Lib"), ("S", "Lib-B"), ("ertifikasi ", "Lib"),
+                ("P", "Lib-B"), ("rofesi ", "Lib"), ("W", "Lib-B"), ("isata ", "Lib"),
+                ("I", "Lib-B"), ("ndonesia", "Lib")]
+        fsize = 13.0
+        tot_w = sum(rl_pdfmetrics.stringWidth(t, f, fsize) for t, f in segs)
+        xp = x_div + ((x1 - x_div) - tot_w) / 2.0
+        yp = Y((top + bot) / 2.0) - fsize * 0.32
+        for t, f in segs:
+            c.setFont(f, fsize)
+            c.setFillColor(rl_black)
+            c.drawString(xp, yp, t)
+            xp += rl_pdfmetrics.stringWidth(t, f, fsize)
+
+    def draw_pnum(c, pnum):
+        c.setFont("Times", 11.0)
+        c.setFillColor(BLUE_NUM)
+        c.drawCentredString(PAGE_W / 2.0, 34.0, str(pnum))
+
+    def draw_cb(c, cx, cy_top, checked=False):
+        sz = 8.2
+        c.setLineWidth(0.65)
+        c.setStrokeColor(rl_black)
+        c.rect(cx - sz / 2.0, Y(cy_top + sz / 2.0), sz, sz, fill=0, stroke=1)
+        if checked:
+            c.setLineWidth(1.3)
+            p = c.beginPath()
+            p.moveTo(cx - 2.4, Y(cy_top + 0.2))
+            p.lineTo(cx - 0.6, Y(cy_top + 2.4))
+            p.lineTo(cx + 2.6, Y(cy_top - 2.4))
+            c.drawPath(p, stroke=1, fill=0)
+
+    def draw_smilies(c, start_x, cy_top):
+        r = 4.0
+        cy = Y(cy_top)
+        for i, face in enumerate(["smile", "neutral", "frown"]):
+            fcx = start_x + i * 13.0
+            c.setLineWidth(0.55)
+            c.setStrokeColor(rl_black)
+            c.circle(fcx, cy, r, stroke=1, fill=0)
+            c.circle(fcx - 1.4, cy + 1.2, 0.5, stroke=0, fill=1)
+            c.circle(fcx + 1.4, cy + 1.2, 0.5, stroke=0, fill=1)
+            p = c.beginPath()
+            if face == "smile":
+                p.moveTo(fcx - 1.8, cy - 0.8)
+                p.lineTo(fcx, cy - 2.1)
+                p.lineTo(fcx + 1.8, cy - 0.8)
+            elif face == "neutral":
+                p.moveTo(fcx - 1.6, cy - 1.4)
+                p.lineTo(fcx + 1.6, cy - 1.4)
+            else:
+                p.moveTo(fcx - 1.8, cy - 2.1)
+                p.lineTo(fcx, cy - 0.8)
+                p.lineTo(fcx + 1.8, cy - 2.1)
+            c.drawPath(p, stroke=1, fill=0)
+
+    def draw_sig(c, sig_data, x, y_bot_topcoord, w=70.0, h=22.0):
+        cleaned = clean_signature_image(sig_data)
+        if not cleaned:
+            return
+        try:
+            bio = io.BytesIO(cleaned)
+            im = Image.open(bio)
+            iw, ih = im.size
+            if iw == 0 or ih == 0:
+                return
+            aspect = float(iw) / float(ih)
+            if aspect > (w / h):
+                dw, dh = w, w / aspect
+            else:
+                dh, dw = h, h * aspect
+            bio.seek(0)
+            c.drawImage(rl_ImageReader(bio), x + (w - dw) / 2.0, Y(y_bot_topcoord), dw, dh, mask="auto")
+        except Exception:
+            pass
+
+    os.makedirs(os.path.dirname(os.path.abspath(dest_path)), exist_ok=True)
+    c = rl_canvas.Canvas(dest_path, pagesize=(PAGE_W, PAGE_H))
+    c.setTitle("FR.MAPA.01 Merencanakan Aktivitas dan Proses Asesmen")
+    c.setAuthor("LSP Wisata Indonesia")
+
+    pnum = 1
+    draw_header(c)
+
+    # ================= PAGE 1 =================
+    c.setFont("Lib-B", 10.0)
+    c.setFillColor(rl_black)
+    c.drawString(L, Y(119.0), "FR.MAPA.01- MERENCANAKAN AKTIVITAS DAN PROSES ASESMEN")
+
+    # Skema Table
+    sc1, sc2, sc3 = 175.0, 224.0, 236.0
+    st_top = 128.0
+    skema_nama = str(data.get("skema_nama") or "-")
+    judul_lines = wrap_w(skema_nama, "Lib-I", 9.5, R - (sc3 + 8.0)) or [skema_nama]
+    st_mid = st_top + max(20.0, 8.0 + len(judul_lines) * 11.5)
+    st_bot = st_mid + 20.0
+    c.setLineWidth(0.75)
+    c.setStrokeColor(rl_black)
+    c.rect(L, Y(st_bot), R - L, st_bot - st_top)
+    c.line(sc1, Y(st_mid), R, Y(st_mid))
+    for sx in (sc1, sc2, sc3):
+        c.line(sx, Y(st_bot), sx, Y(st_top))
+    c.setFont("Lib-B", 9.5)
+    c.drawString(L + 6.0, Y(st_top + 14.0), "Skema Sertifikasi")
+    c.setFont("Lib", 8.5)
+    c.drawString(L + 6.0, Y(st_top + 26.0), "(KKNI/Okupasi/Klaster)")
+    c.setFont("Lib", 9.5)
+    c.drawString(sc1 + 6.0, Y(st_top + 14.0), "Judul")
+    c.drawString(sc2 + 4.0, Y(st_top + 14.0), ":")
+    c.setFont("Lib-I", 9.5)
+    for idx, jl in enumerate(judul_lines):
+        c.drawString(sc3 + 6.0, Y(st_top + 14.0 + idx * 11.5), jl)
+    c.setFont("Lib", 9.5)
+    c.drawString(sc1 + 6.0, Y(st_mid + 14.0), "Nomor")
+    c.drawString(sc2 + 4.0, Y(st_mid + 14.0), ":")
+    c.drawString(sc3 + 6.0, Y(st_mid + 14.0), str(data.get("skema_nomor") or "-"))
+
+    # Section 1 Table
+    s1_top = st_bot + 4.0
+    s1_bot = 782.0
+    c.setLineWidth(0.75)
+    c.rect(L, Y(s1_bot), R - L, s1_bot - s1_top)
+    hdr_bot = s1_top + 18.0
+    c.line(L, Y(hdr_bot), R, Y(hdr_bot))
+    c.setFont("Lib-B", 9.5)
+    c.drawString(L + 6.0, Y(s1_top + 12.5), "1.   Menentukan Pendekatan Asesmen")
+
+    pendekatan = str(data.get("pendekatan_asesi", "")).lower()
+    tujuan = str(data.get("tujuan_asesmen", "Sertifikasi")).lower()
+    lingkungan = str(data.get("konteks_lingkungan", "simulasi")).lower()
+    peluang = str(data.get("peluang_bukti", "Tersedia")).lower()
+    hubungan = str(data.get("hubungan_standar", "mendukung asesmen")).lower()
+    pelaksana = str(data.get("pelaksana_asesmen", "Lembaga Sertifikasi")).lower()
+    orang_relevan = [str(x).lower() for x in data.get("orang_relevan", [])]
+
+    rem = s1_bot - hdr_bot
+    h_as = rem * 0.285
+    h_tj = rem * 0.145
+    h_ling = rem * 0.055
+    h_pel = rem * 0.085
+    h_hub = rem * 0.115
+    h_pelak = rem * 0.115
+    h_rel = rem - (h_as + h_tj + h_ling + h_pel + h_hub + h_pelak)
+
+    # 1.1 Asesi
+    y_as_top = hdr_bot
+    y_as_bot = y_as_top + h_as
+    x_sub1 = L + 30.0
+    x_sp = L + 100.0
+    c.setLineWidth(0.55)
+    c.line(x_sub1, Y(y_as_top), x_sub1, Y(y_as_bot))
+    c.line(x_sp, Y(y_as_top), x_sp, Y(y_as_bot))
+    c.line(L, Y(y_as_bot), R, Y(y_as_bot))
+    c.setFont("Lib-B", 9.0)
+    c.drawString(L + 6.0, Y(y_as_top + 15.0), "1.1.")
+    c.drawString(x_sub1 + 6.0, Y(y_as_top + 15.0), "Asesi")
+
+    asesi_opts = [
+        (["Hasil pelatihan dan / atau pendidikan, dimana Kurikulum dan fasilitas", "praktek mampu telusur terhadap standar kompetensi"],
+         "kurikulum dan fasilitas" in pendekatan or ("mampu telusur" in pendekatan and "belum" not in pendekatan and "industri" not in pendekatan)),
+        (["Hasil pelatihan dan / atau pendidikan, dimana kurikulum belum berbasis", "kompetensi."],
+         "kurikulum belum" in pendekatan and "industri" not in pendekatan),
+        (["Pekerja berpengalaman, dimana berasal dari industri/tempat kerja yang", "dalam operasionalnya mampu telusur dengan standar kompetensi"],
+         "industri" in pendekatan and "mampu telusur" in pendekatan and "belum" not in pendekatan),
+        (["Pekerja berpengalaman, dimana berasal dari industri/tempat kerja yang", "dalam operasionalnya belum berbasis kompetensi."],
+         "industri" in pendekatan and "belum berbasis" in pendekatan),
+        (["Pelatihan / belajar mandiri atau otodidak."],
+         "mandiri" in pendekatan or "otodidak" in pendekatan),
+    ]
+    cy = y_as_top
+    rh_as = h_as / 5.0
+    for idx, (lines, chk) in enumerate(asesi_opts):
+        rt, rb = cy, cy + rh_as
+        if idx < 4:
+            c.line(x_sp, Y(rb), R, Y(rb))
+        draw_cb(c, x_sp + 11.0, (rt + rb) / 2.0, chk)
+        c.setFont("Lib", 8.4)
+        if len(lines) == 1:
+            c.drawString(x_sp + 21.0, Y((rt + rb) / 2.0 + 3.0), lines[0])
+        else:
+            mid = (rt + rb) / 2.0
+            c.drawString(x_sp + 21.0, Y(mid - 2.0), lines[0])
+            c.drawString(x_sp + 21.0, Y(mid + 9.0), lines[1])
+        cy = rb
+
+    # Tujuan Asesmen
+    y_tj_top = y_as_bot
+    y_tj_bot = y_tj_top + h_tj
+    c.line(x_sp, Y(y_tj_top), x_sp, Y(y_tj_bot))
+    c.line(L, Y(y_tj_bot), R, Y(y_tj_bot))
+    c.setFont("Lib-B", 9.0)
+    c.drawString(L + 6.0, Y(y_tj_top + 16.0), "Tujuan")
+    c.drawString(L + 6.0, Y(y_tj_top + 28.0), "Asesmen")
+    tj_opts = [
+        ("Sertifikasi", "sertifikasi" in tujuan),
+        ("Pengakuan Kompetensi Terkini (PKT)", "terkini" in tujuan or "pkt" in tujuan),
+        ("Rekognisi Pembelajaran Lampau", "rekognisi" in tujuan or "rpl" in tujuan),
+        ("Lainnya", "lainnya" in tujuan),
+    ]
+    cy = y_tj_top
+    rh_tj = h_tj / 4.0
+    for idx, (txt, chk) in enumerate(tj_opts):
+        rt, rb = cy, cy + rh_tj
+        if idx < 3:
+            c.line(x_sp, Y(rb), R, Y(rb))
+        draw_cb(c, x_sp + 11.0, (rt + rb) / 2.0, chk)
+        c.setFont("Lib", 8.5)
+        c.drawString(x_sp + 21.0, Y((rt + rb) / 2.0 + 3.0), txt)
+        cy = rb
+
+    # Konteks Asesmen
+    y_kt_top = y_tj_bot
+    y_kt_bot = y_kt_top + h_ling + h_pel + h_hub + h_pelak
+    x_k1 = L + 72.0
+    x_k2 = L + 180.0
+    c.line(x_k1, Y(y_kt_top), x_k1, Y(y_kt_bot))
+    c.line(x_k2, Y(y_kt_top), x_k2, Y(s1_bot))
+    c.setFont("Lib-B", 9.0)
+    c.drawString(L + 6.0, Y(y_kt_top + 16.0), "Konteks")
+    c.drawString(L + 6.0, Y(y_kt_top + 28.0), "Asesmen:")
+
+    # Lingkungan
+    y_ling_bot = y_kt_top + h_ling
+    c.line(x_k1, Y(y_ling_bot), R, Y(y_ling_bot))
+    mid = (y_kt_top + y_ling_bot) / 2.0
+    c.setFont("Lib", 8.5)
+    c.drawString(x_k1 + 6.0, Y(mid + 3.0), "Lingkungan")
+    draw_cb(c, x_k2 + 11.0, mid, "nyata" in lingkungan)
+    c.drawString(x_k2 + 21.0, Y(mid + 3.0), "Tempat kerja nyata")
+    draw_cb(c, x_k2 + 150.0, mid, "simulasi" in lingkungan)
+    c.drawString(x_k2 + 160.0, Y(mid + 3.0), "Tempat kerja simulasi")
+
+    # Peluang
+    y_pel_bot = y_ling_bot + h_pel
+    c.line(x_k1, Y(y_pel_bot), R, Y(y_pel_bot))
+    mid = (y_ling_bot + y_pel_bot) / 2.0
+    c.setFont("Lib", 8.2)
+    c.drawString(x_k1 + 6.0, Y(mid - 9.0), "Peluang untuk")
+    c.drawString(x_k1 + 6.0, Y(mid + 1.5), "mengumpulkan bukti dalam")
+    c.drawString(x_k1 + 6.0, Y(mid + 12.0), "sejumlah situasi")
+    c.setFont("Lib", 8.5)
+    draw_cb(c, x_k2 + 11.0, mid, "tersedia" in peluang)
+    c.drawString(x_k2 + 21.0, Y(mid + 3.0), "Tersedia")
+    draw_cb(c, x_k2 + 150.0, mid, "terbatas" in peluang)
+    c.drawString(x_k2 + 160.0, Y(mid + 3.0), "Terbatas")
+
+    # Hubungan
+    y_hub_bot = y_pel_bot + h_hub
+    c.line(x_k1, Y(y_hub_bot), R, Y(y_hub_bot))
+    mid = (y_pel_bot + y_hub_bot) / 2.0
+    c.setFont("Lib", 8.2)
+    c.drawString(x_k1 + 6.0, Y(mid - 9.0), "Hubungan antara")
+    c.drawString(x_k1 + 6.0, Y(mid + 1.5), "standar kompetensi")
+    c.drawString(x_k1 + 6.0, Y(mid + 12.0), "dan:")
+    hub_opts = [
+        ("Bukti untuk mendukung asesmen :", "mendukung asesmen" in hubungan or "bukti untuk" in hubungan),
+        ("Aktivitas kerja di tempat kerja Asesi:", "aktivitas kerja" in hubungan or "tempat kerja asesi" in hubungan),
+        ("Kegiatan Pembelajaran:", "kegiatan pembelajaran" in hubungan),
+    ]
+    cy = y_pel_bot
+    rh_hub = h_hub / 3.0
+    c.setFont("Lib", 8.4)
+    for idx, (txt, chk) in enumerate(hub_opts):
+        rt, rb = cy, cy + rh_hub
+        if idx < 2:
+            c.line(x_k2, Y(rb), R, Y(rb))
+        draw_cb(c, x_k2 + 11.0, (rt + rb) / 2.0, chk)
+        c.drawString(x_k2 + 21.0, Y((rt + rb) / 2.0 + 3.0), txt)
+        draw_smilies(c, R - 50.0, (rt + rb) / 2.0)
+        cy = rb
+
+    # Pelaksana
+    y_pelak_bot = y_hub_bot + h_pelak
+    c.line(L, Y(y_pelak_bot), R, Y(y_pelak_bot))
+    mid = (y_hub_bot + y_pelak_bot) / 2.0
+    c.setFont("Lib", 8.2)
+    c.drawString(x_k1 + 6.0, Y(mid - 9.0), "Siapa yang")
+    c.drawString(x_k1 + 6.0, Y(mid + 1.5), "melakukan asesmen/")
+    c.drawString(x_k1 + 6.0, Y(mid + 12.0), "RPL")
+    pelak_opts = [
+        ("Lembaga Sertifikasi Profesi Wisata Indonesia", "lembaga sertifikasi" in pelaksana or "lsp" in pelaksana),
+        ("Organisasi Pelatihan", "organisasi pelatihan" in pelaksana),
+        ("Asesor Perusahaan", "asesor perusahaan" in pelaksana),
+    ]
+    cy = y_hub_bot
+    rh_pelak = h_pelak / 3.0
+    c.setFont("Lib", 8.4)
+    for idx, (txt, chk) in enumerate(pelak_opts):
+        rt, rb = cy, cy + rh_pelak
+        if idx < 2:
+            c.line(x_k2, Y(rb), R, Y(rb))
+        draw_cb(c, x_k2 + 11.0, (rt + rb) / 2.0, chk)
+        c.drawString(x_k2 + 21.0, Y((rt + rb) / 2.0 + 3.0), txt)
+        cy = rb
+
+    # Konfirmasi dengan orang yang relevan
+    mid = (y_pelak_bot + s1_bot) / 2.0
+    c.setFont("Lib-B", 8.8)
+    c.drawString(L + 6.0, Y(mid - 5.0), "Konfirmasi dengan orang")
+    c.drawString(L + 6.0, Y(mid + 7.0), "yang relevan")
+    relevan_opts = [
+        (["Manajer sertifikasi"], any("manajer sertifikasi" in o for o in orang_relevan) or not orang_relevan),
+        (["Master Asesor / Master Trainer / Lead Asesor Kompetensi"], any("master asesor" in o or "lead asesor" in o for o in orang_relevan) or not orang_relevan),
+        (["Manajer Pelatihan Lembaga Training terakreditasi /", "Lembaga Training terdaftar"], any("manajer pelatihan" in o or "lembaga training" in o for o in orang_relevan)),
+        (["Manajer atau supervisor ditempat kerja"], any("supervisor" in o or "ditempat kerja" in o for o in orang_relevan)),
+    ]
+    weights = [1.0, 1.0, 1.35, 1.0]
+    tw = sum(weights)
+    cy = y_pelak_bot
+    c.setFont("Lib", 8.4)
+    for idx, (lines, chk) in enumerate(relevan_opts):
+        rh = (h_rel * weights[idx]) / tw
+        rt, rb = cy, cy + rh
+        if idx < 3:
+            c.line(x_k2, Y(rb), R, Y(rb))
+        draw_cb(c, x_k2 + 11.0, (rt + rb) / 2.0, chk)
+        if len(lines) == 1:
+            c.drawString(x_k2 + 21.0, Y((rt + rb) / 2.0 + 3.0), lines[0])
+        else:
+            m = (rt + rb) / 2.0
+            c.drawString(x_k2 + 21.0, Y(m - 2.0), lines[0])
+            c.drawString(x_k2 + 21.0, Y(m + 9.0), lines[1])
+        cy = rb
+
+    draw_pnum(c, pnum)
+    c.showPage()
+    pnum += 1
+    draw_header(c)
+
+    # ================= PAGE 2+: 1.2 Standar Industri & 2. Mempersiapkan Rencana Asesmen =================
+    cur_y = Y_TOP_CONT
+
+    def new_page():
+        nonlocal pnum, cur_y
+        draw_pnum(c, pnum)
+        c.showPage()
+        pnum += 1
+        draw_header(c)
+        cur_y = Y_TOP_CONT
+
+    # 1.2 Standar Industri atau Tempat Kerja
+    si_top = cur_y
+    si_c1, si_c2 = L + 32.0, L + 116.0
+    si_dict = data.get("standar_industri") or {}
+    if not isinstance(si_dict, dict):
+        si_dict = {}
+
+    def si_opt(key, def_chk=False, def_val=""):
+        v = si_dict.get(key, {})
+        if isinstance(v, dict):
+            return bool(v.get("checked", def_chk)), str(v.get("text", def_val) or "").strip()
+        if isinstance(v, bool):
+            return v, def_val
+        if isinstance(v, str):
+            return True, v.strip()
+        return def_chk, def_val
+
+    sk_chk, sk_val = si_opt("standar_kompetensi", True, "SKKNI No.125 Tahun 2024")
+    kp_chk, kp_val = si_opt("kurikulum_pelatihan", False, "")
+    kin_chk, kin_val = si_opt("spesifikasi_kinerja", False, "")
+    prod_chk, prod_val = si_opt("spesifikasi_produk", False, "")
+    ped_chk, ped_val = si_opt("pedoman_khusus", False, "")
+
+    si_rows = [
+        ("Standar Kompetensi: ", sk_val, sk_chk, False),
+        ("Kriteria asesmen dari kurikulum pelatihan", kp_val if kp_val and kp_val != "Kriteria asesmen dari kurikulum pelatihan" else "", kp_chk, False),
+        ("Spesifikasi kinerja suatu perusahaan atau industri: ", kin_val, kin_chk, True),
+        ("Spesifikasi Produk: ", prod_val, prod_chk, True),
+        ("Pedoman khusus: ", ped_val, ped_chk, True),
+    ]
+    si_rh = 21.0
+    si_bot = si_top + si_rh * 5
+    c.setLineWidth(0.75)
+    c.rect(L, Y(si_bot), R - L, si_bot - si_top)
+    c.setLineWidth(0.55)
+    c.line(si_c1, Y(si_top), si_c1, Y(si_bot))
+    c.line(si_c2, Y(si_top), si_c2, Y(si_bot))
+    c.setFont("Lib-B", 9.0)
+    c.drawString(L + 7.0, Y(si_top + 14.0), "1.2")
+    c.setFont("Lib", 8.6)
+    c.drawString(si_c1 + 6.0, Y(si_top + 14.0), "Standar Industri")
+    c.drawString(si_c1 + 6.0, Y(si_top + 25.0), "atau Tempat")
+    c.drawString(si_c1 + 6.0, Y(si_top + 36.0), "Kerja")
+
+    for idx, (pref, val, chk, is_ital) in enumerate(si_rows):
+        rt = si_top + idx * si_rh
+        rb = rt + si_rh
+        if idx < 4:
+            c.line(si_c2, Y(rb), R, Y(rb))
+        draw_cb(c, si_c2 + 11.0, (rt + rb) / 2.0, chk)
+        tx = si_c2 + 21.0
+        ty = (rt + rb) / 2.0 + 3.0
+        disp_pref = pref if val else pref.rstrip()
+        c.setFont("Lib", 8.5)
+        c.drawString(tx, Y(ty), disp_pref)
+        if val:
+            pw = rl_pdfmetrics.stringWidth(pref, "Lib", 8.5)
+            c.setFont("Lib-I" if is_ital else "Lib", 8.5)
+            c.drawString(tx + pw, Y(ty), val[:55])
+
+    cur_y = si_bot + 14.0
+
+    # Section 2 Banner
+    c.setLineWidth(0.75)
+    c.rect(L, Y(cur_y + 20.0), R - L, 20.0)
+    c.setFont("Lib-B", 10.0)
+    c.drawString(L + 8.0, Y(cur_y + 13.5), "2.    Mempersiapkan Rencana Asesmen")
+    cur_y += 28.0
+
+    # 2a. Daftar Unit Kompetensi (Kelompok Pekerjaan)
+    units = data.get("units") or []
+    if units:
+        u_c1, u_c2, u_c3 = L + 90.0, L + 125.0, L + 220.0
+
+        def draw_units_list_header(top_y):
+            hb = top_y + 24.0
+            c.setLineWidth(0.65)
+            c.rect(L, Y(hb), R - L, 24.0)
+            for ux in (u_c1, u_c2, u_c3):
+                c.line(ux, Y(top_y), ux, Y(hb))
+            c.setFont("Lib-B", 8.8)
+            c.drawCentredString((L + u_c1) / 2.0, Y(top_y + 15.0), "Kelompok")
+            c.drawCentredString((u_c1 + u_c2) / 2.0, Y(top_y + 15.0), "No.")
+            c.drawCentredString((u_c2 + u_c3) / 2.0, Y(top_y + 15.0), "Kode Unit")
+            c.drawCentredString((u_c3 + R) / 2.0, Y(top_y + 15.0), "Judul Unit")
+            return hb
+
+        def close_units_list_box(box_top, body_top, bot_y):
+            c.setLineWidth(0.65)
+            c.rect(L, Y(bot_y), R - L, bot_y - box_top)
+            for ux in (u_c1, u_c2, u_c3):
+                c.line(ux, Y(box_top), ux, Y(bot_y))
+            mid = (body_top + bot_y) / 2.0
+            c.setFont("Lib-B", 8.5)
+            c.drawCentredString((L + u_c1) / 2.0, Y(mid - 3.0), "Kelompok")
+            c.drawCentredString((L + u_c1) / 2.0, Y(mid + 8.0), "Pekerjaan 1")
+
+        box_top = cur_y
+        body_top = draw_units_list_header(box_top)
+        cur_y = body_top
+        has_u_rows = False
+
+        for idx, u in enumerate(units, 1):
+            code = str(u.get("code", "") if isinstance(u, dict) else (u[0] if isinstance(u, (list, tuple)) else u))
+            title = str(u.get("title", "") if isinstance(u, dict) else (u[1] if isinstance(u, (list, tuple)) and len(u) > 1 else ""))
+            t_lines = wrap_w(title, "Lib", 8.5, (R - 6.0) - (u_c3 + 6.0)) or [title]
+            rh = max(18.0, 7.0 + len(t_lines) * 10.5)
+
+            if cur_y + rh > Y_MAX and has_u_rows:
+                close_units_list_box(box_top, body_top, cur_y)
+                new_page()
+                box_top = cur_y
+                body_top = draw_units_list_header(box_top)
+                cur_y = body_top
+                has_u_rows = False
+
+            if has_u_rows:
+                c.setLineWidth(0.45)
+                c.line(u_c1, Y(cur_y), R, Y(cur_y))
+
+            ym = cur_y + rh / 2.0
+            c.setFont("Lib", 8.5)
+            c.drawCentredString((u_c1 + u_c2) / 2.0, Y(ym + 3.0), f"{idx}.")
+            c.drawCentredString((u_c2 + u_c3) / 2.0, Y(ym + 3.0), code)
+            for k, tl in enumerate(t_lines):
+                c.drawString(u_c3 + 6.0, Y(ym + 3.0 + (k - (len(t_lines) - 1) / 2.0) * 10.5), tl)
+            cur_y += rh
+            has_u_rows = True
+
+        close_units_list_box(box_top, body_top, cur_y)
+        cur_y += 14.0
+
+    # 2b. Rencana Asesmen Berdasarkan Unit Kompetensi (Terhubung langsung ke AK.01)
+    # Column boundaries: Unit(50.4..148), Bukti(148..244), L(244..260), TL(260..276), T(276..292),
+    # CL(292..338), DIT(338..374), TJ(374..420), CVP(420..464), CRP(464..502), VPK(502..544.8)
+    cols = [L, 148.0, 244.0, 260.0, 276.0, 292.0, 338.0, 374.0, 420.0, 464.0, 502.0, R]
+    raw_types = data.get("evidence_types", ["L", "T"])
+    ev_types = [str(x).strip().upper() for x in (raw_types if isinstance(raw_types, list) else str(raw_types).split(","))]
+    raw_met = data.get("metode_codes", ["CL", "DPT"])
+    met_codes = [("CVP" if str(x).strip().upper() == "VP" else str(x).strip().upper()) for x in (raw_met if isinstance(raw_met, list) else [])]
+    ev_lines = data.get("evidence_lines") or ["Hasil observasi", "langsung dan tanya", "jawab tentang"]
+    ev_prefix = " ".join(str(x).strip() for x in ev_lines if str(x).strip())
+
+    def draw_plan_table_header(top_y):
+        hdr_h = 216.0
+        sub_y = top_y + 84.0
+        bot_y = top_y + hdr_h
+        c.setLineWidth(0.75)
+        c.setStrokeColor(rl_black)
+        c.rect(L, Y(bot_y), R - L, hdr_h)
+        # Vertical full lines
+        c.setLineWidth(0.6)
+        for cx in (cols[1], cols[2], cols[5]):
+            c.line(cx, Y(top_y), cx, Y(bot_y))
+        # Sub-columns from sub_y down to bot_y
+        for cx in (cols[3], cols[4], cols[6], cols[7], cols[8], cols[9], cols[10]):
+            c.line(cx, Y(sub_y), cx, Y(bot_y))
+        c.line(cols[2], Y(sub_y), R, Y(sub_y))
+
+        # Col 0: Unit Kompetensi
+        c.setFont("Cal-B", 9.0)
+        c.drawCentredString((cols[0] + cols[1]) / 2.0, Y(top_y + 98.0), "Unit")
+        c.drawCentredString((cols[0] + cols[1]) / 2.0, Y(top_y + 110.0), "Kompetensi")
+
+        # Col 1: Bukti-Bukti
+        c.setFont("Cal-B", 8.8)
+        c.drawCentredString((cols[1] + cols[2]) / 2.0, Y(top_y + 32.0), "Bukti-Bukti")
+        c.setFont("Cal", 8.0)
+        for idx, bl in enumerate(["(Kinerja, Produk,", "Portofolio, dan /", "atau", "Pengetahuan)", "diidentifikasi", "berdasarkan", "Kriteria Unjuk", "Kerja dan", "Pendekatan", "Asesmen."]):
+            c.drawCentredString((cols[1] + cols[2]) / 2.0, Y(top_y + 47.0 + idx * 11.2), bl)
+
+        # Col 2..4: Jenis Bukti
+        c.setFont("Cal-B", 8.8)
+        c.drawCentredString((cols[2] + cols[5]) / 2.0, Y(top_y + 36.0), "Jenis")
+        c.drawCentredString((cols[2] + cols[5]) / 2.0, Y(top_y + 48.0), "Bukti")
+        for cx0, cx1, lbl in [(cols[2], cols[3], "L"), (cols[3], cols[4], "TL"), (cols[4], cols[5], "T")]:
+            c.drawCentredString((cx0 + cx1) / 2.0, Y((sub_y + bot_y) / 2.0 + 3.0), lbl)
+
+        # Col 5..11: Metode dan Perangkat Asesmen (strictly centered within cols[5]..R)
+        mcx = (cols[5] + R) / 2.0
+        c.setFont("Cal-B", 8.0)
+        c.drawCentredString(mcx, Y(top_y + 13.0), "Metode dan Perangkat")
+        c.drawCentredString(mcx, Y(top_y + 24.0), "Asesmen")
+        c.setFont("Cal-B", 7.2)
+        for idx, ml in enumerate([
+            "CL (Ceklis Observasi), DIT (Daftar Instruksi",
+            "Terstruktur), DPL (Daftar Pertanyaan Lisan), DPT",
+            "(Daftar Pertanyaan Tertulis), VPK (Verifikasi Pihak",
+            "Ketiga), CVP (Ceklis Verifikasi Portofolio), CRP (Ceklis",
+            "Reviu Produk), PW (Pertanyaan Wawancara)",
+        ]):
+            c.drawCentredString(mcx, Y(top_y + 36.0 + idx * 10.5), ml)
+
+        # Vertical rotated sub-headers (centered both horizontally & vertically inside each cell)
+        sub_defs = [
+            (cols[5], cols[6], "Observasi langsung", [
+                "(kerja nyata/aktivitas waktu nyata",
+                "di tempat kerja di lingkungan",
+                "tempat kerja yang disimulasikan)",
+            ]),
+            (cols[6], cols[7], "Kegiatan Terstruktur", [
+                "(latihan simulasi dan bermain peran,",
+                "proyek, presentasi, lembar kegiatan)",
+            ]),
+            (cols[7], cols[8], "Tanya Jawab", [
+                "(pertanyaan tertulis, wawancara,",
+                "asesmen diri, tanya jawab lisan,",
+                "angket, ujian lisan atau tertulis)",
+            ]),
+            (cols[8], cols[9], "Verifikasi Portofolio", [
+                "(sampel pekerjaan yang disusun oleh Asesi,",
+                "produk dengan dokumentasi pendukung,",
+                "bukti sejarah, jurnal atau buku catatan,",
+                "informasi tentang pengalaman hidup)",
+            ]),
+            (cols[9], cols[10], "Reviu Produk", [
+                "Produk hasil proyek, contoh hasil",
+                "kerja/produk",
+            ]),
+            (cols[10], cols[11], "Verifikasi Pihak Ketiga", [
+                "(testimoni dan laporan dari atasan, bukti",
+                "pelatihan, otentikasi pencapaian sebelumnya,",
+                "wawancara dengan atasan, atau rekan kerja)",
+            ]),
+        ]
+        mid_rot_y = Y((sub_y + bot_y) / 2.0)
+        for cx0, cx1, title_v, sub_lines in sub_defs:
+            total_lines = 1 + len(sub_lines)
+            line_step = 8.0
+            c.saveState()
+            c.translate((cx0 + cx1) / 2.0, mid_rot_y)
+            c.rotate(90)
+            # In rotated coords: x = vertical axis along cell, y = horizontal offset across column
+            start_y_off = ((total_lines - 1) * line_step) / 2.0 - 2.0
+            c.setFont("Cal-B", 7.6)
+            c.drawCentredString(0, start_y_off, title_v)
+            c.setFont("Cal", 6.2)
+            for s_idx, s_txt in enumerate(sub_lines):
+                c.drawCentredString(0, start_y_off - (s_idx + 1) * line_step, s_txt)
+            c.restoreState()
+
+        return bot_y
+
+    def close_plan_table(box_top, bot_y):
+        sub_y = box_top + 84.0
+        c.setLineWidth(0.75)
+        c.rect(L, Y(bot_y), R - L, bot_y - box_top)
+        c.setLineWidth(0.6)
+        for cx in (cols[1], cols[2], cols[5]):
+            c.line(cx, Y(box_top), cx, Y(bot_y))
+        for cx in (cols[3], cols[4], cols[6], cols[7], cols[8], cols[9], cols[10]):
+            c.line(cx, Y(sub_y), cx, Y(bot_y))
+
+    if cur_y + 265.0 > Y_MAX:
+        new_page()
+
+    plan_box_top = cur_y
+    cur_y = draw_plan_table_header(plan_box_top)
+    has_p_rows = False
+
+    for idx, u in enumerate(units, 1):
+        title = str(u.get("title", "") if isinstance(u, dict) else (u[1] if isinstance(u, (list, tuple)) and len(u) > 1 else u))
+        u_lines = wrap_w(f"{idx}. {title}", "Lib", 8.2, (cols[1] - cols[0]) - 8.0) or [f"{idx}. {title}"]
+        b_lines = wrap_w(f"{ev_prefix} {title}", "Lib", 8.0, (cols[2] - cols[1]) - 8.0) or [ev_prefix]
+        rh = max(26.0, 10.0 + max(len(u_lines), len(b_lines)) * 10.2)
+
+        if cur_y + rh > Y_MAX and has_p_rows:
+            close_plan_table(plan_box_top, cur_y)
+            new_page()
+            plan_box_top = cur_y
+            cur_y = draw_plan_table_header(plan_box_top)
+            has_p_rows = False
+
+        if has_p_rows:
+            c.setLineWidth(0.45)
+            c.line(L, Y(cur_y), R, Y(cur_y))
+
+        ym = cur_y + rh / 2.0
+        c.setFont("Lib", 8.2)
+        for k, ul in enumerate(u_lines):
+            c.drawString(cols[0] + 4.0, Y(cur_y + 11.0 + k * 10.2), ul)
+        c.setFont("Lib", 8.0)
+        for k, bl in enumerate(b_lines):
+            c.drawString(cols[1] + 4.0, Y(cur_y + 11.0 + k * 10.2), bl)
+
+        # Jenis Bukti (L, TL, T)
+        c.setFont("Lib-B", 8.5)
+        if "L" in ev_types:
+            c.drawCentredString((cols[2] + cols[3]) / 2.0, Y(ym + 3.0), "L")
+        if "TL" in ev_types:
+            c.drawCentredString((cols[3] + cols[4]) / 2.0, Y(ym + 3.0), "TL")
+        if "T" in ev_types:
+            c.drawCentredString((cols[4] + cols[5]) / 2.0, Y(ym + 3.0), "T")
+
+        # Metode & Perangkat
+        if "CL" in met_codes:
+            c.drawCentredString((cols[5] + cols[6]) / 2.0, Y(ym + 3.0), "CL")
+        if "DIT" in met_codes:
+            c.drawCentredString((cols[6] + cols[7]) / 2.0, Y(ym + 3.0), "DIT")
+        tj_items = [x for x in ["DPT", "DPL", "PW"] if x in met_codes]
+        if tj_items:
+            tj_str = ", ".join(tj_items)
+            c.setFont("Lib-B", 7.0 if len(tj_items) >= 3 else (7.8 if len(tj_items) == 2 else 8.5))
+            c.drawCentredString((cols[7] + cols[8]) / 2.0, Y(ym + 3.0), tj_str)
+            c.setFont("Lib-B", 8.5)
+        if "CVP" in met_codes:
+            c.drawCentredString((cols[8] + cols[9]) / 2.0, Y(ym + 3.0), "CVP")
+        if "CRP" in met_codes:
+            c.drawCentredString((cols[9] + cols[10]) / 2.0, Y(ym + 3.0), "CRP")
+        if "VPK" in met_codes:
+            c.drawCentredString((cols[10] + cols[11]) / 2.0, Y(ym + 3.0), "VPK")
+
+        cur_y += rh
+        has_p_rows = True
+
+    close_plan_table(plan_box_top, cur_y)
+    cur_y += 14.0
+
+    # ================= SECTION 3: Modifikasi & Kontekstualisasi =================
+    mod_items = [
+        ("3.1. a. Karakteristik Asesi:", "karakteristik khusus Asesi", bool(data.get("has_karakteristik", False)), str(data.get("karakteristik_detail") or "")),
+        ("       b. Kebutuhan kontekstualisasi terkait tempat kerja:", "kebutuhan kontekstualisasi", bool(data.get("has_kontekstualisasi", False)), str(data.get("kontekstualisasi_detail") or "")),
+        ("3.2. Saran yang diberikan oleh paket pelatihan atau pengembang pelatihan", "saran", bool(data.get("has_saran", False)), str(data.get("saran_detail") or "")),
+        ("3.3. Penyesuaian perangkat asesmen terkait kebutuhan kontekstualisasi", "penyesuaian perangkat", bool(data.get("has_penyesuaian", False)), str(data.get("penyesuaian_detail") or "")),
+        ("3.4. Peluang untuk kegiatan asesmen terintegrasi dan mencatat setiap perubahan yang diperlukan untuk alat asesmen", "peluang", bool(data.get("has_terintegrasi", False)), str(data.get("terintegrasi_detail") or "")),
+    ]
+    tasks = data.get("integrated_tasks") or []
+    est_s3_h = 22.0 + len(mod_items) * 34.0 + len(tasks) * 12.0
+    if cur_y + est_s3_h > Y_MAX:
+        new_page()
+
+    s3_top = cur_y
+    s3_mid = L + 245.0
+    c.setLineWidth(0.75)
+    c.line(L, Y(s3_top), R, Y(s3_top))
+    c.line(L, Y(s3_top + 20.0), R, Y(s3_top + 20.0))
+    c.setFont("Lib-B", 9.5)
+    c.drawString(L + 6.0, Y(s3_top + 13.5), "3.  Mengidentifikasi Persyaratan Modifikasi dan Kontekstualisasi:")
+    cur_y = s3_top + 20.0
+
+    for idx, (left_lbl, suffix_lbl, has_it, detail) in enumerate(mod_items):
+        l_lines = wrap_w(left_lbl, "Lib", 8.5, (s3_mid - L) - 12.0)
+        d_lines = wrap_w(f"Jika Ada, tuliskan: {detail}" if detail else "Jika Ada, tuliskan...........................................", "Lib", 8.4, (R - s3_mid) - 12.0)
+        extra_t = tasks if (idx == 4 and has_it and isinstance(tasks, list)) else []
+        rh = max(32.0, 12.0 + max(len(l_lines), 1 + len(d_lines) + len(extra_t)) * 11.5)
+
+        if cur_y + rh > Y_MAX:
+            c.setLineWidth(0.75)
+            c.rect(L, Y(cur_y), R - L, cur_y - s3_top)
+            c.line(s3_mid, Y(s3_top + 20.0), s3_mid, Y(cur_y))
+            new_page()
+            s3_top = cur_y
+            c.line(L, Y(s3_top), R, Y(s3_top))
+
+        if idx > 0:
+            c.setLineWidth(0.5)
+            c.line(L, Y(cur_y), R, Y(cur_y))
+
+        c.setFont("Lib", 8.5)
+        for k, ll in enumerate(l_lines):
+            c.drawString(L + 6.0, Y(cur_y + 13.0 + k * 11.5), ll)
+
+        # Ada / tidak ada* with strikethrough
+        rx = s3_mid + 8.0
+        ry = cur_y + 13.0
+        w_ada = rl_pdfmetrics.stringWidth("Ada", "Lib", 8.5)
+        w_sl = rl_pdfmetrics.stringWidth(" / ", "Lib", 8.5)
+        w_tdk = rl_pdfmetrics.stringWidth("tidak ada*", "Lib", 8.5)
+        c.drawString(rx, Y(ry), f"Ada / tidak ada* {suffix_lbl}")
+        c.setLineWidth(0.9)
+        if has_it:
+            c.line(rx + w_ada + w_sl, Y(ry - 2.5), rx + w_ada + w_sl + w_tdk, Y(ry - 2.5))
+        else:
+            c.line(rx, Y(ry - 2.5), rx + w_ada, Y(ry - 2.5))
+
+        dy_off = ry + 13.0
+        for dl in d_lines:
+            c.drawString(rx, Y(dy_off), dl)
+            dy_off += 11.5
+        for tk in extra_t:
+            c.drawString(rx + 6.0, Y(dy_off), f"- {tk}")
+            dy_off += 11.5
+
+        cur_y += rh
+
+    c.setLineWidth(0.75)
+    c.rect(L, Y(cur_y), R - L, cur_y - s3_top)
+    c.line(s3_mid, Y(s3_top + 20.0), s3_mid, Y(cur_y))
+    c.setFont("Lib", 8.2)
+    c.drawString(L + 6.0, Y(cur_y + 12.0), "*Coret yang tidak perlu")
+    cur_y += 24.0
+
+    # ================= FINAL PAGE: Konfirmasi & Penyusun / Validator =================
+    penyusun_list = data.get("penyusun_list") or []
+    validators_list = data.get("validators_list") or []
+    p_rows = []
+    if penyusun_list:
+        for idx, item in enumerate(penyusun_list, 1):
+            p_rows.append(("PENYUSUN", str(idx), str(item.get("name") or ""), str(item.get("no_met") or ""), item.get("signature"), str(data.get("tanggal") or "")))
+    else:
+        p_rows.append(("PENYUSUN", "1", str(data.get("asesor_nama") or ""), str(data.get("asesor_met") or ""), data.get("signature_asesor"), str(data.get("tanggal") or "")))
+
+    v_rows = []
+    if validators_list:
+        for idx, item in enumerate(validators_list, 1):
+            v_rows.append(("VALIDATOR", str(idx), str(item.get("name") or ""), str(item.get("no_met") or ""), item.get("signature"), str(data.get("tanggal") or "")))
+    else:
+        v_rows.append(("VALIDATOR", "1", "", "", None, ""))
+
+    pv_rows = p_rows + v_rows
+    pv_rh = 36.0
+    needed_final_h = 122.0 + 39.0 + len(pv_rows) * pv_rh + 20.0
+    if cur_y + needed_final_h > Y_MAX:
+        new_page()
+
+    # Konfirmasi Table
+    kc1, kc2 = L + 255.0, L + 375.0
+    k_top = cur_y
+    k_hdr_bot = k_top + 26.0
+    k_rows = [
+        ("Manajer sertifikasi LSP", "", ""),
+        ("Master Asesor / Master Trainer / Lead Asesor Kompetensi", "", ""),
+        ("Manajer Pelatihan Lembaga Training terakreditasi / Lembaga Training terdaftar", "", ""),
+        ("Manajer atau supervisor ditempat kerja", "", ""),
+    ]
+    k_rh = 24.0
+    k_bot = k_hdr_bot + len(k_rows) * k_rh
+    c.setLineWidth(0.75)
+    c.rect(L, Y(k_bot), R - L, k_bot - k_top)
+    c.line(L, Y(k_hdr_bot), R, Y(k_hdr_bot))
+    c.line(kc1, Y(k_top), kc1, Y(k_bot))
+    c.line(kc2, Y(k_top), kc2, Y(k_bot))
+    c.setFont("Lib-B", 8.8)
+    c.drawCentredString((L + kc1) / 2.0, Y(k_top + 16.0), "Orang yang relevan")
+    c.drawCentredString((kc1 + kc2) / 2.0, Y(k_top + 16.0), "Nama")
+    c.drawCentredString((kc2 + R) / 2.0, Y(k_top + 11.0), "Tandatangan dan")
+    c.drawCentredString((kc2 + R) / 2.0, Y(k_top + 21.0), "Tanggal")
+    c.setFont("Lib", 8.4)
+    for idx, (lbl, nm, dt) in enumerate(k_rows):
+        rt = k_hdr_bot + idx * k_rh
+        if idx > 0:
+            c.setLineWidth(0.5)
+            c.line(L, Y(rt), R, Y(rt))
+        lbl_l = wrap_w(lbl, "Lib", 8.3, (kc1 - L) - 10.0)
+        for li, ll in enumerate(lbl_l):
+            c.drawString(L + 6.0, Y(rt + 10.5 + li * 10.0), ll)
+
+    cur_y = k_bot + 16.0
+
+    # PENYUSUN DAN VALIDATOR
+    c.setFont("Lib-B", 9.0)
+    c.drawString(L, Y(cur_y + 10.0), "PENYUSUN DAN VALIDATOR")
+    pv_top = cur_y + 15.0
+    pv_hdr_bot = pv_top + 24.0
+    pc1, pc2, pc3, pc4 = L + 72.0, L + 98.0, L + 295.0, L + 392.0
+    pv_bot = pv_hdr_bot + len(pv_rows) * pv_rh
+    c.setLineWidth(0.75)
+    c.rect(L, Y(pv_bot), R - L, pv_bot - pv_top)
+    c.line(L, Y(pv_hdr_bot), R, Y(pv_hdr_bot))
+    for px in (pc1, pc2, pc3, pc4):
+        c.line(px, Y(pv_top), px, Y(pv_bot))
+    c.setFont("Lib-B", 8.4)
+    c.drawCentredString((L + pc1) / 2.0, Y(pv_top + 15.0), "STATUS")
+    c.drawCentredString((pc1 + pc2) / 2.0, Y(pv_top + 15.0), "NO")
+    c.drawCentredString((pc2 + pc3) / 2.0, Y(pv_top + 15.0), "NAMA")
+    c.drawCentredString((pc3 + pc4) / 2.0, Y(pv_top + 15.0), "NOMOR MET")
+    c.drawCentredString((pc4 + R) / 2.0, Y(pv_top + 10.0), "TANDA TANGAN")
+    c.drawCentredString((pc4 + R) / 2.0, Y(pv_top + 20.0), "DAN TANGGAL")
+
+    for idx, (st_lbl, no_lbl, nm, met, sig, dt) in enumerate(pv_rows):
+        rt = pv_hdr_bot + idx * pv_rh
+        if idx > 0:
+            prev_st = pv_rows[idx - 1][0]
+            if st_lbl != prev_st:
+                c.setLineWidth(0.75)
+                c.line(L, Y(rt), R, Y(rt))
+            else:
+                c.setLineWidth(0.5)
+                c.line(pc1, Y(rt), R, Y(rt))
+        c.setFont("Lib", 8.5)
+        c.drawCentredString((pc1 + pc2) / 2.0, Y(rt + 21.0), no_lbl)
+        c.drawString(pc2 + 6.0, Y(rt + 21.0), nm)
+        c.drawCentredString((pc3 + pc4) / 2.0, Y(rt + 21.0), met)
+        if sig:
+            draw_sig(c, sig, pc4 + 16.0, rt + 24.0, w=70.0, h=20.0)
+        if dt:
+            c.setFont("Lib", 7.8)
+            c.drawCentredString((pc4 + R) / 2.0, Y(rt + 32.0), dt)
+
+    c.setFont("Lib-B", 8.5)
+    p_count = len(p_rows)
+    v_count = len(v_rows)
+    c.drawCentredString((L + pc1) / 2.0, Y(pv_hdr_bot + (p_count * pv_rh) / 2.0 + 3.0), "PENYUSUN")
+    c.drawCentredString((L + pc1) / 2.0, Y(pv_hdr_bot + (p_count * pv_rh) + (v_count * pv_rh) / 2.0 + 3.0), "VALIDATOR")
+
+    draw_pnum(c, pnum)
+    c.showPage()
+    c.save()
+    print(f"OK -> Berhasil generate FR.MAPA.01 Dinamis ({pnum} Halaman): {dest_path}")
+
+
 def render_mapa_overlay(master_pdf_path, data, dest_path):
-    """Overlay assessor's MAPA data onto official clean master template without watermarks."""
+    """Overlay assessor's MAPA data onto official clean master template, or generate dynamically when units exist."""
+    if isinstance(data.get("units"), list) and len(data["units"]) > 0 and not os.path.isfile(master_pdf_path):
+        render_mapa_dynamic(data, dest_path)
+        return
     if not os.path.isfile(master_pdf_path):
-        raise FileNotFoundError(f"Master PDF not found: {master_pdf_path}")
+        render_mapa_dynamic(data, dest_path)
+        return
 
     doc = fitz.open(master_pdf_path)
 

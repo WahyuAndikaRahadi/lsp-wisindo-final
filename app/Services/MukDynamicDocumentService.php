@@ -1037,6 +1037,7 @@ class MukDynamicDocumentService
         $mapaData = $assessment?->mapa01_data ?? $schedule->mapa01_data ?? [];
         $ak01Data = $assessment?->ak01_data ?? $schedule->ak01_data ?? [];
         $scheme = $assessment?->scheme ?? $schedule->scheme;
+        $scheme?->loadMissing(['competencyUnits', 'penyusun', 'validators']);
         $assessor = $assessment?->assessor ?? $schedule->assessors->first();
         $assessorProfile = $assessor?->profile;
 
@@ -1049,26 +1050,29 @@ class MukDynamicDocumentService
 
         $tukType = $ak01Data['tuk_type'] ?? ($schedule->tuk_type ?? 'Sewaktu');
         $selectedInstruments = $ak01Data['selected_instruments'] ?? $schedule->selected_instruments ?? $schedule->getEffectiveInstruments();
+        $hasExplicitEvidence = ! empty($ak01Data['evidence']);
         $evidence = $ak01Data['evidence'] ?? [
             'Hasil Observasi Langsung',
             'Hasil Pertanyaan Tertulis',
         ];
         $evidenceTypes = $ak01Data['evidence_types'] ?? [];
 
-        $hasPortofolio = in_array('Hasil Verifikasi Portofolio', $evidence, true) || in_array('IA08', $selectedInstruments, true);
-        $hasWawancara = in_array('Hasil Pertanyaan Wawancara', $evidence, true) || in_array('IA09', $selectedInstruments, true) || in_array('IA07', $selectedInstruments, true);
-        $hasObservasi = in_array('Hasil Observasi Langsung', $evidence, true) || in_array('IA01', $selectedInstruments, true);
-        $hasTertulis = in_array('Hasil Pertanyaan Tertulis', $evidence, true) || in_array('IA05', $selectedInstruments, true) || in_array('IA06', $selectedInstruments, true);
-        $hasLisan = in_array('Hasil Pertanyaan Lisan', $evidence, true) || in_array('IA03', $selectedInstruments, true);
-        $hasTerstruktur = in_array('Hasil Kegiatan Terstruktur', $evidence, true) || in_array('IA02', $selectedInstruments, true);
+        $hasPortofolio = in_array('Hasil Verifikasi Portofolio', $evidence, true) || (! $hasExplicitEvidence && in_array('IA08', $selectedInstruments, true));
+        $hasWawancara = in_array('Hasil Pertanyaan Wawancara', $evidence, true) || (! $hasExplicitEvidence && (in_array('IA09', $selectedInstruments, true) || in_array('IA07', $selectedInstruments, true)));
+        $hasObservasi = in_array('Hasil Observasi Langsung', $evidence, true) || (! $hasExplicitEvidence && in_array('IA01', $selectedInstruments, true));
+        $hasTertulis = in_array('Hasil Pertanyaan Tertulis', $evidence, true) || (! $hasExplicitEvidence && (in_array('IA05', $selectedInstruments, true) || in_array('IA06', $selectedInstruments, true)));
+        $hasLisan = in_array('Hasil Pertanyaan Lisan', $evidence, true) || (! $hasExplicitEvidence && in_array('IA03', $selectedInstruments, true));
+        $hasTerstruktur = in_array('Hasil Kegiatan Terstruktur', $evidence, true) || (! $hasExplicitEvidence && in_array('IA02', $selectedInstruments, true));
+        $hasReviuProduk = in_array('Hasil Reviu Produk', $evidence, true);
+        $hasPihakKetiga = in_array('Verifikasi Pihak Ketiga', $evidence, true);
 
         // Derive evidence types if empty
         if (empty($evidenceTypes)) {
             $derivedTypes = [];
-            if ($hasObservasi || $hasTerstruktur) {
+            if ($hasObservasi || $hasTerstruktur || $hasReviuProduk) {
                 $derivedTypes[] = 'L';
             }
-            if ($hasPortofolio) {
+            if ($hasPortofolio || $hasPihakKetiga) {
                 $derivedTypes[] = 'TL';
             }
             if ($hasTertulis || $hasLisan || $hasWawancara) {
@@ -1096,6 +1100,12 @@ class MukDynamicDocumentService
         }
         if ($hasPortofolio) {
             $metodeCodes[] = 'CVP';
+        }
+        if ($hasReviuProduk) {
+            $metodeCodes[] = 'CRP';
+        }
+        if ($hasPihakKetiga) {
+            $metodeCodes[] = 'VPK';
         }
         if (empty($metodeCodes)) {
             $metodeCodes = ['CL', 'DPT'];
@@ -1138,6 +1148,12 @@ class MukDynamicDocumentService
         if ($hasWawancara) {
             $summaryParts[] = 'PW (Pertanyaan Wawancara) [T]';
         }
+        if ($hasReviuProduk) {
+            $summaryParts[] = 'CRP (Ceklis Reviu Produk) [L]';
+        }
+        if ($hasPihakKetiga) {
+            $summaryParts[] = 'VPK (Verifikasi Pihak Ketiga) [TL]';
+        }
         if (empty($summaryParts)) {
             $summaryParts = ['CL (Ceklis Observasi) [L]', 'DPT (Daftar Pertanyaan Tertulis) [T]'];
         }
@@ -1146,26 +1162,42 @@ class MukDynamicDocumentService
         // Konteks lingkungan default based on tuk_type
         $konteksLingkungan = $mapaData['konteks_lingkungan'] ?? ($tukType === 'Tempat Kerja' ? 'Tempat kerja nyata' : 'Tempat kerja simulasi');
 
+        $unitsPayload = [];
+        $standarRef = 'SKKNI No.125 Tahun 2024';
+        if ($scheme) {
+            $standarRef = $scheme->competencyUnits->first()?->standard_reference ?? $standarRef;
+            foreach ($scheme->competencyUnits as $u) {
+                $unitsPayload[] = [
+                    'code' => $u->code,
+                    'title' => $u->title,
+                ];
+            }
+        }
+
         return [
             'skema_nama' => $scheme?->name ?? '',
             'skema_nomor' => $scheme?->code ?? '',
+            'asesi_nama' => $assessment?->asesi?->full_name ?? '',
             'asesor_nama' => $assessor?->full_name ?? '',
             'asesor_met' => $noMet,
             'signature_asesor' => $sigAsesor,
             'tanggal' => $tglStr,
             'tuk_nama' => $schedule->tuk_name ?? '',
             'tuk_type' => $tukType,
+            'units' => $unitsPayload,
+            'penyusun_list' => $scheme?->penyusun_list ?? [],
+            'validators_list' => $scheme?->validator_list ?? [],
             'pendekatan_asesi' => $mapaData['pendekatan_asesi'] ?? 'Hasil pelatihan dan / atau pendidikan, dimana Kurikulum dan fasilitas praktek mampu telusur terhadap standar kompetensi',
             'tujuan_asesmen' => $mapaData['tujuan_asesmen'] ?? 'Sertifikasi',
             'konteks_lingkungan' => $konteksLingkungan,
             'peluang_bukti' => $mapaData['peluang_bukti'] ?? 'Tersedia',
             'hubungan_standar' => $mapaData['hubungan_standar'] ?? 'Bukti untuk mendukung asesmen',
-            'pelaksana_asesmen' => $mapaData['pelaksana_asesmen'] ?? 'Lembaga Sertifikasi LSP Praktisi Otomotif Indonesia',
+            'pelaksana_asesmen' => $mapaData['pelaksana_asesmen'] ?? 'Lembaga Sertifikasi Profesi Wisata Indonesia',
             'orang_relevan' => $mapaData['orang_relevan'] ?? ['Manajer sertifikasi', 'Master Asesor / Master Trainer / Lead Asesor Kompetensi'],
             'standar_industri' => $mapaData['standar_industri'] ?? [
-                'standar_kompetensi' => ['checked' => true, 'text' => 'SKKNI Nomor 97 Tahun 2018'],
+                'standar_kompetensi' => ['checked' => true, 'text' => $standarRef],
                 'kurikulum_pelatihan' => ['checked' => false, 'text' => ''],
-                'spesifikasi_kinerja' => ['checked' => true, 'text' => 'Repair Manual'],
+                'spesifikasi_kinerja' => ['checked' => false, 'text' => ''],
                 'spesifikasi_produk' => ['checked' => false, 'text' => ''],
                 'pedoman_khusus' => ['checked' => false, 'text' => ''],
             ],
@@ -1178,15 +1210,9 @@ class MukDynamicDocumentService
             'saran_detail' => $mapaData['saran_detail'] ?? '',
             'has_penyesuaian' => (bool) ($mapaData['has_penyesuaian'] ?? false),
             'penyesuaian_detail' => $mapaData['penyesuaian_detail'] ?? '',
-            'has_terintegrasi' => isset($mapaData['has_terintegrasi']) ? (bool) $mapaData['has_terintegrasi'] : true,
+            'has_terintegrasi' => isset($mapaData['has_terintegrasi']) ? (bool) $mapaData['has_terintegrasi'] : false,
             'terintegrasi_detail' => $mapaData['terintegrasi_detail'] ?? '',
-            'integrated_tasks' => $mapaData['integrated_tasks'] ?? [
-                'Melaksanakan Keselamatan dan Kesehatan Kerja',
-                'Menggunakan Peralatan dan Perlengkapan Tempat Kerja',
-                'Membaca Gambar Teknik',
-                'Menggunakan Alat Ukur',
-                'Melaksanakan Diagnosis',
-            ],
+            'integrated_tasks' => $mapaData['integrated_tasks'] ?? [],
             'evidence' => $evidence,
             'evidence_types' => $evidenceTypes,
             'selected_instruments' => $selectedInstruments,
